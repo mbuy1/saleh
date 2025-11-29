@@ -48,6 +48,16 @@ class AuthService {
         'display_name': displayName,
       });
 
+      // 3. إنشاء wallet_account للمستخدم الجديد
+      await supabaseClient.from('wallet_accounts').insert({
+        'user_id': user.id,
+        'account_type': 'customer',
+        'balance': 0,
+      });
+
+      // ملاحظة: points_accounts يتم إنشاؤه فقط عند تحويل المستخدم إلى تاجر (role = 'merchant')
+      // النقاط هي "رصيد خدمات" للتاجر فقط، وليست للعميل
+
       return user;
     } catch (e) {
       throw Exception('خطأ في التسجيل: ${e.toString()}');

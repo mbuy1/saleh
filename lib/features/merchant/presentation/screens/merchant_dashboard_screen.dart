@@ -10,6 +10,8 @@ import '../../../../core/app_config.dart';
 import 'merchant_store_setup_screen.dart';
 import 'merchant_products_screen.dart';
 import 'merchant_orders_screen.dart';
+import 'merchant_wallet_screen.dart';
+import 'merchant_points_screen.dart';
 
 class MerchantDashboardScreen extends StatelessWidget {
   final AppModeProvider appModeProvider;
@@ -86,6 +88,36 @@ class MerchantDashboardScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const MerchantOrdersScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildMenuCard(
+            context,
+            icon: Icons.account_balance_wallet,
+            title: 'محفظة التاجر',
+            subtitle: 'عرض رصيدك وعملياتك',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MerchantWalletScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildMenuCard(
+            context,
+            icon: Icons.stars,
+            title: 'نقاط التاجر',
+            subtitle: 'استخدم نقاطك لتفعيل المميزات',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MerchantPointsScreen(),
                 ),
               );
             },

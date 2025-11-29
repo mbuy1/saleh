@@ -13,6 +13,9 @@ import 'stores_screen.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'map_screen.dart';
+import 'customer_wallet_screen.dart';
+import 'customer_points_screen.dart';
+import 'customer_orders_screen.dart';
 
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -60,7 +63,94 @@ class _CustomerShellState extends State<CustomerShell> {
                 ),
               ],
             )
-          : null, // لا AppBar للعميل العادي
+          : AppBar(
+              title: const Text('Saleh'),
+              automaticallyImplyLeading: false,
+            ),
+      drawer: widget.userRole == 'customer'
+          ? Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  const DrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Saleh',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'تطبيق التسوق',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.shopping_bag),
+                    title: const Text('طلباتي'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomerOrdersScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.account_balance_wallet),
+                    title: const Text('محفظتي'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomerWalletScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.stars),
+                    title: const Text('نقاطي'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CustomerPointsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('الإعدادات'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: إضافة شاشة الإعدادات
+                    },
+                  ),
+                ],
+              ),
+            )
+          : null,
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
