@@ -17,6 +17,7 @@
 /// - عرض صور المتاجر من Cloudflare على الخريطة
 
 import 'package:flutter/material.dart';
+import 'customer_orders_screen.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -78,6 +79,19 @@ class MapScreen extends StatelessWidget {
                         );
                       },
                       tooltip: 'المفضلة',
+                    ),
+                    // زر طلباتي
+                    IconButton(
+                      icon: const Icon(Icons.receipt_long),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CustomerOrdersScreen(),
+                          ),
+                        );
+                      },
+                      tooltip: 'طلباتي',
                     ),
                   ],
                 ),

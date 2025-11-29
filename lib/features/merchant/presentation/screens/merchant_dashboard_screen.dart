@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import 'merchant_store_setup_screen.dart';
 import 'merchant_products_screen.dart';
+import 'merchant_orders_screen.dart';
 
 class MerchantDashboardScreen extends StatelessWidget {
   final AppModeProvider appModeProvider;
@@ -70,6 +71,21 @@ class MerchantDashboardScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const MerchantProductsScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildMenuCard(
+            context,
+            icon: Icons.receipt_long,
+            title: 'الطلبات',
+            subtitle: 'عرض طلبات متجرك',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MerchantOrdersScreen(),
                 ),
               );
             },

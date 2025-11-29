@@ -16,9 +16,12 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../data/cart_service.dart';
 
 class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({super.key});
+  final String? userRole; // 'customer' أو 'merchant'
+
+  const ExploreScreen({super.key, this.userRole});
 
   @override
   Widget build(BuildContext context) {
@@ -70,13 +73,15 @@ class ExploreScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const _ExploreScreenContent(),
+      body: _ExploreScreenContent(userRole: userRole),
     );
   }
 }
 
 class _ExploreScreenContent extends StatefulWidget {
-  const _ExploreScreenContent();
+  final String? userRole;
+
+  const _ExploreScreenContent({this.userRole});
 
   @override
   State<_ExploreScreenContent> createState() => _ExploreScreenContentState();
@@ -175,7 +180,7 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
       itemBuilder: (context, index) {
         final product = _products[index];
         final store = _storesMap[product['store_id']];
-        return _buildExploreItem(context, product, store);
+        return _buildExploreItem(context, product, store, widget.userRole);
       },
     );
   }
@@ -184,6 +189,7 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
     BuildContext context,
     Map<String, dynamic> product,
     Map<String, dynamic>? store,
+    String? userRole,
   ) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -259,19 +265,36 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                 ),
                 const SizedBox(height: 12),
                 // أزرار
+                // ملاحظة: زر "شراء الآن" يعمل فقط للعميل (role == 'customer')
+                // التاجر في وضع Viewer Mode: لا يمكنه الشراء أو إضافة للسلة
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: إضافة منطق "شراء الآن"
-                          // - إضافة المنتج إلى السلة (carts و cart_items)
-                          // - تتبع الحدث في Firebase Analytics (add_to_cart)
-                          // - الانتقال إلى شاشة تفاصيل المنتج أو السلة
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('شراء الآن')),
-                          );
-                        },
+                        onPressed: userRole == 'customer' && product['id'] != null
+                            ? () async {
+                                try {
+                                  await CartService.addToCart(product['id']);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('تم إضافة المنتج إلى السلة'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('خطأ: ${e.toString()}'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            : null, // معطل للتاجر (Viewer Mode)
                         icon: const Icon(Icons.shopping_bag),
                         label: const Text('شراء الآن'),
                       ),

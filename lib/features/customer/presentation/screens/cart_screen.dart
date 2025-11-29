@@ -1,12 +1,6 @@
 /// شاشة Cart
 /// 
-/// عرض السلة مع عناصر وهمية
-/// 
-/// TODO: ربط هذه الشاشة بجداول Supabase:
-/// - carts: جلب سلة المستخدم الحالي
-/// - cart_items: جلب عناصر السلة مع معلومات المنتجات
-/// - products: جلب تفاصيل المنتجات (الاسم، السعر، الصورة)
-/// - product_media: جلب صور المنتجات من Cloudflare
+/// عرض السلة مع عناصر حقيقية من Supabase
 /// 
 /// TODO: ربط بوابات الدفع:
 /// - Tap Payment Gateway
@@ -15,42 +9,256 @@
 /// - معالجة حالات الدفع (نجح، فشل، معلق)
 
 import 'package:flutter/material.dart';
+import '../../data/cart_service.dart';
+import '../../data/order_service.dart';
+import '../../../../core/permissions_helper.dart';
 
-class CartScreen extends StatelessWidget {
-  const CartScreen({super.key});
+class CartScreen extends StatefulWidget {
+  final String? userRole; // 'customer' أو 'merchant'
+
+  const CartScreen({super.key, this.userRole});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  List<Map<String, dynamic>> _cartItems = [];
+  double _total = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCart();
+  }
+
+  Future<void> _loadCart() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // التحقق من الصلاحيات: فقط customer يمكنه رؤية السلة
+      final canAdd = await PermissionsHelper.canAddToCart();
+      if (!canAdd) {
+        // إذا كان merchant، لا نحاول جلب السلة
+        setState(() {
+          _cartItems = [];
+          _total = 0;
+        });
+        return;
+      }
+
+      final items = await CartService.getCartItems();
+      final total = await CartService.getCartTotal();
+
+      setState(() {
+        _cartItems = items;
+        _total = total;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في جلب السلة: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _updateQuantity(String cartItemId, int newQuantity) async {
+    // التحقق من الصلاحيات
+    final canAdd = await PermissionsHelper.canAddToCart();
+    if (!canAdd) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('غير مسموح: التاجر لا يمكنه تعديل السلة'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      await CartService.updateCartItemQuantity(cartItemId, newQuantity);
+      _loadCart(); // إعادة تحميل السلة
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في تحديث الكمية: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _removeItem(String cartItemId) async {
+    // التحقق من الصلاحيات
+    final canAdd = await PermissionsHelper.canAddToCart();
+    if (!canAdd) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('غير مسموح: التاجر لا يمكنه حذف من السلة'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      await CartService.removeFromCart(cartItemId);
+      _loadCart(); // إعادة تحميل السلة
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم حذف العنصر من السلة'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في حذف العنصر: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _completeOrder() async {
+    // التحقق من الصلاحيات
+    final canCreate = await PermissionsHelper.canCreateOrder();
+    if (!canCreate) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('غير مسموح: التاجر لا يمكنه إنشاء طلبات كعميل'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (_cartItems.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('السلة فارغة'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // إنشاء طلب من السلة
+      final orderId = await OrderService.createOrderFromCart();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('تم إنشاء الطلب بنجاح! رقم الطلب: $orderId'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // إعادة تحميل السلة (ستكون فارغة الآن)
+        _loadCart();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في إتمام الطلب: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // عناصر وهمية
-    final cartItems = List.generate(3, (index) => index + 1);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('السلة'),
       ),
-      body: cartItems.isEmpty
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text(
-                    'السلة فارغة',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : widget.userRole == 'merchant'
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.remove_shopping_cart, size: 64, color: Colors.orange),
+                      SizedBox(height: 16),
+                      Text(
+                        'وضع التصفح فقط',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'التاجر لا يمكنه استخدام سلة العميل',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                )
+              : _cartItems.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text(
+                            'السلة فارغة',
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    )
           : Column(
               children: [
                 // قائمة العناصر
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(8),
-                    itemCount: cartItems.length,
+                    itemCount: _cartItems.length,
                     itemBuilder: (context, index) {
-                      return _buildCartItem(context, cartItems[index]);
+                      return _buildCartItem(context, _cartItems[index]);
                     },
                   ),
                 ),
@@ -81,7 +289,7 @@ class CartScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${cartItems.length * 50} ر.س',
+                            '${_total.toStringAsFixed(2)} ر.س',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -94,24 +302,17 @@ class CartScreen extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: إضافة منطق إتمام الطلب
-                            // 1. التحقق من صحة بيانات السلة
-                            // 2. إنشاء طلب جديد في جدول orders
-                            // 3. فتح بوابة الدفع (Tap/HyperPay)
-                            // 4. معالجة استجابة الدفع
-                            // 5. تحديث حالة الطلب في orders
-                            // 6. إرسال إشعار FCM للمستخدم والتاجر
-                            // 7. تتبع الحدث في Firebase Analytics (place_order)
-                            // 8. تفريغ السلة (carts و cart_items)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('إتمام الطلب')),
-                            );
-                          },
+                          onPressed: _isLoading ? null : _completeOrder,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: const Text('إتمام الطلب'),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('إتمام الطلب'),
                         ),
                       ),
                     ],
@@ -122,7 +323,15 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, int itemIndex) {
+  Widget _buildCartItem(BuildContext context, Map<String, dynamic> item) {
+    final product = item['products'] as Map<String, dynamic>?;
+    final cartItemId = item['id'] as String;
+    final quantity = (item['quantity'] as num?)?.toInt() ?? 1;
+    final productName = product?['name'] ?? 'بدون اسم';
+    final productPrice = (product?['price'] as num?)?.toDouble() ?? 0;
+    final totalPrice = productPrice * quantity;
+    final isCustomer = widget.userRole == 'customer';
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
@@ -135,32 +344,34 @@ class CartScreen extends StatelessWidget {
           ),
           child: const Icon(Icons.image, color: Colors.grey),
         ),
-        title: Text('منتج $itemIndex'),
-        subtitle: Text('${itemIndex * 50} ر.س'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.remove_circle_outline),
-              onPressed: () {
-                // TODO: تقليل الكمية
-              },
-            ),
-            const Text('1'),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () {
-                // TODO: زيادة الكمية
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: () {
-                // TODO: حذف العنصر
-              },
-            ),
-          ],
-        ),
+        title: Text(productName),
+        subtitle: Text('${productPrice.toStringAsFixed(2)} ر.س × $quantity = ${totalPrice.toStringAsFixed(2)} ر.س'),
+        trailing: isCustomer
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: () {
+                      _updateQuantity(cartItemId, quantity - 1);
+                    },
+                  ),
+                  Text('$quantity'),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: () {
+                      _updateQuantity(cartItemId, quantity + 1);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _removeItem(cartItemId);
+                    },
+                  ),
+                ],
+              )
+            : null, // لا تظهر أزرار التعديل للتاجر
       ),
     );
   }

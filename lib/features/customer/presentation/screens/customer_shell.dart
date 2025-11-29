@@ -31,13 +31,13 @@ class CustomerShell extends StatefulWidget {
 class _CustomerShellState extends State<CustomerShell> {
   int _currentIndex = 2; // Home هو الافتراضي (في المنتصف)
 
-  final List<Widget> _screens = [
-    const ExploreScreen(),
-    const StoresScreen(),
-    const HomeScreen(),
-    const CartScreen(),
-    const MapScreen(),
-  ];
+  List<Widget> get _screens => [
+        ExploreScreen(userRole: widget.userRole),
+        const StoresScreen(),
+        HomeScreen(userRole: widget.userRole),
+        CartScreen(userRole: widget.userRole),
+        const MapScreen(),
+      ];
 
   @override
   Widget build(BuildContext context) {

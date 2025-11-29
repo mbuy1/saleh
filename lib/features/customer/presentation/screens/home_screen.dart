@@ -7,9 +7,12 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../data/cart_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? userRole; // 'customer' أو 'merchant'
+
+  const HomeScreen({super.key, this.userRole});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -85,13 +88,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   itemCount: _products.length,
                   itemBuilder: (context, index) {
-                    return _buildHomeItem(context, _products[index]);
+                    return _buildHomeItem(context, _products[index], widget.userRole);
                   },
                 ),
     );
   }
 
-  Widget _buildHomeItem(BuildContext context, Map<String, dynamic> product) {
+  Widget _buildHomeItem(
+    BuildContext context,
+    Map<String, dynamic> product,
+    String? userRole,
+  ) {
+    final isCustomer = userRole == 'customer';
+    final productId = product['id'] as String?;
+
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -147,6 +157,44 @@ class _HomeScreenState extends State<HomeScreen> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+                // زر "إضافة إلى السلة" - للعميل فقط
+                if (isCustomer && productId != null) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        if (!mounted) return;
+                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+                        try {
+                          await CartService.addToCart(productId);
+                          if (mounted) {
+                            scaffoldMessenger.showSnackBar(
+                              const SnackBar(
+                                content: Text('تم إضافة المنتج إلى السلة'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            scaffoldMessenger.showSnackBar(
+                              SnackBar(
+                                content: Text('خطأ: ${e.toString()}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.shopping_cart, size: 18),
+                      label: const Text('إضافة إلى السلة'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
