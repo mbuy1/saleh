@@ -25,14 +25,23 @@ Future<void> main() async {
   }
   
   // تهيئة Supabase
-  await initSupabase();
+  try {
+    await initSupabase();
+  } catch (e) {
+    // إذا فشل تهيئة Supabase، نتابع بدونها (للتطوير فقط)
+    // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase
+    debugPrint('⚠️ خطأ في تهيئة Supabase: $e');
+  }
   
   // تهيئة Cloudflare Images Service
   try {
     await CloudflareImagesService.initialize();
+    debugPrint('✅ تم تهيئة Cloudflare Images بنجاح');
   } catch (e) {
     // إذا فشل تهيئة Cloudflare، نتابع بدونها
     // (مفيد في حالة عدم وجود ملفات الإعداد)
+    debugPrint('⚠️ تحذير: فشل تهيئة Cloudflare Images: $e');
+    debugPrint('   التطبيق سيعمل لكن رفع الصور لن يكون متاحاً');
   }
   
   runApp(const MyApp());
