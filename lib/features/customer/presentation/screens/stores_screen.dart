@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
 
@@ -20,10 +19,6 @@ class _StoresScreenState extends State<StoresScreen> {
   void initState() {
     super.initState();
     _loadStores();
-    // تتبع عرض شاشة المتاجر
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseService.logScreenView('stores_screen');
-    });
   }
 
   Future<void> _loadStores() async {
@@ -42,13 +37,15 @@ class _StoresScreenState extends State<StoresScreen> {
           .order('created_at', ascending: false);
 
       // تحويل إلى List وترتيبها
-      List<Map<String, dynamic>> stores = List<Map<String, dynamic>>.from(response);
-      
+      List<Map<String, dynamic>> stores = List<Map<String, dynamic>>.from(
+        response,
+      );
+
       // ترتيب المتاجر: المدعومة أولاً
       stores.sort((a, b) {
         final aBoosted = a['boosted_until'] as String?;
         final bBoosted = b['boosted_until'] as String?;
-        
+
         // إذا كان a مدعوم و b غير مدعوم
         if (aBoosted != null && bBoosted == null) {
           try {
@@ -60,7 +57,7 @@ class _StoresScreenState extends State<StoresScreen> {
             // خطأ في parsing التاريخ
           }
         }
-        
+
         // إذا كان b مدعوم و a غير مدعوم
         if (bBoosted != null && aBoosted == null) {
           try {
@@ -72,7 +69,7 @@ class _StoresScreenState extends State<StoresScreen> {
             // خطأ في parsing التاريخ
           }
         }
-        
+
         // إذا كان كلاهما مدعوم أو غير مدعوم، نرتب حسب boosted_until ثم created_at
         if (aBoosted != null && bBoosted != null) {
           try {
@@ -80,7 +77,7 @@ class _StoresScreenState extends State<StoresScreen> {
             final bDate = DateTime.parse(bBoosted);
             final aActive = aDate.isAfter(DateTime.now());
             final bActive = bDate.isAfter(DateTime.now());
-            
+
             if (aActive && bActive) {
               // كلاهما مدعوم، نرتب حسب boosted_until (الأحدث أولاً)
               return bDate.compareTo(aDate);
@@ -93,7 +90,7 @@ class _StoresScreenState extends State<StoresScreen> {
             // خطأ في parsing التاريخ
           }
         }
-        
+
         // إذا لم يكن هناك دعم، نرتب حسب created_at
         final aCreated = a['created_at'] as String?;
         final bCreated = b['created_at'] as String?;
@@ -104,7 +101,7 @@ class _StoresScreenState extends State<StoresScreen> {
             // خطأ في parsing التاريخ
           }
         }
-        
+
         return 0;
       });
 
@@ -136,32 +133,29 @@ class _StoresScreenState extends State<StoresScreen> {
       appBar: AppBar(
         title: const Text(
           'المتاجر',
-          style: TextStyle(
-            color: MbuyColors.textPrimary,
-            fontFamily: 'Arabic',
-          ),
+          style: TextStyle(color: MbuyColors.textPrimary, fontFamily: 'Arabic'),
         ),
       ),
       body: _isLoading
           ? const Center(child: MbuyLoader())
           : _stores.isEmpty
-              ? Center(
-                  child: Text(
-                    'لا توجد متاجر متاحة',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: MbuyColors.textSecondary,
-                      fontFamily: 'Arabic',
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _stores.length,
-                  itemBuilder: (context, index) {
-                    return _buildStoreCard(_stores[index]);
-                  },
+          ? Center(
+              child: Text(
+                'لا توجد متاجر متاحة',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: MbuyColors.textSecondary,
+                  fontFamily: 'Arabic',
                 ),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _stores.length,
+              itemBuilder: (context, index) {
+                return _buildStoreCard(_stores[index]);
+              },
+            ),
     );
   }
 
@@ -169,7 +163,7 @@ class _StoresScreenState extends State<StoresScreen> {
     // التحقق من أن المتجر مدعوم حالياً
     final boostedUntil = store['boosted_until'] as String?;
     bool isBoosted = false;
-    
+
     if (boostedUntil != null) {
       try {
         final boostedDate = DateTime.parse(boostedUntil);
@@ -190,10 +184,7 @@ class _StoresScreenState extends State<StoresScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: isBoosted
-            ? BorderSide(
-                width: 2,
-                color: MbuyColors.primaryBlue,
-              )
+            ? BorderSide(width: 2, color: MbuyColors.primaryBlue)
             : BorderSide.none,
       ),
       child: ListTile(
@@ -208,7 +199,9 @@ class _StoresScreenState extends State<StoresScreen> {
                 : MbuyColors.surface,
             child: Icon(
               Icons.store,
-              color: isBoosted ? MbuyColors.primaryBlue : MbuyColors.textSecondary,
+              color: isBoosted
+                  ? MbuyColors.primaryBlue
+                  : MbuyColors.textSecondary,
               size: 28,
             ),
           ),
@@ -236,11 +229,7 @@ class _StoresScreenState extends State<StoresScreen> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.rocket_launch,
-                      color: Colors.white,
-                      size: 12,
-                    ),
+                    Icon(Icons.rocket_launch, color: Colors.white, size: 12),
                     SizedBox(width: 4),
                     Text(
                       'مدعوم',
@@ -311,19 +300,9 @@ class _StoresScreenState extends State<StoresScreen> {
           color: MbuyColors.textSecondary,
         ),
         onTap: () {
-          // تتبع عرض متجر
-          final storeId = store['id'] as String?;
-          final storeName = store['name'] as String?;
-          if (storeId != null) {
-            FirebaseService.logViewStore(
-              storeId: storeId,
-              storeName: storeName,
-            );
-          }
           // TODO: الانتقال إلى صفحة المتجر
         },
       ),
     );
   }
 }
-

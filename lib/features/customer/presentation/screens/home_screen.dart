@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
-import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../data/cart_service.dart';
 
@@ -21,10 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadProducts();
-    // تتبع عرض شاشة Home
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseService.logScreenView('home_screen');
-    });
   }
 
   Future<void> _loadProducts() async {
@@ -65,31 +60,33 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('الرئيسية'),
-      ),
+      appBar: AppBar(title: const Text('الرئيسية')),
       body: _isLoading
           ? const Center(child: MbuyLoader())
           : _products.isEmpty
-              ? const Center(
-                  child: Text(
-                    'لا توجد منتجات متاحة',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                )
-              : GridView.builder(
-                  padding: const EdgeInsets.all(8),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: _products.length,
-                  itemBuilder: (context, index) {
-                    return _buildHomeItem(context, _products[index], widget.userRole);
-                  },
-                ),
+          ? const Center(
+              child: Text(
+                'لا توجد منتجات متاحة',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 0.75,
+              ),
+              itemCount: _products.length,
+              itemBuilder: (context, index) {
+                return _buildHomeItem(
+                  context,
+                  _products[index],
+                  widget.userRole,
+                );
+              },
+            ),
     );
   }
 
@@ -115,11 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: const Center(
-                child: Icon(
-                  Icons.shopping_bag,
-                  size: 48,
-                  color: Colors.grey,
-                ),
+                child: Icon(Icons.shopping_bag, size: 48, color: Colors.grey),
               ),
             ),
           ),
@@ -149,10 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 4),
                 Text(
                   product['description'] ?? '',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -167,17 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final scaffoldMessenger = ScaffoldMessenger.of(context);
                         try {
                           await CartService.addToCart(productId);
-                          
-                          // تتبع إضافة المنتج إلى السلة
-                          final productName = product['name'] as String?;
-                          final productPrice = (product['price'] as num?)?.toDouble();
-                          FirebaseService.logAddToCart(
-                            productId: productId,
-                            productName: productName,
-                            price: productPrice,
-                            quantity: 1,
-                          );
-                          
+
                           if (mounted) {
                             scaffoldMessenger.showSnackBar(
                               const SnackBar(
@@ -213,4 +193,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

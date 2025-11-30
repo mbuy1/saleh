@@ -8,10 +8,10 @@ import 'core/root_widget.dart' as app;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // تحميل متغيرات البيئة من ملف .env
   await dotenv.load(fileName: ".env");
-  
+
   // تهيئة Supabase
   try {
     await initSupabase();
@@ -20,7 +20,7 @@ Future<void> main() async {
     // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase
     debugPrint('⚠️ خطأ في تهيئة Supabase: $e');
   }
-  
+
   // تهيئة Cloudflare Images Service
   try {
     await CloudflareImagesService.initialize();
@@ -31,7 +31,7 @@ Future<void> main() async {
     debugPrint('⚠️ تحذير: فشل تهيئة Cloudflare Images: $e');
     debugPrint('   التطبيق سيعمل لكن رفع الصور لن يكون متاحاً');
   }
-  
+
   runApp(const MyApp());
 }
 

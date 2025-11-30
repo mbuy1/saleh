@@ -3,7 +3,6 @@ import '../../data/cart_service.dart';
 import '../../data/order_service.dart';
 import '../../data/coupon_service.dart';
 import '../../../../core/permissions_helper.dart';
-import '../../../../core/firebase_service.dart';
 
 class CartScreen extends StatefulWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -26,10 +25,6 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     _loadCart();
-    // تتبع عرض شاشة السلة
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseService.logScreenView('cart_screen');
-    });
   }
 
   Future<void> _loadCart() async {
@@ -120,22 +115,8 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     try {
-      // جلب معلومات المنتج قبل الحذف للتتبع
-      final item = _cartItems.firstWhere((item) => item['id'] == cartItemId);
-      final product = item['products'] as Map<String, dynamic>?;
-      final productId = product?['id'] as String?;
-      final productName = product?['name'] as String?;
-      
       await CartService.removeFromCart(cartItemId);
-      
-      // تتبع حذف المنتج من السلة
-      if (productId != null) {
-        FirebaseService.logRemoveFromCart(
-          productId: productId,
-          productName: productName,
-        );
-      }
-      
+
       _loadCart(); // إعادة تحميل السلة
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -191,13 +172,6 @@ class _CartScreenState extends State<CartScreen> {
     try {
       // إنشاء طلب من السلة
       final orderId = await OrderService.createOrderFromCart();
-
-      // تتبع إتمام الطلب
-      FirebaseService.logPlaceOrder(
-        orderId: orderId,
-        totalAmount: _total,
-        couponCode: _appliedCoupon?['code'] as String?,
-      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -270,8 +244,9 @@ class _CartScreenState extends State<CartScreen> {
 
       if (mounted) {
         final discountType = coupon['discount_type'] as String? ?? 'fixed';
-        final discountValue = (coupon['discount_value'] as num? ?? 0).toDouble();
-        
+        final discountValue = (coupon['discount_value'] as num? ?? 0)
+            .toDouble();
+
         String discountText = '';
         if (discountType == 'percent') {
           discountText = '$discountValue%';
@@ -313,45 +288,51 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('السلة'),
-      ),
+      appBar: AppBar(title: const Text('السلة')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : widget.userRole == 'merchant'
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.remove_shopping_cart, size: 64, color: Colors.orange),
-                      SizedBox(height: 16),
-                      Text(
-                        'وضع التصفح فقط',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'التاجر لا يمكنه استخدام سلة العميل',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.remove_shopping_cart,
+                    size: 64,
+                    color: Colors.orange,
                   ),
-                )
-              : _cartItems.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'السلة فارغة',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )
+                  SizedBox(height: 16),
+                  Text(
+                    'وضع التصفح فقط',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'التاجر لا يمكنه استخدام سلة العميل',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            )
+          : _cartItems.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'السلة فارغة',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
           : Column(
               children: [
                 // قائمة العناصر
@@ -400,19 +381,24 @@ class _CartScreenState extends State<CartScreen> {
                                         )
                                       : null,
                                 ),
-                                enabled: !_isValidatingCoupon && _appliedCoupon == null,
+                                enabled:
+                                    !_isValidatingCoupon &&
+                                    _appliedCoupon == null,
                               ),
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(
-                              onPressed: _isValidatingCoupon || _appliedCoupon != null
+                              onPressed:
+                                  _isValidatingCoupon || _appliedCoupon != null
                                   ? null
                                   : _applyCoupon,
                               child: _isValidatingCoupon
                                   ? const SizedBox(
                                       width: 20,
                                       height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
                                     )
                                   : const Text('تطبيق'),
                             ),
@@ -429,11 +415,15 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.check_circle, color: Colors.green.shade700),
+                                Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green.shade700,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'كوبون مطبق: ${_appliedCoupon!['code']}',
@@ -514,7 +504,9 @@ class _CartScreenState extends State<CartScreen> {
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Text('إتمام الطلب'),
                         ),
@@ -549,7 +541,9 @@ class _CartScreenState extends State<CartScreen> {
           child: const Icon(Icons.image, color: Colors.grey),
         ),
         title: Text(productName),
-        subtitle: Text('${productPrice.toStringAsFixed(2)} ر.س × $quantity = ${totalPrice.toStringAsFixed(2)} ر.س'),
+        subtitle: Text(
+          '${productPrice.toStringAsFixed(2)} ر.س × $quantity = ${totalPrice.toStringAsFixed(2)} ر.س',
+        ),
         trailing: isCustomer
             ? Row(
                 mainAxisSize: MainAxisSize.min,
@@ -582,10 +576,11 @@ class _CartScreenState extends State<CartScreen> {
 
   String _buildCouponDiscountText() {
     if (_appliedCoupon == null) return '';
-    
+
     final discountType = _appliedCoupon!['discount_type'] as String? ?? 'fixed';
-    final discountValue = (_appliedCoupon!['discount_value'] as num? ?? 0).toDouble();
-    
+    final discountValue = (_appliedCoupon!['discount_value'] as num? ?? 0)
+        .toDouble();
+
     if (discountType == 'percent') {
       return '$discountValue%';
     } else {
@@ -593,4 +588,3 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 }
-

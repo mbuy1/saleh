@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/firebase_service.dart';
 import '../../data/cart_service.dart';
 import '../../../../shared/widgets/mbuy_logo.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
@@ -14,10 +13,6 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // تتبع عرض شاشة Explore
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseService.logScreenView('explore_screen');
-    });
     return Scaffold(
       backgroundColor: MbuyColors.background,
       body: SafeArea(
@@ -28,9 +23,7 @@ class ExploreScreen extends StatelessWidget {
             // Tabs (Placeholder الآن)
             _buildTabs(context),
             // المحتوى
-            Expanded(
-              child: _ExploreScreenContent(userRole: userRole),
-            ),
+            Expanded(child: _ExploreScreenContent(userRole: userRole)),
           ],
         ),
       ),
@@ -73,18 +66,25 @@ class ExploreScreen extends StatelessWidget {
             color: Colors.white,
             onSelected: (value) {
               // TODO: إضافة منطق لكل خيار
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('تم اختيار: $value')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('تم اختيار: $value')));
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'explore',
                 child: Row(
                   children: [
-                    Icon(Icons.explore, size: 20, color: MbuyColors.textPrimary),
+                    Icon(
+                      Icons.explore,
+                      size: 20,
+                      color: MbuyColors.textPrimary,
+                    ),
                     SizedBox(width: 8),
-                    Text('استكشف', style: TextStyle(color: MbuyColors.textPrimary)),
+                    Text(
+                      'استكشف',
+                      style: TextStyle(color: MbuyColors.textPrimary),
+                    ),
                   ],
                 ),
               ),
@@ -94,7 +94,10 @@ class ExploreScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.people, size: 20, color: MbuyColors.textPrimary),
                     SizedBox(width: 8),
-                    Text('الأصدقاء', style: TextStyle(color: MbuyColors.textPrimary)),
+                    Text(
+                      'الأصدقاء',
+                      style: TextStyle(color: MbuyColors.textPrimary),
+                    ),
                   ],
                 ),
               ),
@@ -102,9 +105,16 @@ class ExploreScreen extends StatelessWidget {
                 value: 'trending',
                 child: Row(
                   children: [
-                    Icon(Icons.trending_up, size: 20, color: MbuyColors.textPrimary),
+                    Icon(
+                      Icons.trending_up,
+                      size: 20,
+                      color: MbuyColors.textPrimary,
+                    ),
                     SizedBox(width: 8),
-                    Text('الترند', style: TextStyle(color: MbuyColors.textPrimary)),
+                    Text(
+                      'الترند',
+                      style: TextStyle(color: MbuyColors.textPrimary),
+                    ),
                   ],
                 ),
               ),
@@ -119,9 +129,7 @@ class ExploreScreen extends StatelessWidget {
     // Placeholder الآن - يمكن إضافة Tabs لاحقاً
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: MbuyColors.surface,
-      ),
+      decoration: BoxDecoration(color: MbuyColors.surface),
       child: Row(
         children: [
           _buildTabButton('استكشف', true),
@@ -242,9 +250,7 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(
-        child: MbuyLoader(),
-      );
+      return const Center(child: MbuyLoader());
     }
 
     if (_products.isEmpty) {
@@ -280,9 +286,7 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: MbuyColors.cardBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -319,7 +323,11 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                 if (store != null)
                   Row(
                     children: [
-                      Icon(Icons.store, size: 16, color: MbuyColors.primaryBlue),
+                      Icon(
+                        Icons.store,
+                        size: 16,
+                        color: MbuyColors.primaryBlue,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         store['name'] ?? 'متجر',
@@ -375,14 +383,17 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                       child: MbuySecondaryButton(
                         text: 'شراء الآن',
                         icon: Icons.shopping_bag,
-                        onPressed: userRole == 'customer' && product['id'] != null
+                        onPressed:
+                            userRole == 'customer' && product['id'] != null
                             ? () async {
                                 try {
                                   await CartService.addToCart(product['id']);
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('تم إضافة المنتج إلى السلة'),
+                                        content: Text(
+                                          'تم إضافة المنتج إلى السلة',
+                                        ),
                                         backgroundColor: MbuyColors.success,
                                       ),
                                     );
@@ -409,7 +420,9 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                         onPressed: () {
                           // TODO: إضافة منطق "الانتقال إلى المتجر"
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('الانتقال إلى المتجر')),
+                            const SnackBar(
+                              content: Text('الانتقال إلى المتجر'),
+                            ),
                           );
                         },
                       ),
@@ -424,4 +437,3 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
     );
   }
 }
-
