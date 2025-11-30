@@ -1,9 +1,3 @@
-/// إعدادات التطبيق و AppMode
-/// 
-/// يحتوي على:
-/// - enum AppMode (customer / merchant)
-/// - State management بسيط لإدارة وضع التطبيق
-
 import 'package:flutter/material.dart';
 
 /// وضع التطبيق: عميل أو تاجر

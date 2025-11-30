@@ -1,11 +1,3 @@
-/// شاشة نقاط التاجر
-/// 
-/// تعرض:
-/// - رصيد النقاط الحالي للتاجر
-/// - قائمة الميزات المتاحة (من feature_actions حيث is_enabled = true)
-/// - زر "استخدام" لكل ميزة يستدعي spendPointsForFeature
-/// - آخر عمليات النقاط
-
 import 'package:flutter/material.dart';
 import '../../data/merchant_points_service.dart';
 

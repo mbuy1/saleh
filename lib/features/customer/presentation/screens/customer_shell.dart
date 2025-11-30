@@ -1,11 +1,3 @@
-/// CustomerShell - الواجهة الرئيسية للعميل
-/// 
-/// تحتوي على:
-/// - Scaffold مع BottomNavigationBar
-/// - 5 Tabs: Explore, Stores, Home, Cart, Map
-/// - كل Tab له شاشة منفصلة
-/// - زر "لوحة التحكم" في AppBar (للتاجر فقط)
-
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import 'explore_screen.dart';

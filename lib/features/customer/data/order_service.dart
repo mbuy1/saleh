@@ -1,14 +1,3 @@
-/// خدمة Order - إدارة الطلبات
-/// 
-/// تحتوي على:
-/// - createOrderFromCart: تحويل السلة إلى طلب
-/// - getCustomerOrders: جلب طلبات العميل
-/// - getOrderDetails: جلب تفاصيل طلب مع order_items
-/// 
-/// قواعد الصلاحيات:
-/// - فقط المستخدمون بـ role == 'customer' يمكنهم إنشاء طلبات
-/// - التاجر (merchant) في وضع Viewer Mode: لا يمكنه إنشاء طلبات كعميل
-
 import '../../../../core/supabase_client.dart';
 import '../../../../core/permissions_helper.dart';
 import 'cart_service.dart';

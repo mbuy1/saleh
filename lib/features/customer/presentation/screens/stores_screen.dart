@@ -1,10 +1,3 @@
-/// شاشة Stores
-/// 
-/// عرض قائمة متاجر حقيقية من Supabase
-/// 
-/// الاستعلامات المستخدمة:
-/// - supabaseClient.from('stores').select().eq('visibility', 'public').eq('status', 'active')
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 

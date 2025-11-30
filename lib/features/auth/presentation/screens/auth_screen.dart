@@ -1,10 +1,3 @@
-/// شاشة تسجيل الدخول والتسجيل
-/// 
-/// تحتوي على:
-/// - تسجيل دخول (Email + Password)
-/// - تسجيل جديد (Email + Password + DisplayName)
-/// - ربط مع Supabase Auth
-
 import 'package:flutter/material.dart';
 import '../../data/auth_service.dart';
 

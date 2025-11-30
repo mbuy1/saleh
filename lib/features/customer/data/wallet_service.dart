@@ -1,13 +1,3 @@
-/// خدمة Wallet - إدارة محفظة المستخدم
-/// 
-/// تحتوي على:
-/// - getWalletForCurrentUser: جلب محفظة المستخدم الحالي
-/// - getWalletTransactionsForCurrentUser: جلب عمليات المحفظة للمستخدم الحالي
-/// 
-/// ملاحظات:
-/// - تعمل مع wallet_accounts و wallet_transactions
-/// - تدعم customer و merchant wallets
-
 import '../../../../core/supabase_client.dart';
 
 class WalletService {

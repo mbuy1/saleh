@@ -1,7 +1,3 @@
-/// شاشة CustomerOrderDetailsScreen - تفاصيل طلب العميل
-/// 
-/// تعرض تفاصيل الطلب مع جميع العناصر من order_items + معلومات المنتجات من products
-
 import 'package:flutter/material.dart';
 import '../../data/order_service.dart';
 

@@ -1,13 +1,3 @@
-/// Root Widget - Widget الجذر للتطبيق
-/// 
-/// يقوم بـ:
-/// - فحص حالة المستخدم (مسجل أم لا)
-/// - إذا غير مسجل → يعرض شاشة Auth
-/// - إذا مسجل → يجلب role من user_profiles
-///   - إذا role = 'customer' → يعرض CustomerShell
-///   - إذا role = 'merchant' → يعرض MerchantDashboardScreen
-/// - يستخدم AppModeProvider لإدارة وضع التطبيق
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/presentation/screens/auth_screen.dart';

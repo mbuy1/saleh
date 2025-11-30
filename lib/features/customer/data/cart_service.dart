@@ -1,17 +1,3 @@
-/// خدمة Cart - إدارة السلة
-/// 
-/// تحتوي على:
-/// - getOrCreateActiveCart: جلب أو إنشاء سلة نشطة
-/// - addToCart: إضافة منتج إلى السلة
-/// - updateCartItemQuantity: تحديث كمية عنصر في السلة
-/// - removeFromCart: حذف عنصر من السلة
-/// - getCartItems: جلب عناصر السلة مع معلومات المنتجات
-/// 
-/// قواعد الصلاحيات:
-/// - فقط المستخدمون بـ role == 'customer' يمكنهم استخدام السلة
-/// - التاجر (merchant) في وضع Viewer Mode: لا يمكنه إضافة/تعديل/حذف من السلة
-/// - جميع الدوال تتحقق من الصلاحيات قبل تنفيذ أي عملية
-
 import '../../../../core/supabase_client.dart';
 import '../../../../core/permissions_helper.dart';
 

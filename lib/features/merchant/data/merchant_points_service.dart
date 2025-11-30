@@ -1,16 +1,3 @@
-/// خدمة Merchant Points - إدارة نقاط التاجر
-/// 
-/// تحتوي على:
-/// - getMerchantPointsBalance: جلب رصيد نقاط التاجر
-/// - getAvailableFeatureActions: جلب قائمة الميزات المتاحة
-/// - spendPointsForFeature: صرف نقاط لاستخدام ميزة
-/// - getMerchantPointsTransactions: جلب عمليات نقاط التاجر
-/// 
-/// ملاحظات:
-/// - النقاط للتاجر فقط (merchant_points)
-/// - النقاط هي "رصيد خدمات" لتفعيل مميزات داخل التطبيق
-/// - جميع تكاليف الميزات تأتي من جدول feature_actions (لا قيم ثابتة في الكود)
-
 import '../../../core/supabase_client.dart';
 
 class MerchantPointsService {

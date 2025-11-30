@@ -1,7 +1,3 @@
-/// شاشة CustomerOrdersScreen - عرض طلبات العميل
-/// 
-/// تعرض قائمة بجميع طلبات العميل من جدول orders حيث customer_id = المستخدم الحالي
-
 import 'package:flutter/material.dart';
 import '../../data/order_service.dart';
 import 'customer_order_details_screen.dart';

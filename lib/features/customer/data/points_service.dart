@@ -1,12 +1,3 @@
-/// خدمة Points - إدارة نقاط المستخدم
-/// 
-/// تحتوي على:
-/// - getPointsForCurrentUser: جلب نقاط المستخدم الحالي
-/// - getLastPointsTransactions: جلب آخر عمليات النقاط للمستخدم الحالي
-/// 
-/// ملاحظات:
-/// - تعمل مع points_accounts و points_transactions
-
 import '../../../../core/supabase_client.dart';
 
 class PointsService {

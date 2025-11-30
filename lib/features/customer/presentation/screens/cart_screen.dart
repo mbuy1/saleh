@@ -1,13 +1,3 @@
-/// شاشة Cart
-/// 
-/// عرض السلة مع عناصر حقيقية من Supabase
-/// 
-/// TODO: ربط بوابات الدفع:
-/// - Tap Payment Gateway
-/// - HyperPay Gateway
-/// - ربط مع جدول payments لتسجيل المعاملات
-/// - معالجة حالات الدفع (نجح، فشل، معلق)
-
 import 'package:flutter/material.dart';
 import '../../data/cart_service.dart';
 import '../../data/order_service.dart';

@@ -1,7 +1,3 @@
-/// MerchantOrdersScreen - عرض طلبات المتجر
-/// 
-/// تعرض قائمة بجميع الطلبات التي تحتوي على منتجات من متجر التاجر
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../customer/data/order_service.dart';

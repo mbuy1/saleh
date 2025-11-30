@@ -1,7 +1,3 @@
-/// شاشة MerchantOrderDetailsScreen - تفاصيل طلب للتاجر
-/// 
-/// تعرض تفاصيل الطلب مع المنتجات الخاصة بهذا المتجر فقط
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../customer/data/order_service.dart';

@@ -1,10 +1,3 @@
-/// تهيئة Supabase Client
-/// 
-/// هذا الملف يحتوي على:
-/// - دالة initSupabase() لتهيئة Supabase
-/// - Getter للوصول إلى Supabase client في بقية المشروع
-/// - يستخدم SUPABASE_URL و SUPABASE_ANON_KEY من ملف .env
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

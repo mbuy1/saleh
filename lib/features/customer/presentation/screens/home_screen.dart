@@ -1,10 +1,3 @@
-/// شاشة Home
-/// 
-/// GridView لعرض منتجات حقيقية من Supabase
-/// 
-/// الاستعلامات المستخدمة:
-/// - supabaseClient.from('products').select().eq('status', 'active').limit(20)
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../data/cart_service.dart';

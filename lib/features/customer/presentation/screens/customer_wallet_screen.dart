@@ -1,9 +1,3 @@
-/// شاشة محفظة العميل
-/// 
-/// تعرض:
-/// - الرصيد الحالي من wallet_accounts
-/// - آخر 10 عمليات من wallet_transactions (in/out, amount, description)
-
 import 'package:flutter/material.dart';
 import '../../data/wallet_service.dart';
 

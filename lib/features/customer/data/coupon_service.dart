@@ -1,12 +1,3 @@
-/// خدمة Coupon - إدارة الكوبونات
-/// 
-/// تحتوي على:
-/// - validateCoupon: التحقق من صحة كوبون وتطبيقه
-/// 
-/// ملاحظات:
-/// - تعمل مع coupons و coupon_redemptions
-/// - تتحقق من: is_active, التاريخ (starts_at, expires_at), min_order_amount
-
 import '../../../../core/supabase_client.dart';
 
 class CouponService {

@@ -1,11 +1,3 @@
-/// خدمة Authentication
-/// 
-/// تحتوي على:
-/// - signUp: تسجيل مستخدم جديد
-/// - signIn: تسجيل دخول
-/// - signOut: تسجيل خروج
-/// - getCurrentUser: جلب المستخدم الحالي
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
 

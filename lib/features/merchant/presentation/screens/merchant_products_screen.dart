@@ -1,7 +1,3 @@
-/// MerchantProductsScreen - إدارة المنتجات
-/// 
-/// عرض قائمة منتجات المتجر وإضافة منتجات جديدة
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 

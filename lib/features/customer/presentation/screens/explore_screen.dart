@@ -1,19 +1,3 @@
-/// شاشة Explore
-/// 
-/// ListView لعناصر تشبه الفيديو/المنتج:
-/// - صورة/Container Placeholder
-/// - اسم التاجر
-/// - عنوان المنتج
-/// - زر "شراء الآن"
-/// - زر "الانتقال إلى المتجر"
-/// - قائمة في أعلى يمين (3 خطوط)
-/// 
-/// TODO: ربط هذه الشاشة بجداول Supabase:
-/// - stories: لجلب القصص/الفيديوهات
-/// - products: لجلب المنتجات المعروضة
-/// - stores: لجلب معلومات المتاجر
-/// - product_media: لجلب الصور والفيديوهات من Cloudflare
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../data/cart_service.dart';

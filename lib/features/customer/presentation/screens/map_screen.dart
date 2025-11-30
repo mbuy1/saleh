@@ -1,19 +1,3 @@
-/// شاشة Map
-/// 
-/// خريطة المتاجر
-/// - جلب المتاجر من Supabase
-/// - عرض المتاجر على الخريطة
-/// - تمييز المتاجر المميزة (map_highlight_until > now())
-/// 
-/// TODO: ربط هذه الشاشة بخريطة حقيقية:
-/// - Google Maps / Mapbox
-/// - عرض إحداثيات الموقع (latitude, longitude)
-/// - البحث عن المتاجر حسب الموقع الحالي
-/// - عرض تفاصيل المتجر عند الضغط على Marker
-/// 
-/// TODO: إضافة Cloudflare:
-/// - عرض صور المتاجر من Cloudflare على الخريطة
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import 'customer_orders_screen.dart';

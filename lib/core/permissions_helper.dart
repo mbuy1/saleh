@@ -1,12 +1,3 @@
-/// Permissions Helper - مساعد الصلاحيات
-/// 
-/// يحتوي على دوال مساعدة للتحقق من صلاحيات المستخدم بناءً على role
-/// 
-/// القواعد:
-/// - admin: صلاحيات كاملة (GOD MODE)
-/// - merchant: في واجهة العميل = Viewer Mode فقط (لا شراء، لا سلة، لا تعليقات/تقييمات)
-/// - customer: صلاحيات كاملة للعميل (شراء، سلة، تعليقات، تقييمات)
-
 import '../core/supabase_client.dart';
 
 class PermissionsHelper {

@@ -1,8 +1,3 @@
-/// شاشة نقاط العميل
-/// 
-/// ملاحظة: النقاط هي "رصيد خدمات" للتاجر فقط، وليست للعميل
-/// هذه الشاشة تعرض رسالة توضيحية للعميل
-
 import 'package:flutter/material.dart';
 
 class CustomerPointsScreen extends StatelessWidget {

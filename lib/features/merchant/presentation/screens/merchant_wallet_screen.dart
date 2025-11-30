@@ -1,9 +1,3 @@
-/// شاشة محفظة التاجر
-/// 
-/// تعرض:
-/// - رصيد التاجر من wallet_accounts (account_type = 'merchant')
-/// - آخر العمليات المتعلقة بمتجره من wallet_transactions
-
 import 'package:flutter/material.dart';
 import '../../../customer/data/wallet_service.dart';
 

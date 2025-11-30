@@ -1,11 +1,3 @@
-/// MerchantStoreSetupScreen - إدارة المتجر
-/// 
-/// إذا لم يكن للتاجر متجر:
-/// - يعرض Form لإنشاء متجر جديد
-/// 
-/// إذا كان له متجر:
-/// - يعرض بيانات المتجر بشكل مختصر
-
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../data/merchant_points_service.dart';
@@ -595,7 +587,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                     ),
                   ),
                   Text(
-                    'المتبقي: ${hours} ساعة و $minutes دقيقة',
+                    'المتبقي: $hours ساعة و $minutes دقيقة',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.green.shade600,
@@ -668,7 +660,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                     ),
                   ),
                   Text(
-                    'المتبقي: ${hours} ساعة و $minutes دقيقة',
+                    'المتبقي: $hours ساعة و $minutes دقيقة',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.purple.shade600,

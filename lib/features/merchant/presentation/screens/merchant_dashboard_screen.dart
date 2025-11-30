@@ -1,10 +1,3 @@
-/// MerchantDashboardScreen - لوحة تحكم التاجر
-/// 
-/// شاشة بسيطة تحتوي:
-/// - نص "لوحة تحكم التاجر"
-/// - زر في AppBar: "شاهد التطبيق بنظرة العميل"
-/// - عند الضغط: يغيّر AppMode من merchant إلى customer
-
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import 'merchant_store_setup_screen.dart';
