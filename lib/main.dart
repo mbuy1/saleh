@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/cloudflare_images_service.dart';
+import 'core/firebase_service.dart';
 import 'core/root_widget.dart' as app;
 
 Future<void> main() async {
@@ -11,6 +13,16 @@ Future<void> main() async {
 
   // تحميل متغيرات البيئة من ملف .env
   await dotenv.load(fileName: ".env");
+
+  // تهيئة Firebase
+  try {
+    await Firebase.initializeApp();
+    FirebaseService.initAnalytics();
+    await FirebaseService.setupFCM();
+    debugPrint('✅ تم تهيئة Firebase بنجاح');
+  } catch (e) {
+    debugPrint('⚠️ خطأ في تهيئة Firebase: $e');
+  }
 
   // تهيئة Supabase
   try {
