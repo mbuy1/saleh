@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/presentation/screens/auth_screen.dart';
 import '../core/supabase_client.dart';
 import '../core/app_config.dart';
+import '../core/firebase_service.dart';
+import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
 import '../features/merchant/presentation/screens/merchant_dashboard_screen.dart';
 
@@ -102,23 +104,36 @@ class _RootWidgetState extends State<RootWidget> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: const Center(
+          child: MbuyLoader(),
         ),
       );
     }
 
     // إذا المستخدم غير مسجل → عرض شاشة Auth
     if (_user == null) {
+      // تتبع عرض شاشة Auth
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FirebaseService.logScreenView('auth_screen');
+      });
       return const AuthScreen();
     }
 
     // إذا المستخدم مسجل → عرض الشاشة المناسبة بناءً على AppMode
     // يمكن للتاجر التبديل إلى وضع العميل (كمشاهد)
     if (_appModeProvider.mode == AppMode.merchant) {
+      // تتبع عرض لوحة تحكم التاجر
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FirebaseService.logScreenView('merchant_dashboard');
+      });
       return MerchantDashboardScreen(appModeProvider: _appModeProvider);
     } else {
+      // تتبع عرض واجهة العميل
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FirebaseService.logScreenView('customer_shell');
+      });
       return CustomerShell(
         appModeProvider: _appModeProvider,
         userRole: _userRole,

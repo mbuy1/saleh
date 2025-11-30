@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/firebase_service.dart';
 import '../../data/cart_service.dart';
 import '../../../../shared/widgets/mbuy_logo.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
@@ -13,6 +14,10 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // تتبع عرض شاشة Explore
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('explore_screen');
+    });
     return Scaffold(
       backgroundColor: MbuyColors.background,
       body: SafeArea(

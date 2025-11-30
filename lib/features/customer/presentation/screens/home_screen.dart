@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../core/firebase_service.dart';
+import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../data/cart_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadProducts();
+    // تتبع عرض شاشة Home
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('home_screen');
+    });
   }
 
   Future<void> _loadProducts() async {
@@ -63,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('الرئيسية'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MbuyLoader())
           : _products.isEmpty
               ? const Center(
                   child: Text(
@@ -161,6 +167,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         final scaffoldMessenger = ScaffoldMessenger.of(context);
                         try {
                           await CartService.addToCart(productId);
+                          
+                          // تتبع إضافة المنتج إلى السلة
+                          final productName = product['name'] as String?;
+                          final productPrice = (product['price'] as num?)?.toDouble();
+                          FirebaseService.logAddToCart(
+                            productId: productId,
+                            productName: productName,
+                            price: productPrice,
+                            quantity: 1,
+                          );
+                          
                           if (mounted) {
                             scaffoldMessenger.showSnackBar(
                               const SnackBar(

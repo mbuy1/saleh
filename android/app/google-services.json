@@ -1,0 +1,29 @@
+{
+    "project_info": {
+      "project_number": "49024973839",
+      "project_id": "mbuy-42080",
+      "storage_bucket": "mbuy-42080.firebasestorage.app"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:49024973839:android:3b3eccb63612aae9d7f77a",
+          "android_client_info": {
+            "package_name": "com.mbuy.test"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBVFmBoWPsjfqnYFrB9NoIlbgn5bVFESCc"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

@@ -3,6 +3,7 @@ import '../../data/cart_service.dart';
 import '../../data/order_service.dart';
 import '../../data/coupon_service.dart';
 import '../../../../core/permissions_helper.dart';
+import '../../../../core/firebase_service.dart';
 
 class CartScreen extends StatefulWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -25,6 +26,10 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     _loadCart();
+    // تتبع عرض شاشة السلة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('cart_screen');
+    });
   }
 
   Future<void> _loadCart() async {
@@ -115,7 +120,22 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     try {
+      // جلب معلومات المنتج قبل الحذف للتتبع
+      final item = _cartItems.firstWhere((item) => item['id'] == cartItemId);
+      final product = item['products'] as Map<String, dynamic>?;
+      final productId = product?['id'] as String?;
+      final productName = product?['name'] as String?;
+      
       await CartService.removeFromCart(cartItemId);
+      
+      // تتبع حذف المنتج من السلة
+      if (productId != null) {
+        FirebaseService.logRemoveFromCart(
+          productId: productId,
+          productName: productName,
+        );
+      }
+      
       _loadCart(); // إعادة تحميل السلة
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -171,6 +191,13 @@ class _CartScreenState extends State<CartScreen> {
     try {
       // إنشاء طلب من السلة
       final orderId = await OrderService.createOrderFromCart();
+
+      // تتبع إتمام الطلب
+      FirebaseService.logPlaceOrder(
+        orderId: orderId,
+        totalAmount: _total,
+        couponCode: _appliedCoupon?['code'] as String?,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

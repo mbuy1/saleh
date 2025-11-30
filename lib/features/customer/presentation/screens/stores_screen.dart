@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
 
@@ -19,6 +20,10 @@ class _StoresScreenState extends State<StoresScreen> {
   void initState() {
     super.initState();
     _loadStores();
+    // تتبع عرض شاشة المتاجر
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('stores_screen');
+    });
   }
 
   Future<void> _loadStores() async {
@@ -306,6 +311,15 @@ class _StoresScreenState extends State<StoresScreen> {
           color: MbuyColors.textSecondary,
         ),
         onTap: () {
+          // تتبع عرض متجر
+          final storeId = store['id'] as String?;
+          final storeName = store['name'] as String?;
+          if (storeId != null) {
+            FirebaseService.logViewStore(
+              storeId: storeId,
+              storeName: storeName,
+            );
+          }
           // TODO: الانتقال إلى صفحة المتجر
         },
       ),
