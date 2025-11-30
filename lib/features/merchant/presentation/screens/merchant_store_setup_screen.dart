@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../data/merchant_points_service.dart';
 
 class MerchantStoreSetupScreen extends StatefulWidget {
   const MerchantStoreSetupScreen({super.key});
@@ -20,6 +21,8 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
   Map<String, dynamic>? _store;
   bool _isLoading = true;
   bool _isCreating = false;
+  bool _isBoosting = false;
+  bool _isHighlighting = false;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -139,6 +142,154 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       if (mounted) {
         setState(() {
           _isCreating = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _boostStore() async {
+    if (_store == null) {
+      return;
+    }
+
+    final storeId = _store!['id'] as String;
+
+    // تأكيد الدعم
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('دعم المتجر'),
+        content: const Text(
+          'هل تريد دعم متجرك لمدة 24 ساعة؟ سيتم خصم النقاط المطلوبة من رصيدك.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('تأكيد'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isBoosting = true;
+    });
+
+    try {
+      final success = await MerchantPointsService.boostStore(storeId);
+
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم دعم المتجر بنجاح! سيظهر في أعلى قائمة المتاجر لمدة 24 ساعة'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // إعادة تحميل بيانات المتجر
+          _loadStore();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('لا توجد نقاط كافية لدعم المتجر'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isBoosting = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _highlightStoreOnMap() async {
+    if (_store == null) {
+      return;
+    }
+
+    final storeId = _store!['id'] as String;
+
+    // تأكيد الإبراز
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إبراز المتجر على الخريطة'),
+        content: const Text(
+          'هل تريد إبراز متجرك على الخريطة لمدة 24 ساعة؟ سيتم خصم النقاط المطلوبة من رصيدك.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('تأكيد'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isHighlighting = true;
+    });
+
+    try {
+      final success = await MerchantPointsService.highlightStoreOnMap(storeId);
+
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إبراز المتجر على الخريطة بنجاح! سيظهر بشكل مميز لمدة 24 ساعة'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // إعادة تحميل بيانات المتجر
+          _loadStore();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('لا توجد نقاط كافية لإبراز المتجر على الخريطة'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isHighlighting = false;
         });
       }
     }
@@ -283,6 +434,118 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                     'حالة المتجر',
                     _store!['status'] == 'active' ? 'نشط' : 'غير نشط',
                   ),
+                  // عرض حالة الدعم إذا كان موجوداً
+                  if (_store!['boosted_until'] != null) ...[
+                    const SizedBox(height: 8),
+                    _buildBoostStatus(),
+                  ],
+                  // عرض حالة الإبراز على الخريطة إذا كان موجوداً
+                  if (_store!['map_highlight_until'] != null) ...[
+                    const SizedBox(height: 8),
+                    _buildMapHighlightStatus(),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // زر دعم المتجر
+          Card(
+            color: Colors.orange.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.rocket_launch, color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'دعم المتجر',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'اجعل متجرك يظهر في أعلى قائمة المتاجر لمدة 24 ساعة',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _isBoosting ? null : _boostStore,
+                      icon: _isBoosting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.rocket_launch),
+                      label: Text(_isBoosting ? 'جاري الدعم...' : 'دعم المتجر لمدة 24 ساعة'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // زر إبراز المتجر على الخريطة
+          Card(
+            color: Colors.purple.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.purple.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'إبراز المتجر على الخريطة',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'اجعل متجرك يظهر بشكل مميز على الخريطة لمدة 24 ساعة',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _isHighlighting ? null : _highlightStoreOnMap,
+                      icon: _isHighlighting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.location_on),
+                      label: Text(_isHighlighting ? 'جاري الإبراز...' : 'إبراز المتجر على الخريطة لمدة 24 ساعة'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -290,6 +553,63 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildBoostStatus() {
+    final boostedUntil = _store!['boosted_until'] as String?;
+    if (boostedUntil == null) return const SizedBox.shrink();
+
+    try {
+      final boostedDate = DateTime.parse(boostedUntil);
+      final now = DateTime.now();
+      final isActive = boostedDate.isAfter(now);
+
+      if (!isActive) {
+        return const SizedBox.shrink(); // انتهى الدعم، لا نعرضه
+      }
+
+      final remaining = boostedDate.difference(now);
+      final hours = remaining.inHours;
+      final minutes = remaining.inMinutes % 60;
+
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.rocket_launch, color: Colors.green.shade700, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'المتجر مدعوم حالياً',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
+                  ),
+                  Text(
+                    'المتبقي: ${hours} ساعة و $minutes دقيقة',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      return const SizedBox.shrink();
+    }
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
@@ -306,6 +626,63 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildMapHighlightStatus() {
+    final highlightUntil = _store!['map_highlight_until'] as String?;
+    if (highlightUntil == null) return const SizedBox.shrink();
+
+    try {
+      final highlightDate = DateTime.parse(highlightUntil);
+      final now = DateTime.now();
+      final isActive = highlightDate.isAfter(now);
+
+      if (!isActive) {
+        return const SizedBox.shrink(); // انتهى الإبراز، لا نعرضه
+      }
+
+      final remaining = highlightDate.difference(now);
+      final hours = remaining.inHours;
+      final minutes = remaining.inMinutes % 60;
+
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.purple.shade50,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.purple.shade200),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.location_on, color: Colors.purple.shade700, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'المتجر مميز على الخريطة حالياً',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple.shade700,
+                    ),
+                  ),
+                  Text(
+                    'المتبقي: ${hours} ساعة و $minutes دقيقة',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.purple.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      return const SizedBox.shrink();
+    }
   }
 }
 
