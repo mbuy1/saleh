@@ -49,6 +49,12 @@ dependencies:
   # Localizations for RTL support
   flutter_localizations:
     sdk: flutter
+  
+  # HTTP requests
+  http: ^1.2.0
+  
+  # Image picker
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../core/services/cloudflare_images_service.dart';
 import '../../data/merchant_points_service.dart';
 
 class MerchantStoreSetupScreen extends StatefulWidget {
@@ -15,11 +18,15 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
   bool _isCreating = false;
   bool _isBoosting = false;
   bool _isHighlighting = false;
+  bool _isUploadingImage = false;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _cityController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+  File? _selectedImageFile;
+  String? _logoUrl;
 
   @override
   void initState() {
@@ -57,6 +64,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           _nameController.text = _store!['name'] ?? '';
           _cityController.text = _store!['city'] ?? '';
           _descriptionController.text = _store!['description'] ?? '';
+          _logoUrl = _store!['logo_url'] as String?;
         });
       }
     } catch (e) {
@@ -98,6 +106,33 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           .replaceAll(' ', '-')
           .replaceAll(RegExp(r'[^a-z0-9-]'), '');
 
+      // رفع الصورة إذا تم اختيارها
+      String? logoUrl = _logoUrl;
+      if (_selectedImageFile != null) {
+        setState(() {
+          _isUploadingImage = true;
+        });
+        try {
+          logoUrl = await CloudflareImagesService.uploadImage(
+            _selectedImageFile!,
+            folder: 'stores',
+          );
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('خطأ في رفع الصورة: ${e.toString()}'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        } finally {
+          setState(() {
+            _isUploadingImage = false;
+          });
+        }
+      }
+
       // إنشاء متجر جديد
       final response = await supabaseClient.from('stores').insert({
         'owner_id': user.id,
@@ -107,6 +142,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         'slug': slug,
         'visibility': 'public', // افتراضي: عام
         'status': 'active', // افتراضي: نشط
+        if (logoUrl != null) 'logo_url': logoUrl,
       }).select().single();
 
       setState(() {
@@ -364,8 +400,11 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
               maxLines: 4,
             ),
             const SizedBox(height: 24),
+            // اختيار صورة المتجر
+            _buildImagePicker(),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _isCreating ? null : _createStore,
+              onPressed: (_isCreating || _isUploadingImage) ? null : _createStore,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -397,7 +436,28 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.store, size: 32, color: Colors.blue),
+                      // عرض صورة المتجر
+                      if (_logoUrl != null)
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              _logoUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(Icons.store, size: 32);
+                              },
+                            ),
+                          ),
+                        )
+                      else
+                        const Icon(Icons.store, size: 32, color: Colors.blue),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -674,6 +734,101 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       );
     } catch (e) {
       return const SizedBox.shrink();
+    }
+  }
+
+  /// Widget لاختيار صورة المتجر
+  Widget _buildImagePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'صورة المتجر',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            // عرض الصورة المختارة أو الحالية
+            if (_selectedImageFile != null || _logoUrl != null)
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: _selectedImageFile != null
+                      ? Image.file(
+                          _selectedImageFile!,
+                          fit: BoxFit.cover,
+                        )
+                      : _logoUrl != null
+                          ? Image.network(
+                              _logoUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(Icons.image, size: 50);
+                              },
+                            )
+                          : const Icon(Icons.image, size: 50),
+                ),
+              )
+            else
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[200],
+                ),
+                child: const Icon(Icons.image, size: 50, color: Colors.grey),
+              ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _pickImage,
+                icon: const Icon(Icons.photo_library),
+                label: const Text('اختر صورة'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// اختيار صورة من المعرض
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImageFile = File(image.path);
+          _logoUrl = null; // إعادة تعيين URL القديم عند اختيار صورة جديدة
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في اختيار الصورة: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

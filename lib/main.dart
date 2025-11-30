@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/firebase_service.dart';
+import 'core/services/cloudflare_images_service.dart';
 import 'core/root_widget.dart' as app;
 
 Future<void> main() async {
@@ -25,6 +26,14 @@ Future<void> main() async {
   
   // تهيئة Supabase
   await initSupabase();
+  
+  // تهيئة Cloudflare Images Service
+  try {
+    await CloudflareImagesService.initialize();
+  } catch (e) {
+    // إذا فشل تهيئة Cloudflare، نتابع بدونها
+    // (مفيد في حالة عدم وجود ملفات الإعداد)
+  }
   
   runApp(const MyApp());
 }
