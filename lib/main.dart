@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/supabase_client.dart';
+import 'core/theme/app_theme.dart';
 import 'core/root_widget.dart' as app;
 
 Future<void> main() async {
@@ -27,11 +29,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Saleh',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      title: 'Mbuy',
+      debugShowCheckedModeBanner: false,
+      // استخدام الثيم الفاتح الجديد
+      theme: AppTheme.lightTheme,
+      // تفعيل RTL للعربية
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ar', 'SA'), // العربية
+        Locale('en', 'US'), // الإنجليزية
+      ],
+      locale: const Locale('ar', 'SA'),
       // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
       home: const app.RootWidget(),
     );

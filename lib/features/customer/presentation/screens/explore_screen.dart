@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../data/cart_service.dart';
+import '../../../../shared/widgets/mbuy_logo.dart';
+import '../../../../shared/widgets/mbuy_loader.dart';
+import '../../../../shared/widgets/mbuy_buttons.dart';
 
 class ExploreScreen extends StatelessWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -10,12 +14,58 @@ class ExploreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('استكشف'),
-        actions: [
+      backgroundColor: MbuyColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header مع الشعار
+            _buildHeader(context),
+            // Tabs (Placeholder الآن)
+            _buildTabs(context),
+            // المحتوى
+            Expanded(
+              child: _ExploreScreenContent(userRole: userRole),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // الشعار الدائري الصغير
+          MbuyLogo.small(),
+          const SizedBox(width: 12),
+          // العنوان
+          const Expanded(
+            child: Text(
+              'استكشف',
+              style: TextStyle(
+                color: MbuyColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Arabic',
+              ),
+            ),
+          ),
           // قائمة في أعلى يمين (3 خطوط)
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert, color: MbuyColors.textPrimary),
+            color: Colors.white,
             onSelected: (value) {
               // TODO: إضافة منطق لكل خيار
               ScaffoldMessenger.of(context).showSnackBar(
@@ -27,9 +77,9 @@ class ExploreScreen extends StatelessWidget {
                 value: 'explore',
                 child: Row(
                   children: [
-                    Icon(Icons.explore, size: 20),
+                    Icon(Icons.explore, size: 20, color: MbuyColors.textPrimary),
                     SizedBox(width: 8),
-                    Text('استكشف'),
+                    Text('استكشف', style: TextStyle(color: MbuyColors.textPrimary)),
                   ],
                 ),
               ),
@@ -37,9 +87,9 @@ class ExploreScreen extends StatelessWidget {
                 value: 'friends',
                 child: Row(
                   children: [
-                    Icon(Icons.people, size: 20),
+                    Icon(Icons.people, size: 20, color: MbuyColors.textPrimary),
                     SizedBox(width: 8),
-                    Text('الأصدقاء'),
+                    Text('الأصدقاء', style: TextStyle(color: MbuyColors.textPrimary)),
                   ],
                 ),
               ),
@@ -47,9 +97,9 @@ class ExploreScreen extends StatelessWidget {
                 value: 'trending',
                 child: Row(
                   children: [
-                    Icon(Icons.trending_up, size: 20),
+                    Icon(Icons.trending_up, size: 20, color: MbuyColors.textPrimary),
                     SizedBox(width: 8),
-                    Text('الترند'),
+                    Text('الترند', style: TextStyle(color: MbuyColors.textPrimary)),
                   ],
                 ),
               ),
@@ -57,7 +107,48 @@ class ExploreScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: _ExploreScreenContent(userRole: userRole),
+    );
+  }
+
+  Widget _buildTabs(BuildContext context) {
+    // Placeholder الآن - يمكن إضافة Tabs لاحقاً
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: MbuyColors.surface,
+      ),
+      child: Row(
+        children: [
+          _buildTabButton('استكشف', true),
+          const SizedBox(width: 16),
+          _buildTabButton('الأصدقاء', false),
+          const SizedBox(width: 16),
+          _buildTabButton('الترند', false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String label, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: isSelected ? MbuyColors.primaryGradient : null,
+        color: isSelected ? null : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: isSelected
+            ? null
+            : Border.all(color: MbuyColors.surfaceLight, width: 1),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.white : MbuyColors.textSecondary,
+          fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          fontFamily: 'Arabic',
+        ),
+      ),
     );
   }
 }
@@ -146,14 +237,20 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: MbuyLoader(),
+      );
     }
 
     if (_products.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'لا توجد منتجات متاحة',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 18,
+            color: MbuyColors.textSecondary,
+            fontFamily: 'Arabic',
+          ),
         ),
       );
     }
@@ -176,7 +273,11 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
     String? userRole,
   ) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: MbuyColors.cardBackground,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -184,16 +285,23 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  MbuyColors.primaryBlue.withValues(alpha: 0.3),
+                  MbuyColors.primaryPurple.withValues(alpha: 0.3),
+                ],
+              ),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(8),
+                top: Radius.circular(16),
               ),
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 Icons.image,
                 size: 64,
-                color: Colors.grey,
+                color: MbuyColors.textSecondary,
               ),
             ),
           ),
@@ -206,13 +314,14 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                 if (store != null)
                   Row(
                     children: [
-                      const Icon(Icons.store, size: 16, color: Colors.blue),
+                      Icon(Icons.store, size: 16, color: MbuyColors.primaryBlue),
                       const SizedBox(width: 4),
                       Text(
                         store['name'] ?? 'متجر',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: MbuyColors.primaryBlue,
+                          fontFamily: 'Arabic',
                         ),
                       ),
                     ],
@@ -221,9 +330,11 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                 // عنوان المنتج
                 Text(
                   product['name'] ?? 'بدون اسم',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: MbuyColors.textPrimary,
+                    fontFamily: 'Arabic',
                   ),
                 ),
                 if (product['description'] != null) ...[
@@ -232,19 +343,21 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                     product['description'],
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: MbuyColors.textSecondary,
+                      fontFamily: 'Arabic',
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
                   '${product['price'] ?? 0} ر.س',
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: MbuyColors.primaryBlue,
+                    fontFamily: 'Arabic',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -254,7 +367,9 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: MbuySecondaryButton(
+                        text: 'شراء الآن',
+                        icon: Icons.shopping_bag,
                         onPressed: userRole == 'customer' && product['id'] != null
                             ? () async {
                                 try {
@@ -263,7 +378,7 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('تم إضافة المنتج إلى السلة'),
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: MbuyColors.success,
                                       ),
                                     );
                                   }
@@ -272,31 +387,26 @@ class _ExploreScreenContentState extends State<_ExploreScreenContent> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('خطأ: ${e.toString()}'),
-                                        backgroundColor: Colors.red,
+                                        backgroundColor: MbuyColors.error,
                                       ),
                                     );
                                   }
                                 }
                               }
                             : null, // معطل للتاجر (Viewer Mode)
-                        icon: const Icon(Icons.shopping_bag),
-                        label: const Text('شراء الآن'),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child: MbuyPrimaryButton(
+                        text: 'المتجر',
+                        icon: Icons.store,
                         onPressed: () {
                           // TODO: إضافة منطق "الانتقال إلى المتجر"
-                          // - جلب معلومات المتجر من جدول stores
-                          // - تتبع الحدث في Firebase Analytics (view_store)
-                          // - الانتقال إلى صفحة المتجر
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('الانتقال إلى المتجر')),
                           );
                         },
-                        icon: const Icon(Icons.store),
-                        label: const Text('المتجر'),
                       ),
                     ),
                   ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/mbuy_loader.dart';
+import '../../../../shared/widgets/story_ring.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -124,20 +127,31 @@ class _StoresScreenState extends State<StoresScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: MbuyColors.background,
       appBar: AppBar(
-        title: const Text('المتاجر'),
+        title: const Text(
+          'المتاجر',
+          style: TextStyle(
+            color: MbuyColors.textPrimary,
+            fontFamily: 'Arabic',
+          ),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MbuyLoader())
           : _stores.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
                     'لا توجد متاجر متاحة',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: MbuyColors.textSecondary,
+                      fontFamily: 'Arabic',
+                    ),
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(16),
                   itemCount: _stores.length,
                   itemBuilder: (context, index) {
                     return _buildStoreCard(_stores[index]);
@@ -160,67 +174,79 @@ class _StoresScreenState extends State<StoresScreen> {
       }
     }
 
+    // TODO: جلب hasStory من قاعدة البيانات (حالياً placeholder)
+    // يمكن إضافة حقل hasStory في جدول stores لاحقاً
+    final hasStory = store['has_story'] as bool? ?? false; // Placeholder
+
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      elevation: isBoosted ? 4 : 1, // ارتفاع أكبر للمتاجر المدعومة
-      color: isBoosted ? Colors.orange.shade50 : null,
+      margin: const EdgeInsets.only(bottom: 16),
+      color: MbuyColors.surfaceLight,
+      elevation: isBoosted ? 6 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: isBoosted
+            ? BorderSide(
+                width: 2,
+                color: MbuyColors.primaryBlue,
+              )
+            : BorderSide.none,
+      ),
       child: ListTile(
-        leading: Stack(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: isBoosted ? Colors.orange[100] : Colors.blue[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.store,
-                color: isBoosted ? Colors.orange : Colors.blue,
-                size: 32,
-              ),
+        contentPadding: const EdgeInsets.all(16),
+        leading: StoryRing(
+          hasStory: hasStory,
+          ringWidth: 3.0,
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: isBoosted
+                ? MbuyColors.primaryBlue.withValues(alpha: 0.3)
+                : MbuyColors.surface,
+            child: Icon(
+              Icons.store,
+              color: isBoosted ? MbuyColors.primaryBlue : MbuyColors.textSecondary,
+              size: 28,
             ),
-            if (isBoosted)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(
-                    color: Colors.orange,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.rocket_launch,
-                    color: Colors.white,
-                    size: 12,
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
         title: Row(
           children: [
             Expanded(
               child: Text(
                 store['name'] ?? 'بدون اسم',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: MbuyColors.textPrimary,
+                  fontSize: 16,
+                  fontFamily: 'Arabic',
+                ),
               ),
             ),
             if (isBoosted)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  gradient: MbuyColors.primaryGradient,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'مدعوم',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.rocket_launch,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'مدعوم',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Arabic',
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
@@ -228,30 +254,57 @@ class _StoresScreenState extends State<StoresScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 8),
             if (store['city'] != null)
-              Text('${store['city']}'),
-            if (store['description'] != null)
+              Text(
+                '${store['city']}',
+                style: TextStyle(
+                  color: MbuyColors.textSecondary,
+                  fontSize: 14,
+                  fontFamily: 'Arabic',
+                ),
+              ),
+            if (store['description'] != null) ...[
+              const SizedBox(height: 4),
               Text(
                 store['description'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MbuyColors.textSecondary,
+                  fontFamily: 'Arabic',
+                ),
               ),
-            if (isBoosted)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
+            ],
+            if (isBoosted) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: MbuyColors.primaryBlue.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Text(
                   'مميز لمدة محدودة',
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.orange.shade700,
+                    color: MbuyColors.primaryBlue,
                     fontWeight: FontWeight.w500,
+                    fontFamily: 'Arabic',
                   ),
                 ),
               ),
+            ],
+            // Badges المستقبلية (Placeholder)
+            // TODO: إضافة badges مثل "شحن مجاني"، "مدعوم"، إلخ
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: MbuyColors.textSecondary,
+        ),
         onTap: () {
           // TODO: الانتقال إلى صفحة المتجر
         },

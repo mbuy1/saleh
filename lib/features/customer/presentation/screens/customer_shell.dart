@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'explore_screen.dart';
 import 'stores_screen.dart';
 import 'home_screen.dart';
@@ -152,30 +153,110 @@ class _CustomerShellState extends State<CustomerShell> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        items: const [
+        showSelectedLabels: false, // إلغاء النص
+        showUnselectedLabels: false, // إلغاء النص
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'استكشف',
+            icon: _buildCircleIcon(
+              isSelected: _currentIndex == 0,
+              icon: Icons.explore,
+            ),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'المتاجر',
+            icon: _buildCircleIcon(
+              isSelected: _currentIndex == 1,
+              icon: Icons.store,
+            ),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'الرئيسية',
+            icon: _buildCircleIcon(
+              isSelected: _currentIndex == 2,
+              icon: Icons.home,
+            ),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'السلة',
+            icon: _buildCircleIcon(
+              isSelected: _currentIndex == 3,
+              icon: Icons.shopping_cart,
+            ),
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'الخريطة',
+            icon: _buildCircleIcon(
+              isSelected: _currentIndex == 4,
+              icon: Icons.map,
+            ),
+            label: '',
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildCircleIcon({
+    required bool isSelected,
+    required IconData icon,
+  }) {
+    // دائرة كاملة أصغر بألوان ناعمة فخمة عند الضغط
+    return SizedBox(
+      width: 24, // أصغر قليلاً
+      height: 24,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // دائرة الجراديانت الخارجية (عند الاختيار)
+          if (isSelected)
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CustomPaint(
+                painter: _CircleIconPainter(
+                  gradient: MbuyColors.circularGradient,
+                ),
+              ),
+            ),
+          // الأيقونة
+          Icon(
+            icon,
+            size: 18,
+            color: isSelected ? Colors.white : MbuyColors.textTertiary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Painter لرسم دائرة كاملة بألوان الشعار
+class _CircleIconPainter extends CustomPainter {
+  final SweepGradient gradient;
+
+  _CircleIconPainter({
+    required this.gradient,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..style = PaintingStyle.fill;
+
+    // إنشاء شادر للجراديانت
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final shader = gradient.createShader(rect);
+    paint.shader = shader;
+
+    // رسم دائرة كاملة
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 1;
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  @override
+  bool shouldRepaint(_CircleIconPainter oldDelegate) {
+    return oldDelegate.gradient != gradient;
   }
 }
 
