@@ -28,7 +28,7 @@ class FirebaseService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('✅ تم منح أذونات الإشعارات');
-      
+
       // الحصول على FCM Token
       String? token = await _messaging!.getToken();
       if (token != null) {
@@ -134,10 +134,7 @@ class FirebaseService {
   }) async {
     await _analytics?.logEvent(
       name: 'view_store',
-      parameters: {
-        'store_id': storeId,
-        'store_name': storeName ?? 'Unknown',
-      },
+      parameters: {'store_id': storeId, 'store_name': storeName ?? 'Unknown'},
     );
     debugPrint('📊 Analytics: عرض متجر $storeName');
   }
@@ -153,10 +150,7 @@ class FirebaseService {
     String eventName,
     Map<String, Object>? parameters,
   ) async {
-    await _analytics?.logEvent(
-      name: eventName,
-      parameters: parameters,
-    );
+    await _analytics?.logEvent(name: eventName, parameters: parameters);
     debugPrint('📊 Analytics: حدث مخصص $eventName');
   }
 }
