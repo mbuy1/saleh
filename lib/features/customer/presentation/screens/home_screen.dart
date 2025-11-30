@@ -59,8 +59,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMerchant = widget.userRole == 'merchant';
+
     return Scaffold(
-      appBar: AppBar(title: const Text('الرئيسية')),
+      appBar: AppBar(
+        title: const Text('الرئيسية'),
+        // رسالة توضيحية للتاجر في وضع Viewer Mode
+        bottom: isMerchant
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  color: Colors.orange.shade50,
+                  child: const Row(
+                    children: [
+                      Icon(Icons.visibility, size: 16, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'وضع التصفح فقط - لا يمكن الشراء أو إضافة للسلة',
+                          style: TextStyle(fontSize: 12, color: Colors.orange),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : null,
+      ),
       body: _isLoading
           ? const Center(child: MbuyLoader())
           : _products.isEmpty

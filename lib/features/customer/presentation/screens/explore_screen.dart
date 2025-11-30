@@ -13,6 +13,8 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMerchant = userRole == 'merchant';
+
     return Scaffold(
       backgroundColor: MbuyColors.background,
       body: SafeArea(
@@ -20,6 +22,32 @@ class ExploreScreen extends StatelessWidget {
           children: [
             // Header مع الشعار
             _buildHeader(context),
+            // رسالة توضيحية للتاجر في وضع Viewer Mode
+            if (isMerchant)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                color: Colors.orange.shade50,
+                child: const Row(
+                  children: [
+                    Icon(Icons.visibility, size: 18, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'أنت في وضع التصفح - لا يمكن الشراء أو إضافة للسلة',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             // Tabs (Placeholder الآن)
             _buildTabs(context),
             // المحتوى
