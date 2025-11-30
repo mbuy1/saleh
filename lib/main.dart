@@ -24,9 +24,10 @@ Future<void> main() async {
     debugPrint('⚠️ خطأ في تهيئة Firebase: $e');
   }
 
-  // تهيئة Supabase
+  // تهيئة Supabase مع حفظ الجلسة
   try {
     await initSupabase();
+    debugPrint('✅ تم تهيئة Supabase بنجاح');
   } catch (e) {
     // إذا فشل تهيئة Supabase، نتابع بدونها (للتطوير فقط)
     // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase

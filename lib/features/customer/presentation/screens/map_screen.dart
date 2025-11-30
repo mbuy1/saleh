@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import 'customer_orders_screen.dart';
+import 'profile_screen.dart';
+import 'categories_screen.dart';
+import 'favorites_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -83,9 +86,11 @@ class _MapScreenState extends State<MapScreen> {
                     IconButton(
                       icon: const Icon(Icons.person),
                       onPressed: () {
-                        // TODO: فتح صفحة الحساب
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('الحساب الشخصي')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
                         );
                       },
                       tooltip: 'الحساب الشخصي',
@@ -94,9 +99,11 @@ class _MapScreenState extends State<MapScreen> {
                     IconButton(
                       icon: const Icon(Icons.category),
                       onPressed: () {
-                        // TODO: فتح البحث بالفئات
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('البحث بالفئات')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CategoriesScreen(),
+                          ),
                         );
                       },
                       tooltip: 'البحث بالفئات',
@@ -105,9 +112,11 @@ class _MapScreenState extends State<MapScreen> {
                     IconButton(
                       icon: const Icon(Icons.favorite_border),
                       onPressed: () {
-                        // TODO: فتح المفضلة
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('المفضلة')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FavoritesScreen(),
+                          ),
                         );
                       },
                       tooltip: 'المفضلة',
@@ -141,9 +150,9 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   onSubmitted: (value) {
                     // TODO: إضافة منطق البحث
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('البحث عن: $value')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('البحث عن: $value')));
                   },
                 ),
               ],
@@ -154,54 +163,89 @@ class _MapScreenState extends State<MapScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _stores.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.map,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'لا توجد متاجر متاحة',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.map, size: 64, color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'لا توجد متاجر متاحة',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
                         ),
-                      )
-                    : Column(
-                        children: [
-                          // Placeholder للخريطة (سيتم استبداله بخريطة حقيقية لاحقاً)
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              color: Colors.grey[200],
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      // Placeholder للخريطة (سيتم استبداله بخريطة حقيقية لاحقاً)
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.map,
+                                  size: 64,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'خريطة المتاجر',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'سيتم إضافة خريطة حقيقية لاحقاً',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // قائمة المتاجر
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withValues(alpha: 0.3),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset: const Offset(0, -2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
                                   children: [
-                                    const Icon(
-                                      Icons.map,
-                                      size: 64,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(height: 16),
                                     const Text(
-                                      'خريطة المتاجر',
+                                      'المتاجر',
                                       style: TextStyle(
-                                        fontSize: 24,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    const Spacer(),
                                     Text(
-                                      'سيتم إضافة خريطة حقيقية لاحقاً',
+                                      '${_stores.length} متجر',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey[600],
@@ -210,63 +254,23 @@ class _MapScreenState extends State<MapScreen> {
                                   ],
                                 ),
                               ),
-                            ),
-                          ),
-                          // قائمة المتاجر
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withValues(alpha: 0.3),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, -2),
+                              Expanded(
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
                                   ),
-                                ],
+                                  itemCount: _stores.length,
+                                  itemBuilder: (context, index) {
+                                    return _buildStoreItem(_stores[index]);
+                                  },
+                                ),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          'المتاجر',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          '${_stores.length} متجر',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                                      itemCount: _stores.length,
-                                      itemBuilder: (context, index) {
-                                        return _buildStoreItem(_stores[index]);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -277,7 +281,7 @@ class _MapScreenState extends State<MapScreen> {
     // التحقق من أن المتجر مميز على الخريطة حالياً
     final highlightUntil = store['map_highlight_until'] as String?;
     bool isHighlighted = false;
-    
+
     if (highlightUntil != null) {
       try {
         final highlightDate = DateTime.parse(highlightUntil);
@@ -320,11 +324,7 @@ class _MapScreenState extends State<MapScreen> {
                     color: Colors.purple,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 12,
-                  ),
+                  child: const Icon(Icons.star, color: Colors.white, size: 12),
                 ),
               ),
           ],
@@ -361,8 +361,7 @@ class _MapScreenState extends State<MapScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (store['city'] != null)
-              Text('${store['city']}'),
+            if (store['city'] != null) Text('${store['city']}'),
             if (isHighlighted)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
@@ -388,4 +387,3 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 }
-

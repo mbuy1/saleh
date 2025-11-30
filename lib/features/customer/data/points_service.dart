@@ -1,9 +1,9 @@
 import '../../../../core/supabase_client.dart';
 
 class PointsService {
-  /// جلب نقاط المستخدم الحالي
-  /// 
-  /// Returns: Map يحتوي على بيانات حساب النقاط (user_id, points_balance)
+  /// جلب نقاط العميل الحالي
+  ///
+  /// Returns: Map يحتوي على بيانات حساب النقاط (user_id, account_type, points_balance)
   /// Throws: Exception إذا لم يكن المستخدم مسجل أو لم يوجد حساب نقاط
   static Future<Map<String, dynamic>> getPointsForCurrentUser() async {
     final user = supabaseClient.auth.currentUser;
@@ -12,14 +12,27 @@ class PointsService {
     }
 
     try {
+      // جلب حساب نقاط العميل فقط (account_type = 'customer')
       final response = await supabaseClient
           .from('points_accounts')
           .select()
           .eq('user_id', user.id)
+          .eq('account_type', 'customer')
           .maybeSingle();
 
       if (response == null) {
-        throw Exception('حساب النقاط غير موجود');
+        // إذا لم يوجد حساب نقاط، نقوم بإنشائه تلقائياً
+        final newAccount = await supabaseClient
+            .from('points_accounts')
+            .insert({
+              'user_id': user.id,
+              'account_type': 'customer',
+              'points_balance': 0,
+            })
+            .select()
+            .single();
+
+        return newAccount;
       }
 
       return response;
@@ -29,10 +42,10 @@ class PointsService {
   }
 
   /// جلب آخر عمليات النقاط للمستخدم الحالي
-  /// 
+  ///
   /// Parameters:
   /// - limit: عدد العمليات المطلوبة (افتراضي: 10)
-  /// 
+  ///
   /// Returns: List من عمليات النقاط مرتبة حسب التاريخ (الأحدث أولاً)
   /// Throws: Exception إذا لم يكن المستخدم مسجل
   static Future<List<Map<String, dynamic>>> getLastPointsTransactions({
@@ -62,4 +75,3 @@ class PointsService {
     }
   }
 }
-

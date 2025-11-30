@@ -3,6 +3,7 @@ import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
+import 'store_details_screen.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -130,179 +131,144 @@ class _StoresScreenState extends State<StoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MbuyColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'المتاجر',
-          style: TextStyle(color: MbuyColors.textPrimary, fontFamily: 'Arabic'),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(child: MbuyLoader())
-          : _stores.isEmpty
-          ? Center(
-              child: Text(
-                'لا توجد متاجر متاحة',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: MbuyColors.textSecondary,
-                  fontFamily: 'Arabic',
+      body: SafeArea(
+        child: Column(
+          children: [
+            // عنوان بسيط
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Text(
+                    'المتاجر',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: MbuyColors.textPrimary,
+                      fontFamily: 'Arabic',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // قائمة المتاجر أفقية نمط Snapchat
+            if (_isLoading)
+              const Expanded(child: Center(child: MbuyLoader()))
+            else if (_stores.isEmpty)
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'لا توجد متاجر متاحة',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: MbuyColors.textSecondary,
+                      fontFamily: 'Arabic',
+                    ),
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: _stores.length,
+                  itemBuilder: (context, index) {
+                    final store = _stores[index];
+                    return _buildStoreCircle(store);
+                  },
                 ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _stores.length,
-              itemBuilder: (context, index) {
-                return _buildStoreCard(_stores[index]);
-              },
-            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildStoreCard(Map<String, dynamic> store) {
-    // التحقق من أن المتجر مدعوم حالياً
-    final boostedUntil = store['boosted_until'] as String?;
-    bool isBoosted = false;
+  Widget _buildStoreCircle(Map<String, dynamic> store) {
+    final bool isBoosted = _isStoreBoosted(store);
 
-    if (boostedUntil != null) {
-      try {
-        final boostedDate = DateTime.parse(boostedUntil);
-        isBoosted = boostedDate.isAfter(DateTime.now());
-      } catch (e) {
-        // خطأ في parsing التاريخ
-      }
-    }
-
-    // TODO: جلب hasStory من قاعدة البيانات (حالياً placeholder)
-    // يمكن إضافة حقل hasStory في جدول stores لاحقاً
-    final hasStory = store['has_story'] as bool? ?? false; // Placeholder
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      color: MbuyColors.surfaceLight,
-      elevation: isBoosted ? 6 : 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: isBoosted
-            ? BorderSide(width: 2, color: MbuyColors.primaryBlue)
-            : BorderSide.none,
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: StoryRing(
-          hasStory: hasStory,
-          ringWidth: 3.0,
-          child: CircleAvatar(
-            radius: 30,
-            backgroundColor: isBoosted
-                ? MbuyColors.primaryBlue.withValues(alpha: 0.3)
-                : MbuyColors.surface,
-            child: Icon(
-              Icons.store,
-              color: isBoosted
-                  ? MbuyColors.primaryBlue
-                  : MbuyColors.textSecondary,
-              size: 28,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoreDetailsScreen(
+              storeId: store['id'],
+              storeName: store['name'] ?? 'متجر',
             ),
           ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                store['name'] ?? 'بدون اسم',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: MbuyColors.textPrimary,
-                  fontSize: 16,
-                  fontFamily: 'Arabic',
-                ),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // صورة دائرية مع حلقة Story
+          StoryRing(
+            hasStory: isBoosted,
+            child: Container(
+              width: 66,
+              height: 66,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: MbuyColors.surfaceLight,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
-            ),
-            if (isBoosted)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  gradient: MbuyColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.rocket_launch, color: Colors.white, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'مدعوم',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Arabic',
-                      ),
+              child: ClipOval(
+                child: Center(
+                  child: Text(
+                    (store['name'] as String?)?.substring(0, 1).toUpperCase() ??
+                        'M',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: MbuyColors.primaryPurple,
                     ),
-                  ],
-                ),
-              ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            if (store['city'] != null)
-              Text(
-                '${store['city']}',
-                style: TextStyle(
-                  color: MbuyColors.textSecondary,
-                  fontSize: 14,
-                  fontFamily: 'Arabic',
-                ),
-              ),
-            if (store['description'] != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                store['description'],
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: MbuyColors.textSecondary,
-                  fontFamily: 'Arabic',
-                ),
-              ),
-            ],
-            if (isBoosted) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: MbuyColors.primaryBlue.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'مميز لمدة محدودة',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: MbuyColors.primaryBlue,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Arabic',
                   ),
                 ),
               ),
-            ],
-            // Badges المستقبلية (Placeholder)
-            // TODO: إضافة badges مثل "شحن مجاني"، "مدعوم"، إلخ
-          ],
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: MbuyColors.textSecondary,
-        ),
-        onTap: () {
-          // TODO: الانتقال إلى صفحة المتجر
-        },
+            ),
+          ),
+          const SizedBox(height: 6),
+          // اسم المتجر
+          Text(
+            store['name'] ?? 'متجر',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: MbuyColors.textPrimary,
+              fontFamily: 'Arabic',
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
+  }
+
+  bool _isStoreBoosted(Map<String, dynamic> store) {
+    final boostedUntil = store['boosted_until'] as String?;
+    if (boostedUntil == null) return false;
+
+    try {
+      final date = DateTime.parse(boostedUntil);
+      return date.isAfter(DateTime.now());
+    } catch (e) {
+      return false;
+    }
   }
 }

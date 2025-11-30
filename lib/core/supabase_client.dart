@@ -2,9 +2,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// تهيئة Supabase
-/// 
+///
 /// يجب استدعاء هذه الدالة في main() قبل runApp()
-/// 
+///
 /// المفاتيح المطلوبة في ملف .env:
 /// - SUPABASE_URL: رابط مشروع Supabase
 /// - SUPABASE_ANON_KEY: المفتاح العام (anon key) من Supabase
@@ -23,14 +23,16 @@ Future<void> initSupabase() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
   );
 }
 
 /// Getter للوصول إلى Supabase client في بقية المشروع
-/// 
+///
 /// مثال الاستخدام:
 /// ```dart
 /// final response = supabaseClient.from('table_name').select();
 /// ```
 SupabaseClient get supabaseClient => Supabase.instance.client;
-

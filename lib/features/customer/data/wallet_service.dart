@@ -1,8 +1,8 @@
 import '../../../../core/supabase_client.dart';
 
 class WalletService {
-  /// جلب محفظة المستخدم الحالي
-  /// 
+  /// جلب محفظة العميل الحالي
+  ///
   /// Returns: Map يحتوي على بيانات المحفظة (user_id, account_type, balance)
   /// Throws: Exception إذا لم يكن المستخدم مسجل أو لم توجد محفظة
   static Future<Map<String, dynamic>> getWalletForCurrentUser() async {
@@ -12,14 +12,23 @@ class WalletService {
     }
 
     try {
+      // جلب محفظة العميل فقط (type = 'customer')
       final response = await supabaseClient
-          .from('wallet_accounts')
+          .from('wallets')
           .select()
-          .eq('user_id', user.id)
+          .eq('owner_id', user.id)
+          .eq('type', 'customer')
           .maybeSingle();
 
       if (response == null) {
-        throw Exception('المحفظة غير موجودة');
+        // إذا لم توجد محفظة، نقوم بإنشائها تلقائياً
+        final newWallet = await supabaseClient
+            .from('wallets')
+            .insert({'owner_id': user.id, 'type': 'customer', 'balance': 0.0})
+            .select()
+            .single();
+
+        return newWallet;
       }
 
       return response;
@@ -29,22 +38,21 @@ class WalletService {
   }
 
   /// جلب عمليات المحفظة للمستخدم الحالي
-  /// 
+  ///
   /// Parameters:
   /// - limit: عدد العمليات المطلوبة (افتراضي: 10)
-  /// 
+  ///
   /// Returns: List من عمليات المحفظة مرتبة حسب التاريخ (الأحدث أولاً)
   /// Throws: Exception إذا لم يكن المستخدم مسجل
-  static Future<List<Map<String, dynamic>>> getWalletTransactionsForCurrentUser({
-    int limit = 10,
-  }) async {
+  static Future<List<Map<String, dynamic>>>
+  getWalletTransactionsForCurrentUser({int limit = 10}) async {
     final user = supabaseClient.auth.currentUser;
     if (user == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
     try {
-      // جلب wallet_account أولاً
+      // جلب wallet أولاً
       final wallet = await getWalletForCurrentUser();
       final walletId = wallet['id'] as String;
 
@@ -52,7 +60,7 @@ class WalletService {
       final response = await supabaseClient
           .from('wallet_transactions')
           .select()
-          .eq('wallet_account_id', walletId)
+          .eq('wallet_id', walletId)
           .order('created_at', ascending: false)
           .limit(limit);
 
@@ -63,7 +71,7 @@ class WalletService {
   }
 
   /// جلب محفظة التاجر الحالي
-  /// 
+  ///
   /// Returns: Map يحتوي على بيانات محفظة التاجر
   /// Throws: Exception إذا لم يكن المستخدم مسجل أو لم توجد محفظة merchant
   static Future<Map<String, dynamic>> getMerchantWallet() async {
@@ -74,10 +82,10 @@ class WalletService {
 
     try {
       final response = await supabaseClient
-          .from('wallet_accounts')
+          .from('wallets')
           .select()
-          .eq('user_id', user.id)
-          .eq('account_type', 'merchant')
+          .eq('owner_id', user.id)
+          .eq('type', 'merchant')
           .maybeSingle();
 
       if (response == null) {
@@ -91,10 +99,10 @@ class WalletService {
   }
 
   /// جلب عمليات محفظة التاجر المرتبطة بالطلبات
-  /// 
+  ///
   /// Parameters:
   /// - limit: عدد العمليات المطلوبة (افتراضي: 10)
-  /// 
+  ///
   /// Returns: List من عمليات المحفظة مرتبة حسب التاريخ (الأحدث أولاً)
   /// Throws: Exception إذا لم يكن المستخدم مسجل
   static Future<List<Map<String, dynamic>>> getMerchantWalletTransactions({
@@ -114,7 +122,7 @@ class WalletService {
       final response = await supabaseClient
           .from('wallet_transactions')
           .select()
-          .eq('wallet_account_id', walletId)
+          .eq('wallet_id', walletId)
           .order('created_at', ascending: false)
           .limit(limit);
 
@@ -124,4 +132,3 @@ class WalletService {
     }
   }
 }
-

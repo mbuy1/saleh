@@ -1,49 +1,67 @@
 import 'package:flutter/material.dart';
 
-/// ألوان هوية Mbuy - يمكن تغييرها من هنا فقط
+/// ألوان هوية Mbuy - تصميم عصري وجذاب
 class MbuyColors {
-  // الألوان الأساسية من الشعار
-  static const Color primaryBlue = Color(0xFF00D2FF);
-  static const Color primaryPurple = Color(0xFFFF00FF);
-  
-  // الخلفيات الفاتحة (وضع فاتح)
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFF8F9FA);
-  static const Color surfaceLight = Color(0xFFF0F2F5);
+  // الألوان الأساسية - تدرجات حديثة
+  static const Color primaryBlue = Color(0xFF0EA5E9); // Sky Blue
+  static const Color primaryPurple = Color(0xFF8B5CF6); // Violet
+  static const Color accentPink = Color(0xFFEC4899); // Pink accent
+
+  // الخلفيات الحديثة
+  static const Color background = Color(0xFFFAFAFA);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceLight = Color(0xFFF3F4F6);
   static const Color cardBackground = Color(0xFFFFFFFF);
-  
-  // النصوص (وضع فاتح)
-  static const Color textPrimary = Color(0xFF1A1A1A);
+
+  // النصوص
+  static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color textTertiary = Color(0xFF9CA3AF);
-  
+
   // الألوان الثانوية
   static const Color error = Color(0xFFEF4444);
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
-  
-  // ألوان ناعمة للخلفيات
-  static const Color blueLight = Color(0xFFE0F7FF);
-  static const Color purpleLight = Color(0xFFFFE0FF);
-  
-  // الجراديانت الأساسي (من الأزرق إلى الموف) - ناعم
+
+  // ألوان التدرجات الخفيفة
+  static const Color blueLight = Color(0xFFE0F2FE);
+  static const Color purpleLight = Color(0xFFF3E8FF);
+  static const Color pinkLight = Color(0xFFFCE7F3);
+
+  // التدرجات العصرية - من أزرق سماوي لبنفسجي لوردي
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryBlue, primaryPurple],
+    colors: [primaryBlue, primaryPurple, accentPink],
   );
-  
-  // جراديانت ناعم للخلفيات
-  static const LinearGradient softGradient = LinearGradient(
+
+  // تدرج ناعم للبطاقات
+  static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [blueLight, purpleLight],
+    colors: [Color(0xFFEFF6FF), Color(0xFFF5F3FF)],
   );
-  
-  // جراديانت دائري للحدود
+
+  // تدرج للخلفيات
+  static const LinearGradient softGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [blueLight, purpleLight, pinkLight],
+  );
+
+  // تدرج دائري للأيقونات
   static const SweepGradient circularGradient = SweepGradient(
-    colors: [primaryBlue, primaryPurple, primaryBlue],
-    stops: [0.0, 0.5, 1.0],
+    colors: [primaryBlue, primaryPurple, accentPink, primaryBlue],
+    stops: [0.0, 0.33, 0.66, 1.0],
+  );
+
+  // تدرجات إضافية
+  static const LinearGradient successGradient = LinearGradient(
+    colors: [Color(0xFF10B981), Color(0xFF059669)],
+  );
+
+  static const LinearGradient warningGradient = LinearGradient(
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
   );
 }
 
@@ -53,10 +71,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      
+
       // الخلفية الأساسية
       scaffoldBackgroundColor: MbuyColors.background,
-      
+
       // ColorScheme
       colorScheme: const ColorScheme.light(
         primary: MbuyColors.primaryBlue,
@@ -68,7 +86,7 @@ class AppTheme {
         onSurface: MbuyColors.textPrimary,
         onError: Colors.white,
       ),
-      
+
       // AppBar Theme
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
@@ -83,22 +101,16 @@ class AppTheme {
         ),
         surfaceTintColor: Colors.transparent,
       ),
-      
-      // Card Theme - ناعم وحديث
+
+      // Card Theme - عصري مع ظل ناعم
       cardTheme: CardThemeData(
         color: MbuyColors.cardBackground,
         elevation: 0,
-        shadowColor: Colors.black.withValues(alpha: 0.05),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: Colors.grey.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
+        shadowColor: Colors.black.withValues(alpha: 0.08),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
-      
+
       // Text Theme - ناعم وواضح
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -178,19 +190,26 @@ class AppTheme {
           fontFamily: 'Arabic',
         ),
       ),
-      
-      // Elevated Button Theme
+
+      // Elevated Button Theme - عصري
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
+          backgroundColor: MbuyColors.primaryBlue,
+          foregroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shadowColor: MbuyColors.primaryBlue.withValues(alpha: 0.3),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Arabic',
           ),
         ),
       ),
-      
+
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -198,7 +217,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
-      
+
       // Input Decoration Theme - ناعم
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -224,7 +243,7 @@ class AppTheme {
           fontFamily: 'Arabic',
         ),
       ),
-      
+
       // Bottom Navigation Bar Theme - ناعم
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -236,11 +255,9 @@ class AppTheme {
           fontFamily: 'Arabic',
           fontWeight: FontWeight.w500,
         ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'Arabic',
-        ),
+        unselectedLabelStyle: const TextStyle(fontFamily: 'Arabic'),
       ),
-      
+
       // Drawer Theme
       drawerTheme: const DrawerThemeData(
         backgroundColor: Colors.white,
@@ -249,4 +266,3 @@ class AppTheme {
     );
   }
 }
-

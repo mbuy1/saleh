@@ -28,47 +28,25 @@ class _CustomerShellState extends State<CustomerShell> {
   int _currentIndex = 2; // Home هو الافتراضي (في المنتصف)
 
   List<Widget> get _screens => [
-        ExploreScreen(userRole: widget.userRole),
-        const StoresScreen(),
-        HomeScreen(userRole: widget.userRole),
-        CartScreen(userRole: widget.userRole),
-        const MapScreen(),
-      ];
+    ExploreScreen(userRole: widget.userRole),
+    const StoresScreen(),
+    HomeScreen(userRole: widget.userRole),
+    CartScreen(userRole: widget.userRole),
+    const MapScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // التحقق إذا كان المستخدم تاجر (حتى لو في وضع customer كمشاهد)
-    final bool isMerchant = widget.userRole == 'merchant';
+    final bool isExploreScreen = _currentIndex == 0;
 
     return Scaffold(
-      appBar: isMerchant
-          ? AppBar(
-              title: const Text('Saleh - وضع العميل'),
-              actions: [
-                // زر "لوحة التحكم" - يظهر فقط للتاجر
-                TextButton.icon(
-                  onPressed: () {
-                    // تغيير AppMode إلى merchant للعودة إلى لوحة التحكم
-                    widget.appModeProvider.setMerchantMode();
-                  },
-                  icon: const Icon(Icons.dashboard),
-                  label: const Text('لوحة التحكم'),
-                ),
-              ],
-            )
-          : AppBar(
-              title: const Text('Saleh'),
-              automaticallyImplyLeading: false,
-            ),
       drawer: widget.userRole == 'customer'
           ? Drawer(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
                   const DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                    ),
+                    decoration: BoxDecoration(color: Colors.blue),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -84,10 +62,7 @@ class _CustomerShellState extends State<CustomerShell> {
                         SizedBox(height: 8),
                         Text(
                           'تطبيق التسوق',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
                         ),
                       ],
                     ),
@@ -145,118 +120,98 @@ class _CustomerShellState extends State<CustomerShell> {
             )
           : null,
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false, // إلغاء النص
-        showUnselectedLabels: false, // إلغاء النص
-        items: [
-          BottomNavigationBarItem(
-            icon: _buildCircleIcon(
-              isSelected: _currentIndex == 0,
-              icon: Icons.explore,
+      extendBody: true,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: isExploreScreen
+              ? Colors.black.withValues(alpha: 0.6)
+              : Colors.white.withValues(alpha: 0.95),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
             ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildCircleIcon(
-              isSelected: _currentIndex == 1,
-              icon: Icons.store,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildCircleIcon(
-              isSelected: _currentIndex == 2,
-              icon: Icons.home,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildCircleIcon(
-              isSelected: _currentIndex == 3,
-              icon: Icons.shopping_cart,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildCircleIcon(
-              isSelected: _currentIndex == 4,
-              icon: Icons.map,
-            ),
-            label: '',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCircleIcon({
-    required bool isSelected,
-    required IconData icon,
-  }) {
-    // دائرة كاملة أصغر بألوان ناعمة فخمة عند الضغط
-    return SizedBox(
-      width: 24, // أصغر قليلاً
-      height: 24,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // دائرة الجراديانت الخارجية (عند الاختيار)
-          if (isSelected)
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: CustomPaint(
-                painter: _CircleIconPainter(
-                  gradient: MbuyColors.circularGradient,
-                ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          showSelectedLabels: false, // إلغاء النص
+          showUnselectedLabels: false, // إلغاء النص
+          items: [
+            BottomNavigationBarItem(
+              icon: _buildCircleIcon(
+                isSelected: _currentIndex == 0,
+                icon: Icons.explore,
               ),
+              label: '',
             ),
-          // الأيقونة
-          Icon(
-            icon,
-            size: 18,
-            color: isSelected ? Colors.white : MbuyColors.textTertiary,
-          ),
-        ],
+            BottomNavigationBarItem(
+              icon: _buildCircleIcon(
+                isSelected: _currentIndex == 1,
+                icon: Icons.store,
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildCircleIcon(
+                isSelected: _currentIndex == 2,
+                icon: Icons.home,
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildCircleIcon(
+                isSelected: _currentIndex == 3,
+                icon: Icons.shopping_cart,
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: _buildCircleIcon(
+                isSelected: _currentIndex == 4,
+                icon: Icons.map,
+              ),
+              label: '',
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-/// Painter لرسم دائرة كاملة بألوان الشعار
-class _CircleIconPainter extends CustomPainter {
-  final SweepGradient gradient;
+  Widget _buildCircleIcon({required bool isSelected, required IconData icon}) {
+    final bool isExploreScreen = _currentIndex == 0;
 
-  _CircleIconPainter({
-    required this.gradient,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
-
-    // إنشاء شادر للجراديانت
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final shader = gradient.createShader(rect);
-    paint.shader = shader;
-
-    // رسم دائرة كاملة
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 1;
-    canvas.drawCircle(center, radius, paint);
-  }
-
-  @override
-  bool shouldRepaint(_CircleIconPainter oldDelegate) {
-    return oldDelegate.gradient != gradient;
+    if (isSelected) {
+      // الأيقونة المحددة بتدرج لوني
+      return ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: [
+            MbuyColors.primaryBlue,
+            MbuyColors.primaryPurple,
+            MbuyColors.accentPink,
+          ],
+        ).createShader(bounds),
+        child: Icon(icon, size: 28, color: Colors.white),
+      );
+    } else {
+      // الأيقونة غير المحددة
+      return Icon(
+        icon,
+        size: 28,
+        color: isExploreScreen
+            ? Colors.white.withValues(alpha: 0.7)
+            : MbuyColors.textSecondary,
+      );
+    }
   }
 }
-

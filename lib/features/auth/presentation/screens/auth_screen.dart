@@ -13,7 +13,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _displayNameController = TextEditingController();
-  
+
   bool _isSignUp = false; // true = تسجيل جديد، false = تسجيل دخول
   bool _isLoading = false;
 
@@ -42,11 +42,11 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _passwordController.text,
           displayName: _displayNameController.text.trim(),
         );
-        
+
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم التسجيل بنجاح!')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('تم التسجيل بنجاح!')));
           // سيتم إعادة بناء الشاشة تلقائياً من Root Widget
         }
       } else {
@@ -55,7 +55,7 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('تم تسجيل الدخول بنجاح!')),
@@ -84,9 +84,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isSignUp ? 'تسجيل جديد' : 'تسجيل الدخول'),
-      ),
+      appBar: AppBar(title: Text(_isSignUp ? 'تسجيل جديد' : 'تسجيل الدخول')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -95,7 +93,7 @@ class _AuthScreenState extends State<AuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              
+
               // حقل الاسم المعروض (فقط عند التسجيل)
               if (_isSignUp) ...[
                 TextFormField(
@@ -114,7 +112,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              
+
               // حقل البريد الإلكتروني
               TextFormField(
                 controller: _emailController,
@@ -135,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // حقل كلمة المرور
               TextFormField(
                 controller: _passwordController,
@@ -156,7 +154,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              
+
               // زر الإرسال
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
@@ -172,7 +170,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     : Text(_isSignUp ? 'تسجيل جديد' : 'تسجيل الدخول'),
               ),
               const SizedBox(height: 16),
-              
+
               // زر التبديل بين تسجيل دخول وتسجيل جديد
               TextButton(
                 onPressed: _isLoading
@@ -189,6 +187,27 @@ class _AuthScreenState extends State<AuthScreen> {
                       : 'ليس لديك حساب؟ تسجيل جديد',
                 ),
               ),
+              const SizedBox(height: 8),
+
+              // زر التخطي (الدخول كضيف)
+              TextButton(
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        // إغلاق شاشة Auth والعودة (الدخول كضيف)
+                        // في المستقبل يمكن إضافة منطق للضيف
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('ميزة الدخول كضيف قريباً'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      },
+                child: const Text(
+                  'تخطي - الدخول كضيف',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
             ],
           ),
         ),
@@ -196,4 +215,3 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
-

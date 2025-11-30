@@ -5,7 +5,7 @@ import '../core/supabase_client.dart';
 import '../core/app_config.dart';
 import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
-import '../features/merchant/presentation/screens/merchant_dashboard_screen.dart';
+import '../features/merchant/presentation/screens/merchant_home_screen.dart';
 
 class RootWidget extends StatefulWidget {
   const RootWidget({super.key});
@@ -57,8 +57,9 @@ class _RootWidgetState extends State<RootWidget> {
       _isLoading = true;
     });
 
-    // جلب المستخدم الحالي
-    final user = supabaseClient.auth.currentUser;
+    // جلب المستخدم الحالي من الجلسة المحفوظة
+    final session = supabaseClient.auth.currentSession;
+    final user = session?.user;
 
     if (user != null) {
       // جلب role من user_profiles
@@ -118,7 +119,7 @@ class _RootWidgetState extends State<RootWidget> {
     // إذا المستخدم مسجل → عرض الشاشة المناسبة بناءً على AppMode
     // يمكن للتاجر التبديل إلى وضع العميل (كمشاهد)
     if (_appModeProvider.mode == AppMode.merchant) {
-      return MerchantDashboardScreen(appModeProvider: _appModeProvider);
+      return MerchantHomeScreen(appModeProvider: _appModeProvider);
     } else {
       return CustomerShell(
         appModeProvider: _appModeProvider,

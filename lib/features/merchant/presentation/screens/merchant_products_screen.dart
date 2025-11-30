@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/services/cloudflare_images_service.dart';
+import '../../../customer/presentation/screens/product_details_screen.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
   const MerchantProductsScreen({super.key});
@@ -103,100 +104,106 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     _descriptionController.clear();
     _priceController.clear();
     _stockController.clear();
-    _selectedImageFile = null;
+    setState(() {
+      _selectedImageFile = null;
+    });
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('إضافة منتج جديد'),
-        content: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'اسم المنتج *',
-                    border: OutlineInputBorder(),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('إضافة منتج جديد'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'اسم المنتج *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الرجاء إدخال اسم المنتج';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'الرجاء إدخال اسم المنتج';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'الوصف',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'الوصف',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
                   ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(
-                    labelText: 'السعر *',
-                    border: OutlineInputBorder(),
-                    prefixText: 'ر.س ',
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _priceController,
+                    decoration: const InputDecoration(
+                      labelText: 'السعر *',
+                      border: OutlineInputBorder(),
+                      prefixText: 'ر.س ',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الرجاء إدخال السعر';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'السعر يجب أن يكون رقماً';
+                      }
+                      return null;
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'الرجاء إدخال السعر';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'السعر يجب أن يكون رقماً';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _stockController,
-                  decoration: const InputDecoration(
-                    labelText: 'الكمية المتوفرة *',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _stockController,
+                    decoration: const InputDecoration(
+                      labelText: 'الكمية المتوفرة *',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الرجاء إدخال الكمية';
+                      }
+                      if (int.tryParse(value) == null) {
+                        return 'الكمية يجب أن تكون رقماً';
+                      }
+                      return null;
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'الرجاء إدخال الكمية';
-                    }
-                    if (int.tryParse(value) == null) {
-                      return 'الكمية يجب أن تكون رقماً';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                // اختيار صورة المنتج
-                _buildImagePicker(),
-              ],
+                  const SizedBox(height: 16),
+                  // اختيار صورة المنتج
+                  _buildImagePickerInDialog(setDialogState),
+                ],
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: (_isCreating || _isUploadingImage)
+                  ? null
+                  : _createProduct,
+              child: (_isCreating || _isUploadingImage)
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('إضافة'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: (_isCreating || _isUploadingImage) ? null : _createProduct,
-            child: (_isCreating || _isUploadingImage)
-                ? const SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('إضافة'),
-          ),
-        ],
       ),
     );
   }
@@ -295,45 +302,46 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('المنتجات'),
-      ),
+      appBar: AppBar(title: const Text('المنتجات')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _products.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.inventory_2_outlined,
-                          size: 64, color: Colors.grey),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'لا توجد منتجات',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: _showAddProductDialog,
-                        icon: const Icon(Icons.add),
-                        label: const Text('إضافة منتج جديد'),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.inventory_2_outlined,
+                    size: 64,
+                    color: Colors.grey,
                   ),
-                )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: _products.length,
-                        itemBuilder: (context, index) {
-                          return _buildProductCard(_products[index]);
-                        },
-                      ),
-                    ),
-                  ],
+                  const SizedBox(height: 16),
+                  const Text(
+                    'لا توجد منتجات',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton.icon(
+                    onPressed: _showAddProductDialog,
+                    icon: const Icon(Icons.add),
+                    label: const Text('إضافة منتج جديد'),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: _products.length,
+                    itemBuilder: (context, index) {
+                      return _buildProductCard(_products[index]);
+                    },
+                  ),
                 ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddProductDialog,
         child: const Icon(Icons.add),
@@ -345,6 +353,15 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ProductDetailsScreen(productId: product['id']),
+            ),
+          );
+        },
         leading: Container(
           width: 50,
           height: 50,
@@ -352,7 +369,9 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
           ),
-          child: (product['image_url'] != null || product['main_image_url'] != null)
+          child:
+              (product['image_url'] != null ||
+                  product['main_image_url'] != null)
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -379,17 +398,14 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     );
   }
 
-  /// Widget لاختيار صورة المنتج
-  Widget _buildImagePicker() {
+  /// Widget لاختيار صورة المنتج داخل Dialog
+  Widget _buildImagePickerInDialog(StateSetter setDialogState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'صورة المنتج',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Row(
@@ -405,10 +421,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    _selectedImageFile!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.file(_selectedImageFile!, fit: BoxFit.cover),
                 ),
               )
             else
@@ -425,7 +438,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: _pickImage,
+                onPressed: () => _pickImageInDialog(setDialogState),
                 icon: const Icon(Icons.photo_library),
                 label: const Text('اختر صورة'),
               ),
@@ -436,8 +449,8 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     );
   }
 
-  /// اختيار صورة من المعرض
-  Future<void> _pickImage() async {
+  /// اختيار صورة من المعرض داخل Dialog
+  Future<void> _pickImageInDialog(StateSetter setDialogState) async {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -448,6 +461,10 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
 
       if (image != null) {
         setState(() {
+          _selectedImageFile = File(image.path);
+        });
+        // تحديث Dialog أيضاً
+        setDialogState(() {
           _selectedImageFile = File(image.path);
         });
       }
@@ -463,4 +480,3 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     }
   }
 }
-
