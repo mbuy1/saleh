@@ -260,10 +260,13 @@ class _CustomerShellState extends State<CustomerShell> {
       extendBody: true,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.7),
+          // أبيض في صفحة الخريطة، رمادي شفاف في الصفحات الأخرى
+          color: _currentIndex == 4
+              ? Colors.white
+              : Colors.grey.withValues(alpha: 0.85),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -3),
             ),
@@ -290,8 +293,13 @@ class _CustomerShellState extends State<CustomerShell> {
             fontFamily: 'Cairo',
             fontSize: 11,
           ),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white.withValues(alpha: 0.6),
+          // ألوان الأيقونات تتغير حسب خلفية الصفحة
+          selectedItemColor: _currentIndex == 4
+              ? MbuyColors.primaryPurple
+              : Colors.white,
+          unselectedItemColor: _currentIndex == 4
+              ? Colors.grey.shade600
+              : Colors.white.withValues(alpha: 0.6),
           items: [
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
@@ -335,16 +343,31 @@ class _CustomerShellState extends State<CustomerShell> {
   }
 
   Widget _buildCircleIcon({required bool isSelected, required IconData icon}) {
+    // في صفحة الخريطة (_currentIndex == 4) نستخدم ألوان داكنة
+    final bool isMapPage = _currentIndex == 4;
+
     if (isSelected) {
-      // الأيقونة المحددة بتدرج Purple
-      return ShaderMask(
-        shaderCallback: (bounds) =>
-            MbuyColors.primaryGradient.createShader(bounds),
-        child: Icon(icon, size: 28, color: Colors.white),
-      );
+      // الأيقونة المحددة
+      if (isMapPage) {
+        return ShaderMask(
+          shaderCallback: (bounds) =>
+              MbuyColors.primaryGradient.createShader(bounds),
+          child: Icon(icon, size: 28, color: Colors.white),
+        );
+      } else {
+        return ShaderMask(
+          shaderCallback: (bounds) =>
+              MbuyColors.primaryGradient.createShader(bounds),
+          child: Icon(icon, size: 28, color: Colors.white),
+        );
+      }
     } else {
       // الأيقونة غير المحددة
-      return Icon(icon, size: 28, color: Colors.white.withValues(alpha: 0.6));
+      if (isMapPage) {
+        return Icon(icon, size: 28, color: Colors.grey.shade600);
+      } else {
+        return Icon(icon, size: 28, color: Colors.white.withValues(alpha: 0.6));
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/exceptions/error_handler.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
-import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/mbuy_search_bar.dart';
 import '../../../../shared/widgets/categories_bar.dart';
 import 'store_details_screen.dart';
 
@@ -138,69 +138,23 @@ class _StoresScreenState extends State<StoresScreen> {
             // عنوان مع أيقونة الحساب
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'المتاجر',
-                        style: GoogleFonts.cairo(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: MbuyColors.textPrimary,
-                        ),
-                      ),
-                    ),
+              child: Center(
+                child: Text(
+                  'المتاجر',
+                  style: GoogleFonts.cairo(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: MbuyColors.textPrimary,
                   ),
-                  const ProfileButton(),
-                ],
+                ),
               ),
             ),
-            // شريط البحث
+            // شريط البحث مع أيقونة الحساب
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    hintText: 'ابحث عن متجر...',
-                    hintStyle: TextStyle(
-                      color: MbuyColors.textSecondary,
-                      fontSize: 14,
-                      fontFamily: 'Arabic',
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: MbuyColors.textSecondary,
-                      size: 22,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: MbuyColors.textPrimary,
-                    fontSize: 14,
-                    fontFamily: 'Arabic',
-                  ),
-                  onChanged: (value) {
-                    // TODO: تنفيذ البحث
-                  },
-                ),
+              child: MbuySearchBar(
+                hintText: 'ابحث عن متجر...',
+                showProfileButton: true,
               ),
             ),
             const SizedBox(height: 16),

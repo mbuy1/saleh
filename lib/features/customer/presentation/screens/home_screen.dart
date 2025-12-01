@@ -4,9 +4,8 @@ import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
-import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/mbuy_search_bar.dart';
 import '../../../../shared/widgets/categories_bar.dart';
-import '../../../../shared/widgets/common_widgets.dart';
 import '../../data/cart_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -97,65 +96,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // العنوان مع أيقونة الحساب
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              'الرئيسية',
-                              style: GoogleFonts.cairo(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: MbuyColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const ProfileButton(),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // شريط البحث
-                    const MbuySearchBar(hintText: 'ابحث عن منتج...'),
-                    const SizedBox(height: 12),
-                    // زر عرض جميع الفئات
-                    InkWell(
-                      onTap: () {
-                        // TODO: Navigate to all categories screen
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: MbuyColors.borderLight),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.grid_view_rounded,
-                              size: 20,
-                              color: MbuyColors.primaryPurple,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'عرض جميع الفئات',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: MbuyColors.primaryPurple,
-                              ),
-                            ),
-                          ],
+                    // العنوان
+                    Center(
+                      child: Text(
+                        'الرئيسية',
+                        style: GoogleFonts.cairo(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: MbuyColors.textPrimary,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    // شريط البحث مع أيقونة الحساب
+                    MbuySearchBar(
+                      hintText: 'ابحث عن منتج...',
+                      showProfileButton: true,
                     ),
                   ],
                 ),

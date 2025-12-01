@@ -173,9 +173,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                 // أيقونة الحساب على اليمين (RTL)
                 const ProfileButton(),
                 const SizedBox(width: 12),
-                // Tabs في المنتصف
+                // Tabs محركة قليلاً لليسار
                 Expanded(
-                  child: Center(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
                     child: Container(
                       height: 40,
                       constraints: const BoxConstraints(maxWidth: 300),

@@ -21,12 +21,33 @@ class CategoriesBar extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'الفئات',
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: MbuyColors.textPrimary,
+          child: InkWell(
+            onTap: () {
+              // TODO: Navigate to all categories screen
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => AllCategoriesScreen()));
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'جميع الفئات',
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: MbuyColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.arrow_back_ios,
+                    size: 14,
+                    color: MbuyColors.textSecondary,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
