@@ -292,12 +292,12 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         title: const Text('السلة'),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         actions: const [
-          Padding(padding: EdgeInsets.only(left: 8), child: ProfileButton()),
+          Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: ProfileButton(),
+          ),
         ],
       ),
       body: _isLoading

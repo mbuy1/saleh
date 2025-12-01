@@ -135,16 +135,12 @@ class _StoresScreenState extends State<StoresScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // عنوان مع أيقونة الحساب وزر العودة
+            // عنوان مع أيقونة الحساب
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
