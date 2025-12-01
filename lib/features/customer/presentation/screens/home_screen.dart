@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
-import '../../../../shared/widgets/mbuy_loader.dart';
-import '../../../../shared/widgets/mbuy_search_bar.dart';
-import '../../../../shared/widgets/categories_bar.dart';
-import '../../data/cart_service.dart';
+import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/enhanced_search_bar.dart';
+import '../../../../shared/widgets/section_header.dart';
+import '../../../../shared/widgets/product_card_compact.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String? userRole; // 'customer' أو 'merchant'
+  final String? userRole;
 
   const HomeScreen({super.key, this.userRole});
 
@@ -17,392 +16,230 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>> _products = [];
-  bool _isLoading = true;
-  String _selectedCategoryId = 'all';
-  bool _useDummyData = false; // تبديل بين البيانات الحقيقية والوهمية
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
-  Future<void> _loadProducts() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (_useDummyData) {
-        // استخدام البيانات الوهمية
-        await Future.delayed(
-          const Duration(milliseconds: 500),
-        ); // محاكاة التحميل
-        final products = DummyData.getProductsByCategory(_selectedCategoryId);
-        setState(() {
-          _products = products.map((p) => p.toJson()).toList();
-        });
-      } else {
-        // جلب من Supabase
-        final response = await supabaseClient
-            .from('products')
-            .select()
-            .eq('status', 'active')
-            .limit(20)
-            .order('created_at', ascending: false);
-
-        setState(() {
-          _products = List<Map<String, dynamic>>.from(response);
-        });
-      }
-    } catch (e) {
-      // في حالة فشل Supabase، استخدم البيانات الوهمية
-      final products = DummyData.getProductsByCategory(_selectedCategoryId);
-      setState(() {
-        _products = products.map((p) => p.toJson()).toList();
-        _useDummyData = true;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم التحويل للبيانات التجريبية'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MbuyColors.background,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // شريط البحث والفلاتر
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // العنوان
-                    Center(
-                      child: Text(
-                        'الرئيسية',
-                        style: GoogleFonts.cairo(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: MbuyColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // شريط البحث مع أيقونة الحساب
-                    MbuySearchBar(
-                      hintText: 'ابحث عن منتج...',
-                      showProfileButton: true,
-                    ),
-                  ],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 60,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            // التبويبات
+            Expanded(
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: false,
+                indicatorColor: MbuyColors.primaryPurple,
+                indicatorWeight: 3,
+                labelColor: MbuyColors.primaryPurple,
+                unselectedLabelColor: MbuyColors.textSecondary,
+                labelStyle: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+                unselectedLabelStyle: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                tabs: const [
+                  Tab(text: 'المنتجات'),
+                  Tab(text: 'الفئات'),
+                ],
               ),
             ),
-            // شريط الفئات
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: CategoriesBar(
-                  selectedCategoryId: _selectedCategoryId,
-                  onCategorySelected: (categoryId) {
-                    setState(() {
-                      _selectedCategoryId = categoryId;
-                    });
-                    _loadProducts();
-                  },
-                ),
-              ),
-            ),
-
-            // المنتجات
-            if (_isLoading)
-              const SliverFillRemaining(child: Center(child: MbuyLoader()))
-            else if (_products.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(32),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: MbuyColors.cardGradient,
-                        ),
-                        child: const Icon(
-                          Icons.inventory_2_outlined,
-                          size: 80,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'لا توجد منتجات متاحة',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'تحقق مرة أخرى قريبًا',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return _buildProductCard(_products[index]);
-                  }, childCount: _products.length),
-                ),
-              ),
+            const SizedBox(width: 12),
+            // أيقونة الحساب
+            const ProfileButton(),
           ],
         ),
+      ),
+      body: Column(
+        children: [
+          // شريط البحث
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: const EnhancedSearchBar(),
+          ),
+          // المحتوى
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [_buildProductsTab(), _buildCategoriesTab()],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
-    final isCustomer = widget.userRole == 'customer';
-    final productId = product['id'] as String?;
+  Widget _buildProductsTab() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      children: [
+        _buildSection(
+          title: 'أفضل العروض',
+          subtitle: 'خصومات حصرية',
+          icon: Icons.local_fire_department,
+          products: DummyData.products.take(5).toList(),
+        ),
+        _buildSection(
+          title: 'الأعلى تصنيفاً',
+          subtitle: 'منتجات موثوقة',
+          icon: Icons.star,
+          products: DummyData.products.skip(5).take(5).toList(),
+        ),
+        _buildSection(
+          title: 'وصل حديثاً',
+          subtitle: 'أحدث المنتجات',
+          icon: Icons.new_releases,
+          products: DummyData.products.skip(10).take(5).toList(),
+        ),
+        _buildSection(
+          title: 'مختاراتك',
+          subtitle: 'خصيصاً لك',
+          icon: Icons.favorite,
+          products: DummyData.products.skip(15).take(5).toList(),
+        ),
+        _buildSection(
+          title: 'عشوائية',
+          subtitle: 'اكتشف المزيد',
+          icon: Icons.shuffle,
+          products: DummyData.products.take(8).toList(),
+          isFeed: true,
+        ),
+      ],
+    );
+  }
 
+  Widget _buildCategoriesTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'الفئات',
+          style: GoogleFonts.cairo(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: MbuyColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          children: [
+            _buildCategoryCard('إلكترونيات', Icons.phone_android, Colors.blue),
+            _buildCategoryCard('أزياء', Icons.checkroom, Colors.pink),
+            _buildCategoryCard('منزل', Icons.home, Colors.orange),
+            _buildCategoryCard('رياضة', Icons.sports_soccer, Colors.green),
+            _buildCategoryCard('جمال', Icons.spa, Colors.purple),
+            _buildCategoryCard('كتب', Icons.book, Colors.brown),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List products,
+    bool isFeed = false,
+  }) {
+    return Container(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        children: [
+          SectionHeader(
+            title: title,
+            subtitle: subtitle,
+            icon: icon,
+            onViewMore: () {},
+          ),
+          if (isFeed)
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.7,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                return ProductCardCompact(
+                  product: products[index],
+                  width: double.infinity,
+                );
+              },
+            )
+          else
+            SizedBox(
+              height: 240,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  return ProductCardCompact(product: products[index]);
+                },
+              ),
+            ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(String name, IconData icon, Color color) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: MbuyColors.primaryBlue.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: () {
-            // Navigate to product details
-          },
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {},
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Modern Image with Gradient
-              Expanded(
-                flex: 3,
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: MbuyColors.cardGradient,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    // Subtle Overlay
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.05),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Product Info
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Name
-                      Text(
-                        product['name'] ?? 'بدون اسم',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          height: 1.2,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-
-                      // Price & Add Button
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Price
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: MbuyColors.successGradient,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${product['price'] ?? 0} ر.س',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-
-                          // Add to Cart Button - للعميل فقط
-                          if (isCustomer && productId != null)
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: MbuyColors.primaryGradient,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: MbuyColors.primaryBlue.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () async {
-                                    if (!mounted) return;
-                                    final scaffoldMessenger =
-                                        ScaffoldMessenger.of(context);
-                                    try {
-                                      await CartService.addToCart(productId);
-                                      if (mounted) {
-                                        scaffoldMessenger.showSnackBar(
-                                          SnackBar(
-                                            content: const Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.check_circle,
-                                                  color: Colors.white,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  'تم إضافة المنتج إلى السلة',
-                                                ),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.green,
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    } catch (e) {
-                                      if (mounted) {
-                                        scaffoldMessenger.showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.error,
-                                                  color: Colors.white,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Text(
-                                                    'خطأ: ${e.toString()}',
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.red,
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Icon(
-                                      Icons.add_shopping_cart,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
+              Icon(icon, size: 40, color: color),
+              const SizedBox(height: 8),
+              Text(
+                name,
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: color,
                 ),
               ),
             ],

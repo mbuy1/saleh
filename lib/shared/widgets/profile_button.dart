@@ -13,9 +13,7 @@ class ProfileButton extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const ProfileScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
         );
       },
       child: Container(
@@ -46,4 +44,3 @@ class ProfileButton extends StatelessWidget {
     );
   }
 }
-

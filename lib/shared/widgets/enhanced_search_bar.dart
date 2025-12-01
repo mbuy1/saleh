@@ -108,7 +108,8 @@ class _EnhancedSearchBarState extends State<EnhancedSearchBar> {
                 color: MbuyColors.textSecondary,
                 size: 22,
               ),
-              onPressed: widget.onImageSearch ??
+              onPressed:
+                  widget.onImageSearch ??
                   () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('قريباً: البحث بالصورة')),
@@ -127,7 +128,8 @@ class _EnhancedSearchBarState extends State<EnhancedSearchBar> {
                   color: MbuyColors.primaryPurple,
                   size: 22,
                 ),
-                onPressed: widget.onVoiceSearch ??
+                onPressed:
+                    widget.onVoiceSearch ??
                     () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('قريباً: البحث الصوتي')),

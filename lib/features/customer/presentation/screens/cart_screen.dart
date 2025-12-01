@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../data/cart_service.dart';
 import '../../data/order_service.dart';
 import '../../data/coupon_service.dart';
 import '../../../../core/permissions_helper.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/product_card_compact.dart';
+import '../../../../shared/widgets/section_header.dart';
 
 class CartScreen extends StatefulWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -288,13 +293,39 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final itemCount = _cartItems.length;
+
     return Scaffold(
+      backgroundColor: MbuyColors.surface,
       appBar: AppBar(
-        title: const Text('السلة'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Text(
+          'عربة التسوق ${itemCount > 0 ? "($itemCount)" : ""}',
+          style: GoogleFonts.cairo(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: MbuyColors.textPrimary,
+          ),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
-        actions: const [
-          Padding(padding: EdgeInsets.only(left: 8), child: ProfileButton()),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.favorite_border,
+              color: MbuyColors.textSecondary,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('قريباً: المفضلة')));
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: ProfileButton(),
+          ),
         ],
       ),
       body: _isLoading
@@ -324,25 +355,65 @@ class _CartScreenState extends State<CartScreen> {
               ),
             )
           : _cartItems.isEmpty
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.shopping_cart_outlined,
-                    size: 64,
-                    color: Colors.grey,
+                    size: 80,
+                    color: Colors.grey.shade300,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Text(
-                    'السلة فارغة',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    'عربة تسوقك فارغة',
+                    style: GoogleFonts.cairo(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: MbuyColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'أضف منتجات لتبدأ التسوق',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      color: MbuyColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MbuyColors.primaryPurple,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'استكشف المنتجات',
+                      style: GoogleFonts.cairo(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             )
           : Column(
               children: [
+                // شريط حماية الطلبات من mBuy
+                _buildOrderProtectionBar(),
                 // قائمة العناصر
                 Expanded(
                   child: ListView.builder(
@@ -522,6 +593,8 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
                 ),
+                // منتجات مقترحة
+                _buildSuggestedProducts(),
               ],
             ),
     );
@@ -594,5 +667,129 @@ class _CartScreenState extends State<CartScreen> {
     } else {
       return '${discountValue.toStringAsFixed(2)} ر.س';
     }
+  }
+
+  Widget _buildOrderProtectionBar() {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: MbuyColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.verified_user,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'حماية الطلبات من mBuy',
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: MbuyColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildProtectionFeature(Icons.support_agent, 'دعم 24/7'),
+              ),
+              Expanded(
+                child: _buildProtectionFeature(
+                  Icons.assignment_return,
+                  'استرداد المبلغ',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildProtectionFeature(
+                  Icons.local_shipping_outlined,
+                  'توصيل مضمون',
+                ),
+              ),
+              Expanded(
+                child: _buildProtectionFeature(Icons.security, 'دفع آمن'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProtectionFeature(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: MbuyColors.primaryPurple),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: MbuyColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSuggestedProducts() {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          SectionHeader(
+            title: 'منتجات مقترحة',
+            subtitle: 'قد تعجبك أيضاً',
+            icon: Icons.recommend_outlined,
+            onViewMore: () {},
+          ),
+          SizedBox(
+            height: 240,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: 6,
+              itemBuilder: (context, index) {
+                final products = DummyData.products;
+                if (index >= products.length) return const SizedBox();
+                return ProductCardCompact(product: products[index]);
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
   }
 }

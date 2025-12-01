@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/exceptions/app_exception.dart';
-import '../../../../core/exceptions/error_handler.dart';
-import '../../../../shared/widgets/mbuy_loader.dart';
-import '../../../../shared/widgets/story_ring.dart';
-import '../../../../shared/widgets/mbuy_search_bar.dart';
-import '../../../../shared/widgets/categories_bar.dart';
-import 'store_details_screen.dart';
+import '../../../../core/data/dummy_data.dart';
+import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/enhanced_search_bar.dart';
+import '../../../../shared/widgets/section_header.dart';
+import '../../../../shared/widgets/store_card_compact.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -17,268 +14,240 @@ class StoresScreen extends StatefulWidget {
   State<StoresScreen> createState() => _StoresScreenState();
 }
 
-class _StoresScreenState extends State<StoresScreen> {
-  List<Map<String, dynamic>> _stores = [];
-  bool _isLoading = true;
+class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _loadStores();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
-  Future<void> _loadStores() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // جلب المتاجر العامة والنشطة
-      // ترتيب: المتاجر المدعومة أولاً (boosted_until > now())، ثم الباقي
-      final response = await supabaseClient
-          .from('stores')
-          .select()
-          .eq('visibility', 'public')
-          .eq('status', 'active')
-          .order('created_at', ascending: false);
-
-      // تحويل إلى List وترتيبها
-      List<Map<String, dynamic>> stores = List<Map<String, dynamic>>.from(
-        response,
-      );
-
-      // ترتيب المتاجر: المدعومة أولاً
-      stores.sort((a, b) {
-        final aBoosted = a['boosted_until'] as String?;
-        final bBoosted = b['boosted_until'] as String?;
-
-        // إذا كان a مدعوم و b غير مدعوم
-        if (aBoosted != null && bBoosted == null) {
-          try {
-            final aDate = DateTime.parse(aBoosted);
-            if (aDate.isAfter(DateTime.now())) {
-              return -1; // a يأتي أولاً
-            }
-          } catch (e) {
-            // خطأ في parsing التاريخ
-          }
-        }
-
-        // إذا كان b مدعوم و a غير مدعوم
-        if (bBoosted != null && aBoosted == null) {
-          try {
-            final bDate = DateTime.parse(bBoosted);
-            if (bDate.isAfter(DateTime.now())) {
-              return 1; // b يأتي أولاً
-            }
-          } catch (e) {
-            // خطأ في parsing التاريخ
-          }
-        }
-
-        // إذا كان كلاهما مدعوم أو غير مدعوم، نرتب حسب boosted_until ثم created_at
-        if (aBoosted != null && bBoosted != null) {
-          try {
-            final aDate = DateTime.parse(aBoosted);
-            final bDate = DateTime.parse(bBoosted);
-            final aActive = aDate.isAfter(DateTime.now());
-            final bActive = bDate.isAfter(DateTime.now());
-
-            if (aActive && bActive) {
-              // كلاهما مدعوم، نرتب حسب boosted_until (الأحدث أولاً)
-              return bDate.compareTo(aDate);
-            } else if (aActive) {
-              return -1; // a مدعوم و b غير مدعوم
-            } else if (bActive) {
-              return 1; // b مدعوم و a غير مدعوم
-            }
-          } catch (e) {
-            // خطأ في parsing التاريخ
-          }
-        }
-
-        // إذا لم يكن هناك دعم، نرتب حسب created_at
-        final aCreated = a['created_at'] as String?;
-        final bCreated = b['created_at'] as String?;
-        if (aCreated != null && bCreated != null) {
-          try {
-            return DateTime.parse(bCreated).compareTo(DateTime.parse(aCreated));
-          } catch (e) {
-            // خطأ في parsing التاريخ
-          }
-        }
-
-        return 0;
-      });
-
-      setState(() {
-        _stores = stores;
-      });
-    } catch (e) {
-      if (mounted) {
-        final exception = AppException.fromException(e);
-        ErrorHandler.showErrorSnackBar(context, exception);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MbuyColors.background,
-      body: SafeArea(
-        child: Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 60,
+        automaticallyImplyLeading: false,
+        title: Row(
           children: [
-            // عنوان مع أيقونة الحساب
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: Text(
-                  'المتاجر',
-                  style: GoogleFonts.cairo(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: MbuyColors.textPrimary,
-                  ),
+            // Ø§Ù„ØªØ¨ÙˆÙŠØ¨Ø§Øª
+            Expanded(
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: false,
+                indicatorColor: MbuyColors.primaryPurple,
+                indicatorWeight: 3,
+                labelColor: MbuyColors.primaryPurple,
+                unselectedLabelColor: MbuyColors.textSecondary,
+                labelStyle: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+                unselectedLabelStyle: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                tabs: const [
+                  Tab(text: 'Ø§Ù„Ù…ØªØ§Ø¬Ø±'),
+                  Tab(text: 'Ø§Ù„ÙØ¦Ø§Øª'),
+                ],
               ),
             ),
-            // شريط البحث مع أيقونة الحساب
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: MbuySearchBar(
-                hintText: 'ابحث عن متجر...',
-                showProfileButton: true,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // شريط الفئات
-            const CategoriesBar(),
-            const SizedBox(height: 16),
-            // قائمة المتاجر أفقية نمط Snapchat
-            if (_isLoading)
-              const Expanded(child: Center(child: MbuyLoader()))
-            else if (_stores.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Text(
-                    'لا توجد متاجر متاحة',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: MbuyColors.textSecondary,
-                      fontFamily: 'Arabic',
-                    ),
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: _stores.length,
-                  itemBuilder: (context, index) {
-                    final store = _stores[index];
-                    return _buildStoreCircle(store);
-                  },
-                ),
-              ),
+            const SizedBox(width: 12),
+            // Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø§Ù„Ø­Ø³Ø§Ø¨
+            const ProfileButton(),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStoreCircle(Map<String, dynamic> store) {
-    final bool isBoosted = _isStoreBoosted(store);
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => StoreDetailsScreen(
-              storeId: store['id'],
-              storeName: store['name'] ?? 'متجر',
-            ),
-          ),
-        );
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      body: Column(
         children: [
-          // صورة دائرية مع حلقة Story
-          StoryRing(
-            hasStory: isBoosted,
-            child: Container(
-              width: 66,
-              height: 66,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: MbuyColors.surfaceLight,
-                border: Border.all(color: Colors.white, width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Center(
-                  child: Text(
-                    (store['name'] as String?)?.substring(0, 1).toUpperCase() ??
-                        'M',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: MbuyColors.primaryPurple,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          // Ø´Ø±ÙŠØ· Ø§Ù„Ø¨Ø­Ø«
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: const EnhancedSearchBar(),
           ),
-          const SizedBox(height: 6),
-          // اسم المتجر
-          Text(
-            store['name'] ?? 'متجر',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: MbuyColors.textPrimary,
-              fontFamily: 'Arabic',
+          // Ø§Ù„Ù…Ø­ØªÙˆÙ‰
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildStoresTab(),
+                _buildCategoriesTab(),
+              ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  bool _isStoreBoosted(Map<String, dynamic> store) {
-    final boostedUntil = store['boosted_until'] as String?;
-    if (boostedUntil == null) return false;
+  Widget _buildStoresTab() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      children: [
+        _buildSection(
+          title: 'Ø£ÙØ¶Ù„ Ø§Ù„Ù…ØªØ§Ø¬Ø±',
+          subtitle: 'Ø§Ù„Ø£ÙƒØ«Ø± Ø·Ù„Ø¨Ø§Ù‹',
+          icon: Icons.local_fire_department,
+          stores: DummyData.stores.take(5).toList(),
+        ),
+        _buildSection(
+          title: 'Ø§Ù„Ø£Ø¹Ù„Ù‰ ØªÙ‚ÙŠÙŠÙ…Ø§Ù‹',
+          subtitle: 'Ù…ØªØ§Ø¬Ø± Ù…ÙˆØ«ÙˆÙ‚Ø©',
+          icon: Icons.star,
+          stores: DummyData.stores.skip(5).take(5).toList(),
+        ),
+        _buildSection(
+          title: 'Ù…ØªØ§Ø¬Ø± Ø¬Ø¯ÙŠØ¯Ø©',
+          subtitle: 'Ø§ÙƒØªØ´Ù Ø§Ù„Ø¬Ø¯ÙŠØ¯',
+          icon: Icons.new_releases,
+          stores: DummyData.stores.take(5).toList(),
+        ),
+        _buildSection(
+          title: 'Ø²Ø±ØªÙ‡Ø§ Ø³Ø§Ø¨Ù‚Ø§Ù‹',
+          subtitle: 'Ù…ØªØ§Ø¬Ø±Ùƒ Ø§Ù„Ù…ÙØ¶Ù„Ø©',
+          icon: Icons.history,
+          stores: DummyData.stores.skip(5).take(5).toList(),
+        ),
+        _buildSection(
+          title: 'Ù…ØªØ§Ø¬Ø± Ù…Ù‚ØªØ±Ø­Ø©',
+          subtitle: 'Ù‚Ø¯ ØªØ¹Ø¬Ø¨Ùƒ',
+          icon: Icons.recommend,
+          stores: DummyData.stores.take(6).toList(),
+          isGrid: true,
+        ),
+      ],
+    );
+  }
 
-    try {
-      final date = DateTime.parse(boostedUntil);
-      return date.isAfter(DateTime.now());
-    } catch (e) {
-      return false;
-    }
+  Widget _buildCategoriesTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'ÙØ¦Ø§Øª Ø§Ù„Ù…ØªØ§Ø¬Ø±',
+          style: GoogleFonts.cairo(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: MbuyColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          children: [
+            _buildCategoryCard('Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Øª', Icons.phone_android, Colors.blue),
+            _buildCategoryCard('Ø£Ø²ÙŠØ§Ø¡', Icons.checkroom, Colors.pink),
+            _buildCategoryCard('Ù…Ù†Ø²Ù„', Icons.home, Colors.orange),
+            _buildCategoryCard('Ø±ÙŠØ§Ø¶Ø©', Icons.sports_soccer, Colors.green),
+            _buildCategoryCard('Ø¬Ù…Ø§Ù„', Icons.spa, Colors.purple),
+            _buildCategoryCard('ÙƒØªØ¨', Icons.book, Colors.brown),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List stores,
+    bool isGrid = false,
+  }) {
+    return Container(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        children: [
+          SectionHeader(
+            title: title,
+            subtitle: subtitle,
+            icon: icon,
+            onViewMore: () {},
+          ),
+          if (isGrid)
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.85,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: stores.length,
+              itemBuilder: (context, index) {
+                return StoreCardCompact(
+                  store: stores[index],
+                  width: double.infinity,
+                );
+              },
+            )
+          else
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: stores.length,
+                itemBuilder: (context, index) {
+                  return StoreCardCompact(store: stores[index]);
+                },
+              ),
+            ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(String name, IconData icon, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {},
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: color),
+              const SizedBox(height: 8),
+              Text(
+                name,
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
+

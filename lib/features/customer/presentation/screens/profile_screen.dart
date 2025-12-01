@@ -80,7 +80,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('تسجيل الخروج', style: GoogleFonts.cairo(color: Colors.white)),
+            child: Text(
+              'تسجيل الخروج',
+              style: GoogleFonts.cairo(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -175,11 +178,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.help_outline, color: MbuyColors.textSecondary),
+                      icon: const Icon(
+                        Icons.help_outline,
+                        color: MbuyColors.textSecondary,
+                      ),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(Icons.settings_outlined, color: MbuyColors.textSecondary),
+                      icon: const Icon(
+                        Icons.settings_outlined,
+                        color: MbuyColors.textSecondary,
+                      ),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('قريباً: الإعدادات')),
@@ -187,7 +196,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.arrow_forward, color: MbuyColors.textSecondary),
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color: MbuyColors.textSecondary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -203,22 +215,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         children: [
-                          _buildFeatureItem(Icons.favorite_border, 'المفضلة', () {}),
+                          _buildFeatureItem(
+                            Icons.favorite_border,
+                            'المفضلة',
+                            () {},
+                          ),
                           _buildFeatureItem(Icons.history, 'سجل التصفح', () {}),
-                          _buildFeatureItem(Icons.local_offer_outlined, 'القسائم', () {}),
-                          _buildFeatureItem(Icons.account_balance_wallet_outlined, 'رصيد mBuy', () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const WalletScreen()),
-                            );
-                          }),
+                          _buildFeatureItem(
+                            Icons.local_offer_outlined,
+                            'القسائم',
+                            () {},
+                          ),
+                          _buildFeatureItem(
+                            Icons.account_balance_wallet_outlined,
+                            'رصيد mBuy',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const WalletScreen(),
+                                ),
+                              );
+                            },
+                          ),
                           _buildFeatureItem(Icons.stars_outlined, 'النقاط', () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const PointsScreen()),
+                              MaterialPageRoute(
+                                builder: (context) => const PointsScreen(),
+                              ),
                             );
                           }),
-                          _buildFeatureItem(Icons.location_on_outlined, 'عناوين الشحن', () {}),
+                          _buildFeatureItem(
+                            Icons.location_on_outlined,
+                            'عناوين الشحن',
+                            () {},
+                          ),
                         ],
                       ),
                     ),
@@ -246,9 +278,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildOrderStatus(Icons.payment, 'قيد الدفع', 0),
-                            _buildOrderStatus(Icons.local_shipping_outlined, 'قيد الشحن', 0),
-                            _buildOrderStatus(Icons.inventory_2_outlined, 'قيد الاستلام', 0),
-                            _buildOrderStatus(Icons.rate_review_outlined, 'قيد التقييم', 0),
+                            _buildOrderStatus(
+                              Icons.local_shipping_outlined,
+                              'قيد الشحن',
+                              0,
+                            ),
+                            _buildOrderStatus(
+                              Icons.inventory_2_outlined,
+                              'قيد الاستلام',
+                              0,
+                            ),
+                            _buildOrderStatus(
+                              Icons.rate_review_outlined,
+                              'قيد التقييم',
+                              0,
+                            ),
                           ],
                         ),
                       ],

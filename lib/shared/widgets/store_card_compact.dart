@@ -141,11 +141,7 @@ class StoreCardCompact extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.star,
-                        size: 14,
-                        color: Colors.amber,
-                      ),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
                       const SizedBox(width: 4),
                       Text(
                         store.rating.toStringAsFixed(1),
@@ -160,7 +156,9 @@ class StoreCardCompact extends StatelessWidget {
                         'متحقق ✔',
                         style: GoogleFonts.cairo(
                           fontSize: 11,
-                          color: store.isVerified ? Colors.green : MbuyColors.textSecondary,
+                          color: store.isVerified
+                              ? Colors.green
+                              : MbuyColors.textSecondary,
                         ),
                       ),
                     ],
