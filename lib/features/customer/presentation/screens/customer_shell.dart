@@ -196,7 +196,13 @@ class _CustomerShellState extends State<CustomerShell> {
 
                     // التأكد من بقاء الزر داخل الشاشة
                     newX = newX.clamp(0.0, screenSize.width - buttonWidth);
-                    newY = newY.clamp(0.0, screenSize.height - buttonHeight - padding.top - padding.bottom);
+                    newY = newY.clamp(
+                      0.0,
+                      screenSize.height -
+                          buttonHeight -
+                          padding.top -
+                          padding.bottom,
+                    );
 
                     _backButtonPosition = Offset(newX, newY);
                   });

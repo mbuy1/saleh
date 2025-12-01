@@ -2,11 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' show cos, sin, sqrt, asin;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import 'store_details_screen.dart';
+
+/// موديل المتجر مع المسافة
+class StoreWithDistance {
+  final Store store;
+  final double distanceInKm;
+
+  StoreWithDistance(this.store, this.distanceInKm);
+}
+
+/// دالة حساب المسافة بين نقطتين باستخدام Haversine formula
+double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  const double earthRadius = 6371; // نصف قطر الأرض بالكيلومتر
+
+  final double dLat = _toRadians(lat2 - lat1);
+  final double dLon = _toRadians(lon2 - lon1);
+
+  final double a =
+      (sin(dLat / 2) * sin(dLat / 2)) +
+      cos(_toRadians(lat1)) *
+          cos(_toRadians(lat2)) *
+          (sin(dLon / 2) * sin(dLon / 2));
+
+  final double c = 2 * asin(sqrt(a));
+  return earthRadius * c;
+}
+
+double _toRadians(double degree) {
+  return degree * 3.141592653589793 / 180;
+}
+
+/// قائمة المدن المتاحة
+class City {
+  final String name;
+  final double latitude;
+  final double longitude;
+
+  const City(this.name, this.latitude, this.longitude);
+}
+
+final List<City> availableCities = [
+  const City('الرياض', 24.7136, 46.6753),
+  const City('جدة', 21.4858, 39.1925),
+  const City('الدمام', 26.4207, 50.0888),
+  const City('مكة المكرمة', 21.3891, 39.8579),
+  const City('المدينة المنورة', 24.5247, 39.5692),
+];
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -17,16 +64,25 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late final MapController _mapController;
-  late final List<Store> _stores;
-  late final List<Marker> _markers;
+  late List<StoreWithDistance> _storesWithDistance;
+  late List<Marker> _markers;
   bool _isInitialized = false;
+
+  // موقع المركز الحالي (موقع المستخدم أو المدينة المختارة)
+  LatLng _currentCenter = const LatLng(24.7136, 46.6753); // الرياض افتراضياً
+  String _selectedCityName = 'الرياض';
+
+  // نصف قطر الدائرة بالكيلومتر (TODO: يمكن جعله قابل للتغيير)
+  final double _radiusInKm = 10.0;
+
+  // TODO: يمكن الحصول على موقع المستخدم الفعلي باستخدام geolocator package
+  // bool _useUserLocation = false;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-    _stores = _loadStores();
-    _markers = _buildMarkers();
+    _loadStoresWithDistance();
     if (mounted) {
       setState(() => _isInitialized = true);
     }
@@ -38,26 +94,48 @@ class _MapScreenState extends State<MapScreen> {
     super.dispose();
   }
 
-  List<Store> _loadStores() {
+  /// تحميل المتاجر مع حساب المسافة من المركز الحالي
+  void _loadStoresWithDistance() {
     try {
-      return DummyData.stores
+      final stores = DummyData.stores
           .where((s) => s.latitude != null && s.longitude != null)
           .toList();
+
+      // حساب المسافة لكل متجر
+      _storesWithDistance = stores.map((store) {
+        final distance = calculateDistance(
+          _currentCenter.latitude,
+          _currentCenter.longitude,
+          store.latitude!,
+          store.longitude!,
+        );
+        return StoreWithDistance(store, distance);
+      }).toList();
+
+      // ترتيب المتاجر حسب المسافة (الأقرب أولاً)
+      _storesWithDistance.sort(
+        (a, b) => a.distanceInKm.compareTo(b.distanceInKm),
+      );
+
+      // بناء الـ markers
+      _markers = _buildMarkers();
     } catch (e) {
-      debugPrint('Error loading stores: $e');
-      return [];
+      debugPrint('Error loading stores with distance: $e');
+      _storesWithDistance = [];
+      _markers = [];
     }
   }
 
   List<Marker> _buildMarkers() {
-    return _stores.map((store) {
+    return _storesWithDistance.map((storeWithDist) {
       try {
+        final store = storeWithDist.store;
         return Marker(
           width: 50,
           height: 50,
           point: LatLng(store.latitude!, store.longitude!),
           child: GestureDetector(
-            onTap: () => _onMarkerTap(store),
+            onTap: () => _onMarkerTap(storeWithDist),
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -86,19 +164,21 @@ class _MapScreenState extends State<MapScreen> {
     }).toList();
   }
 
-  void _onMarkerTap(Store store) {
+  void _onMarkerTap(StoreWithDistance storeWithDist) {
     if (!mounted) return;
     try {
+      final store = storeWithDist.store;
       if (store.latitude != null && store.longitude != null) {
         _mapController.move(LatLng(store.latitude!, store.longitude!), 15.0);
       }
-      _showStoreBottomSheet(store);
+      _showStoreBottomSheet(storeWithDist);
     } catch (e) {
       debugPrint('Error on marker tap: $e');
     }
   }
 
-  void _showStoreBottomSheet(Store store) {
+  void _showStoreBottomSheet(StoreWithDistance storeWithDist) {
+    final store = storeWithDist.store;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -139,6 +219,26 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 if (store.isVerified)
                   const Icon(Icons.verified, color: Colors.blue, size: 24),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // المسافة
+            Row(
+              children: [
+                Icon(
+                  Icons.directions_walk,
+                  size: 16,
+                  color: MbuyColors.primaryPurple,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${storeWithDist.distanceInKm.toStringAsFixed(1)} كم',
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: MbuyColors.primaryPurple,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -282,6 +382,51 @@ class _MapScreenState extends State<MapScreen> {
                 tileSize: 256,
                 keepBuffer: 2,
               ),
+              // دائرة نصف القطر حول المركز الحالي
+              CircleLayer(
+                circles: [
+                  CircleMarker(
+                    point: _currentCenter,
+                    radius: _radiusInKm * 1000, // تحويل من كم إلى متر
+                    useRadiusInMeter: true,
+                    color: MbuyColors.primaryPurple.withValues(alpha: 0.15),
+                    borderColor: MbuyColors.primaryPurple.withValues(
+                      alpha: 0.5,
+                    ),
+                    borderStrokeWidth: 2,
+                  ),
+                ],
+              ),
+              // Marker للمركز الحالي
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    width: 40,
+                    height: 40,
+                    point: _currentCenter,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MbuyColors.primaryPurple,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // Markers للمتاجر
               MarkerLayer(markers: _markers),
             ],
           ),
@@ -296,30 +441,89 @@ class _MapScreenState extends State<MapScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // العنوان على اليسار
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                    // العنوان وزر المدينة
+                    Expanded(
+                      child: Row(
+                        children: [
+                          // العنوان
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              'الخريطة',
+                              style: GoogleFonts.cairo(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: MbuyColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // زر تحديد المدينة
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _showCitySelector,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: MbuyColors.primaryGradient,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: MbuyColors.primaryPurple
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.location_city,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      _selectedCityName,
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                      ),
-                      child: Text(
-                        'الخريطة',
-                        style: GoogleFonts.cairo(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: MbuyColors.textPrimary,
-                        ),
                       ),
                     ),
                     // إيقونة الحساب الشخصي على اليمين
@@ -374,6 +578,115 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
     );
+  }
+
+  /// عرض قائمة اختيار المدينة
+  void _showCitySelector() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // العنوان
+            Text(
+              'اختر المدينة',
+              style: GoogleFonts.cairo(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: MbuyColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // قائمة المدن
+            ...availableCities
+                .map(
+                  (city) => ListTile(
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: city.name == _selectedCityName
+                            ? MbuyColors.primaryGradient
+                            : null,
+                        color: city.name == _selectedCityName
+                            ? null
+                            : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.location_city,
+                        color: city.name == _selectedCityName
+                            ? Colors.white
+                            : Colors.grey[600],
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      city.name,
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: city.name == _selectedCityName
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: city.name == _selectedCityName
+                            ? MbuyColors.primaryPurple
+                            : MbuyColors.textPrimary,
+                      ),
+                    ),
+                    trailing: city.name == _selectedCityName
+                        ? const Icon(
+                            Icons.check_circle,
+                            color: MbuyColors.primaryPurple,
+                          )
+                        : null,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _selectCity(city);
+                    },
+                  ),
+                ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// اختيار مدينة وتحديث الخريطة
+  void _selectCity(City city) {
+    if (!mounted) return;
+
+    setState(() {
+      _selectedCityName = city.name;
+      _currentCenter = LatLng(city.latitude, city.longitude);
+
+      // إعادة حساب المسافات بناءً على المركز الجديد
+      _loadStoresWithDistance();
+    });
+
+    // تحريك الخريطة إلى المدينة المختارة
+    try {
+      _mapController.move(_currentCenter, 13.0);
+    } catch (e) {
+      debugPrint('Error moving map: $e');
+    }
   }
 }
 
