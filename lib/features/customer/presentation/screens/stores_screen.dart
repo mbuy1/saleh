@@ -3,6 +3,8 @@ import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
+import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/categories_bar.dart';
 import 'store_details_screen.dart';
 
 class StoresScreen extends StatefulWidget {
@@ -134,10 +136,11 @@ class _StoresScreenState extends State<StoresScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // عنوان بسيط
+            // عنوان مع أيقونة الحساب
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'المتاجر',
@@ -148,9 +151,60 @@ class _StoresScreenState extends State<StoresScreen> {
                       fontFamily: 'Arabic',
                     ),
                   ),
+                  const ProfileButton(),
                 ],
               ),
             ),
+            // شريط البحث
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن متجر...',
+                    hintStyle: TextStyle(
+                      color: MbuyColors.textSecondary,
+                      fontSize: 14,
+                      fontFamily: 'Arabic',
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: MbuyColors.textSecondary,
+                      size: 22,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: MbuyColors.textPrimary,
+                    fontSize: 14,
+                    fontFamily: 'Arabic',
+                  ),
+                  onChanged: (value) {
+                    // TODO: تنفيذ البحث
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // شريط الفئات
+            const CategoriesBar(),
+            const SizedBox(height: 16),
             // قائمة المتاجر أفقية نمط Snapchat
             if (_isLoading)
               const Expanded(child: Center(child: MbuyLoader()))

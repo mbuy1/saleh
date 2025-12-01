@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
+import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/categories_bar.dart';
+import '../../../../shared/widgets/common_widgets.dart';
 import '../../data/cart_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _products = [];
   bool _isLoading = true;
+  String _selectedCategoryId = 'all';
+  bool _useDummyData = false; // تبديل بين البيانات الحقيقية والوهمية
 
   @override
   void initState() {
@@ -29,23 +36,41 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      // جلب أول 20 منتج نشط
-      final response = await supabaseClient
-          .from('products')
-          .select()
-          .eq('status', 'active')
-          .limit(20)
-          .order('created_at', ascending: false);
+      if (_useDummyData) {
+        // استخدام البيانات الوهمية
+        await Future.delayed(
+          const Duration(milliseconds: 500),
+        ); // محاكاة التحميل
+        final products = DummyData.getProductsByCategory(_selectedCategoryId);
+        setState(() {
+          _products = products.map((p) => p.toJson()).toList();
+        });
+      } else {
+        // جلب من Supabase
+        final response = await supabaseClient
+            .from('products')
+            .select()
+            .eq('status', 'active')
+            .limit(20)
+            .order('created_at', ascending: false);
 
-      setState(() {
-        _products = List<Map<String, dynamic>>.from(response);
-      });
+        setState(() {
+          _products = List<Map<String, dynamic>>.from(response);
+        });
+      }
     } catch (e) {
+      // في حالة فشل Supabase، استخدم البيانات الوهمية
+      final products = DummyData.getProductsByCategory(_selectedCategoryId);
+      setState(() {
+        _products = products.map((p) => p.toJson()).toList();
+        _useDummyData = true;
+      });
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في جلب المنتجات: ${e.toString()}'),
-            backgroundColor: Colors.red,
+          const SnackBar(
+            content: Text('تم التحويل للبيانات التجريبية'),
+            backgroundColor: Colors.orange,
           ),
         );
       }
@@ -60,112 +85,57 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isMerchant = widget.userRole == 'merchant';
-
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              MbuyColors.primaryBlue.withValues(alpha: 0.05),
-              Colors.white,
-              Colors.white,
-            ],
-          ),
-        ),
+      backgroundColor: MbuyColors.background,
+      body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Modern App Bar with Gradient
-            SliverAppBar(
-              expandedHeight: isMerchant ? 180 : 140,
-              floating: true,
-              pinned: true,
-              backgroundColor: Colors.transparent,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: MbuyColors.primaryGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: MbuyColors.primaryBlue.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: FlexibleSpaceBar(
-                  title: const Text(
-                    'اكتشف منتجاتنا',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
-                    ),
-                  ),
-                  centerTitle: true,
-                  background: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 60,
-                      left: 20,
-                      right: 20,
-                    ),
-                    child: Column(
+            // شريط البحث والفلاتر
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // العنوان مع أيقونة الحساب
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (isMerchant) ...[
-                          const SizedBox(height: 50),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.visibility,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    'وضع التصفح فقط',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        Text(
+                          'الرئيسية',
+                          style: GoogleFonts.cairo(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: MbuyColors.textPrimary,
                           ),
-                        ] else ...[
-                          const SizedBox(height: 20),
-                          Icon(
-                            Icons.shopping_bag_outlined,
-                            color: Colors.white.withValues(alpha: 0.3),
-                            size: 50,
-                          ),
-                        ],
+                        ),
+                        const ProfileButton(),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    // شريط البحث
+                    const MbuySearchBar(hintText: 'ابحث عن منتج...'),
+                  ],
+                ),
+              ),
+            ),
+            // شريط الفئات
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: CategoriesBar(
+                  selectedCategoryId: _selectedCategoryId,
+                  onCategorySelected: (categoryId) {
+                    setState(() {
+                      _selectedCategoryId = categoryId;
+                    });
+                    _loadProducts();
+                  },
                 ),
               ),
             ),
 
-            // Content
+            // المنتجات
             if (_isLoading)
               const SliverFillRemaining(child: Center(child: MbuyLoader()))
             else if (_products.isEmpty)
@@ -209,20 +179,16 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 sliver: SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.72,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    return _buildHomeItem(
-                      context,
-                      _products[index],
-                      widget.userRole,
-                    );
+                    return _buildProductCard(_products[index]);
                   }, childCount: _products.length),
                 ),
               ),
@@ -232,12 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHomeItem(
-    BuildContext context,
-    Map<String, dynamic> product,
-    String? userRole,
-  ) {
-    final isCustomer = userRole == 'customer';
+  Widget _buildProductCard(Map<String, dynamic> product) {
+    final isCustomer = widget.userRole == 'customer';
     final productId = product['id'] as String?;
 
     return Container(

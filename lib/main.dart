@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
 import 'core/firebase_service.dart';
 import 'core/root_widget.dart' as app;
@@ -45,32 +46,48 @@ Future<void> main() async {
     debugPrint('   التطبيق سيعمل لكن رفع الصور لن يكون متاحاً');
   }
 
-  runApp(const MyApp());
+  // تهيئة Theme Provider
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadThemeMode();
+
+  runApp(MyApp(themeProvider: themeProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeProvider themeProvider;
+
+  const MyApp({super.key, required this.themeProvider});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mbuy',
-      debugShowCheckedModeBanner: false,
-      // استخدام الثيم الفاتح الجديد
-      theme: AppTheme.lightTheme,
-      // تفعيل RTL للعربية
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ar', 'SA'), // العربية
-        Locale('en', 'US'), // الإنجليزية
-      ],
-      locale: const Locale('ar', 'SA'),
-      // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
-      home: const app.RootWidget(),
+    return ListenableBuilder(
+      listenable: themeProvider,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Mbuy',
+          debugShowCheckedModeBanner: false,
+
+          // Theme Configuration
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
+
+          // تفعيل RTL للعربية
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ar', 'SA'), // العربية
+            Locale('en', 'US'), // الإنجليزية
+          ],
+          locale: const Locale('ar', 'SA'),
+
+          // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
+          home: app.RootWidget(themeProvider: themeProvider),
+        );
+      },
     );
   }
 }

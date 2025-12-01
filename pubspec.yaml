@@ -55,6 +55,9 @@ dependencies:
   
   # Image picker
   image_picker: ^1.0.7
+  
+  # Google Fonts - Cairo font for mBuy
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:

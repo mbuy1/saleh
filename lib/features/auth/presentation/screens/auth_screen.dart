@@ -195,13 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ? null
                     : () {
                         // إغلاق شاشة Auth والعودة (الدخول كضيف)
-                        // في المستقبل يمكن إضافة منطق للضيف
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('ميزة الدخول كضيف قريباً'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
+                        Navigator.of(context).pop();
                       },
                 child: const Text(
                   'تخطي - الدخول كضيف',

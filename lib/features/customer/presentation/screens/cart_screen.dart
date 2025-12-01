@@ -3,6 +3,7 @@ import '../../data/cart_service.dart';
 import '../../data/order_service.dart';
 import '../../data/coupon_service.dart';
 import '../../../../core/permissions_helper.dart';
+import '../../../../shared/widgets/profile_button.dart';
 
 class CartScreen extends StatefulWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -288,7 +289,10 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('السلة')),
+      appBar: AppBar(
+        title: const Text('السلة'),
+        actions: const [ProfileButton()],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : widget.userRole == 'merchant'

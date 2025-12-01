@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_provider.dart';
 import 'explore_screen.dart';
 import 'stores_screen.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'map_screen.dart';
+import 'settings_screen.dart';
 import 'customer_wallet_screen.dart';
 import 'customer_points_screen.dart';
 import 'customer_orders_screen.dart';
@@ -13,11 +15,13 @@ import 'customer_orders_screen.dart';
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;
   final String? userRole; // 'customer' أو 'merchant'
+  final ThemeProvider? themeProvider;
 
   const CustomerShell({
     super.key,
     required this.appModeProvider,
     this.userRole,
+    this.themeProvider,
   });
 
   @override
@@ -37,8 +41,6 @@ class _CustomerShellState extends State<CustomerShell> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isExploreScreen = _currentIndex == 0;
-
     return Scaffold(
       drawer: widget.userRole == 'customer'
           ? Drawer(
@@ -46,13 +48,15 @@ class _CustomerShellState extends State<CustomerShell> {
                 padding: EdgeInsets.zero,
                 children: [
                   const DrawerHeader(
-                    decoration: BoxDecoration(color: Colors.blue),
+                    decoration: BoxDecoration(
+                      gradient: MbuyColors.primaryGradient,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'Saleh',
+                          'mBuy',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -112,23 +116,83 @@ class _CustomerShellState extends State<CustomerShell> {
                     title: const Text('الإعدادات'),
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: إضافة شاشة الإعدادات
+                      if (widget.themeProvider != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(
+                              themeProvider: widget.themeProvider!,
+                            ),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],
               ),
             )
           : null,
-      body: _screens[_currentIndex],
+      body: Stack(
+        children: [
+          _screens[_currentIndex],
+          // زر العودة للتاجر في الأعلى
+          if (widget.userRole == 'merchant')
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        widget.appModeProvider.setMerchantMode();
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'العودة',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Cairo',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
       extendBody: true,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isExploreScreen
-              ? Colors.black.withValues(alpha: 0.6)
-              : Colors.white.withValues(alpha: 0.95),
+          color: Colors.black.withValues(alpha: 0.7),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, -3),
             ),
@@ -144,43 +208,54 @@ class _CustomerShellState extends State<CustomerShell> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
-          showSelectedLabels: false, // إلغاء النص
-          showUnselectedLabels: false, // إلغاء النص
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 11,
+          ),
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white.withValues(alpha: 0.6),
           items: [
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
                 isSelected: _currentIndex == 0,
                 icon: Icons.explore,
               ),
-              label: '',
+              label: 'اكسبلور',
             ),
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
                 isSelected: _currentIndex == 1,
                 icon: Icons.store,
               ),
-              label: '',
+              label: 'المتاجر',
             ),
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
                 isSelected: _currentIndex == 2,
                 icon: Icons.home,
               ),
-              label: '',
+              label: 'الرئيسية',
             ),
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
                 isSelected: _currentIndex == 3,
                 icon: Icons.shopping_cart,
               ),
-              label: '',
+              label: 'السلة',
             ),
             BottomNavigationBarItem(
               icon: _buildCircleIcon(
                 isSelected: _currentIndex == 4,
                 icon: Icons.map,
               ),
-              label: '',
+              label: 'الخريطة',
             ),
           ],
         ),
@@ -189,29 +264,16 @@ class _CustomerShellState extends State<CustomerShell> {
   }
 
   Widget _buildCircleIcon({required bool isSelected, required IconData icon}) {
-    final bool isExploreScreen = _currentIndex == 0;
-
     if (isSelected) {
-      // الأيقونة المحددة بتدرج لوني
+      // الأيقونة المحددة بتدرج Purple
       return ShaderMask(
-        shaderCallback: (bounds) => LinearGradient(
-          colors: [
-            MbuyColors.primaryBlue,
-            MbuyColors.primaryPurple,
-            MbuyColors.accentPink,
-          ],
-        ).createShader(bounds),
+        shaderCallback: (bounds) =>
+            MbuyColors.primaryGradient.createShader(bounds),
         child: Icon(icon, size: 28, color: Colors.white),
       );
     } else {
       // الأيقونة غير المحددة
-      return Icon(
-        icon,
-        size: 28,
-        color: isExploreScreen
-            ? Colors.white.withValues(alpha: 0.7)
-            : MbuyColors.textSecondary,
-      );
+      return Icon(icon, size: 28, color: Colors.white.withValues(alpha: 0.6));
     }
   }
 }

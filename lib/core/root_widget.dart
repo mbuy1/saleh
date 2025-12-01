@@ -3,12 +3,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/presentation/screens/auth_screen.dart';
 import '../core/supabase_client.dart';
 import '../core/app_config.dart';
+import '../core/theme/theme_provider.dart';
 import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
 import '../features/merchant/presentation/screens/merchant_home_screen.dart';
 
 class RootWidget extends StatefulWidget {
-  const RootWidget({super.key});
+  final ThemeProvider themeProvider;
+
+  const RootWidget({super.key, required this.themeProvider});
 
   @override
   State<RootWidget> createState() => _RootWidgetState();
@@ -106,7 +109,7 @@ class _RootWidgetState extends State<RootWidget> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: const Center(child: MbuyLoader()),
       );
     }
@@ -124,6 +127,7 @@ class _RootWidgetState extends State<RootWidget> {
       return CustomerShell(
         appModeProvider: _appModeProvider,
         userRole: _userRole,
+        themeProvider: widget.themeProvider,
       );
     }
   }

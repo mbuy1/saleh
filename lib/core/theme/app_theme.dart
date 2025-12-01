@@ -1,67 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-/// ألوان هوية Mbuy - تصميم عصري وجذاب
+/// ألوان هوية mBuy - Meta AI Style × mBuy Purple Identity
 class MbuyColors {
-  // الألوان الأساسية - تدرجات حديثة
-  static const Color primaryBlue = Color(0xFF0EA5E9); // Sky Blue
-  static const Color primaryPurple = Color(0xFF8B5CF6); // Violet
-  static const Color accentPink = Color(0xFFEC4899); // Pink accent
+  // الألوان الأساسية - mBuy Purple Palette
+  static const Color primaryPurple = Color(0xFF7B2CF5); // mBuy Purple
+  static const Color primaryLight = Color(0xFFA46CFF); // Soft Purple
+  static const Color primaryDark = Color(0xFF5320A0); // Deep Purple
+  static const Color primarySubtle = Color(0xFFF5F0FF); // Background Tint
 
-  // الخلفيات الحديثة
-  static const Color background = Color(0xFFFAFAFA);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceLight = Color(0xFFF3F4F6);
+  // الخلفيات - White & Clean
+  static const Color background = Color(0xFFFFFFFF); // Pure White
+  static const Color surface = Color(0xFFF7F7F9); // Soft Gray
+  static const Color surfaceDark = Color(0xFFF0F0F2); // Card Hover
   static const Color cardBackground = Color(0xFFFFFFFF);
 
-  // النصوص
-  static const Color textPrimary = Color(0xFF111827);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textTertiary = Color(0xFF9CA3AF);
+  // النصوص - Clean & Clear
+  static const Color textPrimary = Color(0xFF1A1A1A); // Main Content
+  static const Color textSecondary = Color(0xFF6A6A6A); // Descriptions
+  static const Color textTertiary = Color(0xFF9A9A9A); // Placeholders
 
-  // الألوان الثانوية
-  static const Color error = Color(0xFFEF4444);
-  static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
+  // الحدود - Soft Borders
+  static const Color borderLight = Color(0xFFE6E6E8); // Dividers
+  static const Color border = Color(0xFFD0D0D2); // Input Borders
 
-  // ألوان التدرجات الخفيفة
-  static const Color blueLight = Color(0xFFE0F2FE);
-  static const Color purpleLight = Color(0xFFF3E8FF);
-  static const Color pinkLight = Color(0xFFFCE7F3);
+  // Backward compatibility aliases (للألوان القديمة)
+  static const Color primaryBlue = primaryPurple; // مرادف للون الأساسي الجديد
+  static const Color accentPink = primaryLight; // مرادف للون الفاتح
+  static const Color surfaceLight = surface; // مرادف للسطح
+  static const LinearGradient cardGradient = subtleGradient; // مرادف للتدرج
 
-  // التدرجات العصرية - من أزرق سماوي لبنفسجي لوردي
+  // ألوان الحالات - Status Colors
+  static const Color success = Color(0xFF22CC88); // Green
+  static const Color successLight = Color(0xFFE6F9F0); // Background
+  static const Color error = Color(0xFFFF4D4F); // Red
+  static const Color errorLight = Color(0xFFFFF0F0); // Background
+  static const Color warning = Color(0xFFFFA940); // Orange
+  static const Color warningLight = Color(0xFFFFF7E6); // Background
+  static const Color info = Color(0xFF40A9FF); // Blue
+  static const Color infoLight = Color(0xFFE6F7FF); // Background
+
+  // التدرجات - Purple Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryBlue, primaryPurple, accentPink],
+    colors: [primaryPurple, primaryLight],
   );
 
-  // تدرج ناعم للبطاقات
-  static const LinearGradient cardGradient = LinearGradient(
+  // تدرج غامق للأزرار
+  static const LinearGradient darkGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFEFF6FF), Color(0xFFF5F3FF)],
+    colors: [primaryDark, primaryPurple],
   );
 
-  // تدرج للخلفيات
-  static const LinearGradient softGradient = LinearGradient(
+  // تدرج ناعم للبطاقات والخلفيات
+  static const LinearGradient subtleGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [blueLight, purpleLight, pinkLight],
+    colors: [primarySubtle, Color(0xFFFFFFFF)],
   );
 
   // تدرج دائري للأيقونات
   static const SweepGradient circularGradient = SweepGradient(
-    colors: [primaryBlue, primaryPurple, accentPink, primaryBlue],
-    stops: [0.0, 0.33, 0.66, 1.0],
+    colors: [primaryPurple, primaryLight, primaryPurple],
+    stops: [0.0, 0.5, 1.0],
   );
 
-  // تدرجات إضافية
+  // تدرجات الحالات
   static const LinearGradient successGradient = LinearGradient(
-    colors: [Color(0xFF10B981), Color(0xFF059669)],
+    colors: [success, Color(0xFF059669)],
   );
 
-  static const LinearGradient warningGradient = LinearGradient(
-    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+  static const LinearGradient errorGradient = LinearGradient(
+    colors: [error, Color(0xFFDC2626)],
   );
 }
 
@@ -75,10 +87,10 @@ class AppTheme {
       // الخلفية الأساسية
       scaffoldBackgroundColor: MbuyColors.background,
 
-      // ColorScheme
+      // ColorScheme - mBuy Purple Identity
       colorScheme: const ColorScheme.light(
-        primary: MbuyColors.primaryBlue,
-        secondary: MbuyColors.primaryPurple,
+        primary: MbuyColors.primaryPurple,
+        secondary: MbuyColors.primaryLight,
         surface: MbuyColors.surface,
         error: MbuyColors.error,
         onPrimary: Colors.white,
@@ -87,125 +99,137 @@ class AppTheme {
         onError: Colors.white,
       ),
 
-      // AppBar Theme
-      appBarTheme: const AppBarTheme(
+      // AppBar Theme - Clean & Modern
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: MbuyColors.textPrimary),
-        titleTextStyle: TextStyle(
+        iconTheme: const IconThemeData(color: MbuyColors.textPrimary),
+        titleTextStyle: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Arabic',
         ),
         surfaceTintColor: Colors.transparent,
       ),
 
-      // Card Theme - عصري مع ظل ناعم
+      // Card Theme - Soft Shadows & 16px Radius
       cardTheme: CardThemeData(
         color: MbuyColors.cardBackground,
-        elevation: 0,
-        shadowColor: Colors.black.withValues(alpha: 0.08),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.06),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
 
-      // Text Theme - ناعم وواضح
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          color: MbuyColors.textPrimary,
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          fontFamily: 'Arabic',
-          letterSpacing: -0.5,
-        ),
-        displayMedium: TextStyle(
+      // Text Theme - Cairo Font System
+      textTheme: TextTheme(
+        // Hero Title - 28px SemiBold
+        displayLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 28,
-          fontWeight: FontWeight.w700,
-          fontFamily: 'Arabic',
-          letterSpacing: -0.5,
-        ),
-        displaySmall: TextStyle(
-          color: MbuyColors.textPrimary,
-          fontSize: 24,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Arabic',
+          height: 1.29,
         ),
-        headlineLarge: TextStyle(
-          color: MbuyColors.textPrimary,
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Arabic',
-        ),
-        headlineMedium: TextStyle(
+        // Page Title - 20px SemiBold
+        displayMedium: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Arabic',
+          height: 1.4,
         ),
-        headlineSmall: TextStyle(
+        // Section Title - 17px Medium
+        displaySmall: GoogleFonts.cairo(
+          color: MbuyColors.textPrimary,
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+          height: 1.41,
+        ),
+        // Stats/Numbers - 18px Bold
+        headlineLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Arabic',
+          fontWeight: FontWeight.w700,
+          height: 1.33,
+          letterSpacing: -0.2,
         ),
-        titleLarge: TextStyle(
+        // Subtitle - 17px Medium
+        headlineMedium: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 18,
+          fontSize: 17,
           fontWeight: FontWeight.w500,
-          fontFamily: 'Arabic',
+          height: 1.41,
         ),
-        titleMedium: TextStyle(
+        // Body Large - 16px Regular
+        headlineSmall: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 16,
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Arabic',
-        ),
-        bodyLarge: TextStyle(
-          color: MbuyColors.textPrimary,
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Arabic',
+          fontWeight: FontWeight.w400,
           height: 1.5,
         ),
-        bodyMedium: TextStyle(
+        // Title Medium - 15px SemiBold
+        titleLarge: GoogleFonts.cairo(
+          color: MbuyColors.textPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+        // Title Small - 14px Medium
+        titleMedium: GoogleFonts.cairo(
+          color: MbuyColors.textPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        // Body - 14px Regular
+        bodyLarge: GoogleFonts.cairo(
+          color: MbuyColors.textPrimary,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          height: 1.57,
+        ),
+        // Body Secondary - 14px Regular
+        bodyMedium: GoogleFonts.cairo(
           color: MbuyColors.textSecondary,
           fontSize: 14,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Arabic',
-          height: 1.5,
+          fontWeight: FontWeight.w400,
+          height: 1.57,
         ),
-        bodySmall: TextStyle(
+        // Small - 12px Regular
+        bodySmall: GoogleFonts.cairo(
           color: MbuyColors.textTertiary,
           fontSize: 12,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Arabic',
+          fontWeight: FontWeight.w400,
+          height: 1.5,
         ),
-        labelLarge: TextStyle(
+        // Caption - 11px Regular
+        labelSmall: GoogleFonts.cairo(
+          color: MbuyColors.textSecondary,
+          fontSize: 11,
+          fontWeight: FontWeight.w400,
+          height: 1.45,
+        ),
+        // Label - 14px Medium
+        labelLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          fontFamily: 'Arabic',
         ),
       ),
 
-      // Elevated Button Theme - عصري
+      // Elevated Button Theme - Purple with Glow
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: MbuyColors.primaryBlue,
+          backgroundColor: MbuyColors.primaryPurple,
           foregroundColor: Colors.white,
           elevation: 0,
-          shadowColor: MbuyColors.primaryBlue.withValues(alpha: 0.3),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+          shadowColor: MbuyColors.primaryPurple.withValues(alpha: 0.2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          minimumSize: const Size(0, 48),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
+          textStyle: GoogleFonts.cairo(
+            fontSize: 15,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Arabic',
           ),
         ),
       ),
@@ -213,54 +237,283 @@ class AppTheme {
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: MbuyColors.primaryBlue,
+          foregroundColor: MbuyColors.primaryPurple,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
 
-      // Input Decoration Theme - ناعم
+      // Input Decoration Theme - 12px Radius
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: MbuyColors.surfaceLight,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: MbuyColors.borderLight,
+            width: 1.5,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: MbuyColors.borderLight,
+            width: 1.5,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: MbuyColors.primaryBlue, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: MbuyColors.primaryPurple,
+            width: 1.5,
+          ),
         ),
-        labelStyle: const TextStyle(
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: MbuyColors.error, width: 1.5),
+        ),
+        labelStyle: GoogleFonts.cairo(
           color: MbuyColors.textSecondary,
-          fontFamily: 'Arabic',
+          fontSize: 14,
         ),
-        hintStyle: const TextStyle(
+        hintStyle: GoogleFonts.cairo(
           color: MbuyColors.textTertiary,
-          fontFamily: 'Arabic',
+          fontSize: 14,
         ),
       ),
 
-      // Bottom Navigation Bar Theme - ناعم
+      // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
-        selectedItemColor: MbuyColors.primaryBlue,
+        selectedItemColor: MbuyColors.primaryPurple,
         unselectedItemColor: MbuyColors.textTertiary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
-        selectedLabelStyle: const TextStyle(
-          fontFamily: 'Arabic',
+        selectedLabelStyle: GoogleFonts.cairo(
           fontWeight: FontWeight.w500,
+          fontSize: 12,
         ),
-        unselectedLabelStyle: const TextStyle(fontFamily: 'Arabic'),
+        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
       ),
 
       // Drawer Theme
       drawerTheme: const DrawerThemeData(
         backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+    );
+  }
+
+  /// Dark Theme - الثيم الداكن
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+
+      // الخلفية الأساسية
+      scaffoldBackgroundColor: const Color(0xFF121212),
+
+      // ColorScheme - Dark Mode
+      colorScheme: const ColorScheme.dark(
+        primary: MbuyColors.primaryPurple,
+        secondary: MbuyColors.primaryLight,
+        surface: Color(0xFF1E1E1E),
+        error: MbuyColors.error,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: Colors.white,
+        onError: Colors.white,
+      ),
+
+      // AppBar Theme
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF1E1E1E),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        surfaceTintColor: Colors.transparent,
+      ),
+
+      // Card Theme
+      cardTheme: CardThemeData(
+        color: const Color(0xFF1E1E1E),
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+
+      // Text Theme - Cairo Font System
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          height: 1.29,
+        ),
+        displayMedium: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          height: 1.4,
+        ),
+        displaySmall: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+          height: 1.41,
+        ),
+        headlineLarge: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          height: 1.33,
+          letterSpacing: -0.2,
+        ),
+        headlineMedium: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+          height: 1.41,
+        ),
+        headlineSmall: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          height: 1.5,
+        ),
+        titleLarge: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+        titleMedium: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        bodyLarge: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          height: 1.57,
+        ),
+        bodyMedium: GoogleFonts.cairo(
+          color: Colors.white70,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          height: 1.57,
+        ),
+        bodySmall: GoogleFonts.cairo(
+          color: Colors.white60,
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          height: 1.5,
+        ),
+        labelSmall: GoogleFonts.cairo(
+          color: Colors.white70,
+          fontSize: 11,
+          fontWeight: FontWeight.w400,
+          height: 1.45,
+        ),
+        labelLarge: GoogleFonts.cairo(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // Elevated Button Theme
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: MbuyColors.primaryPurple,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: MbuyColors.primaryPurple.withValues(alpha: 0.2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          minimumSize: const Size(0, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      // Text Button Theme
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: MbuyColors.primaryPurple,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: GoogleFonts.cairo(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+
+      // Input Decoration Theme
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF2A2A2A),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF404040), width: 1.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF404040), width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: MbuyColors.primaryPurple,
+            width: 1.5,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: MbuyColors.error, width: 1.5),
+        ),
+        labelStyle: GoogleFonts.cairo(color: Colors.white70, fontSize: 14),
+        hintStyle: GoogleFonts.cairo(color: Colors.white60, fontSize: 14),
+      ),
+
+      // Bottom Navigation Bar Theme
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: const Color(0xFF1E1E1E),
+        selectedItemColor: MbuyColors.primaryPurple,
+        unselectedItemColor: Colors.white60,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+        selectedLabelStyle: GoogleFonts.cairo(
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
+      ),
+
+      // Drawer Theme
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: Color(0xFF1E1E1E),
         elevation: 0,
       ),
     );
