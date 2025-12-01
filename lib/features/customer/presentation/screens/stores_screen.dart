@@ -14,7 +14,8 @@ class StoresScreen extends StatefulWidget {
   State<StoresScreen> createState() => _StoresScreenState();
 }
 
-class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderStateMixin {
+class _StoresScreenState extends State<StoresScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -81,10 +82,7 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildStoresTab(),
-                _buildCategoriesTab(),
-              ],
+              children: [_buildStoresTab(), _buildCategoriesTab()],
             ),
           ),
         ],
@@ -151,7 +149,11 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
           children: [
-            _buildCategoryCard('Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Øª', Icons.phone_android, Colors.blue),
+            _buildCategoryCard(
+              'Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ§Øª',
+              Icons.phone_android,
+              Colors.blue,
+            ),
             _buildCategoryCard('Ø£Ø²ÙŠØ§Ø¡', Icons.checkroom, Colors.pink),
             _buildCategoryCard('Ù…Ù†Ø²Ù„', Icons.home, Colors.orange),
             _buildCategoryCard('Ø±ÙŠØ§Ø¶Ø©', Icons.sports_soccer, Colors.green),
@@ -250,4 +252,3 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
     );
   }
 }
-
