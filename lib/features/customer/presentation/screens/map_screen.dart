@@ -6,7 +6,7 @@ import 'dart:math' show cos, sin, sqrt, asin;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
-import '../../../../shared/widgets/profile_button.dart';
+import '../../../../shared/widgets/map_search_bar.dart';
 import 'store_details_screen.dart';
 
 /// موديل المتجر مع المسافة
@@ -131,26 +131,64 @@ class _MapScreenState extends State<MapScreen> {
       try {
         final store = storeWithDist.store;
         return Marker(
-          width: 50,
-          height: 50,
+          width: 120,
+          height: 60,
           point: LatLng(store.latitude!, store.longitude!),
           child: GestureDetector(
             onTap: () => _onMarkerTap(storeWithDist),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: store.isBoosted
-                    ? MbuyColors.primaryPurple
-                    : MbuyColors.primaryBlue,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // نص اسم المتجر في balloon
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
                   ),
-                ],
-              ),
-              child: const Icon(Icons.store, color: Colors.white, size: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    store.name,
+                    style: GoogleFonts.cairo(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                // أيقونة المتجر
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: store.isBoosted
+                        ? MbuyColors.primaryPurple
+                        : MbuyColors.primaryBlue,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.store, color: Colors.white, size: 18),
+                ),
+              ],
             ),
           ),
         );
@@ -430,7 +468,7 @@ class _MapScreenState extends State<MapScreen> {
               MarkerLayer(markers: _markers),
             ],
           ),
-          // Header في الأعلى - العنوان وإيقونة الحساب
+          // Header نمط Google Maps - شريط البحث والفئات
           Positioned(
             top: 0,
             left: 0,
@@ -438,97 +476,74 @@ class _MapScreenState extends State<MapScreen> {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
-                    // العنوان وزر المدينة
-                    Expanded(
-                      child: Row(
-                        children: [
-                          // العنوان
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              'الخريطة',
-                              style: GoogleFonts.cairo(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: MbuyColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // زر تحديد المدينة
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: _showCitySelector,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: MbuyColors.primaryGradient,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: MbuyColors.primaryPurple
-                                          .withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.location_city,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      _selectedCityName,
-                                      style: GoogleFonts.cairo(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    // شريط البحث مع أيقونة الحساب الشخصي
+                    MapSearchBar(
+                      hintText: 'ابحث عن متجر أو مكان',
+                      onTap: () {
+                        // TODO: فتح شاشة البحث
+                        debugPrint('Search tapped');
+                      },
                     ),
-                    // إيقونة الحساب الشخصي على اليمين
-                    const ProfileButton(),
+                    const SizedBox(height: 12),
+                    // شريط الفئات
+                    const MapCategoriesBar(),
                   ],
+                ),
+              ),
+            ),
+          ),
+          // زر اختيار المدينة (عائم في الأسفل يمين)
+          Positioned(
+            bottom: 100,
+            right: 16,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: _showCitySelector,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: MbuyColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: MbuyColors.primaryPurple.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.location_city,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _selectedCityName,
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -615,53 +630,52 @@ class _MapScreenState extends State<MapScreen> {
             ),
             const SizedBox(height: 20),
             // قائمة المدن
-            ...availableCities
-                .map(
-                  (city) => ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: city.name == _selectedCityName
-                            ? MbuyColors.primaryGradient
-                            : null,
-                        color: city.name == _selectedCityName
-                            ? null
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.location_city,
-                        color: city.name == _selectedCityName
-                            ? Colors.white
-                            : Colors.grey[600],
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      city.name,
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        fontWeight: city.name == _selectedCityName
-                            ? FontWeight.bold
-                            : FontWeight.w500,
-                        color: city.name == _selectedCityName
-                            ? MbuyColors.primaryPurple
-                            : MbuyColors.textPrimary,
-                      ),
-                    ),
-                    trailing: city.name == _selectedCityName
-                        ? const Icon(
-                            Icons.check_circle,
-                            color: MbuyColors.primaryPurple,
-                          )
+            ...availableCities.map(
+              (city) => ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: city.name == _selectedCityName
+                        ? MbuyColors.primaryGradient
                         : null,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _selectCity(city);
-                    },
+                    color: city.name == _selectedCityName
+                        ? null
+                        : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.location_city,
+                    color: city.name == _selectedCityName
+                        ? Colors.white
+                        : Colors.grey[600],
+                    size: 20,
                   ),
                 ),
+                title: Text(
+                  city.name,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    fontWeight: city.name == _selectedCityName
+                        ? FontWeight.bold
+                        : FontWeight.w500,
+                    color: city.name == _selectedCityName
+                        ? MbuyColors.primaryPurple
+                        : MbuyColors.textPrimary,
+                  ),
+                ),
+                trailing: city.name == _selectedCityName
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: MbuyColors.primaryPurple,
+                      )
+                    : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _selectCity(city);
+                },
+              ),
+            ),
             const SizedBox(height: 10),
           ],
         ),

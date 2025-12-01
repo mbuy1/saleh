@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
+import '../../../../shared/widgets/profile_button.dart';
 
 // TODO: Connect to Supabase for video data
 // TODO: Integrate video player (Cloudflare Stream)
@@ -168,8 +169,10 @@ class _ExploreScreenState extends State<ExploreScreen>
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // أيقونة الحساب على اليمين (RTL)
+                const ProfileButton(),
+                const SizedBox(width: 12),
                 // Tabs في المنتصف
                 Expanded(
                   child: Center(
@@ -203,7 +206,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                   ),
                 ),
                 // مساحة فارغة للتوازن
-                const SizedBox(width: 36),
+                const SizedBox(width: 48),
               ],
             ),
           ),
