@@ -30,6 +30,7 @@ class CustomerShell extends StatefulWidget {
 
 class _CustomerShellState extends State<CustomerShell> {
   int _currentIndex = 2; // Home هو الافتراضي (في المنتصف)
+  Offset _backButtonPosition = const Offset(16, 16); // موقع زر العودة
 
   List<Widget> get _screens => [
     ExploreScreen(userRole: widget.userRole),
@@ -135,49 +136,113 @@ class _CustomerShellState extends State<CustomerShell> {
       body: Stack(
         children: [
           _screens[_currentIndex],
-          // زر العودة للتاجر في الأعلى
+          // زر العودة للتاجر قابل للتحريك
           if (widget.userRole == 'merchant')
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        widget.appModeProvider.setMerchantMode();
-                      },
+            Positioned(
+              left: _backButtonPosition.dx,
+              top: _backButtonPosition.dy + MediaQuery.of(context).padding.top,
+              child: Draggable(
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
                           color: Colors.black.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.arrow_back,
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'العودة',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Cairo',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                childWhenDragging: Container(),
+                onDragEnd: (details) {
+                  setState(() {
+                    // حساب الموقع الجديد مع مراعاة حدود الشاشة
+                    final screenSize = MediaQuery.of(context).size;
+                    final padding = MediaQuery.of(context).padding;
+                    final buttonWidth = 100.0;
+                    final buttonHeight = 40.0;
+
+                    double newX = details.offset.dx;
+                    double newY = details.offset.dy - padding.top;
+
+                    // التأكد من بقاء الزر داخل الشاشة
+                    newX = newX.clamp(0.0, screenSize.width - buttonWidth);
+                    newY = newY.clamp(0.0, screenSize.height - buttonHeight - padding.top - padding.bottom);
+
+                    _backButtonPosition = Offset(newX, newY);
+                  });
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      widget.appModeProvider.setMerchantMode();
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'العودة',
+                            style: const TextStyle(
                               color: Colors.white,
-                              size: 20,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Cairo',
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'العودة',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Cairo',
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

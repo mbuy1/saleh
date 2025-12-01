@@ -294,10 +294,7 @@ class _CartScreenState extends State<CartScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: const [
-          Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: ProfileButton(),
-          ),
+          Padding(padding: EdgeInsets.only(left: 8), child: ProfileButton()),
         ],
       ),
       body: _isLoading
