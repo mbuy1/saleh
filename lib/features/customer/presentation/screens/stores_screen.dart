@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/exceptions/app_exception.dart';
+import '../../../../core/exceptions/error_handler.dart';
 import '../../../../shared/widgets/mbuy_loader.dart';
 import '../../../../shared/widgets/story_ring.dart';
 import '../../../../shared/widgets/profile_button.dart';
@@ -113,12 +116,8 @@ class _StoresScreenState extends State<StoresScreen> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في جلب المتاجر: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        final exception = AppException.fromException(e);
+        ErrorHandler.showErrorSnackBar(context, exception);
       }
     } finally {
       if (mounted) {
@@ -136,19 +135,26 @@ class _StoresScreenState extends State<StoresScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // عنوان مع أيقونة الحساب
+            // عنوان مع أيقونة الحساب وزر العودة
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'المتاجر',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: MbuyColors.textPrimary,
-                      fontFamily: 'Arabic',
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'المتاجر',
+                        style: GoogleFonts.cairo(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: MbuyColors.textPrimary,
+                        ),
+                      ),
                     ),
                   ),
                   const ProfileButton(),

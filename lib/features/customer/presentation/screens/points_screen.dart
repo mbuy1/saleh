@@ -55,12 +55,18 @@ class _PointsScreenState extends State<PointsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('نقاطي'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
             onPressed: () {
               _showPointsInfo();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),

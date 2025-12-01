@@ -291,7 +291,14 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('السلة'),
-        actions: const [ProfileButton()],
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: const [
+          Padding(padding: EdgeInsets.only(left: 8), child: ProfileButton()),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

@@ -73,6 +73,8 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.storeName),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
@@ -81,6 +83,10 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                 const SnackBar(content: Text('قريباً: مشاركة المتجر')),
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),

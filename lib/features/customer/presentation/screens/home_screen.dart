@@ -97,16 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // العنوان مع أيقونة الحساب
+                    // العنوان مع أيقونة الحساب وزر العودة
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'الرئيسية',
-                          style: GoogleFonts.cairo(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: MbuyColors.textPrimary,
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              'الرئيسية',
+                              style: GoogleFonts.cairo(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: MbuyColors.textPrimary,
+                              ),
+                            ),
                           ),
                         ),
                         const ProfileButton(),
@@ -115,6 +123,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     // شريط البحث
                     const MbuySearchBar(hintText: 'ابحث عن منتج...'),
+                    const SizedBox(height: 12),
+                    // زر عرض جميع الفئات
+                    InkWell(
+                      onTap: () {
+                        // TODO: Navigate to all categories screen
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: MbuyColors.borderLight),
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.grid_view_rounded,
+                              size: 20,
+                              color: MbuyColors.primaryPurple,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'عرض جميع الفئات',
+                              style: GoogleFonts.cairo(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: MbuyColors.primaryPurple,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

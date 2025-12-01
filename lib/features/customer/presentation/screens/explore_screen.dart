@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
-import '../../../../shared/widgets/profile_button.dart';
 
 // TODO: Connect to Supabase for video data
 // TODO: Integrate video player (Cloudflare Stream)
@@ -158,50 +157,61 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// الطبقة العلوية - Tabs وأيقونة الحساب مع شفافية
   Widget _buildTopOverlay() {
-    return AnimatedOpacity(
-      opacity: _uiOpacity,
-      duration: const Duration(milliseconds: 300),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // الهيدر مع أيقونة الحساب
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: const [ProfileButton()],
-              ),
-            ),
-            // Tabs في المنتصف
-            Center(
-              child: Container(
-                height: 40,
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: TabBar(
-                  controller: _tabController,
-                  indicatorColor: Colors.white,
-                  indicatorWeight: 2,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
-                  labelStyle: GoogleFonts.cairo(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  unselectedLabelStyle: GoogleFonts.cairo(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  tabs: const [
-                    Tab(text: 'استكشف'),
-                    Tab(text: 'أتابعه'),
-                    Tab(text: 'لك'),
-                  ],
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: AnimatedOpacity(
+        opacity: _uiOpacity,
+        duration: const Duration(milliseconds: 300),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // زر العودة على اليسار
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
-              ),
+                // Tabs في المنتصف
+                Expanded(
+                  child: Center(
+                    child: Container(
+                      height: 40,
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: TabBar(
+                        controller: _tabController,
+                        indicatorColor: Colors.white,
+                        indicatorWeight: 2,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white.withValues(
+                          alpha: 0.6,
+                        ),
+                        labelStyle: GoogleFonts.cairo(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        unselectedLabelStyle: GoogleFonts.cairo(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        tabs: const [
+                          Tab(text: 'استكشف'),
+                          Tab(text: 'أتابعه'),
+                          Tab(text: 'لك'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // مساحة فارغة للتوازن
+                const SizedBox(width: 36),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -27,6 +27,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'الإعدادات',
           style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
         ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -84,77 +92,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return null;
           }),
         ),
-        child: Column(
-          children: [
-            RadioListTile<ThemeMode>(
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.light_mode,
-                    color: widget.themeProvider.isLightMode
-                        ? MbuyColors.primaryPurple
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('فاتح'),
-                ],
+        child: RadioGroup<ThemeMode>(
+          groupValue: widget.themeProvider.themeMode,
+          onChanged: (value) {
+            if (value != null) {
+              widget.themeProvider.setThemeMode(value);
+            }
+          },
+          child: Column(
+            children: [
+              RadioListTile<ThemeMode>(
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.light_mode,
+                      color: widget.themeProvider.isLightMode
+                          ? MbuyColors.primaryPurple
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('فاتح'),
+                  ],
+                ),
+                value: ThemeMode.light,
+                toggleable: false,
               ),
-              value: ThemeMode.light,
-              groupValue: widget.themeProvider.themeMode,
-              toggleable: false,
-              onChanged: (value) {
-                if (value != null) {
-                  widget.themeProvider.setThemeMode(value);
-                }
-              },
-            ),
-            const Divider(height: 1),
-            RadioListTile<ThemeMode>(
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.dark_mode,
-                    color: widget.themeProvider.isDarkMode
-                        ? MbuyColors.primaryPurple
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('داكن'),
-                ],
+              const Divider(height: 1),
+              RadioListTile<ThemeMode>(
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.dark_mode,
+                      color: widget.themeProvider.isDarkMode
+                          ? MbuyColors.primaryPurple
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('داكن'),
+                  ],
+                ),
+                value: ThemeMode.dark,
+                toggleable: false,
               ),
-              value: ThemeMode.dark,
-              groupValue: widget.themeProvider.themeMode,
-              toggleable: false,
-              onChanged: (value) {
-                if (value != null) {
-                  widget.themeProvider.setThemeMode(value);
-                }
-              },
-            ),
-            const Divider(height: 1),
-            RadioListTile<ThemeMode>(
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.brightness_auto,
-                    color: widget.themeProvider.isSystemMode
-                        ? MbuyColors.primaryPurple
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('تلقائي (حسب النظام)'),
-                ],
+              const Divider(height: 1),
+              RadioListTile<ThemeMode>(
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.brightness_auto,
+                      color: widget.themeProvider.isSystemMode
+                          ? MbuyColors.primaryPurple
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('تلقائي (حسب النظام)'),
+                  ],
+                ),
+                value: ThemeMode.system,
+                toggleable: false,
               ),
-              value: ThemeMode.system,
-              groupValue: widget.themeProvider.themeMode,
-              toggleable: false,
-              onChanged: (value) {
-                if (value != null) {
-                  widget.themeProvider.setThemeMode(value);
-                }
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -171,48 +169,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return null;
           }),
         ),
-        child: Column(
-          children: [
-            RadioListTile<String>(
-              title: const Text('الإنجليزية'),
-              subtitle: const Text('English'),
-              value: 'en',
-              groupValue: _selectedLanguage,
-              toggleable: false,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                // TODO: تطبيق تغيير اللغة
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('سيتم تطبيق اللغة قريباً'),
-                    duration: Duration(seconds: 2),
+        child: RadioGroup<String>(
+          groupValue: _selectedLanguage,
+          onChanged: (value) {
+            if (value != null) {
+              setState(() {
+                _selectedLanguage = value;
+              });
+              // TODO: تطبيق تغيير اللغة
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    value == 'ar'
+                        ? 'سيتم تطبيق اللغة قريباً'
+                        : 'Language will be applied soon',
                   ),
-                );
-              },
-            ),
-            const Divider(height: 1),
-            RadioListTile<String>(
-              title: const Text('الإنجليزية'),
-              subtitle: const Text('English'),
-              value: 'en',
-              groupValue: _selectedLanguage,
-              toggleable: false,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                // TODO: تطبيق تغيير اللغة
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Language will be applied soon'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-            ),
-          ],
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          child: Column(
+            children: [
+              RadioListTile<String>(
+                title: const Text('العربية'),
+                subtitle: const Text('Arabic'),
+                value: 'ar',
+                toggleable: false,
+              ),
+              const Divider(height: 1),
+              RadioListTile<String>(
+                title: const Text('الإنجليزية'),
+                subtitle: const Text('English'),
+                value: 'en',
+                toggleable: false,
+              ),
+            ],
+          ),
         ),
       ),
     );

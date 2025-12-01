@@ -97,7 +97,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = supabaseClient.auth.currentUser;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الحساب الشخصي')),
+      appBar: AppBar(
+        title: const Text('الحساب الشخصي'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

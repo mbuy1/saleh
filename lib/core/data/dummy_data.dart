@@ -1,6 +1,7 @@
-/// ⚠️ هذا الملف تم إلغاؤه - استخدم Repositories بدلاً منه
+/// بيانات وهمية للتطبيق
 ///
-/// للوصول للبيانات استخدم Repositories:
+/// ملاحظة: يتم استخدام هذه البيانات كبيانات احتياطية عندما لا تكون Supabase متاحة
+/// للوصول للبيانات الحية، استخدم Repositories:
 /// - ProductRepository
 /// - StoreRepository
 /// - CategoryRepository
@@ -9,7 +10,6 @@ library;
 
 import 'models.dart';
 
-@Deprecated('Use CategoryRepository instead')
 class DummyData {
   // البيانات الوهمية - Categories
   static List<Category> get mainCategories => [
@@ -62,6 +62,9 @@ class DummyData {
       followersCount: 1500,
       isVerified: true,
       isBoosted: true,
+      latitude: 24.7136,
+      longitude: 46.6753,
+      city: 'الرياض',
     ),
     const Store(
       id: '2',
@@ -71,6 +74,9 @@ class DummyData {
       followersCount: 2300,
       isVerified: true,
       isBoosted: false,
+      latitude: 24.7240,
+      longitude: 46.6850,
+      city: 'الرياض',
     ),
   ];
 

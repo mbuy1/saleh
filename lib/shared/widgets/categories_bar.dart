@@ -45,7 +45,7 @@ class CategoriesBar extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => onCategorySelected?.call(category.id),
                   child: _buildCategoryChip(
-                    DummyData.getCategoryIcon(category.icon),
+                    category.icon,
                     category.name,
                     isSelected,
                   ),
@@ -58,7 +58,7 @@ class CategoriesBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryChip(IconData icon, String label, bool isSelected) {
+  Widget _buildCategoryChip(String iconEmoji, String label, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -81,11 +81,7 @@ class CategoriesBar extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: isSelected ? Colors.white : MbuyColors.primaryPurple,
-          ),
+          Text(iconEmoji, style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 6),
           Text(
             label,

@@ -49,119 +49,129 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('محفظتي'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadWalletData,
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'خطأ: $_error',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadWalletData,
-                        child: const Text('إعادة المحاولة'),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'خطأ: $_error',
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadWalletData,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // بطاقة الرصيد
-                        Card(
-                          elevation: 4,
-                          color: Colors.blue.shade50,
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'الرصيد الحالي',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '${(_wallet?['balance'] as num? ?? 0).toStringAsFixed(2)} ر.س',
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        // عنوان العمليات
-                        const Text(
-                          'آخر العمليات',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // قائمة العمليات
-                        _transactions.isEmpty
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(32),
-                                  child: Text(
-                                    'لا توجد عمليات',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _transactions.length,
-                                itemBuilder: (context, index) {
-                                  final transaction = _transactions[index];
-                                  return _buildTransactionItem(transaction);
-                                },
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadWalletData,
+                    child: const Text('إعادة المحاولة'),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadWalletData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // بطاقة الرصيد
+                    Card(
+                      elevation: 4,
+                      color: Colors.blue.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'الرصيد الحالي',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
-                      ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${(_wallet?['balance'] as num? ?? 0).toStringAsFixed(2)} ر.س',
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    // عنوان العمليات
+                    const Text(
+                      'آخر العمليات',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // قائمة العمليات
+                    _transactions.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32),
+                              child: Text(
+                                'لا توجد عمليات',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _transactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = _transactions[index];
+                              return _buildTransactionItem(transaction);
+                            },
+                          ),
+                  ],
                 ),
+              ),
+            ),
     );
   }
 
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
     final amount = (transaction['amount'] as num? ?? 0).toDouble();
     final transactionType = transaction['transaction_type'] as String? ?? '';
-    final description = transaction['description'] as String? ?? 'عملية غير محددة';
+    final description =
+        transaction['description'] as String? ?? 'عملية غير محددة';
     final createdAt = transaction['created_at'] as String?;
 
     // تحديد اللون حسب نوع العملية (in/out)
-    final isIncoming = transactionType.toLowerCase().contains('in') ||
+    final isIncoming =
+        transactionType.toLowerCase().contains('in') ||
         transactionType.toLowerCase() == 'credit' ||
         amount > 0;
 
     Color amountColor = isIncoming ? Colors.green : Colors.red;
-    IconData amountIcon = isIncoming ? Icons.arrow_downward : Icons.arrow_upward;
+    IconData amountIcon = isIncoming
+        ? Icons.arrow_downward
+        : Icons.arrow_upward;
     String amountPrefix = isIncoming ? '+' : '-';
 
     // تنسيق التاريخ
@@ -197,4 +207,3 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
     );
   }
 }
-

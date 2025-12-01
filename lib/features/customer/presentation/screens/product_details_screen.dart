@@ -207,6 +207,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('تفاصيل المنتج'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
@@ -232,6 +234,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   onPressed: _toggleFavorite,
                 ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
       body: SingleChildScrollView(

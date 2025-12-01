@@ -55,12 +55,15 @@ class ProfileBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.75,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Handle
           Container(
@@ -125,71 +128,70 @@ class ProfileBottomSheet extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          // القائمة الأفقية للأقسام الرئيسية
-          Container(
-            height: 100,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                _buildQuickAction(
-                  icon: Icons.person,
-                  label: 'الملف الشخصي',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.favorite,
-                  label: 'المفضلة',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.help_outline,
-                  label: 'تحتاج مساعدة؟',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.store,
-                  label: 'أنشئ متجرك',
-                  color: MbuyColors.primaryPurple,
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.account_balance_wallet,
-                  label: 'رصيد mBuy',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.shopping_bag,
-                  label: 'طلباتي',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.store_outlined,
-                  label: 'المتاجر المتابعة',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.local_offer,
-                  label: 'الكوبونات',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.history,
-                  label: 'سجل التصفح',
-                  onTap: () {},
-                ),
-                _buildQuickAction(
-                  icon: Icons.lightbulb_outline,
-                  label: 'الاقتراحات',
-                  onTap: () {},
-                ),
-              ],
+          // القائمة العمودية للأقسام الرئيسية
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                children: [
+                  _buildQuickAction(
+                    icon: Icons.person,
+                    label: 'الملف الشخصي',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.favorite,
+                    label: 'المفضلة',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.shopping_bag,
+                    label: 'طلباتي',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.account_balance_wallet,
+                    label: 'رصيد mBuy',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.store_outlined,
+                    label: 'المتاجر المتابعة',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.local_offer,
+                    label: 'الكوبونات',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.history,
+                    label: 'سجل التصفح',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.store,
+                    label: 'أنشئ متجرك',
+                    color: MbuyColors.primaryPurple,
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.help_outline,
+                    label: 'تحتاج مساعدة؟',
+                    onTap: () {},
+                  ),
+                  _buildQuickAction(
+                    icon: Icons.lightbulb_outline,
+                    label: 'الاقتراحات',
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
           ),
           const Divider(height: 1),
           // الإعدادات في الأسفل
-          const Spacer(),
+          const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -235,39 +237,55 @@ class ProfileBottomSheet extends StatelessWidget {
     required VoidCallback onTap,
     Color? color,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 80,
-        margin: const EdgeInsets.only(left: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: color != null
+              ? color.withValues(alpha: 0.05)
+              : MbuyColors.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: color != null
                     ? color.withValues(alpha: 0.1)
-                    : MbuyColors.surface,
-                borderRadius: BorderRadius.circular(16),
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: color != null
+                      ? color.withValues(alpha: 0.2)
+                      : MbuyColors.borderLight,
+                ),
               ),
               child: Icon(
                 icon,
                 color: color ?? MbuyColors.textSecondary,
-                size: 26,
+                size: 22,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: GoogleFonts.cairo(
-                fontSize: 11,
-                color: MbuyColors.textSecondary,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.cairo(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: color ?? MbuyColors.textPrimary,
+                ),
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            ),
+            Icon(
+              Icons.arrow_back_ios,
+              size: 14,
+              color: MbuyColors.textTertiary,
             ),
           ],
         ),

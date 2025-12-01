@@ -4,10 +4,7 @@ import '../../data/order_service.dart';
 class CustomerOrderDetailsScreen extends StatefulWidget {
   final String orderId;
 
-  const CustomerOrderDetailsScreen({
-    super.key,
-    required this.orderId,
-  });
+  const CustomerOrderDetailsScreen({super.key, required this.orderId});
 
   @override
   State<CustomerOrderDetailsScreen> createState() =>
@@ -101,161 +98,171 @@ class _CustomerOrderDetailsScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text('تفاصيل الطلب #${_formatOrderId(widget.orderId)}'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _orderDetails == null
-              ? const Center(
-                  child: Text(
-                    'لا توجد تفاصيل',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // معلومات الطلب
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'حالة الطلب:',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Chip(
-                                    label: Text(
-                                      _getStatusText(_orderDetails!['status']),
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.white),
-                                    ),
-                                    backgroundColor: _getStatusColor(
-                                        _orderDetails!['status']),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'تاريخ الطلب:',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    _orderDetails!['created_at'] != null
-                                        ? _orderDetails!['created_at']
-                                            .toString()
-                                            .substring(0, 10)
-                                        : 'غير متوفر',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // قائمة المنتجات
-                      const Text(
-                        'المنتجات:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ...(_orderDetails!['order_items'] as List<dynamic>?)
-                              ?.map((item) {
-                            final product =
-                                item['products'] as Map<String, dynamic>?;
-                            final quantity = (item['quantity'] as num?)?.toInt() ?? 0;
-                            final price = (item['price'] as num?)?.toDouble() ?? 0;
-                            final total = quantity * price;
-
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              child: ListTile(
-                                leading: Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(Icons.shopping_bag,
-                                      color: Colors.grey),
-                                ),
-                                title: Text(product?['name'] ?? 'منتج'),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (product?['description'] != null)
-                                      Text(
-                                        product!['description'],
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600]),
-                                      ),
-                                    Text(
-                                      'الكمية: $quantity × ${price.toStringAsFixed(2)} ر.س',
-                                    ),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  '${total.toStringAsFixed(2)} ر.س',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList() ??
-                          [],
-                      const SizedBox(height: 16),
-                      // المجموع الكلي
-                      Card(
-                        color: Colors.green[50],
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
+          ? const Center(
+              child: Text(
+                'لا توجد تفاصيل',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // معلومات الطلب
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'المجموع الكلي:',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                'حالة الطلب:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                '${((_orderDetails!['total_amount'] as num?)?.toDouble() ?? 0).toStringAsFixed(2)} ر.س',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                              Chip(
+                                label: Text(
+                                  _getStatusText(_orderDetails!['status']),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                backgroundColor: _getStatusColor(
+                                  _orderDetails!['status'],
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'تاريخ الطلب:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                _orderDetails!['created_at'] != null
+                                    ? _orderDetails!['created_at']
+                                          .toString()
+                                          .substring(0, 10)
+                                    : 'غير متوفر',
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  // قائمة المنتجات
+                  const Text(
+                    'المنتجات:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  ...(_orderDetails!['order_items'] as List<dynamic>?)?.map((
+                        item,
+                      ) {
+                        final product =
+                            item['products'] as Map<String, dynamic>?;
+                        final quantity =
+                            (item['quantity'] as num?)?.toInt() ?? 0;
+                        final price = (item['price'] as num?)?.toDouble() ?? 0;
+                        final total = quantity * price;
+
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.shopping_bag,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            title: Text(product?['name'] ?? 'منتج'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (product?['description'] != null)
+                                  Text(
+                                    product!['description'],
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                Text(
+                                  'الكمية: $quantity × ${price.toStringAsFixed(2)} ر.س',
+                                ),
+                              ],
+                            ),
+                            trailing: Text(
+                              '${total.toStringAsFixed(2)} ر.س',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList() ??
+                      [],
+                  const SizedBox(height: 16),
+                  // المجموع الكلي
+                  Card(
+                    color: Colors.green[50],
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'المجموع الكلي:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${((_orderDetails!['total_amount'] as num?)?.toDouble() ?? 0).toStringAsFixed(2)} ر.س',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
-

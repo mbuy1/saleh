@@ -54,6 +54,8 @@ class _WalletScreenState extends State<WalletScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('المحفظة'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -62,6 +64,10 @@ class _WalletScreenState extends State<WalletScreen> {
                 const SnackBar(content: Text('قريباً: سجل كامل للعمليات')),
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),

@@ -68,6 +68,9 @@ class Store {
   final int followersCount;
   final bool isVerified;
   final bool isBoosted;
+  final double? latitude;
+  final double? longitude;
+  final String? city;
 
   const Store({
     required this.id,
@@ -79,6 +82,9 @@ class Store {
     this.followersCount = 0,
     this.isVerified = false,
     this.isBoosted = false,
+    this.latitude,
+    this.longitude,
+    this.city,
   });
 }
 
