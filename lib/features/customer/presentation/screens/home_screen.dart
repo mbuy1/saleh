@@ -6,6 +6,7 @@ import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/alibaba_search_bar.dart';
 import '../../../../shared/widgets/category_browser_view.dart';
+import '../../../../shared/widgets/mbuy_logo.dart';
 import 'categories_screen.dart';
 import 'all_products_screen.dart';
 
@@ -44,6 +45,14 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: Column(
         children: [
+          // MBuy Logo at the top
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: MbuyLogo(size: 60, showBackground: false),
+            ),
+          ),
           // Search Bar (Fixed below AppBar)
           Container(
             color: Colors.white,

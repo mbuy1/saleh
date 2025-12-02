@@ -7,12 +7,14 @@ class MerchantBottomBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
   final VoidCallback onAddTap;
+  final VoidCallback? onStoreTap;
 
   const MerchantBottomBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
     required this.onAddTap,
+    this.onStoreTap,
   });
 
   @override
@@ -76,7 +78,7 @@ class MerchantBottomBar extends StatelessWidget {
                   ),
 
                   _buildNavItem(2, Icons.chat_bubble_outline, 'المحادثات'),
-                  _buildNavItem(3, Icons.settings_outlined, 'الإعدادات'),
+                  _buildNavItem(3, Icons.store, 'المتجر'),
                 ],
               ),
             ),
@@ -90,6 +92,53 @@ class MerchantBottomBar extends StatelessWidget {
     // Adjust index for items after the center button
     final actualIndex = index > 1 ? index + 1 : index;
     final isSelected = currentIndex == actualIndex;
+
+    // Special handling for store icon (index 3)
+    if (index == 3 && icon == Icons.store) {
+      return GestureDetector(
+        onTap: () {
+          if (onStoreTap != null) {
+            onStoreTap!();
+          } else {
+            onTap(actualIndex);
+          }
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? MbuyColors.primaryIndigo.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? MbuyColors.primaryIndigo
+                    : MbuyColors.textSecondary,
+                size: MbuyIconSizes.bottomNavigation,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.cairo(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? MbuyColors.primaryIndigo
+                    : MbuyColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return GestureDetector(
       onTap: () => onTap(actualIndex),

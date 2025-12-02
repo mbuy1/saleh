@@ -18,6 +18,7 @@ class MerchantHomeScreen extends StatefulWidget {
 
 class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   int _currentIndex = 0;
+  VoidCallback? _showStoreMenuCallback;
 
   late final List<Widget> _screens;
 
@@ -25,7 +26,12 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      MerchantDashboardScreen(appModeProvider: widget.appModeProvider),
+      MerchantDashboardScreen(
+        appModeProvider: widget.appModeProvider,
+        onStoreMenuReady: (callback) {
+          _showStoreMenuCallback = callback;
+        },
+      ),
       const MerchantCommunityScreen(),
       const MerchantProductsScreen(),
       const MerchantMessagesScreen(),
@@ -53,6 +59,16 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
               builder: (context) => const MerchantProductsScreen(),
             ),
           );
+        },
+        onStoreTap: () {
+          // Navigate to dashboard first
+          setState(() {
+            _currentIndex = 0;
+          });
+          // Show store menu after a short delay
+          Future.delayed(const Duration(milliseconds: 300), () {
+            _showStoreMenuCallback?.call();
+          });
         },
       ),
     );
