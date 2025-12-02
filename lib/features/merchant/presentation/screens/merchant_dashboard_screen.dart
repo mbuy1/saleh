@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
-import 'merchant_orders_screen.dart';
 import 'merchant_store_setup_screen.dart';
 import 'merchant_promotions_screen.dart';
 
@@ -23,26 +23,20 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
   final String storeStatus = 'سجل تجاري';
   final String storeLink = 'tabayu.com/Muath-Buy';
 
-  // Chart Data (merged Sales & Visits)
-  final List<ChartData> chartData = [
-    ChartData(time: '6 ص', sales: 20, visits: 15),
-    ChartData(time: '12 ص', sales: 35, visits: 25),
-    ChartData(time: '6 م', sales: 45, visits: 30),
-    ChartData(time: '12 م', sales: 30, visits: 20),
+  // Chart Data from center screen (Revenue & Expense Comparison)
+  // Dual-axis bar chart data for Jan-Jun
+  final List<SalesVisitsData> barChartData = [
+    SalesVisitsData(month: 'يناير', revenue: 700, expense: 500),
+    SalesVisitsData(month: 'فبراير', revenue: 1700, expense: 1200),
+    SalesVisitsData(month: 'مارس', revenue: 2000, expense: 1500),
+    SalesVisitsData(month: 'أبريل', revenue: 400, expense: 300),
+    SalesVisitsData(month: 'مايو', revenue: 3000, expense: 2500),
+    SalesVisitsData(month: 'يونيو', revenue: 2500, expense: 2000),
   ];
 
-  // Category totals
-  final double salesTotal = 6.0; // hours
-  final double visitsTotal = 1.22; // hours
-  final double statsTotal = 0.38; // hours
-
-  // App usage data
-  final List<AppUsage> appUsage = [
-    AppUsage(name: 'أدواتي', time: '36 د', color: Colors.orange, icon: Icons.build),
-    AppUsage(name: 'يوميات', time: '32 د', color: Colors.purple, icon: Icons.book),
-    AppUsage(name: 'ضاعف ظهورك', time: '47 د', color: Colors.yellow, icon: Icons.trending_up),
-    AppUsage(name: 'mBuy Studio', time: '5 س 15 د', color: Colors.black, icon: Icons.movie_creation),
-  ];
+  // Constants from image measurements
+  static const double _chartHeight = 200.0;
+  static const double _axisLabelFontSize = 10.0;
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +48,8 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           // Profile Section (Facebook-style)
           SliverToBoxAdapter(child: _buildProfileSection()),
 
-          // Chart Section (below store link)
-          SliverToBoxAdapter(child: _buildChartSection()),
+          // Shortcuts Section (replaced with chart)
+          SliverToBoxAdapter(child: _buildShortcutsSection()),
 
           // Main Menu Grid
           SliverPadding(
@@ -69,21 +63,8 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
               ),
               delegate: SliverChildListDelegate([
                 _buildMenuCard(
-                  icon: Icons.shopping_bag_outlined,
-                  title: 'الطلبات',
-                  iconColor: Colors.blue,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MerchantOrdersScreen(),
-                      ),
-                    );
-                  },
-                ),
-                _buildMenuCard(
                   icon: Icons.store_outlined,
-                  title: 'إدارة المتجر',
+                  title: 'خدمات التاجر',
                   iconColor: Colors.blue,
                   onTap: () {
                     Navigator.push(
@@ -95,9 +76,17 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                   },
                 ),
                 _buildMenuCard(
+                  icon: Icons.loyalty,
+                  title: 'الولاء',
+                  iconColor: Colors.purple,
+                  onTap: () {
+                    _showSnackBar('سيتم إضافة الولاء قريباً');
+                  },
+                ),
+                _buildMenuCard(
                   icon: Icons.campaign_outlined,
                   title: 'التسويق',
-                  iconColor: Colors.blue,
+                  iconColor: Colors.orange,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -108,16 +97,27 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                   },
                 ),
                 _buildMenuCard(
-                  icon: Icons.palette_outlined,
-                  title: 'مظهر المتجر',
-                  iconColor: Colors.blue,
+                  icon: Icons.article_outlined,
+                  title: 'يوميات التاجر',
+                  iconColor: Colors.green,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MerchantStoreSetupScreen(),
-                      ),
-                    );
+                    _showSnackBar('سيتم إضافة يوميات التاجر قريباً');
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.local_shipping_outlined,
+                  title: 'الشحن',
+                  iconColor: Colors.teal,
+                  onTap: () {
+                    _showSnackBar('سيتم إضافة الشحن قريباً');
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.handshake_outlined,
+                  title: 'ادعمني ودادعمك',
+                  iconColor: Colors.pink,
+                  onTap: () {
+                    _showSnackBar('سيتم إضافة ادعمني ودادعمك قريباً');
                   },
                 ),
               ]),
@@ -174,18 +174,64 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           color: MbuyColors.textPrimary,
         ),
       ),
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.notifications_outlined, color: MbuyColors.textPrimary),
+            onPressed: () {
+              _showNotificationsBottomSheet();
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.swap_horiz, color: MbuyColors.textPrimary),
+            onPressed: () {
+              widget.appModeProvider.setCustomerMode();
+            },
+            tooltip: 'الانتقال إلى تطبيق العميل',
+          ),
+        ],
+      ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.search, color: MbuyColors.textPrimary),
-          onPressed: () {
-            // TODO: البحث
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.settings_outlined, color: MbuyColors.textPrimary),
-          onPressed: () {
-            // TODO: الإعدادات
-          },
+        // Store Icon with Name - Right side
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: InkWell(
+            onTap: () {
+              _showStoreMenuBottomSheet();
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: MbuyColors.primaryIndigo.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.store,
+                      color: MbuyColors.primaryIndigo,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    storeName,
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: MbuyColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -202,156 +248,11 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
       ),
       child: Column(
         children: [
-          // Profile Row
-          Row(
-            children: [
-              // Store Avatar
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: MbuyColors.primaryIndigo.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.store,
-                  color: MbuyColors.primaryIndigo,
-                  size: 30,
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Store Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      storeName,
-                      style: GoogleFonts.cairo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: MbuyColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      storeStatus,
-                      style: GoogleFonts.cairo(
-                        fontSize: 14,
-                        color: MbuyColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // View Store Button (instead of dropdown arrow)
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MerchantStoreSetupScreen(),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'عرض المتجر',
-                  style: GoogleFonts.cairo(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Store Link Section (instead of "Create new page")
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: MbuyColors.surface,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'رابط متجري',
-                        style: GoogleFonts.cairo(
-                          fontSize: 13,
-                          color: MbuyColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              storeLink,
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: MbuyColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _buildLinkActionButton(
-                            icon: Icons.qr_code,
-                            onTap: () {
-                              _showSnackBar('سيتم إضافة QR Code قريباً');
-                            },
-                          ),
-                          const SizedBox(width: 4),
-                          _buildLinkActionButton(
-                            icon: Icons.copy,
-                            onTap: () {
-                              Clipboard.setData(ClipboardData(text: storeLink));
-                              _showSnackBar('تم نسخ الرابط');
-                            },
-                          ),
-                          const SizedBox(width: 4),
-                          _buildLinkActionButton(
-                            icon: Icons.share,
-                            onTap: () {
-                              _showSnackBar('سيتم إضافة المشاركة قريباً');
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Plus Icon (like Facebook)
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: MbuyColors.surface,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.add,
-                    color: MbuyColors.textSecondary,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Balance and Coins Section (replacing store avatar)
+          _buildBalanceSection(),
+          const SizedBox(height: 24),
+          // Three Tabs: الترويج, mbuy tools, mbuy studio (separated and larger)
+          _buildTabsSection(),
         ],
       ),
     );
@@ -374,213 +275,412 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-  Widget _buildChartSection() {
-    final totalTime = '${(salesTotal + visitsTotal + statsTotal).toStringAsFixed(0)} س ${((salesTotal + visitsTotal + statsTotal) % 1 * 60).toInt()} د';
-    
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: MbuyColors.borderLight, width: 0.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Total Time
-          Text(
-            totalTime,
-            style: GoogleFonts.cairo(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: MbuyColors.textPrimary,
+  Widget _buildShortcutsSection() {
+    // This section replaces "اختصاراتك" with the chart
+    // Exact dimensions matching "اختصاراتك" card from Facebook design
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(12),
             ),
+            border: Border.all(color: MbuyColors.borderLight, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          // Chart
-          SizedBox(
-            height: 150,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: chartData.map((data) {
-                final maxValue = 60.0;
-                final salesHeight = (data.sales / maxValue) * 120;
-                final visitsHeight = (data.visits / maxValue) * 120;
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Stacked bars (Sales + Visits merged)
-                        Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            // Visits (bottom, light blue)
-                            Container(
-                              height: visitsHeight,
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withValues(alpha: 0.3),
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(4),
-                                ),
-                              ),
-                            ),
-                            // Sales (top, dark blue)
-                            Container(
-                              height: salesHeight,
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(4),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          data.time,
-                          style: GoogleFonts.cairo(
-                            fontSize: 11,
-                            color: MbuyColors.textTertiary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
+          child: SizedBox(
+            height: _chartHeight,
+            child: _buildChartWidget(),
+          ),
+        ),
+        // Tabs below chart: المبيعات, الزيارات, الاحصائيات
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(12),
             ),
+            border: Border.all(color: MbuyColors.borderLight, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          // Y-axis labels
-          Row(
+          child: Row(
             children: [
-              Text(
-                '0',
-                style: GoogleFonts.cairo(
-                  fontSize: 11,
-                  color: MbuyColors.textTertiary,
+              Expanded(
+                child: _buildChartTab(
+                  label: 'المبيعات',
+                  color: const Color(0xFF4A90E2),
                 ),
               ),
-              const Spacer(),
-              Text(
-                '30 د',
-                style: GoogleFonts.cairo(
-                  fontSize: 11,
-                  color: MbuyColors.textTertiary,
+              Expanded(
+                child: _buildChartTab(
+                  label: 'الزيارات',
+                  color: Colors.green,
                 ),
               ),
-              const Spacer(),
-              Text(
-                '60 د',
-                style: GoogleFonts.cairo(
-                  fontSize: 11,
-                  color: MbuyColors.textTertiary,
+              Expanded(
+                child: _buildChartTab(
+                  label: 'الاحصائيات',
+                  color: MbuyColors.textSecondary,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Category Summary
-          Row(
-            children: [
-              Expanded(
-                child: _buildCategoryItem(
-                  'المبيعات',
-                  '${salesTotal.toStringAsFixed(0)} س ${((salesTotal % 1) * 60).toInt()} د',
-                  Colors.blue,
-                ),
-              ),
-              Expanded(
-                child: _buildCategoryItem(
-                  'الزيارات',
-                  '${visitsTotal.toStringAsFixed(0)} س ${((visitsTotal % 1) * 60).toInt()} د',
-                  Colors.cyan,
-                ),
-              ),
-              Expanded(
-                child: _buildCategoryItem(
-                  'الإحصائيات',
-                  '${(statsTotal * 60).toInt()} د',
-                  Colors.orange,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // App Usage List
-          ...appUsage.map((app) => _buildAppUsageItem(app)),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCategoryItem(String label, String value, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.cairo(
-              fontSize: 13,
-              color: color,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              color: MbuyColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppUsageItem(AppUsage app) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: app.color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(app.icon, color: app.color, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              app.name,
+  Widget _buildChartTab({
+    required String label,
+    required Color color,
+  }) {
+    return InkWell(
+              onTap: () {
+                _showSnackBar(label);
+              },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (label == 'المبيعات' || label == 'الزيارات')
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            if (label == 'المبيعات' || label == 'الزيارات')
+              const SizedBox(width: 6),
+            Text(
+              label,
               style: GoogleFonts.cairo(
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: MbuyColors.textPrimary,
               ),
             ),
-          ),
-          Text(
-            app.time,
-            style: GoogleFonts.cairo(
-              fontSize: 14,
-              color: MbuyColors.textSecondary,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  Widget _buildBalanceSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Total Balance
+        Text(
+          'الرصيد الإجمالي:',
+          style: GoogleFonts.cairo(
+            fontSize: 14,
+            color: MbuyColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '5000.00 SAR',
+          style: GoogleFonts.cairo(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: MbuyColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Currencies/Coins - Same format as Total Balance
+        Text(
+          'العملات:',
+          style: GoogleFonts.cairo(
+            fontSize: 14,
+            color: MbuyColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            // Coin Icon
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.monetization_on,
+                color: Colors.amber,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '1250 MBuy Coins',
+              style: GoogleFonts.cairo(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: MbuyColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabsSection() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _buildTabButton(
+                icon: Icons.trending_up,
+                label: 'الترويج',
+                subtitle: 'دعم المنتجات والمتاجر',
+                gradient: LinearGradient(
+                  colors: [Colors.purple.shade400, Colors.purple.shade600],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MerchantPromotionsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTabButton(
+                icon: Icons.analytics,
+                label: 'mbuy tools',
+                subtitle: 'التحليلات والأدوات الذكية',
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade400, Colors.blue.shade600],
+                ),
+                onTap: () {
+                  _showSnackBar('سيتم إضافة mbuy tools قريباً');
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTabButton(
+                icon: Icons.video_library,
+                label: 'mbuy studio',
+                subtitle: 'الفيديو والصوت والصورة',
+                gradient: LinearGradient(
+                  colors: [Colors.orange.shade400, Colors.orange.shade600],
+                ),
+                onTap: () {
+                  _showSnackBar('سيتم إضافة mbuy studio قريباً');
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabButton({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required Gradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: GoogleFonts.cairo(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChartWidget() {
+    // Calculate max values for dual-axis chart
+    final maxRevenue = barChartData.map((e) => e.revenue).reduce((a, b) => a > b ? a : b);
+    final maxExpense = barChartData.map((e) => e.expense).reduce((a, b) => a > b ? a : b);
+    final maxLeftAxis = ((maxRevenue / 1000).ceil() * 1000).toDouble();
+    final maxRightAxis = ((maxExpense / 1000).ceil() * 1000).toDouble();
+
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: maxLeftAxis,
+        barTouchData: BarTouchData(enabled: false),
+        titlesData: FlTitlesData(
+          show: true,
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                if (value == 0 || value == maxLeftAxis / 2 || value == maxLeftAxis) {
+                  return Text(
+                    '${(value / 1000).toStringAsFixed(0)}K',
+                    style: GoogleFonts.cairo(
+                      fontSize: _axisLabelFontSize,
+                      color: const Color(0xFF666666),
+                    ),
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                if (value == 0 || value == maxRightAxis / 2 || value == maxRightAxis) {
+                  return Text(
+                    '${(value / 1000).toStringAsFixed(0)}K',
+                    style: GoogleFonts.cairo(
+                      fontSize: _axisLabelFontSize,
+                      color: const Color(0xFF666666),
+                    ),
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (index >= 0 && index < barChartData.length) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      barChartData[index].month,
+                      style: GoogleFonts.cairo(
+                        fontSize: _axisLabelFontSize,
+                        color: const Color(0xFF666666),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: maxLeftAxis / 4,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: const Color(0xFFE0E0E0),
+              strokeWidth: 0.5,
+            );
+          },
+        ),
+        borderData: FlBorderData(show: false),
+        barGroups: List.generate(barChartData.length, (index) {
+          final data = barChartData[index];
+          return BarChartGroupData(
+            x: index,
+            barRods: [
+              // Revenue bars (blue) - left axis
+              BarChartRodData(
+                toY: data.revenue,
+                color: const Color(0xFF4A90E2),
+                width: 12,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
+              ),
+              // Expense bars (green) - right axis
+              BarChartRodData(
+                toY: data.expense,
+                color: Colors.green,
+                width: 12,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
+              ),
+            ],
+            barsSpace: 4,
+          );
+        }),
+      ),
+    );
+  }
+
+
 
   Widget _buildMenuCard({
     required IconData icon,
@@ -697,31 +797,284 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
       ),
     );
   }
+
+  void _showStoreMenuBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Store Link Section with actions
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: MbuyColors.surface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'رابط المتجر',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: MbuyColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          storeLink,
+                          style: GoogleFonts.cairo(
+                            fontSize: 14,
+                            color: MbuyColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      _buildLinkActionButton(
+                        icon: Icons.qr_code,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showSnackBar('سيتم إضافة QR Code قريباً');
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      _buildLinkActionButton(
+                        icon: Icons.copy,
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(text: storeLink));
+                          Navigator.pop(context);
+                          _showSnackBar('تم نسخ الرابط');
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      _buildLinkActionButton(
+                        icon: Icons.share,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showSnackBar('سيتم إضافة المشاركة قريباً');
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Grid of square icons
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 3,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.0,
+              children: [
+                _buildSquareMenuOption(
+                  icon: Icons.store,
+                  title: 'عرض المتجر',
+                  color: Colors.blue,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantStoreSetupScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.settings,
+                  title: 'إدارة المتجر',
+                  color: Colors.grey,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSnackBar('سيتم إضافة إدارة المتجر قريباً');
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.palette,
+                  title: 'مظهر المتجر',
+                  color: Colors.purple,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSnackBar('سيتم إضافة مظهر المتجر قريباً');
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.edit,
+                  title: 'تحرير المتجر',
+                  color: Colors.orange,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantStoreSetupScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.person,
+                  title: 'تعديل معلومات الحساب',
+                  color: Colors.teal,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSnackBar('سيتم إضافة تعديل معلومات الحساب قريباً');
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.lock,
+                  title: 'تغيير كلمة المرور',
+                  color: Colors.indigo,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSnackBar('سيتم إضافة تغيير كلمة المرور قريباً');
+                  },
+                ),
+                _buildSquareMenuOption(
+                  icon: Icons.delete_outline,
+                  title: 'حذف المتجر',
+                  color: Colors.red,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSnackBar('سيتم إضافة حذف المتجر قريباً');
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSquareMenuOption({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 28),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  title,
+                  style: GoogleFonts.cairo(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: MbuyColors.textPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showNotificationsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DefaultTabController(
+        length: 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TabBar(
+              labelColor: MbuyColors.primaryIndigo,
+              unselectedLabelColor: MbuyColors.textSecondary,
+              indicatorColor: MbuyColors.primaryIndigo,
+              tabs: [
+                Tab(
+                  child: Text(
+                    'الإشعارات',
+                    style: GoogleFonts.cairo(fontSize: 16),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    'المجتمع',
+                    style: GoogleFonts.cairo(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 300,
+              child: TabBarView(
+                children: [
+                  // Notifications Tab
+                  Center(
+                    child: Text(
+                      'لا توجد إشعارات',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        color: MbuyColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  // Community Tab
+                  Center(
+                    child: Text(
+                      'المجتمع',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        color: MbuyColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-// Data Models
-class ChartData {
-  final String time;
-  final double sales;
-  final double visits;
+// Data Model for Bar Chart
+class SalesVisitsData {
+  final String month;
+  final double revenue; // المبيعات
+  final double expense; // الزيارات
 
-  ChartData({
-    required this.time,
-    required this.sales,
-    required this.visits,
-  });
-}
-
-class AppUsage {
-  final String name;
-  final String time;
-  final Color color;
-  final IconData icon;
-
-  AppUsage({
-    required this.name,
-    required this.time,
-    required this.color,
-    required this.icon,
+  SalesVisitsData({
+    required this.month,
+    required this.revenue,
+    required this.expense,
   });
 }

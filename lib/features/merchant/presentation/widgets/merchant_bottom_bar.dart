@@ -41,7 +41,7 @@ class MerchantBottomBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildNavItem(0, Icons.home_filled, 'الرئيسية'),
-                  _buildNavItem(1, Icons.people_outline, 'المجتمع'),
+                  _buildNavItem(1, Icons.shopping_bag_outlined, 'الطلبات'),
 
                   // Premium Floating FAB - 38px with elevation 14
                   GestureDetector(
@@ -76,7 +76,7 @@ class MerchantBottomBar extends StatelessWidget {
                   ),
 
                   _buildNavItem(2, Icons.chat_bubble_outline, 'المحادثات'),
-                  _buildNavItem(3, Icons.person_outline, 'الملف الشخصي'),
+                  _buildNavItem(3, Icons.settings_outlined, 'الإعدادات'),
                 ],
               ),
             ),
