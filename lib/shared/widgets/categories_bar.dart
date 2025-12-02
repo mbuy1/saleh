@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/data/dummy_data.dart';
+import '../../features/customer/presentation/screens/categories_screen.dart';
 
 /// شريط الفئات الأفقي - يظهر في الصفحة الرئيسية وصفحة المتاجر
 class CategoriesBar extends StatelessWidget {
@@ -23,8 +24,12 @@ class CategoriesBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: InkWell(
             onTap: () {
-              // TODO: Navigate to all categories screen
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => AllCategoriesScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CategoriesScreen(),
+                ),
+              );
             },
             borderRadius: BorderRadius.circular(8),
             child: Padding(

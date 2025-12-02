@@ -30,8 +30,13 @@ class SubCategory {
 /// شريط عامودي على اليمين + grid على اليسار
 class CategoryBrowserView extends StatefulWidget {
   final List<MainCategory> mainCategories;
+  final VoidCallback? onViewAllCategories;
 
-  const CategoryBrowserView({super.key, required this.mainCategories});
+  const CategoryBrowserView({
+    super.key,
+    required this.mainCategories,
+    this.onViewAllCategories,
+  });
 
   @override
   State<CategoryBrowserView> createState() => _CategoryBrowserViewState();
@@ -218,7 +223,7 @@ class _CategoryBrowserViewState extends State<CategoryBrowserView> {
           child: _buildActionCard(
             icon: Icons.grid_view_rounded,
             label: 'مشاهدة الكل',
-            onTap: () {},
+            onTap: widget.onViewAllCategories ?? () {},
           ),
         ),
         const SizedBox(width: 12),

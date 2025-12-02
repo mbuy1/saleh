@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import 'merchant_dashboard_screen.dart';
 import 'merchant_products_screen.dart';
-import 'merchant_orders_screen.dart';
-import 'merchant_wallet_screen.dart';
-import '../widgets/merchant_profile_tab.dart';
+import 'merchant_community_screen.dart';
+import 'merchant_messages_screen.dart';
+import 'merchant_profile_screen.dart';
+import '../widgets/merchant_bottom_bar.dart';
 
 class MerchantHomeScreen extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -16,7 +17,7 @@ class MerchantHomeScreen extends StatefulWidget {
 }
 
 class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
-  final int _currentIndex = 0;
+  int _currentIndex = 0;
 
   late final List<Widget> _screens;
 
@@ -25,17 +26,35 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
     super.initState();
     _screens = [
       MerchantDashboardScreen(appModeProvider: widget.appModeProvider),
+      const MerchantCommunityScreen(),
       const MerchantProductsScreen(),
-      const MerchantOrdersScreen(),
-      const MerchantWalletScreen(),
-      MerchantProfileTab(appModeProvider: widget.appModeProvider),
+      const MerchantMessagesScreen(),
+      const MerchantProfileScreen(),
     ];
+  }
+
+  void _onBottomNavTap(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: MerchantBottomBar(
+        currentIndex: _currentIndex,
+        onTap: _onBottomNavTap,
+        onAddTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MerchantProductsScreen(),
+            ),
+          );
+        },
+      ),
     );
   }
 }

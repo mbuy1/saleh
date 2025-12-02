@@ -1,12 +1,11 @@
-import 'dart:ui'; // For ImageFilter (Glassmorphism)
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../widgets/merchant_bottom_bar.dart';
-import 'merchant_products_screen.dart';
 import 'merchant_orders_screen.dart';
 import 'merchant_store_setup_screen.dart';
+import 'merchant_promotions_screen.dart';
 
 class MerchantDashboardScreen extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -20,471 +19,609 @@ class MerchantDashboardScreen extends StatefulWidget {
 
 class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
   // Mock Data
-  final String storeName = 'متجر الإلكترونيات الذكية';
-  final String storeStatus = 'عام';
-  final int followersCount = 2450;
-  final int newOrdersCount = 5;
+  final String storeName = 'معاذ باي';
+  final String storeStatus = 'سجل تجاري';
+  final String storeLink = 'tabayu.com/Muath-Buy';
 
-  int _bottomNavIndex = 0;
+  // Chart Data (merged Sales & Visits)
+  final List<ChartData> chartData = [
+    ChartData(time: '6 ص', sales: 20, visits: 15),
+    ChartData(time: '12 ص', sales: 35, visits: 25),
+    ChartData(time: '6 م', sales: 45, visits: 30),
+    ChartData(time: '12 م', sales: 30, visits: 20),
+  ];
+
+  // Category totals
+  final double salesTotal = 6.0; // hours
+  final double visitsTotal = 1.22; // hours
+  final double statsTotal = 0.38; // hours
+
+  // App usage data
+  final List<AppUsage> appUsage = [
+    AppUsage(name: 'أدواتي', time: '36 د', color: Colors.orange, icon: Icons.build),
+    AppUsage(name: 'يوميات', time: '32 د', color: Colors.purple, icon: Icons.book),
+    AppUsage(name: 'ضاعف ظهورك', time: '47 د', color: Colors.yellow, icon: Icons.trending_up),
+    AppUsage(name: 'mBuy Studio', time: '5 س 15 د', color: Colors.black, icon: Icons.movie_creation),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MbuyColors.background,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Dashboard Content
-            CustomScrollView(
-              slivers: [
-                // Combined Header (Store Info + Stats + Action)
-                SliverToBoxAdapter(child: _buildStoreHeader()),
+      backgroundColor: const Color(0xFFF0F2F5), // Facebook gray background
+      appBar: _buildAppBar(),
+      body: CustomScrollView(
+        slivers: [
+          // Profile Section (Facebook-style)
+          SliverToBoxAdapter(child: _buildProfileSection()),
 
-                // Feature Grid
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    16,
-                    16,
-                    16,
-                    100,
-                  ), // Bottom padding for scrolling
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.1, // Adjusted to prevent overflow
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                    delegate: SliverChildListDelegate([
-                      _buildFeatureCard(
-                        icon: Icons.shopping_bag_outlined,
-                        title: 'الطلبات',
-                        badge: newOrdersCount,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const MerchantOrdersScreen(),
-                            ),
-                          );
-                        },
+          // Chart Section (below store link)
+          SliverToBoxAdapter(child: _buildChartSection()),
+
+          // Main Menu Grid
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              delegate: SliverChildListDelegate([
+                _buildMenuCard(
+                  icon: Icons.shopping_bag_outlined,
+                  title: 'الطلبات',
+                  iconColor: Colors.blue,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantOrdersScreen(),
                       ),
-                      _buildFeatureCard(
-                        icon: Icons.inventory_2_outlined,
-                        title: 'المنتجات',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const MerchantProductsScreen(),
-                            ),
-                          );
-                        },
+                    );
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.store_outlined,
+                  title: 'إدارة المتجر',
+                  iconColor: Colors.blue,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantStoreSetupScreen(),
                       ),
-                      _buildFeatureCard(
-                        icon: Icons.stars_outlined,
-                        title: 'نقاط التاجر',
-                        subtitle: '1,250 نقطة',
-                        onTap: () {},
+                    );
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.campaign_outlined,
+                  title: 'التسويق',
+                  iconColor: Colors.blue,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantPromotionsScreen(),
                       ),
-                      _buildFeatureCard(
-                        icon: Icons.account_balance_wallet_outlined,
-                        title: 'المحفظة',
-                        subtitle: '12,450 ر.س',
-                        onTap: () {},
+                    );
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.palette_outlined,
+                  title: 'مظهر المتجر',
+                  iconColor: Colors.blue,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantStoreSetupScreen(),
                       ),
-                      _buildFeatureCard(
-                        icon: Icons.chat_bubble_outline,
-                        title: 'الرسائل',
-                        badge: 3,
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.campaign_outlined,
-                        title: 'العروض',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.photo_library_outlined,
-                        title: 'الستوري',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.menu_book_outlined,
-                        title: 'الكتالوج',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.star_outline,
-                        title: 'التقييمات',
-                        subtitle: '4.8 ⭐',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.settings_outlined,
-                        title: 'الإعدادات',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const MerchantStoreSetupScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.bar_chart_outlined,
-                        title: 'الإحصائيات',
-                        onTap: () {},
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.people_outline,
-                        title: 'المتابعون',
-                        subtitle: '$followersCount',
-                        onTap: () {},
-                      ),
-                    ]),
+                    );
+                  },
+                ),
+              ]),
+            ),
+          ),
+
+          // Show More Button
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextButton(
+                onPressed: () {
+                  // TODO: عرض المزيد
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-
-                // Collapsible Sections
-                SliverToBoxAdapter(child: _buildCollapsibleSections()),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              ],
+                child: Text(
+                  'عرض المزيد',
+                  style: GoogleFonts.cairo(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: MbuyColors.textPrimary,
+                  ),
+                ),
+              ),
             ),
+          ),
 
-            // Bottom Bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: MerchantBottomBar(
-                currentIndex: _bottomNavIndex,
-                onTap: (index) {
-                  setState(() {
-                    _bottomNavIndex = index;
-                  });
-                },
-                onAddTap: () {
+          // Help & Support Section
+          SliverToBoxAdapter(child: _buildHelpSupportSection()),
+
+          // Switch to Customer App Button
+          SliverToBoxAdapter(child: _buildSwitchAppButton()),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
+        ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      title: Text(
+        'القائمة',
+        style: GoogleFonts.cairo(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: MbuyColors.textPrimary,
+        ),
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search, color: MbuyColors.textPrimary),
+          onPressed: () {
+            // TODO: البحث
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.settings_outlined, color: MbuyColors.textPrimary),
+          onPressed: () {
+            // TODO: الإعدادات
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileSection() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: MbuyColors.borderLight, width: 0.5),
+      ),
+      child: Column(
+        children: [
+          // Profile Row
+          Row(
+            children: [
+              // Store Avatar
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: MbuyColors.primaryIndigo.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.store,
+                  color: MbuyColors.primaryIndigo,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Store Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      storeName,
+                      style: GoogleFonts.cairo(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: MbuyColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      storeStatus,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        color: MbuyColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // View Store Button (instead of dropdown arrow)
+              TextButton(
+                onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MerchantProductsScreen(),
+                      builder: (context) => const MerchantStoreSetupScreen(),
                     ),
                   );
                 },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'عرض المتجر',
+                  style: GoogleFonts.cairo(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue,
+                  ),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Store Link Section (instead of "Create new page")
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: MbuyColors.surface,
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'رابط متجري',
+                        style: GoogleFonts.cairo(
+                          fontSize: 13,
+                          color: MbuyColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              storeLink,
+                              style: GoogleFonts.cairo(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: MbuyColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildLinkActionButton(
+                            icon: Icons.qr_code,
+                            onTap: () {
+                              _showSnackBar('سيتم إضافة QR Code قريباً');
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                          _buildLinkActionButton(
+                            icon: Icons.copy,
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(text: storeLink));
+                              _showSnackBar('تم نسخ الرابط');
+                            },
+                          ),
+                          const SizedBox(width: 4),
+                          _buildLinkActionButton(
+                            icon: Icons.share,
+                            onTap: () {
+                              _showSnackBar('سيتم إضافة المشاركة قريباً');
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Plus Icon (like Facebook)
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: MbuyColors.surface,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add,
+                    color: MbuyColors.textSecondary,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkActionButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Icon(icon, size: 18, color: MbuyColors.textSecondary),
         ),
       ),
     );
   }
 
-  Widget _buildStoreHeader() {
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(
-        bottom: Radius.circular(MbuySpacing.cardRadius),
+  Widget _buildChartSection() {
+    final totalTime = '${(salesTotal + visitsTotal + statsTotal).toStringAsFixed(0)} س ${((salesTotal + visitsTotal + statsTotal) % 1 * 60).toInt()} د';
+    
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: MbuyColors.borderLight, width: 0.5),
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: MbuySpacing.glassBlur,
-          sigmaY: MbuySpacing.glassBlur,
-        ),
-        child: Container(
-          padding: EdgeInsets.all(MbuySpacing.headerPadding), // 14px
-          decoration: BoxDecoration(
-            color: MbuyColors.glassBackground,
-            border: Border.all(color: MbuyColors.glassBorder, width: 1),
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(MbuySpacing.cardRadius),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Total Time
+          Text(
+            totalTime,
+            style: GoogleFonts.cairo(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: MbuyColors.textPrimary,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 22,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: Column(
-            children: [
-              // Super Premium Store-Focused Header (iOS-like spacious)
-              Row(
-                children: [
-                  // Store Image - 60px per Super Premium spec
-                  Container(
-                    width: MbuyIconSizes.merchant, // 60px
-                    height: MbuyIconSizes.merchant,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: MbuyColors.surface,
-                      border: Border.all(
-                        color: MbuyColors.borderLight,
-                        width: 1,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.store_outlined,
-                      color: MbuyColors.textSecondary,
-                      size: 28,
-                    ),
-                  ),
-                  SizedBox(width: MbuySpacing.iconTextGap),
-                  // Store Name & Status - Super Premium Typography
-                  Expanded(
+          const SizedBox(height: 20),
+          // Chart
+          SizedBox(
+            height: 150,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: chartData.map((data) {
+                final maxValue = 60.0;
+                final salesHeight = (data.sales / maxValue) * 120;
+                final visitsHeight = (data.visits / maxValue) * 120;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text(
-                          storeName,
-                          style: GoogleFonts.cairo(
-                            fontSize: 20, // Title L - SemiBold
-                            fontWeight: FontWeight.w600,
-                            color: MbuyColors.textPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        // Stacked bars (Sales + Visits merged)
+                        Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            // Visits (bottom, light blue)
+                            Container(
+                              height: visitsHeight,
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.3),
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(4),
+                                ),
+                              ),
+                            ),
+                            // Sales (top, dark blue)
+                            Container(
+                              height: salesHeight,
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(4),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Text(
-                          storeStatus,
+                          data.time,
                           style: GoogleFonts.cairo(
-                            fontSize: 14, // Subtext - Medium
-                            fontWeight: FontWeight.w500,
-                            color: MbuyColors.success,
+                            fontSize: 11,
+                            color: MbuyColors.textTertiary,
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  // Actions - Gray Icons (24px header size)
-                  Row(
-                    children: [
-                      _buildHeaderIconButton(
-                        Icons.swap_horiz,
-                        () => widget.appModeProvider.setCustomerMode(),
-                      ),
-                      const SizedBox(width: 6),
-                      _buildHeaderIconButton(Icons.settings_outlined, () {}),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Stats Section - Clean Numbers
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatItem('المنتجات', '124', Icons.inventory_2_outlined),
-                  _buildStatItem(
-                    'الطلبات',
-                    '$newOrdersCount',
-                    Icons.shopping_bag_outlined,
-                    isHighlighted: true,
-                  ),
-                  _buildStatItem('التقييم', '4.8', Icons.star_outline),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Manage Store Button - Gradient Style
-              Container(
-                width: double.infinity,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: MbuyColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: MbuyColors.primaryPurple.withValues(alpha: 0.15),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Y-axis labels
+          Row(
+            children: [
+              Text(
+                '0',
+                style: GoogleFonts.cairo(
+                  fontSize: 11,
+                  color: MbuyColors.textTertiary,
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(12),
-                    child: Center(
-                      child: Text(
-                        'إدارة المتجر',
-                        style: GoogleFonts.cairo(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+              ),
+              const Spacer(),
+              Text(
+                '30 د',
+                style: GoogleFonts.cairo(
+                  fontSize: 11,
+                  color: MbuyColors.textTertiary,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '60 د',
+                style: GoogleFonts.cairo(
+                  fontSize: 11,
+                  color: MbuyColors.textTertiary,
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 20),
+          // Category Summary
+          Row(
+            children: [
+              Expanded(
+                child: _buildCategoryItem(
+                  'المبيعات',
+                  '${salesTotal.toStringAsFixed(0)} س ${((salesTotal % 1) * 60).toInt()} د',
+                  Colors.blue,
+                ),
+              ),
+              Expanded(
+                child: _buildCategoryItem(
+                  'الزيارات',
+                  '${visitsTotal.toStringAsFixed(0)} س ${((visitsTotal % 1) * 60).toInt()} د',
+                  Colors.cyan,
+                ),
+              ),
+              Expanded(
+                child: _buildCategoryItem(
+                  'الإحصائيات',
+                  '${(statsTotal * 60).toInt()} د',
+                  Colors.orange,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // App Usage List
+          ...appUsage.map((app) => _buildAppUsageItem(app)),
+        ],
       ),
     );
   }
 
-  Widget _buildHeaderIconButton(IconData icon, VoidCallback onTap) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: MbuyColors.surface,
-            borderRadius: BorderRadius.circular(10),
+  Widget _buildCategoryItem(String label, String value, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.cairo(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: MbuyColors.textSecondary,
-            size: MbuyIconSizes.header, // 24px per Ultra Premium spec
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: MbuyColors.textSecondary,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatItem(
-    String label,
-    String value,
-    IconData icon, {
-    bool isHighlighted = false,
-  }) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: GoogleFonts.cairo(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: MbuyColors.textPrimary,
-            height: 1.0,
-            letterSpacing: -0.5,
+  Widget _buildAppUsageItem(AppUsage app) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: app.color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(app.icon, color: app.color, size: 24),
           ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 15, color: MbuyColors.textTertiary),
-            const SizedBox(width: 4),
-            Text(
-              label,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              app.name,
               style: GoogleFonts.cairo(
-                fontSize: 13,
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
-                color: MbuyColors.textSecondary,
+                color: MbuyColors.textPrimary,
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+          Text(
+            app.time,
+            style: GoogleFonts.cairo(
+              fontSize: 14,
+              color: MbuyColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildFeatureCard({
+  Widget _buildMenuCard({
     required IconData icon,
     required String title,
-    String? subtitle,
-    int? badge,
+    required Color iconColor,
     required VoidCallback onTap,
   }) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(MbuySpacing.cardRadius),
+      borderRadius: BorderRadius.circular(12),
       elevation: 0,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(MbuySpacing.cardRadius),
-        splashColor: Colors.black.withValues(alpha: 0.05),
-        highlightColor: Colors.black.withValues(alpha: 0.02),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: MbuyColors.borderLight, width: 1),
-            borderRadius: BorderRadius.circular(MbuySpacing.cardRadius),
+            border: Border.all(color: MbuyColors.borderLight, width: 0.5),
+            borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // أيقونة كبيرة ممتلئة 42-48px
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Icon(
-                    icon,
-                    color: MbuyColors.textPrimary,
-                    size: MbuyIconSizes.gridItem, // 45px
-                  ),
-                  if (badge != null && badge > 0)
-                    Positioned(
-                      right: -6,
-                      top: -6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: MbuyColors.error,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
-                        ),
-                        child: Text(
-                          '$badge',
-                          style: GoogleFonts.cairo(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                ],
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 28),
               ),
               const SizedBox(height: 12),
-              // نص تحت الأيقونة مباشرة
               Text(
                 title,
                 style: GoogleFonts.cairo(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                   color: MbuyColors.textPrimary,
                 ),
+                textAlign: TextAlign.center,
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 2),
-                Flexible(
-                  child: Text(
-                    subtitle,
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: MbuyColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -492,147 +629,99 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-  Widget _buildCollapsibleSections() {
-    return Column(
-      children: [
-        _buildExpandableSection(
-          title: 'المساعدة والدعم',
-          items: [
-            _buildMenuItem(
-              icon: Icons.help_outline,
-              title: 'مركز المساعدة',
-              onTap: () {},
-            ),
-            _buildMenuItem(
-              icon: Icons.support_agent_outlined,
-              title: 'الدعم الفني',
-              onTap: () {},
-            ),
-            _buildMenuItem(
-              icon: Icons.policy_outlined,
-              title: 'سياسات المتاجر',
-              onTap: () {},
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        _buildExpandableSection(
-          title: 'الإدارة المالية',
-          items: [
-            _buildMenuItem(
-              icon: Icons.receipt_long_outlined,
-              title: 'إدارة الفواتير',
-              onTap: () {},
-            ),
-            _buildMenuItem(
-              icon: Icons.payment_outlined,
-              title: 'طرق الدفع',
-              onTap: () {},
-            ),
-            _buildMenuItem(
-              icon: Icons.history_outlined,
-              title: 'سجل المعاملات',
-              onTap: () {},
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        // App Version
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Mbuy للتجار - الإصدار 1.0.0',
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              color: MbuyColors.textTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildExpandableSection({
-    required String title,
-    required List<Widget> items,
-  }) {
+  Widget _buildHelpSupportSection() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: MbuyColors.borderLight, width: 0.5),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          dividerColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          title: Text(
-            title,
-            style: GoogleFonts.cairo(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: MbuyColors.textPrimary,
+      child: Row(
+        children: [
+          Icon(Icons.help_outline, color: MbuyColors.textTertiary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'المساعدة والدعم',
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: MbuyColors.textPrimary,
+              ),
             ),
           ),
-          trailing: Icon(
-            Icons.keyboard_arrow_down,
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 14,
             color: MbuyColors.textTertiary,
-            size: 20,
           ),
-          children: items,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwitchAppButton() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          widget.appModeProvider.setCustomerMode();
+        },
+        icon: const Icon(Icons.swap_horiz, size: 20),
+        label: Text(
+          'الانتقال إلى تطبيق العميل',
+          style: GoogleFonts.cairo(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: MbuyColors.primaryIndigo,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(7),
-                decoration: BoxDecoration(
-                  color: MbuyColors.surface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: MbuyColors.textSecondary, size: 18),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.cairo(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: MbuyColors.textSecondary,
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 13,
-                color: MbuyColors.textTertiary,
-              ),
-            ],
-          ),
-        ),
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
+}
+
+// Data Models
+class ChartData {
+  final String time;
+  final double sales;
+  final double visits;
+
+  ChartData({
+    required this.time,
+    required this.sales,
+    required this.visits,
+  });
+}
+
+class AppUsage {
+  final String name;
+  final String time;
+  final Color color;
+  final IconData icon;
+
+  AppUsage({
+    required this.name,
+    required this.time,
+    required this.color,
+    required this.icon,
+  });
 }

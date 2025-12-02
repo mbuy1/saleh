@@ -11,6 +11,7 @@ import 'settings_screen.dart';
 import 'customer_wallet_screen.dart';
 import 'customer_points_screen.dart';
 import 'customer_orders_screen.dart';
+import 'profile_screen.dart';
 
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -107,6 +108,19 @@ class _CustomerShellState extends State<CustomerShell> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const CustomerPointsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: const Text('الملف الشخصي'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
                         ),
                       );
                     },

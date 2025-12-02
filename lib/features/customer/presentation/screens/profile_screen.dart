@@ -6,6 +6,13 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../auth/data/auth_service.dart';
 import 'customer_wallet_screen.dart';
 import 'customer_points_screen.dart';
+import 'favorites_screen.dart';
+import 'browse_history_screen.dart';
+import 'coupons_screen.dart';
+import 'orders_screen.dart';
+import 'settings_screen.dart';
+import 'help_support_screen.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../core/data/dummy_data.dart';
 
@@ -200,7 +207,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: MbuyColors.textSecondary,
                         size: 24,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HelpSupportScreen(),
+                          ),
+                        );
+                      },
                     ),
                     IconButton(
                       icon: const Icon(
@@ -209,8 +223,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         size: 24,
                       ),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('قريباً: الإعدادات')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(
+                              themeProvider: ThemeProvider(),
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -238,13 +257,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildFeatureItem(
                             Icons.favorite_border,
                             'المفضلة',
-                            () {},
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const FavoritesScreen(),
+                                ),
+                              );
+                            },
                           ),
-                          _buildFeatureItem(Icons.history, 'سجل التصفح', () {}),
+                          _buildFeatureItem(Icons.history, 'سجل التصفح', () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const BrowseHistoryScreen(),
+                              ),
+                            );
+                          }),
                           _buildFeatureItem(
                             Icons.local_offer_outlined,
                             'القسائم',
-                            () {},
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CouponsScreen(),
+                                ),
+                              );
+                            },
                           ),
                           _buildFeatureItem(
                             Icons.account_balance_wallet_outlined,
@@ -302,7 +342,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const OrdersScreen(),
+                                  ),
+                                );
+                              },
                               child: Text(
                                 'عرض الكل',
                                 style: GoogleFonts.cairo(
@@ -318,21 +365,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildOrderStatus(Icons.payment, 'قيد الدفع', 1),
+                            _buildOrderStatus(Icons.payment, 'قيد الدفع', 1, () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const OrdersScreen(status: 'pending_payment'),
+                                ),
+                              );
+                            }),
                             _buildOrderStatus(
                               Icons.local_shipping_outlined,
                               'قيد الشحن',
                               0,
+                              () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const OrdersScreen(status: 'shipping'),
+                                  ),
+                                );
+                              },
                             ),
                             _buildOrderStatus(
                               Icons.inventory_2_outlined,
                               'قيد الاستلام',
                               2,
+                              () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const OrdersScreen(status: 'delivered'),
+                                  ),
+                                );
+                              },
                             ),
                             _buildOrderStatus(
                               Icons.rate_review_outlined,
                               'قيد التقييم',
                               0,
+                              () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const OrdersScreen(status: 'pending_review'),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -453,8 +531,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildOrderStatus(IconData icon, String label, int count) {
-    return Column(
+  Widget _buildOrderStatus(IconData icon, String label, int count, [VoidCallback? onTap]) {
+    final orderWidget = Column(
       children: [
         Stack(
           clipBehavior: Clip.none,
@@ -502,5 +580,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+
+    if (onTap != null) {
+      return GestureDetector(
+        onTap: onTap,
+        child: orderWidget,
+      );
+    }
+    return orderWidget;
   }
 }

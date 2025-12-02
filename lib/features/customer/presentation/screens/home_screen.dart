@@ -6,6 +6,8 @@ import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/alibaba_search_bar.dart';
 import '../../../../shared/widgets/category_browser_view.dart';
+import 'categories_screen.dart';
+import 'all_products_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -84,7 +86,14 @@ class _HomeScreenState extends State<HomeScreen>
                     title: 'أفضل العروض',
                     subtitle: 'خصومات تصل إلى 70%',
                     icon: Icons.local_offer_outlined,
-                    onViewMore: () {},
+                    onViewMore: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AllProductsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(
                     height: 240,
@@ -114,7 +123,14 @@ class _HomeScreenState extends State<HomeScreen>
                     title: 'الأعلى تقييماً',
                     subtitle: 'منتجات أحبها العملاء',
                     icon: Icons.star_outline,
-                    onViewMore: () {},
+                    onViewMore: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AllProductsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(
                     height: 240,
@@ -144,7 +160,14 @@ class _HomeScreenState extends State<HomeScreen>
                     title: 'وصل حديثاً',
                     subtitle: 'أحدث المنتجات في السوق',
                     icon: Icons.new_releases_outlined,
-                    onViewMore: () {},
+                    onViewMore: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AllProductsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(
                     height: 240,
@@ -196,7 +219,17 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildCategoriesTab() {
-    return CategoryBrowserView(mainCategories: _getMainProductCategories());
+    return CategoryBrowserView(
+      mainCategories: _getMainProductCategories(),
+      onViewAllCategories: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CategoriesScreen(),
+          ),
+        );
+      },
+    );
   }
 
   List<MainCategory> _getMainProductCategories() {

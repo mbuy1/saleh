@@ -6,6 +6,7 @@ import '../../../../shared/widgets/store_card_compact.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/alibaba_search_bar.dart';
 import '../../../../shared/widgets/category_browser_view.dart';
+import 'categories_screen.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -197,7 +198,17 @@ class _StoresScreenState extends State<StoresScreen>
   }
 
   Widget _buildCategoriesTab() {
-    return CategoryBrowserView(mainCategories: _getMainStoreCategories());
+    return CategoryBrowserView(
+      mainCategories: _getMainStoreCategories(),
+      onViewAllCategories: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CategoriesScreen(),
+          ),
+        );
+      },
+    );
   }
 
   List<MainCategory> _getMainStoreCategories() {

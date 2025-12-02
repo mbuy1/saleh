@@ -4,6 +4,9 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
 import '../../../../core/widgets/widgets.dart';
+import 'product_details_screen.dart';
+import 'store_details_screen.dart';
+import 'profile_screen.dart';
 
 // TODO: Connect to Supabase for video/product data
 // TODO: Integrate video player (Cloudflare Stream)
@@ -95,7 +98,14 @@ class _ExploreScreenState extends State<ExploreScreen>
                 children: [
                   // Account Icon (Right) - دائرة سوداء
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
                     child: Container(
                       width: 28,
                       height: 28,
@@ -552,7 +562,20 @@ class _ExploreScreenState extends State<ExploreScreen>
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        // TODO: Navigate to store
+                        // البحث عن المتجر من DummyData
+                        final store = DummyData.stores.firstWhere(
+                          (s) => s.id == product.storeId,
+                          orElse: () => DummyData.stores.first,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StoreDetailsScreen(
+                              storeId: store.id,
+                              storeName: store.name,
+                            ),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: MbuyColors.background,
@@ -577,9 +600,17 @@ class _ExploreScreenState extends State<ExploreScreen>
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
-                        // TODO: Add to cart / buy now
+                        // التنقل إلى صفحة تفاصيل المنتج
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailsScreen(
+                              productId: product.id,
+                            ),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: MbuyColors.textPrimary,

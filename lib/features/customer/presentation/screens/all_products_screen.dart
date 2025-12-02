@@ -4,21 +4,21 @@ import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import 'product_details_screen.dart';
 
-/// شاشة المفضلة
-class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+/// شاشة جميع المنتجات
+class AllProductsScreen extends StatefulWidget {
+  const AllProductsScreen({super.key});
 
   @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
+  State<AllProductsScreen> createState() => _AllProductsScreenState();
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen> {
+class _AllProductsScreenState extends State<AllProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MbuyColors.background,
       appBar: AppBar(
-        title: const Text('المفضلة'),
+        title: const Text('جميع المنتجات'),
         backgroundColor: MbuyColors.cardBackground,
         elevation: 0,
       ),
@@ -51,3 +51,4 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 }
+

@@ -4,12 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 /// ألوان الهوية النظيفة لتطبيق mBuy
 /// أبيض / أسود / رمادي / أصفر للعروض / أحمر للتنبيهات / أخضر للنجاح
 class MbuyColors {
-  // الهوية الأساسية - أسود/رصاصي داكن
-  static const Color primaryIndigo = Color(
-    0xFF333333,
-  ); // رمادي داكن (بدلاً من الأزرق)
-  static const Color primaryDeep = Color(0xFF000000); // أسود
-  static const Color primaryHighlight = Color(0xFF6C757D); // رمادي متوسط
+  // الهوية الأساسية - بنفسجي Material Design Purple 500
+  static const Color primaryIndigo = Color(0xFF6200EE); // #6200EE - Material Purple 500
+  static const Color primaryDeep = Color(0xFF3700B3); // Purple 700 - أغمق للدرجات
+  static const Color primaryHighlight = Color(0xFF9D46FF); // Purple 300 - أفتح للتمييز
 
   // المحايد
   static const Color background = Color(0xFFFFFFFF); // أبيض نقي
@@ -27,13 +25,13 @@ class MbuyColors {
   static const Color glassBorder = Color(0x33FFFFFF); // حدود شفافة
 
   // توافق خلفي
-  static const Color primaryPurple = Color(0xFF000000);
-  static const Color primaryLight = Color(0xFF757575);
-  static const Color primaryDark = Color(0xFF000000);
-  static const Color primarySubtle = surface;
+  static const Color primaryPurple = Color(0xFF6200EE); // Purple 500
+  static const Color primaryLight = Color(0xFF9D46FF); // Purple 300 - فاتح
+  static const Color primaryDark = Color(0xFF3700B3); // Purple 700 - داكن
+  static const Color primarySubtle = Color(0xFFE1BEE7); // Purple 100 - خفيف جداً
   static const Color surfaceDark = surface;
-  static const Color primaryBlue = Color(0xFF000000);
-  static const Color accentPink = Color(0xFF000000);
+  static const Color primaryBlue = Color(0xFF6200EE); // نفس الأساسي
+  static const Color accentPink = Color(0xFF6200EE); // نفس الأساسي
   static const Color surfaceLight = surface;
 
   static const Color successLight = successMuted;
@@ -56,13 +54,13 @@ class MbuyColors {
   static const Color error = Color(0xFFFF4D4F);
   static const Color errorMuted = Color(0xFFFFEBEC);
 
-  // التدرجات - رمادي/أسود
+  // التدرجات - بنفسجي Material Design
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment(-0.07, -1.0), // ~94° angle
     end: Alignment(0.07, 1.0),
     colors: [
-      primaryIndigo, // #333333
-      primaryDeep, // #000000
+      primaryIndigo, // #6200EE - Purple 500
+      primaryDeep, // #3700B3 - Purple 700
     ],
     stops: [0.0, 0.86],
   );
@@ -132,9 +130,9 @@ class AppTheme {
       // الخلفية الأساسية
       scaffoldBackgroundColor: MbuyColors.background,
 
-      // ColorScheme - أبيض/أسود/رصاصي
+      // ColorScheme - بنفسجي Material Design
       colorScheme: const ColorScheme.light(
-        primary: MbuyColors.textPrimary,
+        primary: MbuyColors.primaryIndigo, // #6200EE
         secondary: MbuyColors.textSecondary,
         surface: MbuyColors.surface,
         error: MbuyColors.error,
@@ -236,7 +234,7 @@ class AppTheme {
       // Elevated Button Theme - solid fallback, gradients handled via custom widgets
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: MbuyColors.textPrimary, // أسود/رمادي بدلاً من الأزرق
+          backgroundColor: MbuyColors.primaryIndigo, // #6200EE - Purple 500
           foregroundColor: Colors.white,
           elevation: 0,
           shadowColor: Colors.black.withValues(alpha: 0.08),
@@ -310,7 +308,7 @@ class AppTheme {
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: MbuyColors.cardBackground,
-        selectedItemColor: MbuyColors.textPrimary, // أسود بدلاً من الأزرق
+        selectedItemColor: MbuyColors.primaryIndigo, // #6200EE - Purple 500
         unselectedItemColor: MbuyColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
@@ -340,7 +338,7 @@ class AppTheme {
 
       // ColorScheme - Dark Mode
       colorScheme: const ColorScheme.dark(
-        primary: MbuyColors.primaryIndigo,
+        primary: MbuyColors.primaryIndigo, // #6200EE - Purple 500
         secondary: Color(0xFF1E1E1E),
         surface: Color(0xFF1E1E1E),
         error: MbuyColors.error,

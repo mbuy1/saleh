@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
+import 'change_password_screen.dart';
+import 'privacy_security_screen.dart';
+import 'terms_screen.dart';
+import 'help_support_screen.dart';
 
 /// شاشة الإعدادات
 class SettingsScreen extends StatefulWidget {
@@ -258,9 +262,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('تغيير كلمة المرور'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: فتح صفحة تغيير كلمة المرور
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم إضافة هذه الميزة قريباً')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChangePasswordScreen(),
+                ),
               );
             },
           ),
@@ -270,9 +276,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('الخصوصية والأمان'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: فتح صفحة الخصوصية
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم إضافة هذه الميزة قريباً')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacySecurityScreen(),
+                ),
               );
             },
           ),
@@ -322,9 +330,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('الشروط والأحكام'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: فتح صفحة الشروط
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم إضافة هذه الميزة قريباً')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TermsScreen(),
+                ),
               );
             },
           ),
@@ -334,9 +344,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('المساعدة والدعم'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: فتح صفحة المساعدة
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم إضافة هذه الميزة قريباً')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HelpSupportScreen(),
+                ),
               );
             },
           ),
