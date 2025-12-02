@@ -6,7 +6,11 @@ import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
+import 'core/services/gemini_service.dart';
 import 'core/firebase_service.dart';
+import 'features/customer/presentation/screens/customer_support_chat_screen.dart';
+import 'features/merchant/presentation/screens/merchant_ai_assistant_screen.dart';
+import 'features/merchant/presentation/screens/ai_tools/mbuy_tools_screen.dart';
 import 'core/root_widget.dart' as app;
 import 'core/app_router.dart';
 import 'core/app_config.dart';
@@ -96,6 +100,15 @@ Future<void> main() async {
     // (مفيد في حالة عدم وجود ملفات الإعداد)
     debugPrint('⚠️ تحذير: فشل تهيئة Cloudflare Images: $e');
     debugPrint('   التطبيق سيعمل لكن رفع الصور لن يكون متاحاً');
+  }
+
+  // تهيئة Gemini AI
+  try {
+    await GeminiService.initialize();
+    debugPrint('✅ تم تهيئة Gemini AI بنجاح');
+  } catch (e) {
+    debugPrint('⚠️ تحذير: فشل تهيئة Gemini AI: $e');
+    debugPrint('   التطبيق سيعمل لكن المساعد الذكي لن يكون متاحاً');
   }
 
   // تهيئة Theme Provider
@@ -252,6 +265,20 @@ Route<dynamic>? _generateRoute(
     case AppRouter.merchantTransactions:
       return MaterialPageRoute(
         builder: (_) => const MerchantTransactionsScreen(),
+      );
+    case AppRouter.merchantAiAssistant:
+      return MaterialPageRoute(
+        builder: (_) => const MerchantAiAssistantScreen(),
+      );
+
+    // AI Tools Routes
+    case '/merchant/ai-tools':
+      return MaterialPageRoute(builder: (_) => const MbuyToolsScreen());
+
+    // Chat & Support Routes
+    case AppRouter.customerSupportChat:
+      return MaterialPageRoute(
+        builder: (_) => const CustomerSupportChatScreen(),
       );
 
     // Merchant Routes with Arguments

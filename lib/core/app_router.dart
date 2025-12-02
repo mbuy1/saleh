@@ -47,19 +47,35 @@ class AppRouter {
   static const String merchantInvoices = '/merchant/invoices';
   static const String merchantPaymentMethods = '/merchant/payment-methods';
   static const String merchantTransactions = '/merchant/transactions';
+  static const String merchantAiAssistant = '/merchant/ai-assistant';
+
+  // Chat & Support
+  static const String customerSupportChat = '/customer-support-chat';
 
   /// Helper method to navigate to a route
-  static void navigateTo(BuildContext context, String route, {Object? arguments}) {
+  static void navigateTo(
+    BuildContext context,
+    String route, {
+    Object? arguments,
+  }) {
     Navigator.pushNamed(context, route, arguments: arguments);
   }
 
   /// Helper method to navigate and replace current route
-  static void navigateToReplacement(BuildContext context, String route, {Object? arguments}) {
+  static void navigateToReplacement(
+    BuildContext context,
+    String route, {
+    Object? arguments,
+  }) {
     Navigator.pushReplacementNamed(context, route, arguments: arguments);
   }
 
   /// Helper method to navigate and remove all previous routes
-  static void navigateToAndRemoveUntil(BuildContext context, String route, {Object? arguments}) {
+  static void navigateToAndRemoveUntil(
+    BuildContext context,
+    String route, {
+    Object? arguments,
+  }) {
     Navigator.pushNamedAndRemoveUntil(
       context,
       route,

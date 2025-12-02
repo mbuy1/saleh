@@ -201,10 +201,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
             ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                      Navigator.pop(context);
+                    },
+              child: Text(
+                'تخطي',
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  color: MbuyColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

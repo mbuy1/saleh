@@ -154,6 +154,30 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                     _showSnackBar('سيتم إضافة ادعمني ودادعمك قريباً');
                   },
                 ),
+                _buildMenuCard(
+                  icon: Icons.auto_awesome,
+                  title: 'المساعد الذكي',
+                  subtitle: 'مدعوم بـ Gemini AI',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/merchant/ai-assistant');
+                  },
+                  badge: 'جديد',
+                ),
+                _buildMenuCard(
+                  icon: Icons.build_circle,
+                  title: 'أدوات mBuy',
+                  subtitle: 'أدوات ذكية مدعومة بـ AI',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF10B981), Color(0xFF059669)],
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/merchant/ai-tools');
+                  },
+                  badge: 'AI',
+                ),
               ]),
             ),
           ),
@@ -224,7 +248,10 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.notifications_outlined, color: MbuyColors.textPrimary),
+          icon: Icon(
+            Icons.notifications_outlined,
+            color: MbuyColors.textPrimary,
+          ),
           onPressed: () {
             _showNotificationsBottomSheet();
           },
@@ -245,9 +272,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
       child: Column(
         children: [
           // MBuy Logo at the top
-          Center(
-            child: MbuyLogo(size: 80, showBackground: false),
-          ),
+          Center(child: MbuyLogo(size: 80, showBackground: false)),
           const SizedBox(height: 16),
           // Balance and Coins Section (replacing store avatar)
           _buildBalanceSection(),
@@ -286,9 +311,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(12),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             border: Border.all(color: MbuyColors.borderLight, width: 0.5),
             boxShadow: [
               BoxShadow(
@@ -298,10 +321,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
               ),
             ],
           ),
-          child: SizedBox(
-            height: _chartHeight,
-            child: _buildChartWidget(),
-          ),
+          child: SizedBox(height: _chartHeight, child: _buildChartWidget()),
         ),
         // Tabs below chart: المبيعات, الزيارات, الاحصائيات
         Container(
@@ -329,10 +349,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                 ),
               ),
               Expanded(
-                child: _buildChartTab(
-                  label: 'الزيارات',
-                  color: Colors.green,
-                ),
+                child: _buildChartTab(label: 'الزيارات', color: Colors.green),
               ),
               Expanded(
                 child: _buildChartTab(
@@ -347,10 +364,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-  Widget _buildChartTab({
-    required String label,
-    required Color color,
-  }) {
+  Widget _buildChartTab({required String label, required Color color}) {
     return InkWell(
       onTap: () {
         // Navigate to appropriate screen based on label
@@ -528,10 +542,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          constraints: const BoxConstraints(
-            minHeight: 100,
-            maxHeight: 120,
-          ),
+          constraints: const BoxConstraints(minHeight: 100, maxHeight: 120),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           decoration: BoxDecoration(
             gradient: gradient,
@@ -586,8 +597,12 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
 
   Widget _buildChartWidget() {
     // Calculate max values for dual-axis chart
-    final maxRevenue = barChartData.map((e) => e.revenue).reduce((a, b) => a > b ? a : b);
-    final maxExpense = barChartData.map((e) => e.expense).reduce((a, b) => a > b ? a : b);
+    final maxRevenue = barChartData
+        .map((e) => e.revenue)
+        .reduce((a, b) => a > b ? a : b);
+    final maxExpense = barChartData
+        .map((e) => e.expense)
+        .reduce((a, b) => a > b ? a : b);
     final maxLeftAxis = ((maxRevenue / 1000).ceil() * 1000).toDouble();
     final maxRightAxis = ((maxExpense / 1000).ceil() * 1000).toDouble();
 
@@ -603,7 +618,9 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
               showTitles: true,
               reservedSize: 40,
               getTitlesWidget: (value, meta) {
-                if (value == 0 || value == maxLeftAxis / 2 || value == maxLeftAxis) {
+                if (value == 0 ||
+                    value == maxLeftAxis / 2 ||
+                    value == maxLeftAxis) {
                   return Text(
                     '${(value / 1000).toStringAsFixed(0)}K',
                     style: GoogleFonts.cairo(
@@ -621,7 +638,9 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
               showTitles: true,
               reservedSize: 40,
               getTitlesWidget: (value, meta) {
-                if (value == 0 || value == maxRightAxis / 2 || value == maxRightAxis) {
+                if (value == 0 ||
+                    value == maxRightAxis / 2 ||
+                    value == maxRightAxis) {
                   return Text(
                     '${(value / 1000).toStringAsFixed(0)}K',
                     style: GoogleFonts.cairo(
@@ -664,10 +683,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           drawVerticalLine: false,
           horizontalInterval: maxLeftAxis / 4,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: const Color(0xFFE0E0E0),
-              strokeWidth: 0.5,
-            );
+            return FlLine(color: const Color(0xFFE0E0E0), strokeWidth: 0.5);
           },
         ),
         borderData: FlBorderData(show: false),
@@ -702,72 +718,95 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-
-
   Widget _buildMenuCard({
     required IconData icon,
     required String title,
     required String subtitle,
     required Gradient gradient,
     required VoidCallback onTap,
+    String? badge,
   }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: 100,
-            maxHeight: 120,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: Colors.white, size: 28),
-              const SizedBox(height: 6),
-              Flexible(
-                child: Text(
-                  title,
-                  style: GoogleFonts.cairo(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+        child: Stack(
+          children: [
+            Container(
+              constraints: const BoxConstraints(minHeight: 100, maxHeight: 120),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: gradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: Colors.white, size: 28),
+                  const SizedBox(height: 6),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: GoogleFonts.cairo(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Flexible(
+                    child: Text(
+                      subtitle,
+                      style: GoogleFonts.cairo(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (badge != null)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    badge,
+                    style: GoogleFonts.cairo(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 2),
-              Flexible(
-                child: Text(
-                  subtitle,
-                  style: GoogleFonts.cairo(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -818,10 +857,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
   }
 
@@ -911,80 +947,82 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                 mainAxisSpacing: 12,
                 childAspectRatio: 1.0,
                 children: [
-                _buildSquareMenuOption(
-                  icon: Icons.store,
-                  title: 'عرض المتجر',
-                  color: Colors.blue,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MerchantStoreSetupScreen(),
-                      ),
-                    );
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.settings,
-                  title: 'إدارة المتجر',
-                  color: Colors.grey,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSnackBar('سيتم إضافة إدارة المتجر قريباً');
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.palette,
-                  title: 'مظهر المتجر',
-                  color: Colors.purple,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSnackBar('سيتم إضافة مظهر المتجر قريباً');
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.edit,
-                  title: 'تحرير المتجر',
-                  color: Colors.orange,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MerchantStoreSetupScreen(),
-                      ),
-                    );
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.person,
-                  title: 'تعديل معلومات الحساب',
-                  color: Colors.teal,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSnackBar('سيتم إضافة تعديل معلومات الحساب قريباً');
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.lock,
-                  title: 'تغيير كلمة المرور',
-                  color: Colors.indigo,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSnackBar('سيتم إضافة تغيير كلمة المرور قريباً');
-                  },
-                ),
-                _buildSquareMenuOption(
-                  icon: Icons.delete_outline,
-                  title: 'حذف المتجر',
-                  color: Colors.red,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSnackBar('سيتم إضافة حذف المتجر قريباً');
-                  },
-                ),
-              ],
+                  _buildSquareMenuOption(
+                    icon: Icons.store,
+                    title: 'عرض المتجر',
+                    color: Colors.blue,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const MerchantStoreSetupScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.settings,
+                    title: 'إدارة المتجر',
+                    color: Colors.grey,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSnackBar('سيتم إضافة إدارة المتجر قريباً');
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.palette,
+                    title: 'مظهر المتجر',
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSnackBar('سيتم إضافة مظهر المتجر قريباً');
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.edit,
+                    title: 'تحرير المتجر',
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const MerchantStoreSetupScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.person,
+                    title: 'تعديل معلومات الحساب',
+                    color: Colors.teal,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSnackBar('سيتم إضافة تعديل معلومات الحساب قريباً');
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.lock,
+                    title: 'تغيير كلمة المرور',
+                    color: Colors.indigo,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSnackBar('سيتم إضافة تغيير كلمة المرور قريباً');
+                    },
+                  ),
+                  _buildSquareMenuOption(
+                    icon: Icons.delete_outline,
+                    title: 'حذف المتجر',
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSnackBar('سيتم إضافة حذف المتجر قريباً');
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 8),

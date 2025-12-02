@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     // الانتقال للشاشة الرئيسية بعد 2.5 ثانية
     Future.delayed(AppConstants.splashScreenDuration, () {
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed('/');
       }
     });
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
 
@@ -21,6 +22,8 @@ class AuthService {
     required String displayName,
   }) async {
     try {
+      debugPrint('📝 محاولة تسجيل مستخدم جديد: $email');
+
       // 1. إنشاء حساب في Supabase Auth
       final response = await supabaseClient.auth.signUp(
         email: email,
@@ -28,25 +31,37 @@ class AuthService {
       );
 
       if (response.user == null) {
+        debugPrint('❌ فشل إنشاء الحساب: لا يوجد مستخدم');
         throw Exception('فشل إنشاء الحساب');
       }
 
       final user = response.user!;
+      debugPrint('✅ تم إنشاء حساب المستخدم: ${user.email}');
 
       // 2. إنشاء row في user_profiles
-      await supabaseClient.from('user_profiles').insert({
-        'id': user.id,
-        'role': 'customer',
-        'display_name': displayName,
-      });
+      try {
+        await supabaseClient.from('user_profiles').insert({
+          'id': user.id,
+          'role': 'customer',
+          'display_name': displayName,
+        });
+      } catch (e) {
+        // إذا فشل الإدراج، ربما السجل موجود مسبقاً
+        debugPrint('⚠️ تحذير: فشل إنشاء user_profile: $e');
+      }
 
       // 3. إنشاء wallet للمستخدم الجديد
-      await supabaseClient.from('wallets').insert({
-        'owner_id': user.id,
-        'type': 'customer',
-        'balance': 0,
-        'currency': 'SAR',
-      });
+      try {
+        await supabaseClient.from('wallets').insert({
+          'owner_id': user.id,
+          'type': 'customer',
+          'balance': 0,
+          'currency': 'SAR',
+        });
+      } catch (e) {
+        // إذا فشل الإدراج، ربما السجل موجود مسبقاً
+        debugPrint('⚠️ تحذير: فشل إنشاء wallet: $e');
+      }
 
       // ملاحظة: points_accounts يتم إنشاؤه فقط عند تحويل المستخدم إلى تاجر (role = 'merchant')
       // النقاط هي "رصيد خدمات" للتاجر فقط، وليست للعميل
@@ -70,17 +85,34 @@ class AuthService {
     required String password,
   }) async {
     try {
+      debugPrint('🔐 محاولة تسجيل الدخول: $email');
+
       final response = await supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
       if (response.session == null) {
-        throw Exception('فشل تسجيل الدخول');
+        debugPrint('❌ فشل تسجيل الدخول: لا توجد جلسة');
+        throw Exception('فشل تسجيل الدخول - لا توجد جلسة');
       }
 
+      debugPrint('✅ تم تسجيل الدخول بنجاح: ${response.user?.email}');
+      debugPrint(
+        '📱 Session ID: ${response.session!.accessToken.substring(0, 20)}...',
+      );
+
       return response.session!;
+    } on AuthException catch (e) {
+      debugPrint('❌ خطأ في المصادقة: ${e.message}');
+      if (e.message.contains('Invalid login credentials')) {
+        throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      } else if (e.message.contains('Email not confirmed')) {
+        throw Exception('يرجى تأكيد البريد الإلكتروني أولاً');
+      }
+      throw Exception('خطأ في تسجيل الدخول: ${e.message}');
     } catch (e) {
+      debugPrint('❌ خطأ غير متوقع: $e');
       throw Exception('خطأ في تسجيل الدخول: ${e.toString()}');
     }
   }

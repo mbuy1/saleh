@@ -37,30 +37,40 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (_isSignUp) {
         // تسجيل جديد
-        await AuthService.signUp(
+        final user = await AuthService.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           displayName: _displayNameController.text.trim(),
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('تم التسجيل بنجاح!')));
-          // سيتم إعادة بناء الشاشة تلقائياً من Root Widget
+          debugPrint('✅ تم تسجيل المستخدم: ${user.email}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم التسجيل بنجاح! جاري تحميل التطبيق...'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // الانتظار قليلاً ثم إعادة بناء
+          await Future.delayed(const Duration(milliseconds: 500));
         }
       } else {
         // تسجيل دخول
-        await AuthService.signIn(
+        final session = await AuthService.signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
         if (mounted) {
+          debugPrint('✅ تم تسجيل الدخول: ${session.user.email}');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم تسجيل الدخول بنجاح!')),
+            const SnackBar(
+              content: Text('تم تسجيل الدخول بنجاح! جاري تحميل التطبيق...'),
+              backgroundColor: Colors.green,
+            ),
           );
-          // سيتم إعادة بناء الشاشة تلقائياً من Root Widget
+          // الانتظار قليلاً ثم إعادة بناء
+          await Future.delayed(const Duration(milliseconds: 500));
         }
       }
     } catch (e) {
@@ -84,125 +94,150 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isSignUp ? 'تسجيل جديد' : 'تسجيل الدخول')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 32),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 60),
 
-              // حقل الاسم المعروض (فقط عند التسجيل)
-              if (_isSignUp) ...[
+                // عنوان الشاشة
+                Text(
+                  _isSignUp ? 'إنشاء حساب جديد' : 'تسجيل الدخول',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isSignUp
+                      ? 'أنشئ حسابك للبدء في استخدام التطبيق'
+                      : 'مرحباً بعودتك! سجل دخولك للمتابعة',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+
+                // حقل الاسم المعروض (فقط عند التسجيل)
+                if (_isSignUp) ...[
+                  TextFormField(
+                    controller: _displayNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'الاسم المعروض',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الرجاء إدخال الاسم المعروض';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // حقل البريد الإلكتروني
                 TextFormField(
-                  controller: _displayNameController,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    labelText: 'الاسم المعروض',
+                    labelText: 'البريد الإلكتروني',
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Icons.email),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'الرجاء إدخال الاسم المعروض';
+                      return 'الرجاء إدخال البريد الإلكتروني';
+                    }
+                    if (!value.contains('@')) {
+                      return 'البريد الإلكتروني غير صحيح';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
+
+                // حقل كلمة المرور
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'كلمة المرور',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'الرجاء إدخال كلمة المرور';
+                    }
+                    if (value.length < 6) {
+                      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 32),
+
+                // زر الإرسال
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          _isSignUp ? 'إنشاء الحساب' : 'تسجيل الدخول',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 16),
+
+                // زر التبديل بين تسجيل دخول وتسجيل جديد
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          setState(() {
+                            _isSignUp = !_isSignUp;
+                            _displayNameController.clear();
+                          });
+                        },
+                  child: Text(
+                    _isSignUp
+                        ? 'لديك حساب؟ تسجيل الدخول'
+                        : 'ليس لديك حساب؟ إنشاء حساب جديد',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  ),
+                ),
+                const SizedBox(height: 20),
               ],
-
-              // حقل البريد الإلكتروني
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'الرجاء إدخال البريد الإلكتروني';
-                  }
-                  if (!value.contains('@')) {
-                    return 'البريد الإلكتروني غير صحيح';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // حقل كلمة المرور
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'كلمة المرور',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'الرجاء إدخال كلمة المرور';
-                  }
-                  if (value.length < 6) {
-                    return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // زر الإرسال
-              ElevatedButton(
-                onPressed: _isLoading ? null : _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(_isSignUp ? 'تسجيل جديد' : 'تسجيل الدخول'),
-              ),
-              const SizedBox(height: 16),
-
-              // زر التبديل بين تسجيل دخول وتسجيل جديد
-              TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        setState(() {
-                          _isSignUp = !_isSignUp;
-                          _displayNameController.clear();
-                        });
-                      },
-                child: Text(
-                  _isSignUp
-                      ? 'لديك حساب؟ تسجيل الدخول'
-                      : 'ليس لديك حساب؟ تسجيل جديد',
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // زر التخطي (الدخول كضيف)
-              TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        // إغلاق شاشة Auth والعودة (الدخول كضيف)
-                        Navigator.of(context).pop();
-                      },
-                child: const Text(
-                  'تخطي - الدخول كضيف',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

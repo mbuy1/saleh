@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,6 +28,8 @@ Future<void> initSupabase() async {
       authFlowType: AuthFlowType.pkce,
     ),
   );
+
+  debugPrint('✅ Supabase initialized with PKCE auth flow');
 }
 
 /// Getter للوصول إلى Supabase client في بقية المشروع
