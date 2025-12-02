@@ -17,10 +17,9 @@ void main() {
     // Build our app and trigger a frame.
     final themeProvider = ThemeProvider();
     final appModeProvider = AppModeProvider();
-    await tester.pumpWidget(MyApp(
-      themeProvider: themeProvider,
-      appModeProvider: appModeProvider,
-    ));
+    await tester.pumpWidget(
+      MyApp(themeProvider: themeProvider, appModeProvider: appModeProvider),
+    );
 
     // Verify that the app builds successfully
     expect(find.byType(MaterialApp), findsOneWidget);

@@ -101,26 +101,28 @@ Future<void> main() async {
   // تهيئة Theme Provider
   final themeProvider = ThemeProvider();
   await themeProvider.loadThemeMode();
-  
+
   // تهيئة App Mode Provider
   final appModeProvider = AppModeProvider();
 
-  runApp(MyApp(
-    themeProvider: themeProvider,
-    appModeProvider: appModeProvider,
-  ));
+  runApp(MyApp(themeProvider: themeProvider, appModeProvider: appModeProvider));
 }
 
 /// توليد المسارات ديناميكياً
-Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvider, AppModeProvider appModeProvider) {
-  
+Route<dynamic>? _generateRoute(
+  RouteSettings settings,
+  ThemeProvider themeProvider,
+  AppModeProvider appModeProvider,
+) {
   switch (settings.name) {
     // Splash & Home
     case '/splash':
       return MaterialPageRoute(builder: (_) => const SplashScreen());
     case '/':
-      return MaterialPageRoute(builder: (_) => app.RootWidget(themeProvider: themeProvider));
-    
+      return MaterialPageRoute(
+        builder: (_) => app.RootWidget(themeProvider: themeProvider),
+      );
+
     // Customer Routes
     case AppRouter.explore:
       return MaterialPageRoute(builder: (_) => const ExploreScreen());
@@ -131,7 +133,9 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
     case AppRouter.profile:
       return MaterialPageRoute(builder: (_) => const ProfileScreen());
     case AppRouter.settings:
-      return MaterialPageRoute(builder: (_) => SettingsScreen(themeProvider: themeProvider));
+      return MaterialPageRoute(
+        builder: (_) => SettingsScreen(themeProvider: themeProvider),
+      );
     case AppRouter.favorites:
       return MaterialPageRoute(builder: (_) => const FavoritesScreen());
     case AppRouter.browseHistory:
@@ -160,14 +164,13 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
       return MaterialPageRoute(builder: (_) => const CartScreen());
     case '/map':
       return MaterialPageRoute(builder: (_) => const MapScreen());
-    
+
     // Customer Routes with Arguments
     case AppRouter.productDetails:
       final args = settings.arguments as Map<String, dynamic>?;
       return MaterialPageRoute(
-        builder: (_) => ProductDetailsScreen(
-          productId: args?['productId'] ?? '',
-        ),
+        builder: (_) =>
+            ProductDetailsScreen(productId: args?['productId'] ?? ''),
       );
     case AppRouter.storeDetails:
       final args = settings.arguments as Map<String, dynamic>?;
@@ -188,14 +191,16 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
     case '/customer-order-details':
       final args = settings.arguments as Map<String, dynamic>?;
       return MaterialPageRoute(
-        builder: (_) => CustomerOrderDetailsScreen(
-          orderId: args?['orderId'] ?? '',
-        ),
+        builder: (_) =>
+            CustomerOrderDetailsScreen(orderId: args?['orderId'] ?? ''),
       );
-    
+
     // Merchant Routes
     case AppRouter.merchantDashboard:
-      return MaterialPageRoute(builder: (_) => MerchantDashboardScreen(appModeProvider: appModeProvider));
+      return MaterialPageRoute(
+        builder: (_) =>
+            MerchantDashboardScreen(appModeProvider: appModeProvider),
+      );
     case AppRouter.merchantProducts:
       return MaterialPageRoute(builder: (_) => const MerchantProductsScreen());
     case AppRouter.merchantOrders:
@@ -205,11 +210,15 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
     case AppRouter.merchantPoints:
       return MaterialPageRoute(builder: (_) => const MerchantPointsScreen());
     case AppRouter.merchantStoreSetup:
-      return MaterialPageRoute(builder: (_) => const MerchantStoreSetupScreen());
+      return MaterialPageRoute(
+        builder: (_) => const MerchantStoreSetupScreen(),
+      );
     case AppRouter.merchantMessages:
       return MaterialPageRoute(builder: (_) => const MerchantMessagesScreen());
     case AppRouter.merchantPromotions:
-      return MaterialPageRoute(builder: (_) => const MerchantPromotionsScreen());
+      return MaterialPageRoute(
+        builder: (_) => const MerchantPromotionsScreen(),
+      );
     case AppRouter.merchantStories:
       return MaterialPageRoute(builder: (_) => const MerchantStoriesScreen());
     case AppRouter.merchantCatalog:
@@ -225,18 +234,26 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
     case AppRouter.merchantProfile:
       return MaterialPageRoute(builder: (_) => const MerchantProfileScreen());
     case AppRouter.merchantHelpCenter:
-      return MaterialPageRoute(builder: (_) => const MerchantHelpCenterScreen());
+      return MaterialPageRoute(
+        builder: (_) => const MerchantHelpCenterScreen(),
+      );
     case AppRouter.merchantTechnicalSupport:
-      return MaterialPageRoute(builder: (_) => const MerchantTechnicalSupportScreen());
+      return MaterialPageRoute(
+        builder: (_) => const MerchantTechnicalSupportScreen(),
+      );
     case AppRouter.merchantPolicies:
       return MaterialPageRoute(builder: (_) => const MerchantPoliciesScreen());
     case AppRouter.merchantInvoices:
       return MaterialPageRoute(builder: (_) => const MerchantInvoicesScreen());
     case AppRouter.merchantPaymentMethods:
-      return MaterialPageRoute(builder: (_) => const MerchantPaymentMethodsScreen());
+      return MaterialPageRoute(
+        builder: (_) => const MerchantPaymentMethodsScreen(),
+      );
     case AppRouter.merchantTransactions:
-      return MaterialPageRoute(builder: (_) => const MerchantTransactionsScreen());
-    
+      return MaterialPageRoute(
+        builder: (_) => const MerchantTransactionsScreen(),
+      );
+
     // Merchant Routes with Arguments
     case '/merchant-order-details':
       final args = settings.arguments as Map<String, dynamic>?;
@@ -246,7 +263,7 @@ Route<dynamic>? _generateRoute(RouteSettings settings, ThemeProvider themeProvid
           storeId: args?['storeId'] ?? '',
         ),
       );
-    
+
     default:
       return null;
   }
@@ -289,7 +306,8 @@ class MyApp extends StatelessWidget {
           locale: const Locale('ar', 'SA'),
 
           // إعداد المسارات (Routes)
-          onGenerateRoute: (settings) => _generateRoute(settings, themeProvider, appModeProvider),
+          onGenerateRoute: (settings) =>
+              _generateRoute(settings, themeProvider, appModeProvider),
           initialRoute: '/splash', // بدء التطبيق بـ Splash Screen
           // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
           home: app.RootWidget(themeProvider: themeProvider),
