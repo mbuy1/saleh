@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
+import '../../../../shared/widgets/animated_smiley_cart_icon.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import 'explore_screen.dart';
@@ -332,10 +333,9 @@ class _CustomerShellState extends State<CustomerShell> {
               label: 'المتاجر',
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(
-                isSelected: _currentIndex == 2,
-                outlineIcon: Icons.home_outlined,
-                filledIcon: Icons.home,
+              icon: AnimatedSmileyCartIcon(
+                size: 28,
+                isActive: _currentIndex == 2,
               ),
               label: 'الرئيسية',
             ),

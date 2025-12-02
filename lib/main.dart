@@ -8,6 +8,7 @@ import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
 import 'core/firebase_service.dart';
 import 'core/root_widget.dart' as app;
+import 'features/common/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +85,12 @@ class MyApp extends StatelessWidget {
           ],
           locale: const Locale('ar', 'SA'),
 
+          // إعداد المسارات (Routes)
+          routes: {
+            '/home': (context) => app.RootWidget(themeProvider: themeProvider),
+            '/splash': (context) => const SplashScreen(),
+          },
+          initialRoute: '/splash', // بدء التطبيق بـ Splash Screen
           // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
           home: app.RootWidget(themeProvider: themeProvider),
         );

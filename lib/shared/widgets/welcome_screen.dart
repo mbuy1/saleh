@@ -3,7 +3,7 @@ import 'mbuy_logo.dart';
 import '../../core/theme/app_theme.dart';
 
 /// شاشة الترحيب / البداية
-/// 
+///
 /// تعرض:
 /// - الخلفية الكحلية
 /// - الشعار الدائري في المنتصف (نسخة كبيرة)
@@ -11,10 +11,7 @@ import '../../core/theme/app_theme.dart';
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback? onComplete;
 
-  const WelcomeScreen({
-    super.key,
-    this.onComplete,
-  });
+  const WelcomeScreen({super.key, this.onComplete});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +23,7 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // الشعار الدائري الكبير
-              MbuyLogo.large(),
+              const MbuyLogo(size: 120),
               const SizedBox(height: 32),
               // النص الترحيبي
               const Text(
@@ -59,4 +56,3 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
-
