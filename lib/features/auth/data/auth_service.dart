@@ -3,16 +3,16 @@ import '../../../core/supabase_client.dart';
 
 class AuthService {
   /// تسجيل مستخدم جديد
-  /// 
+  ///
   /// يقوم بـ:
   /// 1. إنشاء حساب في Supabase Auth
   /// 2. إنشاء row في user_profiles مع role = 'customer'
-  /// 
+  ///
   /// Parameters:
   /// - email: البريد الإلكتروني
   /// - password: كلمة المرور
   /// - displayName: الاسم المعروض
-  /// 
+  ///
   /// Returns: User object من Supabase
   /// Throws: Exception في حالة الفشل
   static Future<User> signUp({
@@ -40,11 +40,12 @@ class AuthService {
         'display_name': displayName,
       });
 
-      // 3. إنشاء wallet_account للمستخدم الجديد
-      await supabaseClient.from('wallet_accounts').insert({
-        'user_id': user.id,
-        'account_type': 'customer',
+      // 3. إنشاء wallet للمستخدم الجديد
+      await supabaseClient.from('wallets').insert({
+        'owner_id': user.id,
+        'type': 'customer',
         'balance': 0,
+        'currency': 'SAR',
       });
 
       // ملاحظة: points_accounts يتم إنشاؤه فقط عند تحويل المستخدم إلى تاجر (role = 'merchant')
@@ -57,11 +58,11 @@ class AuthService {
   }
 
   /// تسجيل دخول
-  /// 
+  ///
   /// Parameters:
   /// - email: البريد الإلكتروني
   /// - password: كلمة المرور
-  /// 
+  ///
   /// Returns: Session object من Supabase
   /// Throws: Exception في حالة الفشل
   static Future<Session> signIn({
@@ -85,7 +86,7 @@ class AuthService {
   }
 
   /// تسجيل خروج
-  /// 
+  ///
   /// Throws: Exception في حالة الفشل
   static Future<void> signOut() async {
     try {
@@ -96,17 +97,16 @@ class AuthService {
   }
 
   /// جلب المستخدم الحالي
-  /// 
+  ///
   /// Returns: User object إذا كان المستخدم مسجل، null إذا لم يكن مسجل
   static User? getCurrentUser() {
     return supabaseClient.auth.currentUser;
   }
 
   /// التحقق من حالة تسجيل الدخول
-  /// 
+  ///
   /// Returns: true إذا كان المستخدم مسجل، false إذا لم يكن
   static bool isSignedIn() {
     return getCurrentUser() != null;
   }
 }
-
