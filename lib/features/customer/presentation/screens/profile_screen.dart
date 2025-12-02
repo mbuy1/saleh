@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../auth/data/auth_service.dart';
-import 'wallet_screen.dart';
-import 'points_screen.dart';
+import 'customer_wallet_screen.dart';
+import 'customer_points_screen.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
-import '../../../../shared/widgets/section_header.dart';
 import '../../../../core/data/dummy_data.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -107,80 +107,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: MbuyColors.surface,
+    return MbuyScaffold(
+      useSafeArea: false,
+      backgroundColor: MbuyColors.background,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
               slivers: [
-                // AppBar مخصص
+                // 1. Alibaba-style Header
                 SliverAppBar(
-                  elevation: 0,
-                  backgroundColor: Colors.white,
-                  floating: true,
+                  expandedHeight: 140,
                   pinned: true,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
                   automaticallyImplyLeading: false,
-                  title: Row(
-                    children: [
-                      // Avatar + اسم المستخدم
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          gradient: MbuyColors.primaryGradient,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            'م',
-                            style: GoogleFonts.cairo(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                      color: Colors.white,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Avatar
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              gradient: MbuyColors.primaryGradient,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _userProfile?['display_name'] ?? 'مستخدم mBuy',
-                              style: GoogleFonts.cairo(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: MbuyColors.textPrimary,
+                            child: Center(
+                              child: Text(
+                                (_userProfile?['display_name'] ?? 'م')[0]
+                                    .toUpperCase(),
+                                style: GoogleFonts.cairo(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                            Row(
+                          ),
+                          const SizedBox(width: 16),
+                          // Name & Location
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.location_on_outlined,
-                                  size: 12,
-                                  color: MbuyColors.textSecondary,
-                                ),
-                                const SizedBox(width: 4),
+                                const SizedBox(height: 8),
                                 Text(
-                                  'التوصيل إلى الرياض',
+                                  _userProfile?['display_name'] ??
+                                      'مستخدم mBuy',
                                   style: GoogleFonts.cairo(
-                                    fontSize: 12,
-                                    color: MbuyColors.textSecondary,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: MbuyColors.textPrimary,
+                                    height: 1.2,
                                   ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on_outlined,
+                                      size: 16,
+                                      color: MbuyColors.textSecondary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'التوصيل إلى الرياض',
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: MbuyColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   actions: [
                     IconButton(
                       icon: const Icon(
                         Icons.help_outline,
                         color: MbuyColors.textSecondary,
+                        size: 24,
                       ),
                       onPressed: () {},
                     ),
@@ -188,6 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: const Icon(
                         Icons.settings_outlined,
                         color: MbuyColors.textSecondary,
+                        size: 24,
                       ),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -197,23 +216,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     IconButton(
                       icon: const Icon(
-                        Icons.arrow_forward,
+                        Icons.close,
                         color: MbuyColors.textSecondary,
+                        size: 24,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
-                // شريط المميزات
+
+                // 2. Features Bar (Horizontal Scroll)
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: SizedBox(
-                      height: 80,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
                         children: [
                           _buildFeatureItem(
                             Icons.favorite_border,
@@ -228,12 +248,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           _buildFeatureItem(
                             Icons.account_balance_wallet_outlined,
-                            'رصيد mBuy',
+                            'المحفظة',
                             () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const WalletScreen(),
+                                  builder: (context) =>
+                                      const CustomerWalletScreen(),
                                 ),
                               );
                             },
@@ -242,42 +263,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const PointsScreen(),
+                                builder: (context) =>
+                                    const CustomerPointsScreen(),
                               ),
                             );
                           }),
                           _buildFeatureItem(
                             Icons.location_on_outlined,
-                            'عناوين الشحن',
+                            'العناوين',
                             () {},
                           ),
+                          _buildFeatureItem(Icons.payment, 'الدفع', () {}),
                         ],
                       ),
                     ),
                   ),
                 ),
-                // قسم الطلبات
+
+                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                // 3. Orders Section
                 SliverToBoxAdapter(
                   child: Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    padding: const EdgeInsets.all(16),
                     color: Colors.white,
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'طلباتي',
-                          style: GoogleFonts.cairo(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: MbuyColors.textPrimary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'طلباتي',
+                              style: GoogleFonts.cairo(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: MbuyColors.textPrimary,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                'عرض الكل',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13,
+                                  color: MbuyColors.primaryPurple,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildOrderStatus(Icons.payment, 'قيد الدفع', 0),
+                            _buildOrderStatus(Icons.payment, 'قيد الدفع', 1),
                             _buildOrderStatus(
                               Icons.local_shipping_outlined,
                               'قيد الشحن',
@@ -286,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _buildOrderStatus(
                               Icons.inventory_2_outlined,
                               'قيد الاستلام',
-                              0,
+                              2,
                             ),
                             _buildOrderStatus(
                               Icons.rate_review_outlined,
@@ -299,61 +340,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                // قسم "استمر في البحث"
+
                 const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                // 4. "Keep looking for" Section
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    child: SectionHeader(
-                      title: 'استمر في البحث',
-                      subtitle: 'منتجات شاهدتها مؤخراً',
-                      icon: Icons.history,
-                      onViewMore: () {},
+                    child: Column(
+                      children: [
+                        MbuySectionHeader(
+                          title: 'استمر في البحث عن',
+                          subtitle: 'بناءً على تصفحك السابق',
+                        ),
+                        SizedBox(
+                          height: 180, // Slightly smaller cards for history
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: 6,
+                            itemBuilder: (context, index) {
+                              final products = DummyData.products;
+                              if (index >= products.length) {
+                                return const SizedBox();
+                              }
+                              return Container(
+                                width: 140,
+                                margin: const EdgeInsets.only(left: 12),
+                                child: ProductCardCompact(
+                                  product: products[index],
+                                  width: 140,
+                                  hideActions: true, // Simplified card
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
                 ),
+
+                // 5. Sign Out Button
                 SliverToBoxAdapter(
                   child: Container(
-                    color: Colors.white,
-                    height: 240,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 6,
-                      itemBuilder: (context, index) {
-                        final products = DummyData.products;
-                        if (index >= products.length) return const SizedBox();
-                        return ProductCardCompact(product: products[index]);
-                      },
-                    ),
-                  ),
-                ),
-                // زر تسجيل الخروج
-                SliverToBoxAdapter(
-                  child: Container(
-                    margin: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.all(24),
                     child: ElevatedButton.icon(
                       onPressed: _handleSignOut,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.red,
+                        elevation: 0,
+                        side: BorderSide(
+                          color: Colors.red.withValues(alpha: 0.3),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      icon: const Icon(Icons.logout, color: Colors.white),
+                      icon: const Icon(Icons.logout, size: 22),
                       label: Text(
                         'تسجيل الخروج',
                         style: GoogleFonts.cairo(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),
     );
@@ -363,28 +422,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 70,
+        width: 82,
         margin: const EdgeInsets.only(left: 12),
         child: Column(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 58,
+              height: 58,
               decoration: BoxDecoration(
                 color: MbuyColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: MbuyColors.borderLight),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(icon, color: MbuyColors.primaryPurple, size: 24),
+              child: Icon(icon, color: MbuyColors.primaryIndigo, size: 28),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               label,
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: GoogleFonts.cairo(
-                fontSize: 11,
+                fontSize: 13,
                 color: MbuyColors.textPrimary,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -400,42 +460,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
           clipBehavior: Clip.none,
           children: [
             Container(
-              width: 44,
-              height: 44,
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: MbuyColors.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: MbuyColors.textSecondary, size: 22),
+              child: Icon(icon, color: MbuyColors.primaryIndigo, size: 28),
             ),
             if (count > 0)
               Positioned(
                 top: -4,
                 left: -4,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: Text(
                     count.toString(),
                     style: GoogleFonts.cairo(
-                      fontSize: 10,
+                      fontSize: 11,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      height: 1,
                     ),
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
         Text(
           label,
           style: GoogleFonts.cairo(
-            fontSize: 11,
-            color: MbuyColors.textSecondary,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: MbuyColors.textPrimary,
           ),
         ),
       ],

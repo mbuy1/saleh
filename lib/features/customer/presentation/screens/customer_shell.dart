@@ -35,7 +35,7 @@ class _CustomerShellState extends State<CustomerShell> {
   List<Widget> get _screens => [
     ExploreScreen(userRole: widget.userRole),
     const StoresScreen(),
-    HomeScreen(userRole: widget.userRole),
+    const HomeScreen(),
     CartScreen(userRole: widget.userRole),
     const MapScreen(),
   ];
@@ -302,37 +302,42 @@ class _CustomerShellState extends State<CustomerShell> {
               : Colors.white.withValues(alpha: 0.6),
           items: [
             BottomNavigationBarItem(
-              icon: _buildCircleIcon(
+              icon: _buildNavIcon(
                 isSelected: _currentIndex == 0,
-                icon: Icons.explore,
+                outlineIcon: Icons.explore_outlined,
+                filledIcon: Icons.explore,
               ),
               label: 'اكسبلور',
             ),
             BottomNavigationBarItem(
-              icon: _buildCircleIcon(
+              icon: _buildNavIcon(
                 isSelected: _currentIndex == 1,
-                icon: Icons.store,
+                outlineIcon: Icons.store_outlined,
+                filledIcon: Icons.store,
               ),
               label: 'المتاجر',
             ),
             BottomNavigationBarItem(
-              icon: _buildCircleIcon(
+              icon: _buildNavIcon(
                 isSelected: _currentIndex == 2,
-                icon: Icons.home,
+                outlineIcon: Icons.home_outlined,
+                filledIcon: Icons.home,
               ),
               label: 'الرئيسية',
             ),
             BottomNavigationBarItem(
-              icon: _buildCircleIcon(
+              icon: _buildNavIcon(
                 isSelected: _currentIndex == 3,
-                icon: Icons.shopping_cart,
+                outlineIcon: Icons.shopping_cart_outlined,
+                filledIcon: Icons.shopping_cart,
               ),
               label: 'السلة',
             ),
             BottomNavigationBarItem(
-              icon: _buildCircleIcon(
+              icon: _buildNavIcon(
                 isSelected: _currentIndex == 4,
-                icon: Icons.map,
+                outlineIcon: Icons.map_outlined,
+                filledIcon: Icons.map,
               ),
               label: 'الخريطة',
             ),
@@ -342,31 +347,37 @@ class _CustomerShellState extends State<CustomerShell> {
     );
   }
 
-  Widget _buildCircleIcon({required bool isSelected, required IconData icon}) {
-    // في صفحة الخريطة (_currentIndex == 4) نستخدم ألوان داكنة
+  /// بناء أيقونة التنقل - outline للعادي، filled للمحدد
+  /// نظام موحد: أسود/رمادي بدون ألوان زرقاء
+  Widget _buildNavIcon({
+    required bool isSelected,
+    required IconData outlineIcon,
+    required IconData filledIcon,
+  }) {
+    // في صفحة الخريطة نستخدم خلفية بيضاء
     final bool isMapPage = _currentIndex == 4;
 
     if (isSelected) {
-      // الأيقونة المحددة
+      // الأيقونة المحددة - filled
       if (isMapPage) {
-        return ShaderMask(
-          shaderCallback: (bounds) =>
-              MbuyColors.primaryGradient.createShader(bounds),
-          child: Icon(icon, size: 28, color: Colors.white),
-        );
+        // صفحة الخريطة - لون داكن
+        return Icon(filledIcon, size: 28, color: MbuyColors.textPrimary);
       } else {
-        return ShaderMask(
-          shaderCallback: (bounds) =>
-              MbuyColors.primaryGradient.createShader(bounds),
-          child: Icon(icon, size: 28, color: Colors.white),
-        );
+        // باقي الصفحات - لون أبيض
+        return Icon(filledIcon, size: 28, color: Colors.white);
       }
     } else {
-      // الأيقونة غير المحددة
+      // الأيقونة غير المحددة - outline
       if (isMapPage) {
-        return Icon(icon, size: 28, color: Colors.grey.shade600);
+        // صفحة الخريطة - رمادي
+        return Icon(outlineIcon, size: 28, color: MbuyColors.textSecondary);
       } else {
-        return Icon(icon, size: 28, color: Colors.white.withValues(alpha: 0.6));
+        // باقي الصفحات - أبيض شفاف
+        return Icon(
+          outlineIcon,
+          size: 28,
+          color: Colors.white.withValues(alpha: 0.6),
+        );
       }
     }
   }

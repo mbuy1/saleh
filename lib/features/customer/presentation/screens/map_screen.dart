@@ -6,7 +6,7 @@ import 'dart:math' show cos, sin, sqrt, asin;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
-import '../../../../shared/widgets/map_search_bar.dart';
+import '../../../../core/widgets/widgets.dart';
 import 'store_details_screen.dart';
 
 /// موديل المتجر مع المسافة
@@ -72,11 +72,8 @@ class _MapScreenState extends State<MapScreen> {
   LatLng _currentCenter = const LatLng(24.7136, 46.6753); // الرياض افتراضياً
   String _selectedCityName = 'الرياض';
 
-  // نصف قطر الدائرة بالكيلومتر (TODO: يمكن جعله قابل للتغيير)
+  // نصف قطر الدائرة بالكيلومتر
   final double _radiusInKm = 10.0;
-
-  // TODO: يمكن الحصول على موقع المستخدم الفعلي باستخدام geolocator package
-  // bool _useUserLocation = false;
 
   @override
   void initState() {
@@ -131,62 +128,74 @@ class _MapScreenState extends State<MapScreen> {
       try {
         final store = storeWithDist.store;
         return Marker(
-          width: 120,
-          height: 60,
+          width: 240,
+          height: 120, // زيادة الارتفاع لاستيعاب النص الكامل
           point: LatLng(store.latitude!, store.longitude!),
           child: GestureDetector(
             onTap: () => _onMarkerTap(storeWithDist),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // نص اسم المتجر في balloon
+                // Label - النص بارتفاع كافي
                 Container(
+                  width: 230,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: 14,
+                    vertical: 12, // مساحة أكبر للنص
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: MbuyColors.borderLight,
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
                   child: Text(
                     store.name,
                     style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: MbuyColors.textPrimary,
+                      height: 1.4,
+                      letterSpacing: -0.2,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 2),
-                // أيقونة المتجر
+                const SizedBox(height: 8),
+                // Icon
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: store.isBoosted
-                        ? MbuyColors.primaryPurple
-                        : MbuyColors.primaryBlue,
+                        ? MbuyColors.secondary
+                        : MbuyColors.primaryIndigo,
+                    border: Border.all(color: Colors.white, width: 3.5),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.store, color: Colors.white, size: 18),
+                  child: Icon(
+                    store.isBoosted ? Icons.star_rounded : Icons.store_rounded,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                 ),
               ],
             ),
@@ -220,12 +229,13 @@ class _MapScreenState extends State<MapScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,15 +243,15 @@ class _MapScreenState extends State<MapScreen> {
             // Handle bar
             Center(
               child: Container(
-                width: 40,
-                height: 4,
+                width: 48,
+                height: 5,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(2.5),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             // اسم المتجر
             Row(
               children: [
@@ -249,91 +259,110 @@ class _MapScreenState extends State<MapScreen> {
                   child: Text(
                     store.name,
                     style: GoogleFonts.cairo(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: MbuyColors.textPrimary,
                     ),
                   ),
                 ),
                 if (store.isVerified)
-                  const Icon(Icons.verified, color: Colors.blue, size: 24),
+                  const Icon(Icons.verified, color: Colors.blue, size: 28),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             // المسافة
             Row(
               children: [
-                Icon(
-                  Icons.directions_walk,
-                  size: 16,
-                  color: MbuyColors.primaryPurple,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: MbuyColors.primaryPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.directions_walk,
+                    size: 20,
+                    color: MbuyColors.primaryPurple,
+                  ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 12),
                 Text(
-                  '${storeWithDist.distanceInKm.toStringAsFixed(1)} كم',
+                  '${storeWithDist.distanceInKm.toStringAsFixed(1)} كم من موقعك',
                   style: GoogleFonts.cairo(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: MbuyColors.primaryPurple,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             // المدينة
             if (store.city != null)
               Row(
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: MbuyColors.textSecondary,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.location_on,
+                      size: 20,
+                      color: MbuyColors.textSecondary,
+                    ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 12),
                   Text(
                     store.city!,
                     style: GoogleFonts.cairo(
-                      fontSize: 14,
+                      fontSize: 16,
                       color: MbuyColors.textSecondary,
                     ),
                   ),
                 ],
               ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             // الوصف
             Text(
               store.description,
               style: GoogleFonts.cairo(
-                fontSize: 14,
+                fontSize: 15,
                 color: MbuyColors.textSecondary,
+                height: 1.5,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             // التقييم والمتابعين
             Row(
               children: [
-                Icon(Icons.star, size: 18, color: Colors.amber),
-                const SizedBox(width: 4),
+                Icon(Icons.star_rounded, size: 24, color: Colors.amber),
+                const SizedBox(width: 6),
                 Text(
                   store.rating.toString(),
                   style: GoogleFonts.cairo(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Icon(Icons.people, size: 18, color: MbuyColors.textSecondary),
-                const SizedBox(width: 4),
+                const SizedBox(width: 24),
+                Icon(
+                  Icons.people_outline,
+                  size: 22,
+                  color: MbuyColors.textSecondary,
+                ),
+                const SizedBox(width: 6),
                 Text(
                   '${store.followersCount} متابع',
                   style: GoogleFonts.cairo(
-                    fontSize: 14,
+                    fontSize: 15,
                     color: MbuyColors.textSecondary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 32),
             // زر عرض المتجر
             SizedBox(
               width: double.infinity,
@@ -353,21 +382,23 @@ class _MapScreenState extends State<MapScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MbuyColors.primaryPurple,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  elevation: 4,
+                  shadowColor: MbuyColors.primaryPurple.withValues(alpha: 0.4),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: Text(
-                  'عرض المتجر',
+                  'زيارة المتجر',
                   style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -377,7 +408,8 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return Scaffold(
+      return MbuyScaffold(
+        useSafeArea: false,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -397,7 +429,8 @@ class _MapScreenState extends State<MapScreen> {
       );
     }
 
-    return Scaffold(
+    return MbuyScaffold(
+      useSafeArea: false,
       body: Stack(
         children: [
           FlutterMap(
@@ -412,35 +445,40 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
             children: [
+              // CartoDB Positron (Light) Tiles - Google Maps style
               TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate:
+                    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: const ['a', 'b', 'c'],
                 userAgentPackageName: 'com.muath.saleh',
                 maxNativeZoom: 19,
                 maxZoom: 19,
                 tileSize: 256,
                 keepBuffer: 2,
               ),
+
               // دائرة نصف القطر حول المركز الحالي
               CircleLayer(
                 circles: [
                   CircleMarker(
                     point: _currentCenter,
-                    radius: _radiusInKm * 1000, // تحويل من كم إلى متر
+                    radius: _radiusInKm * 1000,
                     useRadiusInMeter: true,
-                    color: MbuyColors.primaryPurple.withValues(alpha: 0.15),
+                    color: MbuyColors.primaryPurple.withValues(alpha: 0.05),
                     borderColor: MbuyColors.primaryPurple.withValues(
-                      alpha: 0.5,
+                      alpha: 0.2,
                     ),
-                    borderStrokeWidth: 2,
+                    borderStrokeWidth: 1,
                   ),
                 ],
               ),
+
               // Marker للمركز الحالي
               MarkerLayer(
                 markers: [
                   Marker(
-                    width: 40,
-                    height: 40,
+                    width: 24,
+                    height: 24,
                     point: _currentCenter,
                     child: Container(
                       decoration: BoxDecoration(
@@ -455,20 +493,17 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.white,
-                        size: 20,
-                      ),
                     ),
                   ),
                 ],
               ),
+
               // Markers للمتاجر
               MarkerLayer(markers: _markers),
             ],
           ),
-          // Header نمط Google Maps - شريط البحث والفئات
+
+          // Header - Google Maps Style Search & Categories
           Positioned(
             top: 0,
             left: 0,
@@ -479,21 +514,44 @@ class _MapScreenState extends State<MapScreen> {
                 child: Column(
                   children: [
                     // شريط البحث مع أيقونة الحساب الشخصي
-                    MapSearchBar(
-                      hintText: 'ابحث عن متجر أو مكان',
-                      onTap: () {
-                        // TODO: فتح شاشة البحث
-                        debugPrint('Search tapped');
-                      },
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.search, color: Colors.grey),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'ابحث عن متجر أو مكان',
+                              style: GoogleFonts.cairo(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    // شريط الفئات
-                    const MapCategoriesBar(),
                   ],
                 ),
               ),
             ),
           ),
+
           // زر اختيار المدينة (عائم في الأسفل يمين)
           Positioned(
             bottom: 100,
@@ -502,20 +560,20 @@ class _MapScreenState extends State<MapScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: _showCitySelector,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(30),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    gradient: MbuyColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: MbuyColors.primaryPurple.withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -524,7 +582,7 @@ class _MapScreenState extends State<MapScreen> {
                     children: [
                       const Icon(
                         Icons.location_city,
-                        color: Colors.white,
+                        color: MbuyColors.primaryPurple,
                         size: 18,
                       ),
                       const SizedBox(width: 6),
@@ -533,13 +591,13 @@ class _MapScreenState extends State<MapScreen> {
                         style: GoogleFonts.cairo(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: MbuyColors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 4),
                       const Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.white,
+                        Icons.keyboard_arrow_down,
+                        color: MbuyColors.textSecondary,
                         size: 20,
                       ),
                     ],
@@ -548,6 +606,8 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ),
+
+          // Map Controls (Zoom, My Location)
           Positioned(
             left: 16,
             bottom: 100,

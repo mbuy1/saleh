@@ -25,14 +25,8 @@ class StoreCardCompact extends StatelessWidget {
         margin: const EdgeInsets.only(left: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: MbuyColors.borderLight, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +37,7 @@ class StoreCardCompact extends StatelessWidget {
               decoration: BoxDecoration(
                 color: MbuyColors.surface,
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+                  top: Radius.circular(16),
                 ),
                 image: store.coverUrl != null
                     ? DecorationImage(
@@ -56,7 +50,7 @@ class StoreCardCompact extends StatelessWidget {
                   ? Center(
                       child: Icon(
                         Icons.store,
-                        size: 40,
+                        size: 36,
                         color: MbuyColors.textTertiary.withValues(alpha: 0.3),
                       ),
                     )
@@ -67,13 +61,14 @@ class StoreCardCompact extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       // لوجو المتجر
                       Container(
-                        width: 36,
-                        height: 36,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
@@ -91,7 +86,7 @@ class StoreCardCompact extends StatelessWidget {
                         child: store.logoUrl == null
                             ? const Icon(
                                 Icons.store,
-                                size: 20,
+                                size: 18,
                                 color: MbuyColors.textTertiary,
                               )
                             : null,
@@ -100,19 +95,23 @@ class StoreCardCompact extends StatelessWidget {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               store.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700, // خط سميك
                                 color: MbuyColors.textPrimary,
+                                height: 1.2,
                               ),
                             ),
-                            if (store.city != null)
+                            if (store.city != null) ...[
+                              const SizedBox(height: 2),
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(
                                     Icons.location_on_outlined,
@@ -120,7 +119,7 @@ class StoreCardCompact extends StatelessWidget {
                                     color: MbuyColors.textSecondary,
                                   ),
                                   const SizedBox(width: 2),
-                                  Expanded(
+                                  Flexible(
                                     child: Text(
                                       store.city!,
                                       maxLines: 1,
@@ -133,6 +132,7 @@ class StoreCardCompact extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                            ],
                           ],
                         ),
                       ),
@@ -140,27 +140,44 @@ class StoreCardCompact extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                      const SizedBox(width: 4),
-                      Text(
-                        store.rating.toStringAsFixed(1),
-                        style: GoogleFonts.cairo(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: MbuyColors.textPrimary,
+                      // تقييم بارز باللون الثانوي (ذهبي)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: MbuyColors.secondary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              size: 14,
+                              color: MbuyColors.secondary,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              store.rating.toStringAsFixed(1),
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: MbuyColors.secondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const Spacer(),
-                      Text(
-                        'متحقق ✔',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          color: store.isVerified
-                              ? Colors.green
-                              : MbuyColors.textSecondary,
+                      if (store.isVerified)
+                        const Icon(
+                          Icons.verified,
+                          size: 16,
+                          color: MbuyColors.success,
                         ),
-                      ),
                     ],
                   ),
                 ],

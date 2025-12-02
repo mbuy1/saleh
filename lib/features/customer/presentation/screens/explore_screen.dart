@@ -1,20 +1,18 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
-import '../../../../shared/widgets/profile_button.dart';
+import '../../../../core/widgets/widgets.dart';
 
-// TODO: Connect to Supabase for video data
+// TODO: Connect to Supabase for video/product data
 // TODO: Integrate video player (Cloudflare Stream)
-// TODO: Implement real like/comment/share functionality
-// TODO: Add comments bottom sheet
-// TODO: Implement share dialog
-// TODO: Track video views/engagement
+// TODO: Implement PageRank sorting algorithm
+// TODO: Track video views/engagement/conversion
 
-/// شاشة الاستكشاف - نمط Reels/TikTok
-/// عرض كامل للفيديو بتمرير عمودي
+/// شاشة الاستكشاف - تصميم نظيف بسيط
+/// Tabs: لك / فيديو / صور
+/// ألوان: أبيض/أسود/رمادي فقط، أصفر للعروض، أحمر للتنبيهات، أخضر للنجاح
 class ExploreScreen extends StatefulWidget {
   final String? userRole;
 
@@ -25,53 +23,630 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen>
-    with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late AnimationController _uiOpacityController;
-  double _uiOpacity = 1.0;
+  int _selectedFilterIndex = 0;
+
+  final List<String> _filters = [
+    'جديد',
+    'الأكثر مشاهدة',
+    'الأكثر مبيعًا',
+    'حسب موقع',
+    'المتاجر الأعلى تقييمًا',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
-
-    _uiOpacityController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-      value: 1.0,
-    );
-
-    _pageController.addListener(_handleScroll);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
   }
-
-  void _handleScroll() {
-    if (_pageController.position.isScrollingNotifier.value) {
-      if (_uiOpacity != 0.3) {
-        setState(() => _uiOpacity = 0.3);
-        _uiOpacityController.animateTo(0.3);
-      }
-    } else {
-      if (_uiOpacity != 1.0) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted && !_pageController.position.isScrollingNotifier.value) {
-            setState(() => _uiOpacity = 1.0);
-            _uiOpacityController.animateTo(1.0);
-          }
-        });
-      }
-    }
-  }
-
-  // استخدام البيانات الموحدة - سيتم استبدالها ببيانات من Supabase لاحقاً
-  final List<VideoItem> _videos = DummyData.exploreVideos;
 
   @override
   void dispose() {
-    _pageController.removeListener(_handleScroll);
-    _pageController.dispose();
     _tabController.dispose();
-    _uiOpacityController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: MbuyScaffold(
+        useSafeArea: false,
+        backgroundColor: Colors.white,
+        body: Column(
+          children: [
+            // هيدر بسيط بخلفية بيضاء
+            _buildGlassHeader(),
+            // Tab Content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildForYouTab(),
+                  _buildVideosTab(),
+                  _buildImagesTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// هيدر بسيط بخلفية بيضاء - بدون glassmorphism
+  Widget _buildGlassHeader() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: MbuyColors.borderLight, width: 0.5),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Header Row with Icons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  // Account Icon (Right) - دائرة سوداء
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: MbuyColors.textPrimary,
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  // Search Icon (Left) - أسود
+                  GestureDetector(
+                    onTap: () {},
+                    child: Icon(
+                      Icons.search,
+                      color: MbuyColors.textPrimary,
+                      size: 26,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Tabs - خط سفلي رفيع فقط
+            TabBar(
+              controller: _tabController,
+              indicatorColor: MbuyColors.textPrimary,
+              indicatorWeight: 1.5,
+              labelColor: MbuyColors.textPrimary,
+              unselectedLabelColor: MbuyColors.textSecondary,
+              labelStyle: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+              ),
+              tabs: const [
+                Tab(text: 'لك'),
+                Tab(text: 'فيديو'),
+                Tab(text: 'صور'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Tab 1: For You (Mixed content)
+  Widget _buildForYouTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          // Video Section
+          _buildVideoSection(),
+          const SizedBox(height: 28),
+          // Image Section with Filters
+          _buildImageSection(),
+        ],
+      ),
+    );
+  }
+
+  /// Tab 2: Videos Only
+  Widget _buildVideosTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 100),
+      child: Column(
+        children: [const SizedBox(height: 16), _buildVideoSection()],
+      ),
+    );
+  }
+
+  /// Tab 3: Images Only (Marketplace Grid)
+  Widget _buildImagesTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 100),
+      child: Column(
+        children: [const SizedBox(height: 16), _buildImageSection()],
+      ),
+    );
+  }
+
+  /// TikTok-style horizontal video cards section
+  Widget _buildVideoSection() {
+    final videos = DummyData.exploreVideos;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'فيديوهات',
+            style: GoogleFonts.cairo(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: MbuyColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height:
+              MediaQuery.of(context).size.height * 0.65, // 65% من ارتفاع الشاشة
+          child: PageView.builder(
+            controller: PageController(viewportFraction: 0.75), // 75% عرض
+            itemCount: videos.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: _buildVideoCard(videos[index]),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Single video card (16:9 or 4:5 aspect ratio) - بطاقة كبيرة 70% من الشاشة
+  Widget _buildVideoCard(VideoItem video) {
+    return GestureDetector(
+      onTap: () => _openTikTokPlayer(video),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Video Thumbnail - كبيرة ومرئية
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        MbuyColors.textSecondary.withValues(alpha: 0.3),
+                        MbuyColors.textPrimary,
+                      ],
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Play icon
+                      Center(
+                        child: Icon(
+                          Icons.play_circle_filled,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          size: 48,
+                        ),
+                      ),
+                      // Stats Overlay (Bottom)
+                      Positioned(
+                        bottom: 8,
+                        left: 8,
+                        right: 8,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.visibility,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatCount(video.likes * 10),
+                              style: GoogleFonts.cairo(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.favorite,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatCount(video.likes),
+                              style: GoogleFonts.cairo(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Video Caption
+            Text(
+              video.caption,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.cairo(
+                fontSize: 14,
+                color: MbuyColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Marketplace image grid with filters
+  Widget _buildImageSection() {
+    final products = DummyData.products;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Title
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'منتجات',
+            style: GoogleFonts.cairo(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: MbuyColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Smart Filters
+        _buildSmartFilters(),
+        const SizedBox(height: 16),
+        // Product Grid
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              return _buildProductCard(products[index]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Smart filter chips (horizontal scroll)
+  Widget _buildSmartFilters() {
+    return SizedBox(
+      height: 36,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _filters.length,
+        itemBuilder: (context, index) {
+          final isSelected = _selectedFilterIndex == index;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedFilterIndex = index;
+                // TODO: Apply PageRank sorting based on filter
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(left: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? MbuyColors.textPrimary
+                    : MbuyColors.background,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isSelected
+                      ? MbuyColors.textPrimary
+                      : MbuyColors.borderLight,
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                _filters[index],
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? Colors.white : MbuyColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Single product card for grid
+  Widget _buildProductCard(Product product) {
+    return GestureDetector(
+      onLongPress: () => _showProductPopup(product),
+      onTap: () {
+        // Navigate to product details
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Product Image (Square)
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: MbuyColors.surface,
+                  border: Border.all(color: MbuyColors.borderLight, width: 1),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.image_outlined,
+                    color: MbuyColors.textSecondary.withValues(alpha: 0.5),
+                    size: 32,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Product Name
+          Text(
+            product.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: MbuyColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          // Price
+          Text(
+            '${product.price} ر.س',
+            style: GoogleFonts.cairo(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: MbuyColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          // Store Name (TODO: lookup store by storeId)
+          Text(
+            'متجر رائع',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: MbuyColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Open TikTok-style video player (swipe up to next)
+  void _openTikTokPlayer(VideoItem video) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => _TikTokPlayerScreen(
+          initialVideo: video,
+          allVideos: DummyData.exploreVideos,
+        ),
+      ),
+    );
+  }
+
+  /// Show product popup on long press
+  void _showProductPopup(Product product) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Product Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: MbuyColors.surface,
+                    border: Border.all(color: MbuyColors.borderLight, width: 1),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.image_outlined,
+                      color: MbuyColors.textSecondary.withValues(alpha: 0.5),
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Product Name
+              Text(
+                product.name,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: MbuyColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Price
+              Text(
+                '${product.price} ر.س',
+                style: GoogleFonts.cairo(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: MbuyColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Action Buttons Row
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // TODO: Navigate to store
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MbuyColors.background,
+                        foregroundColor: MbuyColors.textPrimary,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: MbuyColors.glassBorder),
+                        ),
+                      ),
+                      child: Text(
+                        'المتجر',
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // TODO: Add to cart / buy now
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MbuyColors.textPrimary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'شراء الآن',
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Format count (K, M)
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
+  }
+}
+
+/// TikTok-style video player with swipe-up-to-next
+class _TikTokPlayerScreen extends StatefulWidget {
+  final VideoItem initialVideo;
+  final List<VideoItem> allVideos;
+
+  const _TikTokPlayerScreen({
+    required this.initialVideo,
+    required this.allVideos,
+  });
+
+  @override
+  State<_TikTokPlayerScreen> createState() => _TikTokPlayerScreenState();
+}
+
+class _TikTokPlayerScreenState extends State<_TikTokPlayerScreen> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.allVideos.indexOf(widget.initialVideo);
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -84,40 +659,63 @@ class _ExploreScreenState extends State<ExploreScreen>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            // محتوى الفيديو بتمرير عمودي
+            // Video PageView (Vertical Swipe)
             PageView.builder(
               controller: _pageController,
               scrollDirection: Axis.vertical,
-              itemCount: _videos.length,
+              itemCount: widget.allVideos.length,
               onPageChanged: (index) {
-                // يمكن استخدام index لاحقاً لتتبع الفيديو الحالي
+                setState(() {
+                  _currentIndex = index;
+                });
               },
               itemBuilder: (context, index) {
-                return _buildVideoItem(_videos[index]);
+                return _buildVideoPlayer(widget.allVideos[index]);
               },
             ),
-            // الطبقة العلوية (القائمة والشعار)
-            _buildTopOverlay(),
+            // Close Button (Top Right)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withValues(alpha: 0.5),
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  /// عنصر فيديو واحد
-  Widget _buildVideoItem(VideoItem video) {
+  Widget _buildVideoPlayer(VideoItem video) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // خلفية الفيديو (Placeholder حاليًا)
+        // Video Background (Placeholder)
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                MbuyColors.primaryPurple.withValues(alpha: 0.4),
-                Colors.black,
+                MbuyColors.textSecondary.withValues(alpha: 0.4),
+                MbuyColors.textPrimary,
               ],
             ),
           ),
@@ -129,7 +727,7 @@ class _ExploreScreenState extends State<ExploreScreen>
             ),
           ),
         ),
-        // التدرج في الأسفل لوضوح النص
+        // Bottom Gradient for Text Clarity
         Positioned(
           bottom: 0,
           left: 0,
@@ -148,200 +746,75 @@ class _ExploreScreenState extends State<ExploreScreen>
             ),
           ),
         ),
-        // الأزرار الجانبية (يمين)
-        _buildRightActions(video),
-        // معلومات المستخدم في الأسفل
-        _buildBottomInfo(video),
+        // Action Buttons (Right Side)
+        _buildActionButtons(video),
+        // Video Info (Bottom)
+        _buildVideoInfo(video),
       ],
     );
   }
 
-  /// الطبقة العلوية - Tabs وأيقونة الحساب مع شفافية
-  Widget _buildTopOverlay() {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: AnimatedOpacity(
-        opacity: _uiOpacity,
-        duration: const Duration(milliseconds: 300),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                // أيقونة الحساب على اليمين (RTL)
-                const ProfileButton(),
-                const SizedBox(width: 12),
-                // Tabs محركة قليلاً لليسار
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      height: 40,
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      child: TabBar(
-                        controller: _tabController,
-                        indicatorColor: Colors.white,
-                        indicatorWeight: 2,
-                        indicatorSize: TabBarIndicatorSize.label,
-                        labelColor: Colors.white,
-                        unselectedLabelColor: Colors.white.withValues(
-                          alpha: 0.6,
-                        ),
-                        labelStyle: GoogleFonts.cairo(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        unselectedLabelStyle: GoogleFonts.cairo(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        tabs: const [
-                          Tab(text: 'استكشف'),
-                          Tab(text: 'أتابعه'),
-                          Tab(text: 'لك'),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // مساحة فارغة للتوازن
-                const SizedBox(width: 48),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// الأيقونات الجانبية (يسار الشاشة) - في الأسفل بدون خلفية
-  Widget _buildRightActions(VideoItem video) {
+  Widget _buildActionButtons(VideoItem video) {
     return Positioned(
       left: 12,
-      bottom: 140,
-      child: AnimatedOpacity(
-        opacity: _uiOpacity,
-        duration: const Duration(milliseconds: 300),
-        child: Column(
-          children: [
-            // 1. لايك
-            _buildActionButton(
-              icon: Icons.favorite_border,
-              count: video.likes,
-              onTap: () {},
-            ),
-            const SizedBox(height: 18),
-            // 2. ماعجبني
-            _buildActionButton(
-              icon: Icons.thumb_down_outlined,
-              count: video.dislikes,
-              onTap: () {},
-            ),
-            const SizedBox(height: 18),
-            // 3. تعليقات
-            _buildActionButton(
-              icon: Icons.chat_bubble_outline,
-              count: video.comments,
-              onTap: () {},
-            ),
-            const SizedBox(height: 18),
-            // 4. مشاركة
-            _buildActionButton(
-              icon: Icons.share_outlined,
-              count: video.shares,
-              onTap: () {},
-            ),
-            const SizedBox(height: 18),
-            // 5. حفظ
-            _buildActionButton(
-              icon: Icons.bookmark_border,
-              count: video.bookmarks,
-              onTap: () {},
-            ),
-            const SizedBox(height: 18),
-            // 6. المزيد
-            _buildActionButton(
-              icon: Icons.more_vert,
-              count: 0,
-              onTap: () => _showMoreOptions(context),
-            ),
-          ],
-        ),
+      bottom: 160,
+      child: Column(
+        children: [
+          _buildActionButton(
+            icon: Icons.favorite_rounded,
+            count: video.likes,
+            onTap: () {},
+            color: Colors.redAccent,
+          ),
+          const SizedBox(height: 20),
+          _buildActionButton(
+            icon: Icons.chat_bubble_rounded,
+            count: video.comments,
+            onTap: () {},
+          ),
+          const SizedBox(height: 20),
+          _buildActionButton(
+            icon: Icons.share_rounded,
+            count: video.shares,
+            onTap: () {},
+          ),
+          const SizedBox(height: 20),
+          _buildActionButton(
+            icon: Icons.bookmark_rounded,
+            count: video.bookmarks,
+            onTap: () {},
+          ),
+        ],
       ),
     );
   }
 
-  /// قائمة المزيد
-  void _showMoreOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildMoreOption(Icons.flag, 'إبلاغ'),
-            _buildMoreOption(Icons.visibility_off, 'لا تظهر لي هذا النوع'),
-            _buildMoreOption(Icons.category, 'تحديد الفئات'),
-            _buildMoreOption(Icons.info_outline, 'شرح الفيديو'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMoreOption(IconData icon, String label) {
-    return ListTile(
-      leading: Icon(icon, color: MbuyColors.textPrimary),
-      title: Text(
-        label,
-        style: GoogleFonts.cairo(fontSize: 15, color: MbuyColors.textPrimary),
-      ),
-      onTap: () {
-        Navigator.pop(context);
-      },
-    );
-  }
-
-  /// زر إجراء واحد - بدون خلفية
   Widget _buildActionButton({
     required IconData icon,
     required int count,
     required VoidCallback onTap,
+    Color? color,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 28,
-            shadows: const [
-              Shadow(color: Colors.black, blurRadius: 8, offset: Offset(0, 2)),
-            ],
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withValues(alpha: 0.3),
+            ),
+            child: Icon(icon, color: color ?? Colors.white, size: 32),
           ),
-          if (count > 0) ...<Widget>[
+          if (count > 0) ...[
             const SizedBox(height: 4),
             Text(
               _formatCount(count),
-              style: const TextStyle(
+              style: GoogleFonts.cairo(
                 color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                shadows: [
-                  Shadow(
-                    color: Colors.black,
-                    blurRadius: 6,
-                    offset: Offset(0, 1),
-                  ),
-                ],
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -350,166 +823,81 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  /// معلومات المستخدم والمحتوى في الأسفل مع شفافية
-  Widget _buildBottomInfo(VideoItem video) {
+  Widget _buildVideoInfo(VideoItem video) {
     return Positioned(
       bottom: 0,
       right: 0,
-      left: 80, // مساحة للأزرار الجانبية
+      left: 80,
       child: SafeArea(
-        child: AnimatedOpacity(
-          opacity: _uiOpacity,
-          duration: const Duration(milliseconds: 300),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // اسم المستخدم
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: MbuyColors.primaryPurple,
-                      child: Text(
-                        video.userAvatar,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      video.userName,
-                      style: const TextStyle(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // User Info
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: MbuyColors.textPrimary,
+                    child: Text(
+                      video.userAvatar,
+                      style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Arabic',
-                        shadows: [Shadow(color: Colors.black, blurRadius: 4)],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1.5),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        'متابعة',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Arabic',
-                        ),
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    video.userName,
+                    style: GoogleFonts.cairo(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // الوصف
-                Text(
-                  video.caption,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontFamily: 'Arabic',
-                    shadows: [Shadow(color: Colors.black, blurRadius: 4)],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                // أزرار السلة والشراء - بحجم صغير
-                AnimatedOpacity(
-                  opacity: _uiOpacity,
-                  duration: const Duration(milliseconds: 300),
-                  child: Row(
-                    children: [
-                      // زر إضافة للسلة - صغير
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: InkWell(
-                          onTap: () {},
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.shopping_cart_outlined,
-                                color: MbuyColors.primaryPurple,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'أضف للسلة',
-                                style: GoogleFonts.cairo(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: MbuyColors.primaryPurple,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // زر الشراء الآن - صغير
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: MbuyColors.primaryGradient,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: MbuyColors.primaryPurple.withValues(
-                                alpha: 0.4,
-                              ),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: () {},
-                          child: Text(
-                            'شراء • 199 ر.س',
-                            style: GoogleFonts.cairo(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Caption
+              Text(
+                video.caption,
+                style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 16),
+              // Buy Button
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MbuyColors.textPrimary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
-            ),
+                child: Text(
+                  'شراء الآن',
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// تنسيق العدد (K, M)
   String _formatCount(int count) {
     if (count >= 1000000) {
       return '${(count / 1000000).toStringAsFixed(1)}M';
@@ -517,103 +905,5 @@ class _ExploreScreenState extends State<ExploreScreen>
       return '${(count / 1000).toStringAsFixed(1)}K';
     }
     return count.toString();
-  }
-}
-
-/// قرص موسيقى دوار
-class RotatingMusicDisc extends StatefulWidget {
-  const RotatingMusicDisc({super.key});
-
-  @override
-  State<RotatingMusicDisc> createState() => _RotatingMusicDiscState();
-}
-
-class _RotatingMusicDiscState extends State<RotatingMusicDisc>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: _controller.value * 2 * pi,
-          child: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [MbuyColors.primaryPurple, MbuyColors.accentPink],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: MbuyColors.primaryPurple.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: const Center(
-              child: Icon(Icons.music_note, color: Colors.white, size: 16),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// ويدجت شعار Mbuy دائري
-class LogoCircleWidget extends StatelessWidget {
-  const LogoCircleWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [MbuyColors.primaryPurple, MbuyColors.accentPink],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: MbuyColors.primaryPurple.withValues(alpha: 0.4),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Text(
-          'M',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Arabic',
-          ),
-        ),
-      ),
-    );
   }
 }

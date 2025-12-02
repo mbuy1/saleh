@@ -8,140 +8,130 @@ class ProductCardCompact extends StatelessWidget {
   final Product product;
   final VoidCallback? onTap;
   final double width;
+  final bool hideActions;
 
   const ProductCardCompact({
     super.key,
     required this.product,
     this.onTap,
     this.width = 140,
+    this.hideActions = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasImage = product.imageUrl != null;
+    final cardWidth = width == double.infinity ? null : width;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
+        width: cardWidth,
         margin: const EdgeInsets.only(left: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(color: MbuyColors.borderLight, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // صورة المنتج
-            Stack(
-              children: [
-                Container(
-                  height: width,
-                  decoration: BoxDecoration(
-                    color: MbuyColors.surface,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
+            // صورة المنتج - نسبة 1:1 مربعة
+            AspectRatio(
+              aspectRatio: 1.0,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: MbuyColors.surface,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                      image: hasImage
+                          ? DecorationImage(
+                              image: NetworkImage(product.imageUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
-                    image: hasImage
-                        ? DecorationImage(
-                            image: NetworkImage(product.imageUrl!),
-                            fit: BoxFit.cover,
+                    child: !hasImage
+                        ? const Center(
+                            child: Icon(
+                              Icons.image_outlined,
+                              size: 32,
+                              color: MbuyColors.textTertiary,
+                            ),
                           )
                         : null,
                   ),
-                  child: !hasImage
-                      ? const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 40,
-                            color: MbuyColors.textTertiary,
-                          ),
-                        )
-                      : null,
-                ),
-                // أيقونة المفضلة
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 4,
+                  // أيقونة المفضلة
+                  if (!hideActions)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
                         ),
-                      ],
+                        child: const Icon(
+                          Icons.favorite_border,
+                          size: 14,
+                          color: MbuyColors.textSecondary,
+                        ),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.favorite_border,
-                      size: 16,
-                      color: MbuyColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
             // معلومات المنتج
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.cairo(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: MbuyColors.textPrimary,
-                      height: 1.3,
+                      height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Text(
-                        '${product.price.toStringAsFixed(2)} ر.س',
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: MbuyColors.primaryPurple,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 3),
+                  Text(
+                    '${product.price.toStringAsFixed(0)} ر.س',
+                    style: GoogleFonts.cairo(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: MbuyColors.textPrimary,
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, size: 12, color: Colors.amber),
-                      const SizedBox(width: 2),
-                      Text(
-                        product.rating.toStringAsFixed(1),
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          color: MbuyColors.textSecondary,
+                  if (!hideActions) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          size: 11,
+                          color: MbuyColors.warning,
                         ),
-                      ),
-                      Text(
-                        ' (${product.reviewCount})',
-                        style: GoogleFonts.cairo(
-                          fontSize: 10,
-                          color: MbuyColors.textTertiary,
+                        const SizedBox(width: 2),
+                        Text(
+                          product.rating.toStringAsFixed(1),
+                          style: GoogleFonts.cairo(
+                            fontSize: 10,
+                            color: MbuyColors.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

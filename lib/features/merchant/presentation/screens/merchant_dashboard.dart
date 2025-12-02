@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class MerchantDashboard extends StatefulWidget {
   const MerchantDashboard({super.key});
@@ -18,7 +20,7 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: MbuyColors.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -30,11 +32,11 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
 
             // Feature Grid
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
               sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 1.35,
+                  childAspectRatio: 1.2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),
@@ -116,7 +118,7 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                   horizontal: 16,
                   vertical: 16,
                 ),
-                child: Divider(color: Colors.grey.shade200, thickness: 1),
+                child: Divider(color: MbuyColors.borderLight, thickness: 1),
               ),
             ),
 
@@ -128,25 +130,22 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildMerchantBottomNav(),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
           // Avatar with gradient border
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
-              ),
+              gradient: MbuyColors.primaryGradient,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+                  color: MbuyColors.primaryPurple.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -160,14 +159,14 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
               ),
               padding: const EdgeInsets.all(2),
               child: CircleAvatar(
-                radius: 28,
-                backgroundColor: const Color(0xFFF3F4F6),
+                radius: 32,
+                backgroundColor: MbuyColors.surface,
                 child: Text(
                   merchantName.substring(0, 1),
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: GoogleFonts.cairo(
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF7C3AED),
+                    color: MbuyColors.primaryPurple,
                   ),
                 ),
               ),
@@ -182,16 +181,20 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
               children: [
                 Text(
                   merchantName,
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: GoogleFonts.cairo(
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F0F0F),
+                    color: MbuyColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'لوحة التحكم',
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: MbuyColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -213,14 +216,14 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: const Color(0xFFF3F4F6),
-      borderRadius: BorderRadius.circular(12),
+      color: MbuyColors.surface,
+      borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Container(
           padding: const EdgeInsets.all(10),
-          child: Icon(icon, color: const Color(0xFF6B7280), size: 22),
+          child: Icon(icon, color: MbuyColors.textSecondary, size: 24),
         ),
       ),
     );
@@ -228,14 +231,14 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
 
   Widget _buildMerchantProfileCard() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 24,
             offset: const Offset(0, 4),
           ),
@@ -247,15 +250,13 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
             children: [
               // Store Icon
               Container(
-                width: 60,
-                height: 60,
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
-                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: MbuyColors.primaryGradient,
                 ),
-                child: const Icon(Icons.store, color: Colors.white, size: 30),
+                child: const Icon(Icons.store, color: Colors.white, size: 32),
               ),
               const SizedBox(width: 16),
 
@@ -266,49 +267,47 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                   children: [
                     Text(
                       storeName,
-                      style: const TextStyle(
-                        fontSize: 17,
+                      style: GoogleFonts.cairo(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F0F0F),
+                        color: MbuyColors.textPrimary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
+                            horizontal: 10,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF10B981,
-                            ).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
+                            color: MbuyColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             storeStatus,
-                            style: const TextStyle(
-                              fontSize: 11,
+                            style: GoogleFonts.cairo(
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF10B981),
+                              color: MbuyColors.success,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Icon(
                           Icons.people_outline,
-                          size: 14,
-                          color: Colors.grey.shade600,
+                          size: 16,
+                          color: MbuyColors.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '$followersCount',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
+                          style: GoogleFonts.cairo(
+                            fontSize: 13,
+                            color: MbuyColors.textSecondary,
                           ),
                         ),
                       ],
@@ -316,52 +315,27 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                   ],
                 ),
               ),
-
-              // Notification Badge
-              if (newOrdersCount > 0)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Stack(
-                    children: [
-                      const Icon(
-                        Icons.notifications_outlined,
-                        color: Color(0xFFEF4444),
-                        size: 24,
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFEF4444),
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '$newOrdersCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 24),
+
+          // Important Stats Row (Products - Orders - Rating)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('المنتجات', '124', Icons.inventory_2_outlined),
+              _buildStatItem(
+                'الطلبات',
+                '$newOrdersCount',
+                Icons.shopping_bag_outlined,
+                isHighlighted: true,
+              ),
+              _buildStatItem('التقييم', '4.8', Icons.star_outline),
+            ],
+          ),
+
+          const SizedBox(height: 24),
 
           // Manage Store Button
           SizedBox(
@@ -370,16 +344,14 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {},
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 child: Ink(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: MbuyColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+                        color: MbuyColors.primaryPurple.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -387,18 +359,18 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                   ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.store_outlined,
                           color: Colors.white,
-                          size: 20,
+                          size: 22,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'إدارة المتجر',
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -416,6 +388,44 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     );
   }
 
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon, {
+    bool isHighlighted = false,
+  }) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.cairo(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isHighlighted
+                ? MbuyColors.primaryPurple
+                : MbuyColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: MbuyColors.textSecondary),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: MbuyColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildFeatureCard({
     required IconData icon,
     required String title,
@@ -429,13 +439,15 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
+        splashColor: MbuyColors.primaryPurple.withValues(alpha: 0.1),
+        highlightColor: MbuyColors.primaryPurple.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 12,
                 offset: const Offset(0, 2),
               ),
@@ -449,12 +461,16 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                 clipBehavior: Clip.none,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
+                      color: MbuyColors.primaryPurple.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Icon(icon, color: const Color(0xFF7C3AED), size: 28),
+                    child: Icon(
+                      icon,
+                      color: MbuyColors.primaryPurple,
+                      size: 34,
+                    ),
                   ),
                   if (badge != null && badge > 0)
                     Positioned(
@@ -462,10 +478,10 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                       top: -4,
                       child: Container(
                         padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFEF4444),
+                        decoration: BoxDecoration(
+                          color: MbuyColors.error,
                           shape: BoxShape.circle,
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.white,
                               blurRadius: 0,
@@ -474,14 +490,14 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                           ],
                         ),
                         constraints: const BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
+                          minWidth: 22,
+                          minHeight: 22,
                         ),
                         child: Text(
                           '$badge',
-                          style: const TextStyle(
+                          style: GoogleFonts.cairo(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -490,13 +506,13 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                     ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F0F0F),
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: MbuyColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -506,7 +522,11 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: GoogleFonts.cairo(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: MbuyColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -570,7 +590,10 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Mbuy للتجار - الإصدار 1.0.0',
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: MbuyColors.textTertiary,
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -589,7 +612,7 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -605,15 +628,15 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           title: Text(
             title,
-            style: const TextStyle(
+            style: GoogleFonts.cairo(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0F0F0F),
+              color: MbuyColors.textPrimary,
             ),
           ),
           trailing: Icon(
             Icons.keyboard_arrow_down,
-            color: Colors.grey.shade600,
+            color: MbuyColors.textSecondary,
           ),
           children: items,
         ),
@@ -635,160 +658,29 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(10),
+                  color: MbuyColors.surface,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: const Color(0xFF6B7280), size: 20),
+                child: Icon(icon, color: MbuyColors.textSecondary, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    color: MbuyColors.textSecondary,
+                  ),
                 ),
               ),
               Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
-                color: Colors.grey.shade400,
+                color: MbuyColors.textTertiary,
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMerchantBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                icon: Icons.store_outlined,
-                selectedIcon: Icons.store,
-                label: 'متجر',
-                isSelected: true,
-                onTap: () {},
-              ),
-              _buildNavItem(
-                icon: Icons.inventory_2_outlined,
-                selectedIcon: Icons.inventory_2,
-                label: 'منتجات',
-                onTap: () {},
-              ),
-              _buildNavItem(
-                icon: Icons.shopping_bag_outlined,
-                selectedIcon: Icons.shopping_bag,
-                label: 'طلبات',
-                badge: newOrdersCount,
-                onTap: () {},
-              ),
-              _buildNavItem(
-                icon: Icons.account_balance_wallet_outlined,
-                selectedIcon: Icons.account_balance_wallet,
-                label: 'محفظة',
-                onTap: () {},
-              ),
-              _buildNavItem(
-                icon: Icons.menu,
-                selectedIcon: Icons.menu,
-                label: 'المزيد',
-                onTap: () {},
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required IconData selectedIcon,
-    required String label,
-    bool isSelected = false,
-    int? badge,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(
-                      isSelected ? selectedIcon : icon,
-                      color: isSelected
-                          ? const Color(0xFF7C3AED)
-                          : const Color(0xFF6B7280),
-                      size: 26,
-                    ),
-                    if (badge != null && badge > 0)
-                      Positioned(
-                        right: -8,
-                        top: -4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFEF4444),
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '$badge',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    color: isSelected
-                        ? const Color(0xFF7C3AED)
-                        : const Color(0xFF6B7280),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

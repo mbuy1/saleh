@@ -1,80 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// ألوان هوية mBuy - Meta AI Style × mBuy Purple Identity
+/// ألوان الهوية النظيفة لتطبيق mBuy
+/// أبيض / أسود / رمادي / أصفر للعروض / أحمر للتنبيهات / أخضر للنجاح
 class MbuyColors {
-  // الألوان الأساسية - mBuy Purple Palette
-  static const Color primaryPurple = Color(0xFF7B2CF5); // mBuy Purple
-  static const Color primaryLight = Color(0xFFA46CFF); // Soft Purple
-  static const Color primaryDark = Color(0xFF5320A0); // Deep Purple
-  static const Color primarySubtle = Color(0xFFF5F0FF); // Background Tint
+  // الهوية الأساسية - أسود/رصاصي داكن
+  static const Color primaryIndigo = Color(
+    0xFF333333,
+  ); // رمادي داكن (بدلاً من الأزرق)
+  static const Color primaryDeep = Color(0xFF000000); // أسود
+  static const Color primaryHighlight = Color(0xFF6C757D); // رمادي متوسط
 
-  // الخلفيات - White & Clean
-  static const Color background = Color(0xFFFFFFFF); // Pure White
-  static const Color surface = Color(0xFFF7F7F9); // Soft Gray
-  static const Color surfaceDark = Color(0xFFF0F0F2); // Card Hover
-  static const Color cardBackground = Color(0xFFFFFFFF);
+  // المحايد
+  static const Color background = Color(0xFFFFFFFF); // أبيض نقي
+  static const Color surface = Color(0xFFF8F9FA); // رمادي فاتح جداً
+  static const Color cardBackground = Color(0xFFFFFFFF); // أبيض نقي
+  static const Color textPrimary = Color(0xFF333333); // رمادي داكن للنصوص
+  static const Color textSecondary = Color(0xFF6C757D); // رمادي متوسط
+  static const Color textTertiary = Color(0xFF9E9E9E); // رمادي فاتح
+  static const Color borderLight = Color(0xFFDEE2E6); // رمادي فاتح
+  static const Color border = Color(0xFFDEE2E6); // رمادي فاتح
+  static const Color luxuryBlack = Color(0xFF333333); // رمادي داكن
 
-  // النصوص - Clean & Clear
-  static const Color textPrimary = Color(0xFF1A1A1A); // Main Content
-  static const Color textSecondary = Color(0xFF6A6A6A); // Descriptions
-  static const Color textTertiary = Color(0xFF9A9A9A); // Placeholders
+  // Glass Layer
+  static const Color glassBackground = Color(0x1AFFFFFF); // شفافية خفيفة
+  static const Color glassBorder = Color(0x33FFFFFF); // حدود شفافة
 
-  // الحدود - Soft Borders
-  static const Color borderLight = Color(0xFFE6E6E8); // Dividers
-  static const Color border = Color(0xFFD0D0D2); // Input Borders
+  // توافق خلفي
+  static const Color primaryPurple = Color(0xFF000000);
+  static const Color primaryLight = Color(0xFF757575);
+  static const Color primaryDark = Color(0xFF000000);
+  static const Color primarySubtle = surface;
+  static const Color surfaceDark = surface;
+  static const Color primaryBlue = Color(0xFF000000);
+  static const Color accentPink = Color(0xFF000000);
+  static const Color surfaceLight = surface;
 
-  // Backward compatibility aliases (للألوان القديمة)
-  static const Color primaryBlue = primaryPurple; // مرادف للون الأساسي الجديد
-  static const Color accentPink = primaryLight; // مرادف للون الفاتح
-  static const Color surfaceLight = surface; // مرادف للسطح
-  static const LinearGradient cardGradient = subtleGradient; // مرادف للتدرج
+  static const Color successLight = successMuted;
+  static const Color infoLight = infoMuted;
+  static const Color errorLight = errorMuted;
 
-  // ألوان الحالات - Status Colors
-  static const Color success = Color(0xFF22CC88); // Green
-  static const Color successLight = Color(0xFFE6F9F0); // Background
-  static const Color error = Color(0xFFFF4D4F); // Red
-  static const Color errorLight = Color(0xFFFFF0F0); // Background
-  static const Color warning = Color(0xFFFFA940); // Orange
-  static const Color warningLight = Color(0xFFFFF7E6); // Background
-  static const Color info = Color(0xFF40A9FF); // Blue
-  static const Color infoLight = Color(0xFFE6F7FF); // Background
+  // اللون الثانوي - أصفر/ذهبي جذاب
+  static const Color secondary = Color(0xFFFFC107); // أصفر ذهبي #FFC107
+  static const Color secondaryDark = Color(0xFFFFB300); // ذهبي داكن
+  static const Color secondaryLight = Color(0xFFFFD54F); // ذهبي فاتح
 
-  // التدرجات - Purple Gradients
+  // حالات - Super Ultra Premium Accents
+  static const Color success = Color(0xFF29CC6A); // Success Green
+  static const Color successMuted = Color(0xFFE9F9F0);
+  static const Color warning = Color(0xFFFFC107); // Rating Gold (نفس الثانوي)
+  static const Color warningLight = Color(0xFFFFD54F);
+  static const Color warningMuted = Color(0xFFFFF9E6);
+  static const Color info = Color(0xFF2D9CDB); // Info Blue
+  static const Color infoMuted = Color(0xFFE3F3FB);
+  static const Color error = Color(0xFFFF4D4F);
+  static const Color errorMuted = Color(0xFFFFEBEC);
+
+  // التدرجات - رمادي/أسود
   static const LinearGradient primaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primaryPurple, primaryLight],
+    begin: Alignment(-0.07, -1.0), // ~94° angle
+    end: Alignment(0.07, 1.0),
+    colors: [
+      primaryIndigo, // #333333
+      primaryDeep, // #000000
+    ],
+    stops: [0.0, 0.86],
   );
 
-  // تدرج غامق للأزرار
-  static const LinearGradient darkGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primaryDark, primaryPurple],
-  );
-
-  // تدرج ناعم للبطاقات والخلفيات
+  static const LinearGradient darkGradient = primaryGradient;
   static const LinearGradient subtleGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [primarySubtle, Color(0xFFFFFFFF)],
+    colors: [surface, cardBackground],
   );
-
-  // تدرج دائري للأيقونات
   static const SweepGradient circularGradient = SweepGradient(
-    colors: [primaryPurple, primaryLight, primaryPurple],
+    colors: [primaryIndigo, textPrimary, primaryIndigo],
     stops: [0.0, 0.5, 1.0],
   );
-
-  // تدرجات الحالات
   static const LinearGradient successGradient = LinearGradient(
-    colors: [success, Color(0xFF059669)],
+    colors: [success, Color(0xFF1F9B4F)],
   );
-
   static const LinearGradient errorGradient = LinearGradient(
-    colors: [error, Color(0xFFDC2626)],
+    colors: [error, Color(0xFFB3261E)],
   );
+}
+
+/// الأحجام المعيارية للأيقونات
+class MbuyIconSizes {
+  static const double bottomNavigation = 26; // أيقونات التبويبات
+  static const double bottomNavigationCenter = 38; // الزر المركزي
+  static const double primaryAction = 28; // أيقونات الإجراءات
+  static const double gridItem = 45; // أيقونات داخل الكروت 42-48px
+  static const double header = 24; // أيقونات الهيدر
+  static const double secondary = 22; // أيقونات ثانوية
+  static const double merchant = 60; // صورة المتجر
+  static const double iconStroke = 1.5; // سماكة الحدود
+}
+
+/// نظام المسافات العالمي - Super Ultra Premium Spacing Grid
+class MbuySpacing {
+  static const double screen = 16; // Screen padding
+  static const double section = 28; // Between sections (spacious)
+  static const double row = 18; // Between rows
+  static const double cardPadding = 20; // Card internal padding (Soft Premium)
+  static const double cardGap = 16; // Gap between cards
+  static const double headerPadding = 14; // Header internal padding
+  static const double headerHeight = 70; // Header height
+  static const double iconTextGap = 10; // Icon to text spacing
+  static const double cardRadius = 12; // Card corner radius 10-14px
+  static const double glassBlur = 22; // Glassmorphism blur
+}
+
+/// نظام الحركة والتفاعلات - Premium Motion (Apple-like)
+class MbuyMotion {
+  static const Duration quick = Duration(
+    milliseconds: 180,
+  ); // Elegant transitions
+  static const Duration smooth = Duration(milliseconds: 200); // Smooth fades
+  static const double pressedScale = 1.025; // 2.5% scale on press
+  static const double glassOpacity = 0.18; // 18% glass transparency
+  static const double glassInnerGlow = 0.08; // Inner glow opacity
 }
 
 /// ThemeData الرئيسي للتطبيق
@@ -87,148 +132,121 @@ class AppTheme {
       // الخلفية الأساسية
       scaffoldBackgroundColor: MbuyColors.background,
 
-      // ColorScheme - mBuy Purple Identity
+      // ColorScheme - أبيض/أسود/رصاصي
       colorScheme: const ColorScheme.light(
-        primary: MbuyColors.primaryPurple,
-        secondary: MbuyColors.primaryLight,
+        primary: MbuyColors.textPrimary,
+        secondary: MbuyColors.textSecondary,
         surface: MbuyColors.surface,
         error: MbuyColors.error,
         onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onSecondary: MbuyColors.textPrimary,
         onSurface: MbuyColors.textPrimary,
         onError: Colors.white,
       ),
 
-      // AppBar Theme - Clean & Modern
+      // AppBar Theme - Ultra Premium Clean & Modern
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: MbuyColors.cardBackground,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: MbuyColors.textPrimary),
+        toolbarHeight: MbuySpacing.headerHeight, // 70px
+        iconTheme: const IconThemeData(
+          color: MbuyColors.textPrimary,
+          size: MbuyIconSizes.header, // 24px
+        ),
         titleTextStyle: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 20,
+          fontSize: 18, // Section header size
           fontWeight: FontWeight.w600,
         ),
         surfaceTintColor: Colors.transparent,
       ),
 
-      // Card Theme - Soft Shadows & 16px Radius
+      // Card Theme - كروت بيضاء بدون ظل
       cardTheme: CardThemeData(
         color: MbuyColors.cardBackground,
-        elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.06),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 0, // بدون ظل
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(MbuySpacing.cardRadius), // 12px
+        ),
+        margin: EdgeInsets.symmetric(
+          horizontal: MbuySpacing.screen,
+          vertical: MbuySpacing.cardGap / 2,
+        ),
       ),
 
-      // Text Theme - Cairo Font System
+      // Text Theme - Super Ultra Premium Typography Hierarchy
       textTheme: TextTheme(
-        // Hero Title - 28px SemiBold
         displayLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-          height: 1.29,
+          fontSize: 26, // Title XL - Bold (main header)
+          fontWeight: FontWeight.w700,
+          height: 1.3,
         ),
-        // Page Title - 20px SemiBold
         displayMedium: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 20,
+          fontSize: 22, // Title L - SemiBold (page titles)
           fontWeight: FontWeight.w600,
-          height: 1.4,
+          height: 1.3,
         ),
-        // Section Title - 17px Medium
-        displaySmall: GoogleFonts.cairo(
-          color: MbuyColors.textPrimary,
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          height: 1.41,
-        ),
-        // Stats/Numbers - 18px Bold
         headlineLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          height: 1.33,
-          letterSpacing: -0.2,
+          fontSize: 18, // Section Headline - SemiBold
+          fontWeight: FontWeight.w600,
+          height: 1.3,
         ),
-        // Subtitle - 17px Medium
-        headlineMedium: GoogleFonts.cairo(
-          color: MbuyColors.textPrimary,
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          height: 1.41,
-        ),
-        // Body Large - 16px Regular
-        headlineSmall: GoogleFonts.cairo(
-          color: MbuyColors.textPrimary,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
-        ),
-        // Title Medium - 15px SemiBold
         titleLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 15,
+          fontSize: 18, // Section titles - SemiBold
           fontWeight: FontWeight.w600,
+          height: 1.3,
         ),
-        // Title Small - 14px Medium
-        titleMedium: GoogleFonts.cairo(
-          color: MbuyColors.textPrimary,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        // Body - 14px Regular
         bodyLarge: GoogleFonts.cairo(
           color: MbuyColors.textPrimary,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          height: 1.57,
-        ),
-        // Body Secondary - 14px Regular
-        bodyMedium: GoogleFonts.cairo(
-          color: MbuyColors.textSecondary,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          height: 1.57,
-        ),
-        // Small - 12px Regular
-        bodySmall: GoogleFonts.cairo(
-          color: MbuyColors.textTertiary,
-          fontSize: 12,
+          fontSize: 16, // Body Main - Regular
           fontWeight: FontWeight.w400,
           height: 1.5,
         ),
-        // Caption - 11px Regular
-        labelSmall: GoogleFonts.cairo(
+        bodyMedium: GoogleFonts.cairo(
           color: MbuyColors.textSecondary,
-          fontSize: 11,
+          fontSize: 14, // Subtext - Medium
+          fontWeight: FontWeight.w500,
+          height: 1.5,
+        ),
+        bodySmall: GoogleFonts.cairo(
+          color: MbuyColors.textTertiary,
+          fontSize: 12, // Caption - Regular
           fontWeight: FontWeight.w400,
           height: 1.45,
         ),
-        // Label - 14px Medium
         labelLarge: GoogleFonts.cairo(
-          color: MbuyColors.textPrimary,
-          fontSize: 14,
+          color: MbuyColors.textSecondary,
+          fontSize: 14, // Labels - Medium
           fontWeight: FontWeight.w500,
+        ),
+        labelSmall: GoogleFonts.cairo(
+          color: MbuyColors.textTertiary,
+          fontSize: 12, // Small labels - Regular
+          fontWeight: FontWeight.w400,
         ),
       ),
 
-      // Elevated Button Theme - Purple with Glow
+      // Elevated Button Theme - solid fallback, gradients handled via custom widgets
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: MbuyColors.primaryPurple,
+          backgroundColor: MbuyColors.textPrimary, // أسود/رمادي بدلاً من الأزرق
           foregroundColor: Colors.white,
           elevation: 0,
-          shadowColor: MbuyColors.primaryPurple.withValues(alpha: 0.2),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          shadowColor: Colors.black.withValues(alpha: 0.08),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           minimumSize: const Size(0, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
           textStyle: GoogleFonts.cairo(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -237,7 +255,7 @@ class AppTheme {
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: MbuyColors.primaryPurple,
+          foregroundColor: MbuyColors.primaryIndigo,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           textStyle: GoogleFonts.cairo(
             fontSize: 14,
@@ -271,7 +289,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: MbuyColors.primaryPurple,
+            color: MbuyColors.textSecondary,
             width: 1.5,
           ),
         ),
@@ -291,9 +309,9 @@ class AppTheme {
 
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.white,
-        selectedItemColor: MbuyColors.primaryPurple,
-        unselectedItemColor: MbuyColors.textTertiary,
+        backgroundColor: MbuyColors.cardBackground,
+        selectedItemColor: MbuyColors.textPrimary, // أسود بدلاً من الأزرق
+        unselectedItemColor: MbuyColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: GoogleFonts.cairo(
@@ -322,8 +340,8 @@ class AppTheme {
 
       // ColorScheme - Dark Mode
       colorScheme: const ColorScheme.dark(
-        primary: MbuyColors.primaryPurple,
-        secondary: MbuyColors.primaryLight,
+        primary: MbuyColors.primaryIndigo,
+        secondary: Color(0xFF1E1E1E),
         surface: Color(0xFF1E1E1E),
         error: MbuyColors.error,
         onPrimary: Colors.white,
@@ -346,102 +364,83 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
       ),
 
-      // Card Theme
+      // Card Theme - Dark Mode (20px radius)
       cardTheme: CardThemeData(
         color: const Color(0xFF1E1E1E),
         elevation: 2,
         shadowColor: Colors.black.withValues(alpha: 0.3),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(MbuySpacing.cardRadius), // 20px
+        ),
+        margin: EdgeInsets.symmetric(
+          horizontal: MbuySpacing.screen,
+          vertical: MbuySpacing.cardGap / 2,
+        ),
       ),
 
-      // Text Theme - Cairo Font System
+      // Text Theme - Super Premium Typography (Dark)
       textTheme: TextTheme(
         displayLarge: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-          height: 1.29,
+          fontSize: 26, // Title XL - Bold
+          fontWeight: FontWeight.w700,
+          height: 1.3,
         ),
         displayMedium: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 20,
+          fontSize: 22, // Title L - SemiBold
           fontWeight: FontWeight.w600,
-          height: 1.4,
-        ),
-        displaySmall: GoogleFonts.cairo(
-          color: Colors.white,
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          height: 1.41,
+          height: 1.3,
         ),
         headlineLarge: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          height: 1.33,
-          letterSpacing: -0.2,
-        ),
-        headlineMedium: GoogleFonts.cairo(
-          color: Colors.white,
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          height: 1.41,
-        ),
-        headlineSmall: GoogleFonts.cairo(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
+          fontSize: 18, // Section Headline - SemiBold
+          fontWeight: FontWeight.w600,
+          height: 1.3,
         ),
         titleLarge: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 15,
+          fontSize: 18, // Section titles - SemiBold
           fontWeight: FontWeight.w600,
-        ),
-        titleMedium: GoogleFonts.cairo(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          height: 1.3,
         ),
         bodyLarge: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          height: 1.57,
-        ),
-        bodyMedium: GoogleFonts.cairo(
-          color: Colors.white70,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          height: 1.57,
-        ),
-        bodySmall: GoogleFonts.cairo(
-          color: Colors.white60,
-          fontSize: 12,
+          fontSize: 16, // Body Main - Regular
           fontWeight: FontWeight.w400,
           height: 1.5,
         ),
-        labelSmall: GoogleFonts.cairo(
+        bodyMedium: GoogleFonts.cairo(
           color: Colors.white70,
-          fontSize: 11,
+          fontSize: 14, // Subtext - Medium
+          fontWeight: FontWeight.w500,
+          height: 1.5,
+        ),
+        bodySmall: GoogleFonts.cairo(
+          color: Colors.white60,
+          fontSize: 12, // Caption - Regular
           fontWeight: FontWeight.w400,
           height: 1.45,
         ),
         labelLarge: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 14,
+          fontSize: 14, // Labels - Medium
           fontWeight: FontWeight.w500,
+        ),
+        labelSmall: GoogleFonts.cairo(
+          color: Colors.white60,
+          fontSize: 12, // Small labels - Regular
+          fontWeight: FontWeight.w400,
         ),
       ),
 
       // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: MbuyColors.primaryPurple,
+          backgroundColor: MbuyColors.primaryIndigo,
           foregroundColor: Colors.white,
           elevation: 0,
-          shadowColor: MbuyColors.primaryPurple.withValues(alpha: 0.2),
+          shadowColor: Colors.black.withValues(alpha: 0.2),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           minimumSize: const Size(0, 48),
           shape: RoundedRectangleBorder(
@@ -457,7 +456,7 @@ class AppTheme {
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: MbuyColors.primaryPurple,
+          foregroundColor: MbuyColors.primaryIndigo,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           textStyle: GoogleFonts.cairo(
             fontSize: 14,
@@ -485,7 +484,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: MbuyColors.primaryPurple,
+            color: MbuyColors.primaryIndigo,
             width: 1.5,
           ),
         ),
@@ -500,7 +499,7 @@ class AppTheme {
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: const Color(0xFF1E1E1E),
-        selectedItemColor: MbuyColors.primaryPurple,
+        selectedItemColor: MbuyColors.primaryIndigo,
         unselectedItemColor: Colors.white60,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
