@@ -10,12 +10,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:saleh/main.dart';
 import 'package:saleh/core/theme/theme_provider.dart';
+import 'package:saleh/core/app_config.dart';
 
 void main() {
   testWidgets('App initialization test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     final themeProvider = ThemeProvider();
-    await tester.pumpWidget(MyApp(themeProvider: themeProvider));
+    final appModeProvider = AppModeProvider();
+    await tester.pumpWidget(MyApp(
+      themeProvider: themeProvider,
+      appModeProvider: appModeProvider,
+    ));
 
     // Verify that the app builds successfully
     expect(find.byType(MaterialApp), findsOneWidget);
