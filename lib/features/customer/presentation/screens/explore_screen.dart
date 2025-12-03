@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
-import '../../../../core/data/repositories/explore_repository.dart';
 import '../../../../core/widgets/widgets.dart';
-import '../../data/explore_service.dart';
+import '../../data/services/explore_service.dart';
+import '../../data/models/product_model.dart';
 import 'product_details_screen.dart';
 import 'store_details_screen.dart';
 import 'profile_screen.dart';
@@ -29,10 +28,10 @@ class _ExploreScreenState extends State<ExploreScreen>
   bool _isLoadingVideos = false;
   bool _isLoadingProducts = false;
   List<VideoItem> _videos = [];
-  List<Product> _products = [];
+  List<ProductModel> _products = [];
   int _currentVideoPage = 0;
   int _currentProductPage = 0;
-  final ExploreRepository _repository = ExploreRepository();
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _filters = [
     'جديد',
@@ -98,6 +97,37 @@ class _ExploreScreenState extends State<ExploreScreen>
   Future<void> _loadProducts({bool refresh = false}) async {
     if (_isLoadingProducts) return;
 
+    setState(() {
+      _isLoadingProducts = true;
+      if (refresh) {
+        _currentProductPage = 0;
+        _products = [];
+      }
+    });
+
+    try {
+      final products = await ExploreService.getAllProducts(
+        limit: 20,
+        offset: _currentProductPage * 20,
+      );
+
+      if (mounted) {
+        setState(() {
+          _products.addAll(products);
+          _currentProductPage++;
+          _isLoadingProducts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingProducts = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _searchProducts(String query) async {
     setState(() {
       _isLoadingProducts = true;
       if (refresh) {

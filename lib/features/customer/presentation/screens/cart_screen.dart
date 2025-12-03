@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/cart_service.dart';
-import '../../data/order_service.dart';
-import '../../data/coupon_service.dart';
+import '../../data/services/cart_service.dart';
 import '../../../../core/permissions_helper.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/data/dummy_data.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
@@ -21,7 +18,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<Map<String, dynamic>> _cartItems = [];
+  List<CartItemModel> _cartItems = [];
   double _total = 0;
   bool _isLoading = true;
   final TextEditingController _couponController = TextEditingController();
@@ -50,7 +47,7 @@ class _CartScreenState extends State<CartScreen> {
       }
 
       final items = await CartService.getCartItems();
-      final total = await CartService.getCartTotal();
+      final total = CartService.calculateTotal(items);
 
       setState(() {
         _cartItems = items;
@@ -79,7 +76,7 @@ class _CartScreenState extends State<CartScreen> {
     if (!canAdd) return;
 
     try {
-      await CartService.updateCartItemQuantity(cartItemId, newQuantity);
+      await CartService.updateQuantity(cartItemId, newQuantity);
       _loadCart();
     } catch (e) {
       if (mounted) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/data/dummy_data.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/data/models.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/alibaba_search_bar.dart';
@@ -9,6 +9,9 @@ import '../../../../shared/widgets/category_browser_view.dart';
 import '../../../../shared/widgets/mbuy_logo.dart';
 import 'categories_screen.dart';
 import 'all_products_screen.dart';
+import '../../data/services/home_service.dart';
+import '../../data/models/product_model.dart';
+import '../../data/models/category_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,11 +23,29 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isLoading = true;
+  List<ProductModel> _featuredProducts = [];
+  List<ProductModel> _newArrivals = [];
+  List<ProductModel> _bestSellers = [];
+  List<CategoryModel> _categories = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    final data = await HomeService.getHomeData();
+    setState(() {
+      _featuredProducts = data['featuredProducts'] as List<ProductModel>;
+      _newArrivals = data['newArrivals'] as List<ProductModel>;
+      _bestSellers = data['bestSellers'] as List<ProductModel>;
+      _categories = data['categories'] as List<CategoryModel>;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -49,9 +70,7 @@ class _HomeScreenState extends State<HomeScreen>
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Center(
-              child: MbuyLogo(size: 60, showBackground: false),
-            ),
+            child: Center(child: MbuyLogo(size: 60, showBackground: false)),
           ),
           // Search Bar (Fixed below AppBar)
           Container(
@@ -77,10 +96,12 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildProductsTab() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return RefreshIndicator(
-      onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1));
-      },
+      onRefresh: _loadData,
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 20),
         child: Column(
@@ -143,16 +164,16 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   SizedBox(
                     height: 240,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final products = DummyData.products.reversed.toList();
-                        if (index >= products.length) return const SizedBox();
-                        return ProductCardCompact(product: products[index]);
-                      },
-                    ),
+                    child: _bestSellers.isEmpty
+                        ? const Center(child: Text('لا توجد منتجات متاحة'))
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: _bestSellers.length,
+                            itemBuilder: (context, index) {
+                              return _buildProductCard(_bestSellers[index]);
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -180,14 +201,14 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   SizedBox(
                     height: 240,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final products = DummyData.products;
-                        if (index >= products.length) return const SizedBox();
-                        return ProductCardCompact(product: products[index]);
+                    child: _newArrivals.isEmpty
+                        ? const Center(child: Text('لا توجد منتجات متاحة'))
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: _newArrivals.length,
+                            itemBuilder: (context, index) {
+                              return _buildProductCard(_newArrivals[index]);
                       },
                     ),
                   ),
@@ -213,12 +234,9 @@ class _HomeScreenState extends State<HomeScreen>
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
-              itemCount: DummyData.products.length,
+              itemCount: _featuredProducts.length,
               itemBuilder: (context, index) {
-                return ProductCardCompact(
-                  product: DummyData.products[index],
-                  width: double.infinity, // Fill grid cell
-                );
+                return _buildProductCard(_featuredProducts[index]);
               },
             ),
           ],
@@ -227,15 +245,32 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildProductCard(ProductModel product) {
+    final dummyProduct = Product(
+      id: product.id,
+      name: product.name,
+      price: product.finalPrice,
+      imageUrl: product.imageUrl ?? 'https://via.placeholder.com/150',
+      rating: product.rating ?? 0.0,
+      discount: product.discountPercentage?.toDouble(),
+      originalPrice: product.discountPrice != null ? product.price : null,
+      description: product.description ?? '',
+    );
+    
+    return ProductCardCompact(product: dummyProduct);
+  }
+
   Widget _buildCategoriesTab() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return CategoryBrowserView(
-      mainCategories: _getMainProductCategories(),
+      mainCategories: _categories.isEmpty ? _getMainProductCategories() : _getMainProductCategories(),
       onViewAllCategories: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const CategoriesScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const CategoriesScreen()),
         );
       },
     );
