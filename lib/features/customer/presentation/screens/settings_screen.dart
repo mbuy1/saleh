@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../core/services/preferences_service.dart';
 import 'change_password_screen.dart';
 import 'privacy_security_screen.dart';
 import 'terms_screen.dart';
@@ -18,8 +19,39 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true; // TODO: جلب القيمة من التخزين
-  String _selectedLanguage = 'ar'; // TODO: جلب القيمة من التخزين
+  bool _notificationsEnabled = true;
+  String _selectedLanguage = 'ar';
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  /// تحميل الإعدادات المحفوظة
+  Future<void> _loadSettings() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final savedLanguage = PreferencesService.getLanguage();
+      if (savedLanguage != null) {
+        _selectedLanguage = savedLanguage;
+      }
+
+      _notificationsEnabled = PreferencesService.getNotificationsEnabled();
+    } catch (e) {
+      debugPrint('⚠️ خطأ في تحميل الإعدادات: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +72,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
           // قسم المظهر
           _buildSectionTitle('المظهر'),
           _buildThemeCard(isDark),
@@ -175,22 +209,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         child: RadioGroup<String>(
           groupValue: _selectedLanguage,
-          onChanged: (value) {
+          onChanged: (value) async {
             if (value != null) {
               setState(() {
                 _selectedLanguage = value;
               });
-              // TODO: تطبيق تغيير اللغة
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    value == 'ar'
-                        ? 'سيتم تطبيق اللغة قريباً'
-                        : 'Language will be applied soon',
-                  ),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              
+              // حفظ اللغة
+              try {
+                await PreferencesService.saveLanguage(value);
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        value == 'ar'
+                            ? 'تم حفظ اللغة. سيتم تطبيقها بعد إعادة تشغيل التطبيق'
+                            : 'Language saved. Will be applied after app restart',
+                      ),
+                      duration: const Duration(seconds: 3),
+                      backgroundColor: MbuyColors.success,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('خطأ في حفظ اللغة: $e'),
+                      backgroundColor: MbuyColors.error,
+                    ),
+                  );
+                }
+              }
             }
           },
           child: Column(
@@ -224,11 +275,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('تلقي إشعارات حول الطلبات والعروض'),
             secondary: const Icon(Icons.notifications),
             value: _notificationsEnabled,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() {
                 _notificationsEnabled = value;
               });
-              // TODO: حفظ الإعداد وتطبيقه
+              
+              // حفظ الإعداد
+              try {
+                await PreferencesService.saveNotificationsEnabled(value);
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        value
+                            ? 'تم تفعيل الإشعارات'
+                            : 'تم إيقاف الإشعارات',
+                      ),
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: MbuyColors.success,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('خطأ في حفظ الإعداد: $e'),
+                      backgroundColor: MbuyColors.error,
+                    ),
+                  );
+                }
+              }
             },
             activeTrackColor: MbuyColors.primaryPurple.withValues(alpha: 0.5),
             thumbColor: WidgetStateProperty.resolveWith((states) {

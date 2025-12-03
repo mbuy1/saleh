@@ -4,8 +4,8 @@ import '../../../../shared/widgets/animated_smiley_cart_icon.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import 'explore_screen.dart';
-import 'stores_screen.dart';
-import 'home_screen.dart';
+import 'stores_screen_shein.dart';
+import 'home_screen_shein.dart';
 import 'cart_screen.dart';
 import 'map_screen.dart';
 import 'settings_screen.dart';
@@ -36,8 +36,8 @@ class _CustomerShellState extends State<CustomerShell> {
 
   List<Widget> get _screens => [
     ExploreScreen(userRole: widget.userRole),
-    const StoresScreen(),
-    const HomeScreen(),
+    StoresScreenShein(userRole: widget.userRole),
+    HomeScreenShein(userRole: widget.userRole),
     CartScreen(userRole: widget.userRole),
     const MapScreen(),
   ];

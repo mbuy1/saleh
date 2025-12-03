@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
 import 'core/services/gemini_service.dart';
+import 'core/services/preferences_service.dart';
 import 'core/firebase_service.dart';
 import 'features/customer/presentation/screens/customer_support_chat_screen.dart';
 import 'features/merchant/presentation/screens/merchant_ai_assistant_screen.dart';
@@ -71,10 +72,19 @@ Future<void> main() async {
   // تحميل متغيرات البيئة من ملف .env
   await dotenv.load(fileName: ".env");
 
+  // تهيئة PreferencesService
+  try {
+    await PreferencesService.initialize();
+    debugPrint('✅ تم تهيئة PreferencesService بنجاح');
+  } catch (e) {
+    debugPrint('⚠️ خطأ في تهيئة PreferencesService: $e');
+  }
+
   // تهيئة Firebase
   try {
     await Firebase.initializeApp();
     FirebaseService.initAnalytics();
+    await FirebaseService.initLocalNotifications();
     await FirebaseService.setupFCM();
     debugPrint('✅ تم تهيئة Firebase بنجاح');
   } catch (e) {

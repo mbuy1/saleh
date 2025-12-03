@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/preferences_service.dart';
 
 /// مزود الثيم - يدير حالة الثيم في التطبيق
 class ThemeProvider extends ChangeNotifier {
@@ -28,17 +29,37 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   /// حفظ تفضيل الثيم
-  /// TODO: دمج مع SharedPreferences عند إضافته للمشروع
-  void _saveThemeMode(ThemeMode mode) {
-    // سيتم حفظه في SharedPreferences
-    debugPrint('💾 Theme saved: $mode');
+  Future<void> _saveThemeMode(ThemeMode mode) async {
+    try {
+      final modeString = mode.toString().split('.').last; // 'light', 'dark', 'system'
+      await PreferencesService.saveThemeMode(modeString);
+      debugPrint('💾 Theme saved: $modeString');
+    } catch (e) {
+      debugPrint('⚠️ خطأ في حفظ الثيم: $e');
+    }
   }
 
   /// تحميل تفضيل الثيم المحفوظ
-  /// TODO: جلب من SharedPreferences عند إضافته للمشروع
   Future<void> loadThemeMode() async {
-    // سيتم جلبه من SharedPreferences
-    // _themeMode = savedMode;
-    // notifyListeners();
+    try {
+      final savedMode = PreferencesService.getThemeMode();
+      if (savedMode != null) {
+        switch (savedMode) {
+          case 'light':
+            _themeMode = ThemeMode.light;
+            break;
+          case 'dark':
+            _themeMode = ThemeMode.dark;
+            break;
+          case 'system':
+            _themeMode = ThemeMode.system;
+            break;
+        }
+        notifyListeners();
+        debugPrint('✅ تم تحميل الثيم: $savedMode');
+      }
+    } catch (e) {
+      debugPrint('⚠️ خطأ في تحميل الثيم: $e');
+    }
   }
 }

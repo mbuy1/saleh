@@ -1,17 +1,51 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'supabase_client.dart';
+import 'services/preferences_service.dart';
 
 /// خدمة Firebase المركزية
 /// تدير Analytics و FCM (Push Notifications)
 class FirebaseService {
   static FirebaseAnalytics? _analytics;
   static FirebaseMessaging? _messaging;
+  static FlutterLocalNotificationsPlugin? _localNotifications;
 
   /// تهيئة Firebase Analytics
   static void initAnalytics() {
     _analytics = FirebaseAnalytics.instance;
     debugPrint('✅ تم تهيئة Firebase Analytics');
+  }
+
+  /// تهيئة Local Notifications
+  static Future<void> initLocalNotifications() async {
+    _localNotifications = FlutterLocalNotificationsPlugin();
+
+    // إعداد Android
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    
+    // إعداد iOS
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _localNotifications!.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (details) {
+        debugPrint('🔔 تم النقر على إشعار: ${details.payload}');
+        // TODO: التوجيه إلى الشاشة المناسبة بناءً على payload
+      },
+    );
+
+    debugPrint('✅ تم تهيئة Local Notifications');
   }
 
   /// إعداد FCM (Firebase Cloud Messaging)
@@ -33,19 +67,25 @@ class FirebaseService {
       String? token = await _messaging!.getToken();
       if (token != null) {
         debugPrint('📱 FCM Token: $token');
-        // TODO: حفظ Token في قاعدة البيانات لإرسال إشعارات مستقبلية
+        await _saveFCMToken(token);
       }
 
+      // الاستماع لتحديثات Token
+      _messaging!.onTokenRefresh.listen((newToken) async {
+        debugPrint('🔄 FCM Token تم تحديثه: $newToken');
+        await _saveFCMToken(newToken);
+      });
+
       // الاستماع للرسائل عندما يكون التطبيق في المقدمة
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
         debugPrint('📬 تم استلام رسالة: ${message.notification?.title}');
-        // TODO: عرض إشعار محلي
+        await _showLocalNotification(message);
       });
 
       // معالجة النقر على الإشعار عندما يكون التطبيق في الخلفية
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint('🔔 تم فتح التطبيق من إشعار: ${message.data}');
-        // TODO: التوجيه إلى الشاشة المناسبة
+        _handleNotificationTap(message);
       });
     } else {
       debugPrint('⚠️ لم يتم منح أذونات الإشعارات');
@@ -152,5 +192,100 @@ class FirebaseService {
   ) async {
     await _analytics?.logEvent(name: eventName, parameters: parameters);
     debugPrint('📊 Analytics: حدث مخصص $eventName');
+  }
+
+  // ==================== FCM Token Management ====================
+
+  /// حفظ FCM Token في قاعدة البيانات والتخزين المحلي
+  static Future<void> _saveFCMToken(String token) async {
+    try {
+      // حفظ في SharedPreferences
+      await PreferencesService.saveFCMToken(token);
+
+      // حفظ في Supabase (إذا كان المستخدم مسجل دخول)
+      final user = supabaseClient.auth.currentUser;
+      if (user != null) {
+        try {
+          // التحقق إذا كان Token موجود
+          final existing = await supabaseClient
+              .from('user_fcm_tokens')
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('token', token)
+              .maybeSingle();
+
+          if (existing == null) {
+            // إضافة Token جديد
+            await supabaseClient.from('user_fcm_tokens').insert({
+              'user_id': user.id,
+              'token': token,
+              'device_type': 'mobile', // يمكن تحديده بشكل أدق
+              'created_at': DateTime.now().toIso8601String(),
+            });
+            debugPrint('✅ تم حفظ FCM Token في قاعدة البيانات');
+          }
+        } catch (e) {
+          debugPrint('⚠️ خطأ في حفظ FCM Token في Supabase: $e');
+          // لا نوقف التطبيق إذا فشل حفظ Token
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ خطأ في حفظ FCM Token: $e');
+    }
+  }
+
+  // ==================== Local Notifications ====================
+
+  /// عرض إشعار محلي
+  static Future<void> _showLocalNotification(RemoteMessage message) async {
+    if (_localNotifications == null) {
+      await initLocalNotifications();
+    }
+
+    final notification = message.notification;
+    if (notification == null) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'mbuy_channel',
+      'Mbuy Notifications',
+      channelDescription: 'إشعارات من تطبيق Mbuy',
+      importance: Importance.high,
+      priority: Priority.high,
+      showWhen: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _localNotifications!.show(
+      notification.hashCode,
+      notification.title ?? 'Mbuy',
+      notification.body ?? '',
+      details,
+      payload: message.data.toString(),
+    );
+  }
+
+  /// معالجة النقر على الإشعار
+  static void _handleNotificationTap(RemoteMessage message) {
+    final data = message.data;
+    
+    // التوجيه بناءً على نوع الإشعار
+    if (data.containsKey('type')) {
+      final type = data['type'] as String;
+      debugPrint('🔔 نوع الإشعار: $type');
+      
+      // يمكن إضافة منطق التوجيه هنا
+      // مثال: إذا كان type == 'order' → التوجيه إلى شاشة الطلبات
+      // يمكن استخدام Navigator أو AppRouter هنا
+    }
   }
 }

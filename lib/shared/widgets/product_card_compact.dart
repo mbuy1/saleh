@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/data/models.dart';
+import '../../features/customer/presentation/screens/product_details_screen.dart';
 
 /// بطاقة منتج مدمجة للاستخدام في القوائم الأفقية
 class ProductCardCompact extends StatelessWidget {
@@ -23,8 +24,17 @@ class ProductCardCompact extends StatelessWidget {
     final hasImage = product.imageUrl != null;
     final cardWidth = width == double.infinity ? null : width;
 
-    return GestureDetector(
-      onTap: onTap,
+    return InkWell(
+      onTap: onTap ?? () {
+        // Navigate to product details if no custom onTap
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(productId: product.id),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         width: cardWidth,
         margin: const EdgeInsets.only(left: 12),

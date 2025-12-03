@@ -28,6 +28,9 @@ class AuthService {
       final response = await supabaseClient.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'display_name': displayName,
+        },
       );
 
       if (response.user == null) {
@@ -37,6 +40,26 @@ class AuthService {
 
       final user = response.user!;
       debugPrint('✅ تم إنشاء حساب المستخدم: ${user.email}');
+      
+      // التحقق من وجود Session بعد التسجيل
+      if (response.session == null) {
+        debugPrint('⚠️ لا توجد جلسة بعد التسجيل - قد يتطلب تأكيد البريد الإلكتروني');
+        // إذا لم تكن هناك جلسة، جرب تسجيل الدخول مباشرة
+        try {
+          final signInResponse = await supabaseClient.auth.signInWithPassword(
+            email: email,
+            password: password,
+          );
+          if (signInResponse.session != null) {
+            debugPrint('✅ تم تسجيل الدخول تلقائياً بعد التسجيل');
+          }
+        } catch (e) {
+          debugPrint('⚠️ فشل تسجيل الدخول التلقائي: $e');
+          // لا نرمي خطأ هنا - المستخدم يمكنه تسجيل الدخول لاحقاً
+        }
+      } else {
+        debugPrint('✅ تم إنشاء جلسة تلقائياً بعد التسجيل');
+      }
 
       // 2. إنشاء row في user_profiles
       try {
@@ -86,33 +109,68 @@ class AuthService {
   }) async {
     try {
       debugPrint('🔐 محاولة تسجيل الدخول: $email');
+      debugPrint('🔐 كلمة المرور: ${password.length} أحرف');
 
       final response = await supabaseClient.auth.signInWithPassword(
-        email: email,
+        email: email.trim().toLowerCase(),
         password: password,
       );
 
+      debugPrint('📊 Response: user=${response.user?.id}, session=${response.session != null}');
+      debugPrint('📊 User email: ${response.user?.email}');
+      debugPrint('📊 User confirmed: ${response.user?.emailConfirmedAt != null}');
+
       if (response.session == null) {
         debugPrint('❌ فشل تسجيل الدخول: لا توجد جلسة');
-        throw Exception('فشل تسجيل الدخول - لا توجد جلسة');
+        debugPrint('❌ User ID: ${response.user?.id}');
+        debugPrint('❌ Email confirmed: ${response.user?.emailConfirmedAt}');
+        
+        // إذا كان المستخدم موجود لكن بدون Session، قد يكون Email غير مؤكد
+        if (response.user != null && response.user!.emailConfirmedAt == null) {
+          throw Exception('يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.');
+        }
+        
+        throw Exception('فشل تسجيل الدخول - لا توجد جلسة. يرجى المحاولة مرة أخرى.');
       }
 
       debugPrint('✅ تم تسجيل الدخول بنجاح: ${response.user?.email}');
       debugPrint(
         '📱 Session ID: ${response.session!.accessToken.substring(0, 20)}...',
       );
+      debugPrint('📱 Session expires at: ${response.session!.expiresAt}');
 
       return response.session!;
     } on AuthException catch (e) {
       debugPrint('❌ خطأ في المصادقة: ${e.message}');
-      if (e.message.contains('Invalid login credentials')) {
+      debugPrint('❌ Error code: ${e.statusCode}');
+      
+      // معالجة أنواع الأخطاء المختلفة
+      final errorMessage = e.message.toLowerCase();
+      
+      if (errorMessage.contains('invalid login credentials') || 
+          errorMessage.contains('invalid credentials') ||
+          errorMessage.contains('wrong password')) {
         throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-      } else if (e.message.contains('Email not confirmed')) {
-        throw Exception('يرجى تأكيد البريد الإلكتروني أولاً');
+      } else if (errorMessage.contains('email not confirmed') ||
+                 errorMessage.contains('email not verified') ||
+                 errorMessage.contains('confirmation')) {
+        throw Exception('يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.');
+      } else if (errorMessage.contains('too many requests') ||
+                 errorMessage.contains('rate limit')) {
+        throw Exception('تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.');
+      } else if (errorMessage.contains('user not found')) {
+        throw Exception('البريد الإلكتروني غير مسجل. يرجى إنشاء حساب جديد.');
+      } else {
+        throw Exception('خطأ في تسجيل الدخول: ${e.message}');
       }
-      throw Exception('خطأ في تسجيل الدخول: ${e.message}');
     } catch (e) {
       debugPrint('❌ خطأ غير متوقع: $e');
+      debugPrint('❌ Error type: ${e.runtimeType}');
+      
+      // إرجاع رسالة واضحة
+      if (e.toString().contains('Exception')) {
+        rethrow; // إذا كان Exception مخصص، أرجعه كما هو
+      }
       throw Exception('خطأ في تسجيل الدخول: ${e.toString()}');
     }
   }

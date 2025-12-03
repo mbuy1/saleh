@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/auth_service.dart';
+import '../../../../core/supabase_client.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -45,32 +46,66 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (mounted) {
           debugPrint('✅ تم تسجيل المستخدم: ${user.email}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم التسجيل بنجاح! جاري تحميل التطبيق...'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          // الانتظار قليلاً ثم إعادة بناء
-          await Future.delayed(const Duration(milliseconds: 500));
+          
+          // التحقق من وجود جلسة بعد التسجيل
+          final session = supabaseClient.auth.currentSession;
+          if (session != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم التسجيل بنجاح! جاري تحميل التطبيق...'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            // الانتظار قليلاً ثم إعادة بناء
+            await Future.delayed(const Duration(milliseconds: 500));
+          } else {
+            // إذا لم تكن هناك جلسة، قد يتطلب تأكيد البريد
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم إنشاء الحساب! يرجى تسجيل الدخول الآن'),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+              ),
+            );
+            // التبديل إلى وضع تسجيل الدخول
+            setState(() {
+              _isSignUp = false;
+            });
+          }
         }
       } else {
         // تسجيل دخول
+        final email = _emailController.text.trim().toLowerCase();
+        final password = _passwordController.text;
+        
+        debugPrint('🔐 محاولة تسجيل الدخول: $email');
+        
         final session = await AuthService.signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
+          email: email,
+          password: password,
         );
 
         if (mounted) {
           debugPrint('✅ تم تسجيل الدخول: ${session.user.email}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم تسجيل الدخول بنجاح! جاري تحميل التطبيق...'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          // الانتظار قليلاً ثم إعادة بناء
-          await Future.delayed(const Duration(milliseconds: 500));
+          debugPrint('✅ Session expires: ${session.expiresAt}');
+          
+          // التحقق من أن Session محفوظة
+          final currentSession = supabaseClient.auth.currentSession;
+          if (currentSession != null) {
+            debugPrint('✅ Session محفوظة بنجاح');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم تسجيل الدخول بنجاح! جاري تحميل التطبيق...'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+            // الانتظار قليلاً ثم إعادة بناء
+            await Future.delayed(const Duration(milliseconds: 1000));
+          } else {
+            debugPrint('⚠️ Session غير محفوظة - إعادة المحاولة...');
+            throw Exception('فشل حفظ الجلسة. يرجى المحاولة مرة أخرى.');
+          }
         }
       }
     } catch (e) {

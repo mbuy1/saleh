@@ -3,15 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../core/data/models.dart';
+import '../../../../core/data/repositories/explore_repository.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../data/explore_service.dart';
 import 'product_details_screen.dart';
 import 'store_details_screen.dart';
 import 'profile_screen.dart';
-
-// TODO: Connect to Supabase for video/product data
-// TODO: Integrate video player (Cloudflare Stream)
-// TODO: Implement PageRank sorting algorithm
-// TODO: Track video views/engagement/conversion
 
 /// شاشة الاستكشاف - تصميم نظيف بسيط
 /// Tabs: لك / فيديو / صور
@@ -29,6 +26,13 @@ class _ExploreScreenState extends State<ExploreScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedFilterIndex = 0;
+  bool _isLoadingVideos = false;
+  bool _isLoadingProducts = false;
+  List<VideoItem> _videos = [];
+  List<Product> _products = [];
+  int _currentVideoPage = 0;
+  int _currentProductPage = 0;
+  final ExploreRepository _repository = ExploreRepository();
 
   final List<String> _filters = [
     'جديد',
@@ -38,10 +42,92 @@ class _ExploreScreenState extends State<ExploreScreen>
     'المتاجر الأعلى تقييمًا',
   ];
 
+  final Map<String, String> _filterMap = {
+    'جديد': 'new',
+    'الأكثر مشاهدة': 'trending',
+    'الأكثر مبيعًا': 'top_selling',
+    'حسب موقع': 'by_location',
+    'المتاجر الأعلى تقييمًا': 'top_rated',
+  };
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
+    _loadVideos();
+    _loadProducts();
+  }
+
+  /// تحميل الفيديوهات من Supabase
+  Future<void> _loadVideos({bool refresh = false}) async {
+    if (_isLoadingVideos) return;
+
+    setState(() {
+      _isLoadingVideos = true;
+      if (refresh) {
+        _currentVideoPage = 0;
+        _videos = [];
+      }
+    });
+
+    try {
+      final filter = _filterMap[_filters[_selectedFilterIndex]] ?? 'new';
+      final videos = await _repository.getExploreFeed(
+        filter: filter,
+        page: _currentVideoPage,
+        pageSize: 10,
+      );
+
+      if (mounted) {
+        setState(() {
+          _videos.addAll(videos);
+          _currentVideoPage++;
+          _isLoadingVideos = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingVideos = false;
+        });
+      }
+    }
+  }
+
+  /// تحميل المنتجات من Supabase
+  Future<void> _loadProducts({bool refresh = false}) async {
+    if (_isLoadingProducts) return;
+
+    setState(() {
+      _isLoadingProducts = true;
+      if (refresh) {
+        _currentProductPage = 0;
+        _products = [];
+      }
+    });
+
+    try {
+      final filter = _filterMap[_filters[_selectedFilterIndex]] ?? 'new';
+      final products = await ExploreService.getExploreProducts(
+        filter: filter,
+        page: _currentProductPage,
+        pageSize: 30,
+      );
+
+      if (mounted) {
+        setState(() {
+          _products.addAll(products);
+          _currentProductPage++;
+          _isLoadingProducts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingProducts = false;
+        });
+      }
+    }
   }
 
   @override
@@ -200,7 +286,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// TikTok-style horizontal video cards section
   Widget _buildVideoSection() {
-    final videos = DummyData.exploreVideos;
+    final videos = _videos.isEmpty ? DummyData.exploreVideos : _videos;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,7 +324,11 @@ class _ExploreScreenState extends State<ExploreScreen>
   /// Single video card (16:9 or 4:5 aspect ratio) - بطاقة كبيرة 70% من الشاشة
   Widget _buildVideoCard(VideoItem video) {
     return GestureDetector(
-      onTap: () => _openTikTokPlayer(video),
+      onTap: () {
+        // تتبع المشاهدة
+        ExploreService.trackVideoView(video.id);
+        _openTikTokPlayer(video);
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -333,7 +423,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Marketplace image grid with filters
   Widget _buildImageSection() {
-    final products = DummyData.products;
+    final products = _products.isEmpty ? DummyData.products : _products;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,8 +480,10 @@ class _ExploreScreenState extends State<ExploreScreen>
             onTap: () {
               setState(() {
                 _selectedFilterIndex = index;
-                // TODO: Apply PageRank sorting based on filter
               });
+              // إعادة تحميل البيانات مع الفلتر الجديد
+              _loadVideos(refresh: true);
+              _loadProducts(refresh: true);
             },
             child: Container(
               margin: const EdgeInsets.only(left: 8),
@@ -476,9 +568,9 @@ class _ExploreScreenState extends State<ExploreScreen>
             ),
           ),
           const SizedBox(height: 2),
-          // Store Name (TODO: lookup store by storeId)
+          // Store Name
           Text(
-            'متجر رائع',
+            product.storeName ?? 'متجر',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.cairo(

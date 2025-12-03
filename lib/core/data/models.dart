@@ -30,6 +30,7 @@ class Product {
   final int reviewCount;
   final bool isFeatured;
   final int stockCount;
+  final String? storeName;
 
   const Product({
     required this.id,
@@ -43,6 +44,7 @@ class Product {
     this.reviewCount = 0,
     this.isFeatured = false,
     this.stockCount = 0,
+    this.storeName,
   });
 
   Map<String, dynamic> toJson() => {
@@ -101,6 +103,9 @@ class VideoItem {
   final String caption;
   final String? productId;
   final double? productPrice;
+  final String? videoUrl;
+  final String? thumbnailUrl;
+  final int views;
 
   const VideoItem({
     required this.id,
@@ -115,5 +120,8 @@ class VideoItem {
     required this.caption,
     this.productId,
     this.productPrice,
+    this.videoUrl,
+    this.thumbnailUrl,
+    this.views = 0,
   });
 }

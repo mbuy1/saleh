@@ -66,6 +66,15 @@ dependencies:
   # Charts
   fl_chart: ^0.69.0
   google_generative_ai: ^0.4.7
+  
+  # Local storage
+  shared_preferences: ^2.2.2
+  
+  # Local notifications
+  flutter_local_notifications: ^17.0.0
+  
+  # Carousel slider for banners
+  carousel_slider: ^5.1.1
 
 dev_dependencies:
   flutter_test:

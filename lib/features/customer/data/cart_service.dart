@@ -22,8 +22,7 @@ class CartService {
     final existingCart = await supabaseClient
         .from('carts')
         .select('id')
-        .eq('owner_id', user.id)
-        .eq('status', 'active')
+        .eq('user_id', user.id)
         .maybeSingle();
 
     if (existingCart != null) {
@@ -34,8 +33,7 @@ class CartService {
     final newCart = await supabaseClient
         .from('carts')
         .insert({
-          'owner_id': user.id,
-          'status': 'active',
+          'user_id': user.id,
         })
         .select('id')
         .single();
@@ -134,8 +132,7 @@ class CartService {
     final cart = await supabaseClient
         .from('carts')
         .select('id')
-        .eq('owner_id', user.id)
-        .eq('status', 'active')
+        .eq('user_id', user.id)
         .maybeSingle();
 
     if (cart == null) {

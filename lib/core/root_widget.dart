@@ -72,6 +72,24 @@ class _RootWidgetState extends State<RootWidget> {
     debugPrint(
       '🔍 فحص حالة المصادقة: user=${user?.email}, session=${session != null}',
     );
+    debugPrint('🔍 Session expires at: ${session?.expiresAt}');
+    debugPrint('🔍 User ID: ${user?.id}');
+    debugPrint('🔍 Email confirmed: ${user?.emailConfirmedAt != null}');
+    
+    // التحقق من انتهاء الجلسة
+    if (session != null && session.expiresAt != null) {
+      final expiresAt = DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000);
+      final now = DateTime.now();
+      if (expiresAt.isBefore(now)) {
+        debugPrint('⚠️ الجلسة منتهية - محاولة تحديث...');
+        try {
+          await supabaseClient.auth.refreshSession();
+          debugPrint('✅ تم تحديث الجلسة بنجاح');
+        } catch (e) {
+          debugPrint('❌ فشل تحديث الجلسة: $e');
+        }
+      }
+    }
 
     if (user != null) {
       // جلب role من user_profiles
@@ -84,14 +102,20 @@ class _RootWidgetState extends State<RootWidget> {
 
         if (response != null) {
           final role = response['role'] as String? ?? 'customer';
+          
+          debugPrint('✅ تم جلب role: $role');
+          debugPrint('✅ User ID: ${user.id}');
+          debugPrint('✅ Display Name: ${response['display_name']}');
 
           setState(() {
             _user = user;
             _userRole = role;
             // تحديد AppMode بناءً على role
             if (role == 'merchant') {
+              debugPrint('🛒 تم تفعيل وضع التاجر');
               _appModeProvider.setMerchantMode();
             } else {
+              debugPrint('🛍️ تم تفعيل وضع العميل');
               _appModeProvider.setCustomerMode();
             }
           });

@@ -35,8 +35,7 @@ class OrderService {
     final cart = await supabaseClient
         .from('carts')
         .select('id')
-        .eq('owner_id', user.id)
-        .eq('status', 'active')
+        .eq('user_id', user.id)
         .single();
 
     final cartId = cart['id'] as String;
@@ -70,11 +69,12 @@ class OrderService {
       }
     }
 
-    // تحديث حالة السلة إلى 'converted_to_order'
+    // حذف عناصر السلة بعد تحويلها إلى طلب
+    // (لا نحتاج تحديث status لأن جدول carts لا يحتوي على status)
     await supabaseClient
-        .from('carts')
-        .update({'status': 'converted_to_order'})
-        .eq('id', cartId);
+        .from('cart_items')
+        .delete()
+        .eq('cart_id', cartId);
 
     return orderId;
   }
