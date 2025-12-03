@@ -12,6 +12,9 @@ import 'cart_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
 import '../../data/cart_service.dart';
+import '../../../../core/supabase_client.dart';
+import '../../../../shared/widgets/product_card_compact.dart';
+import '../../../../core/data/models.dart';
 
 /// الصفحة الرئيسية بتصميم SHEIN
 class HomeScreenShein extends StatefulWidget {
@@ -26,6 +29,8 @@ class HomeScreenShein extends StatefulWidget {
 class _HomeScreenSheinState extends State<HomeScreenShein> {
   int _selectedCategoryIndex = 1; // "نساء" هو الافتراضي
   int _cartItemCount = 0;
+  List<Product> _featuredProducts = [];
+  bool _isLoadingProducts = false;
 
   final List<String> _categories = [
     'كل',
@@ -40,6 +45,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   void initState() {
     super.initState();
     _loadCartCount();
+    _loadFeaturedProducts();
   }
 
   Future<void> _loadCartCount() async {
@@ -52,6 +58,49 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
       }
     } catch (e) {
       // تجاهل الخطأ
+    }
+  }
+
+  Future<void> _loadFeaturedProducts() async {
+    setState(() {
+      _isLoadingProducts = true;
+    });
+
+    try {
+      final response = await supabaseClient
+          .from('products')
+          .select()
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(10);
+
+      final products = (response as List).map((data) {
+        return Product(
+          id: data['id']?.toString() ?? '',
+          name: data['name']?.toString() ?? 'منتج',
+          description: data['description']?.toString() ?? '',
+          price: (data['price'] as num?)?.toDouble() ?? 0.0,
+          categoryId: data['category_id']?.toString() ?? '',
+          storeId: data['store_id']?.toString() ?? '',
+          rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
+          reviewCount: (data['review_count'] as num?)?.toInt() ?? 0,
+          stockCount: (data['stock'] as num?)?.toInt() ?? 0,
+          imageUrl: data['image_url']?.toString(),
+        );
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          _featuredProducts = products;
+          _isLoadingProducts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingProducts = false;
+        });
+      }
     }
   }
 
@@ -123,6 +172,8 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                 setState(() {
                   _selectedCategoryIndex = index;
                 });
+                // إعادة تحميل المنتجات عند تغيير الفئة
+                _loadFeaturedProducts();
               },
               onMenuTap: () {
                 Scaffold.of(context).openDrawer();
@@ -141,7 +192,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                       width: 400,
                       height: 280,
                       text: 'ألوان الشتاء الرائجة',
-                    ) ?? 'https://via.placeholder.com/400x280/FF6B9D/FFFFFF?text=ألوان+الشتاء+الرائجة',
+                    ),
                     'title': 'ألوان الشتاء الرائجة',
                     'buttonText': 'تسوقي الآن',
                   },
@@ -150,7 +201,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                       width: 400,
                       height: 280,
                       text: 'عروض خاصة',
-                    ) ?? 'https://via.placeholder.com/400x280/4ECDC4/FFFFFF?text=عروض+خاصة',
+                    ),
                     'title': 'عروض خاصة',
                     'buttonText': 'تسوقي الآن',
                   },
@@ -166,6 +217,9 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
               // 4. بانرات ترويجية إضافية
               _buildPromotionalBanners(),
 
+              // 5. منتجات مميزة
+              _buildFeaturedProductsSection(),
+
               const SizedBox(height: 80), // مساحة للشريط السفلي
             ]),
           ),
@@ -178,47 +232,27 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   Widget _buildLooksSection() {
     final looks = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'إطلالات يومية',
-        ) ?? 'https://via.placeholder.com/140x200/8B4513/FFFFFF?text=إطلالات+يومية',
+        'image': _getLookImage('looks/daily', 'إطلالات يومية', 140, 200),
         'name': 'إطلالات يومية',
         'id': '1'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'محتشمة',
-        ) ?? 'https://via.placeholder.com/140x200/556B2F/FFFFFF?text=محتشمة',
+        'image': _getLookImage('looks/modest', 'محتشمة', 140, 200),
         'name': 'محتشمة',
         'id': '2'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'عمل',
-        ) ?? 'https://via.placeholder.com/140x200/800020/FFFFFF?text=عمل',
+        'image': _getLookImage('looks/work', 'عمل', 140, 200),
         'name': 'عمل',
         'id': '3'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'حفلات',
-        ) ?? 'https://via.placeholder.com/140x200/CD7F32/FFFFFF?text=حفلات',
+        'image': _getLookImage('looks/party', 'حفلات', 140, 200),
         'name': 'حفلات',
         'id': '4'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'موعد في',
-        ) ?? 'https://via.placeholder.com/140x200/8B4513/FFFFFF?text=موعد+في',
+        'image': _getLookImage('looks/date', 'موعد في', 140, 200),
         'name': 'موعد في',
         'id': '5'
       },
@@ -272,94 +306,80 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   }
 
   Widget _buildCategoryIconsGrid() {
+    // استخدام صور Cloudflare إذا كانت متاحة، وإلا placeholder
     final categories = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'ملابس علوية') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=ملابس+علوية',
+        'image': _getCategoryImage('1', 'ملابس علوية'),
         'name': 'ملابس علوية',
         'id': '1'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'ملابس سفلية') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=ملابس+سفلية',
+        'image': _getCategoryImage('2', 'ملابس سفلية'),
         'name': 'ملابس سفلية',
         'id': '2'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'فساتين') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=فساتين',
+        'image': _getCategoryImage('3', 'فساتين'),
         'name': 'فساتين',
         'id': '3'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'بلایز') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=بلایز',
+        'image': _getCategoryImage('4', 'بلایز'),
         'name': 'بلایز',
         'id': '4'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'بدلات') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=بدلات',
+        'image': _getCategoryImage('5', 'بدلات'),
         'name': 'بدلات',
         'id': '5'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'تيشيرتات') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=تيشيرتات',
+        'image': _getCategoryImage('6', 'تيشيرتات'),
         'name': 'تيشيرتات',
         'id': '6'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'أطقم منسقة') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=أطقم+منسقة',
+        'image': _getCategoryImage('7', 'أطقم منسقة'),
         'name': 'أطقم منسقة',
         'id': '7'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'بناطيل') 
-            ?? 'https://via.placeholder.com/100/FFFFFF/000000?text=بناطيل',
+        'image': _getCategoryImage('8', 'بناطيل'),
         'name': 'بناطيل',
         'id': '8'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'الدنيم') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=الدنيم',
+        'image': _getCategoryImage('9', 'الدنيم'),
         'name': 'الدنيم',
         'id': '9'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'جمبسوت') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=جمبسوت',
+        'image': _getCategoryImage('10', 'جمبسوت'),
         'name': 'جمبسوت وبوديسون',
         'id': '10'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'جينز') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=جينز',
+        'image': _getCategoryImage('11', 'جينز'),
         'name': 'جينز',
         'id': '11'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'منسوجة') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=منسوجة',
+        'image': _getCategoryImage('12', 'منسوجة'),
         'name': 'ملابس منسوجة',
         'id': '12'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'تنانير') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=تنانير',
+        'image': _getCategoryImage('13', 'تنانير'),
         'name': 'تنانير',
         'id': '13'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'حفلات') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=حفلات',
+        'image': _getCategoryImage('14', 'حفلات'),
         'name': 'ملابس الحفلات',
         'id': '14'
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'فساتين طو') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=فساتين+طو',
+        'image': _getCategoryImage('15', 'فساتين طو'),
         'name': 'فساتين طو',
         'id': '15'
       },
@@ -447,6 +467,88 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
           },
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildFeaturedProductsSection() {
+    if (_isLoadingProducts) {
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_featuredProducts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              'منتجات مميزة',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 280,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 16),
+              itemCount: _featuredProducts.length,
+              itemBuilder: (context, index) {
+                final product = _featuredProducts[index];
+                return ProductCardCompact(
+                  product: product,
+                  width: 160,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// الحصول على صورة الفئة من Cloudflare أو placeholder
+  String _getCategoryImage(String categoryId, String categoryName) {
+    // محاولة استخدام R2 أولاً (إذا كانت الصور موجودة هناك)
+    final r2Path = 'categories/icons/category-$categoryId.png';
+    final r2Url = CloudflareHelper.buildR2ImageUrl(r2Path, width: 80, height: 80);
+    if (r2Url != null) {
+      return r2Url;
+    }
+    
+    // إذا لم تكن موجودة في R2، استخدم placeholder
+    return CloudflareHelper.getDefaultPlaceholderImage(
+      width: 80,
+      height: 80,
+      text: categoryName,
+    );
+  }
+
+  /// الحصول على صورة Look من Cloudflare أو placeholder
+  String _getLookImage(String lookPath, String lookName, int width, int height) {
+    // محاولة استخدام R2 أولاً
+    final r2Path = '$lookPath.jpg';
+    final r2Url = CloudflareHelper.buildR2ImageUrl(r2Path, width: width, height: height);
+    if (r2Url != null) {
+      return r2Url;
+    }
+    
+    // إذا لم تكن موجودة في R2، استخدم placeholder
+    return CloudflareHelper.getDefaultPlaceholderImage(
+      width: width,
+      height: height,
+      text: lookName,
     );
   }
 

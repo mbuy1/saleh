@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../../shared/widgets/shein/shein_top_bar.dart';
 import '../../../../shared/widgets/shein/shein_search_bar.dart';
 import '../../../../shared/widgets/shein/shein_category_bar.dart';
+import '../../../../shared/widgets/shein/shein_banner_carousel.dart';
+import '../../../../shared/widgets/shein/shein_look_card.dart';
+import '../../../../shared/widgets/shein/shein_category_icon.dart';
+import '../../../../shared/widgets/shein/shein_promotional_banner.dart';
+import '../../../../core/services/cloudflare_helper.dart';
 import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/store_card_compact.dart';
 import '../../../../core/data/repositories/store_repository.dart';
@@ -10,6 +15,7 @@ import 'store_details_screen.dart';
 import 'cart_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
+import 'category_products_screen_shein.dart';
 import '../../data/cart_service.dart';
 
 /// صفحة المتاجر بتصميم SHEIN
@@ -153,49 +159,297 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
             ),
           ),
 
-          // قائمة المتاجر
-          if (_isLoading)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index >= _stores.length) {
-                      return const SizedBox.shrink();
-                    }
-                    final store = _stores[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => StoreDetailsScreen(
-                              storeId: store.id,
-                              storeName: store.name,
-                            ),
-                          ),
-                        );
-                      },
-                      child: StoreCardCompact(store: store),
-                    );
+          // المحتوى الرئيسي
+          SliverList(
+            delegate: SliverChildListDelegate([
+              // 1. البانر الرئيسي (Carousel)
+              SheinBannerCarousel(
+                banners: [
+                  {
+                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
+                      width: 400,
+                      height: 280,
+                      text: 'اكتشف المتاجر',
+                    ) ?? 'https://via.placeholder.com/400x280/FF6B9D/FFFFFF?text=اكتشف+المتاجر',
+                    'title': 'اكتشف المتاجر',
+                    'buttonText': 'تصفح الآن',
                   },
-                  childCount: _stores.length,
-                ),
+                  {
+                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
+                      width: 400,
+                      height: 280,
+                      text: 'عروض المتاجر',
+                    ) ?? 'https://via.placeholder.com/400x280/4ECDC4/FFFFFF?text=عروض+المتاجر',
+                    'title': 'عروض المتاجر',
+                    'buttonText': 'تصفح الآن',
+                  },
+                ],
               ),
-            ),
+
+              // 2. صف أفقي من Looks (بطاقات مع صور عارضات)
+              _buildLooksSection(),
+
+              // 3. شبكة من الأيقونات الدائرية للفئات
+              _buildCategoryIconsGrid(),
+
+              // 4. بانرات ترويجية إضافية
+              _buildPromotionalBanners(),
+
+              // 5. قائمة المتاجر
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(32.0),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else
+                _buildStoresGrid(),
+
+              const SizedBox(height: 80), // مساحة للشريط السفلي
+            ]),
+          ),
         ],
       ),
       drawer: _buildDrawer(),
+    );
+  }
+
+  Widget _buildLooksSection() {
+    final looks = [
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 140,
+          height: 200,
+          text: 'متاجر نسائية',
+        ) ?? 'https://via.placeholder.com/140x200/8B4513/FFFFFF?text=متاجر+نسائية',
+        'name': 'متاجر نسائية',
+        'id': '1'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 140,
+          height: 200,
+          text: 'متاجر رجالية',
+        ) ?? 'https://via.placeholder.com/140x200/556B2F/FFFFFF?text=متاجر+رجالية',
+        'name': 'متاجر رجالية',
+        'id': '2'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 140,
+          height: 200,
+          text: 'متاجر إلكترونيات',
+        ) ?? 'https://via.placeholder.com/140x200/800020/FFFFFF?text=متاجر+إلكترونيات',
+        'name': 'متاجر إلكترونيات',
+        'id': '3'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 140,
+          height: 200,
+          text: 'متاجر منزلية',
+        ) ?? 'https://via.placeholder.com/140x200/CD7F32/FFFFFF?text=متاجر+منزلية',
+        'name': 'متاجر منزلية',
+        'id': '4'
+      },
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              'اكتشف المزيد',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 16),
+              itemCount: looks.length,
+              itemBuilder: (context, index) {
+                final look = looks[index];
+                return SheinLookCard(
+                  imageUrl: look['image']!,
+                  categoryName: look['name']!,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryProductsScreenShein(
+                          categoryId: look['id']!,
+                          categoryName: look['name']!,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryIconsGrid() {
+    final categories = [
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'ملابس') 
+            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=ملابس',
+        'name': 'ملابس',
+        'id': '1'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'إلكترونيات') 
+            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=إلكترونيات',
+        'name': 'إلكترونيات',
+        'id': '2'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'منزلية') 
+            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=منزلية',
+        'name': 'منزلية',
+        'id': '3'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'أحذية') 
+            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=أحذية',
+        'name': 'أحذية',
+        'id': '4'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'إكسسوارات') 
+            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=إكسسوارات',
+        'name': 'إكسسوارات',
+        'id': '5'
+      },
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 5,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return SheinCategoryIcon(
+            imageUrl: category['image']!,
+            categoryName: category['name']!,
+            size: 65,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CategoryProductsScreenShein(
+                    categoryId: category['id']!,
+                    categoryName: category['name']!,
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPromotionalBanners() {
+    final banners = [
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'متاجر مميزة') 
+            ?? 'https://via.placeholder.com/400x120/90EE90/000000?text=متاجر+مميزة',
+        'title': 'متاجر مميزة',
+        'id': '1'
+      },
+      {
+        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'عروض خاصة') 
+            ?? 'https://via.placeholder.com/400x120/FFB6C1/000000?text=عروض+خاصة',
+        'title': 'عروض خاصة',
+        'id': '2'
+      },
+    ];
+
+    return Column(
+      children: banners.map((banner) {
+        return SheinPromotionalBanner(
+          imageUrl: banner['image']!,
+          title: banner['title'],
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CategoryProductsScreenShein(
+                  categoryId: banner['id']!,
+                  categoryName: banner['title']!,
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildStoresGrid() {
+    if (_stores.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Center(
+          child: Text(
+            'لا توجد متاجر متاحة',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: _stores.length,
+        itemBuilder: (context, index) {
+          final store = _stores[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => StoreDetailsScreen(
+                    storeId: store.id,
+                    storeName: store.name,
+                  ),
+                ),
+              );
+            },
+            child: StoreCardCompact(store: store),
+          );
+        },
+      ),
     );
   }
 

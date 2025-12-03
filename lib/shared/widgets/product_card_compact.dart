@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/data/models.dart';
 import '../../features/customer/presentation/screens/product_details_screen.dart';
+import '../../features/customer/data/cart_service.dart';
+import '../../core/permissions_helper.dart';
 
 /// بطاقة منتج مدمجة للاستخدام في القوائم الأفقية
 class ProductCardCompact extends StatelessWidget {
@@ -89,6 +91,71 @@ class ProductCardCompact extends StatelessWidget {
                           Icons.favorite_border,
                           size: 14,
                           color: MbuyColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  // زر إضافة للسلة
+                  if (!hideActions)
+                    Positioned(
+                      bottom: 6,
+                      right: 6,
+                      child: GestureDetector(
+                        onTap: () async {
+                          // منع الانتشار للـ InkWell
+                          // ignore: use_build_context_synchronously
+                          try {
+                            final canAdd = await PermissionsHelper.canAddToCart();
+                            if (!canAdd) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('التجار لا يمكنهم الشراء'),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
+                              }
+                              return;
+                            }
+
+                            await CartService.addToCart(product.id, quantity: 1);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('تمت الإضافة إلى السلة'),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('خطأ: ${e.toString()}'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: MbuyColors.primaryPurple,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
