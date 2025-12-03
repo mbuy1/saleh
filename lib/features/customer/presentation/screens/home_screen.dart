@@ -127,16 +127,18 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   SizedBox(
                     height: 240,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final products = DummyData.products;
-                        if (index >= products.length) return const SizedBox();
-                        return ProductCardCompact(product: products[index]);
-                      },
-                    ),
+                    child: _featuredProducts.isEmpty
+                        ? const Center(child: Text('لا توجد منتجات متاحة'))
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: _featuredProducts.length,
+                            itemBuilder: (context, index) {
+                              return _buildProductCard(
+                                _featuredProducts[index],
+                              );
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -209,8 +211,8 @@ class _HomeScreenState extends State<HomeScreen>
                             itemCount: _newArrivals.length,
                             itemBuilder: (context, index) {
                               return _buildProductCard(_newArrivals[index]);
-                      },
-                    ),
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -250,13 +252,13 @@ class _HomeScreenState extends State<HomeScreen>
       id: product.id,
       name: product.name,
       price: product.finalPrice,
+      categoryId: product.categoryId ?? '',
+      storeId: product.storeId,
       imageUrl: product.imageUrl ?? 'https://via.placeholder.com/150',
       rating: product.rating ?? 0.0,
-      discount: product.discountPercentage?.toDouble(),
-      originalPrice: product.discountPrice != null ? product.price : null,
       description: product.description ?? '',
     );
-    
+
     return ProductCardCompact(product: dummyProduct);
   }
 
@@ -266,7 +268,9 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return CategoryBrowserView(
-      mainCategories: _categories.isEmpty ? _getMainProductCategories() : _getMainProductCategories(),
+      mainCategories: _categories.isEmpty
+          ? _getMainProductCategories()
+          : _getMainProductCategories(),
       onViewAllCategories: () {
         Navigator.push(
           context,

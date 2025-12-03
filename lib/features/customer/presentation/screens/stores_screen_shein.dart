@@ -97,7 +97,11 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
           IconButton(
             icon: Stack(
               children: [
-                const Icon(Icons.notifications_none, size: 24, color: Colors.black87),
+                const Icon(
+                  Icons.notifications_none,
+                  size: 24,
+                  color: Colors.black87,
+                ),
                 Positioned(
                   right: 8,
                   top: 8,
@@ -130,7 +134,9 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
               onBagTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => CartScreen(userRole: widget.userRole)),
+                  MaterialPageRoute(
+                    builder: (_) => CartScreen(userRole: widget.userRole),
+                  ),
                 );
               },
               onHeartTap: () {
@@ -170,7 +176,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                       width: 400,
                       height: 280,
                       text: 'اكتشف المتاجر',
-                    ) ?? 'https://via.placeholder.com/400x280/FF6B9D/FFFFFF?text=اكتشف+المتاجر',
+                    ),
                     'title': 'اكتشف المتاجر',
                     'buttonText': 'تصفح الآن',
                   },
@@ -179,7 +185,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                       width: 400,
                       height: 280,
                       text: 'عروض المتاجر',
-                    ) ?? 'https://via.placeholder.com/400x280/4ECDC4/FFFFFF?text=عروض+المتاجر',
+                    ),
                     'title': 'عروض المتاجر',
                     'buttonText': 'تصفح الآن',
                   },
@@ -220,36 +226,36 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
           width: 140,
           height: 200,
           text: 'متاجر نسائية',
-        ) ?? 'https://via.placeholder.com/140x200/8B4513/FFFFFF?text=متاجر+نسائية',
+        ),
         'name': 'متاجر نسائية',
-        'id': '1'
+        'id': '1',
       },
       {
         'image': CloudflareHelper.getDefaultPlaceholderImage(
           width: 140,
           height: 200,
           text: 'متاجر رجالية',
-        ) ?? 'https://via.placeholder.com/140x200/556B2F/FFFFFF?text=متاجر+رجالية',
+        ),
         'name': 'متاجر رجالية',
-        'id': '2'
+        'id': '2',
       },
       {
         'image': CloudflareHelper.getDefaultPlaceholderImage(
           width: 140,
           height: 200,
           text: 'متاجر إلكترونيات',
-        ) ?? 'https://via.placeholder.com/140x200/800020/FFFFFF?text=متاجر+إلكترونيات',
+        ),
         'name': 'متاجر إلكترونيات',
-        'id': '3'
+        'id': '3',
       },
       {
         'image': CloudflareHelper.getDefaultPlaceholderImage(
           width: 140,
           height: 200,
           text: 'متاجر منزلية',
-        ) ?? 'https://via.placeholder.com/140x200/CD7F32/FFFFFF?text=متاجر+منزلية',
+        ),
         'name': 'متاجر منزلية',
-        'id': '4'
+        'id': '4',
       },
     ];
 
@@ -303,34 +309,49 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildCategoryIconsGrid() {
     final categories = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'ملابس') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=ملابس',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 80,
+          height: 80,
+          text: 'ملابس',
+        ),
         'name': 'ملابس',
-        'id': '1'
+        'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'إلكترونيات') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=إلكترونيات',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 80,
+          height: 80,
+          text: 'إلكترونيات',
+        ),
         'name': 'إلكترونيات',
-        'id': '2'
+        'id': '2',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'منزلية') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=منزلية',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 80,
+          height: 80,
+          text: 'منزلية',
+        ),
         'name': 'منزلية',
-        'id': '3'
+        'id': '3',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'أحذية') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=أحذية',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 80,
+          height: 80,
+          text: 'أحذية',
+        ),
         'name': 'أحذية',
-        'id': '4'
+        'id': '4',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 80, height: 80, text: 'إكسسوارات') 
-            ?? 'https://via.placeholder.com/80/FFFFFF/000000?text=إكسسوارات',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 80,
+          height: 80,
+          text: 'إكسسوارات',
+        ),
         'name': 'إكسسوارات',
-        'id': '5'
+        'id': '5',
       },
     ];
 
@@ -373,16 +394,22 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildPromotionalBanners() {
     final banners = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'متاجر مميزة') 
-            ?? 'https://via.placeholder.com/400x120/90EE90/000000?text=متاجر+مميزة',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'متاجر مميزة',
+        ),
         'title': 'متاجر مميزة',
-        'id': '1'
+        'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'عروض خاصة') 
-            ?? 'https://via.placeholder.com/400x120/FFB6C1/000000?text=عروض+خاصة',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'عروض خاصة',
+        ),
         'title': 'عروض خاصة',
-        'id': '2'
+        'id': '2',
       },
     ];
 
@@ -459,9 +486,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.black87,
-            ),
+            decoration: BoxDecoration(color: Colors.black87),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -498,4 +523,3 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
     );
   }
 }
-

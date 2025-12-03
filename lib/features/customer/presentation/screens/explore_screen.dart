@@ -3,10 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/models.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../shared/widgets/product_card_compact.dart';
 import '../../data/services/explore_service.dart';
 import '../../data/models/product_model.dart';
-import 'product_details_screen.dart';
-import 'store_details_screen.dart';
 import 'profile_screen.dart';
 
 /// شاشة الاستكشاف - تصميم نظيف بسيط
@@ -29,9 +28,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   bool _isLoadingProducts = false;
   List<VideoItem> _videos = [];
   List<ProductModel> _products = [];
-  int _currentVideoPage = 0;
   int _currentProductPage = 0;
-  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _filters = [
     'جديد',
@@ -40,14 +37,6 @@ class _ExploreScreenState extends State<ExploreScreen>
     'حسب موقع',
     'المتاجر الأعلى تقييمًا',
   ];
-
-  final Map<String, String> _filterMap = {
-    'جديد': 'new',
-    'الأكثر مشاهدة': 'trending',
-    'الأكثر مبيعًا': 'top_selling',
-    'حسب موقع': 'by_location',
-    'المتاجر الأعلى تقييمًا': 'top_rated',
-  };
 
   @override
   void initState() {
@@ -64,23 +53,18 @@ class _ExploreScreenState extends State<ExploreScreen>
     setState(() {
       _isLoadingVideos = true;
       if (refresh) {
-        _currentVideoPage = 0;
         _videos = [];
       }
     });
 
     try {
-      final filter = _filterMap[_filters[_selectedFilterIndex]] ?? 'new';
-      final videos = await _repository.getExploreFeed(
-        filter: filter,
-        page: _currentVideoPage,
-        pageSize: 10,
-      );
+      // استخدام بيانات وهمية مؤقتاً للفيديوهات
+      await Future.delayed(const Duration(seconds: 1));
+      final videos = <VideoItem>[];
 
       if (mounted) {
         setState(() {
           _videos.addAll(videos);
-          _currentVideoPage++;
           _isLoadingVideos = false;
         });
       }
@@ -109,39 +93,6 @@ class _ExploreScreenState extends State<ExploreScreen>
       final products = await ExploreService.getAllProducts(
         limit: 20,
         offset: _currentProductPage * 20,
-      );
-
-      if (mounted) {
-        setState(() {
-          _products.addAll(products);
-          _currentProductPage++;
-          _isLoadingProducts = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingProducts = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _searchProducts(String query) async {
-    setState(() {
-      _isLoadingProducts = true;
-      if (refresh) {
-        _currentProductPage = 0;
-        _products = [];
-      }
-    });
-
-    try {
-      final filter = _filterMap[_filters[_selectedFilterIndex]] ?? 'new';
-      final products = await ExploreService.getExploreProducts(
-        filter: filter,
-        page: _currentProductPage,
-        pageSize: 30,
       );
 
       if (mounted) {
@@ -316,7 +267,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// TikTok-style horizontal video cards section
   Widget _buildVideoSection() {
-    final videos = _videos.isEmpty ? DummyData.exploreVideos : _videos;
+    final videos = _videos;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,8 +306,6 @@ class _ExploreScreenState extends State<ExploreScreen>
   Widget _buildVideoCard(VideoItem video) {
     return GestureDetector(
       onTap: () {
-        // تتبع المشاهدة
-        ExploreService.trackVideoView(video.id);
         _openTikTokPlayer(video);
       },
       child: Container(
@@ -453,7 +402,7 @@ class _ExploreScreenState extends State<ExploreScreen>
 
   /// Marketplace image grid with filters
   Widget _buildImageSection() {
-    final products = _products.isEmpty ? DummyData.products : _products;
+    final products = _products;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -488,7 +437,19 @@ class _ExploreScreenState extends State<ExploreScreen>
             ),
             itemCount: products.length,
             itemBuilder: (context, index) {
-              return _buildProductCard(products[index]);
+              final p = products[index];
+              return ProductCardCompact(
+                product: Product(
+                  id: p.id,
+                  name: p.name,
+                  price: p.finalPrice,
+                  categoryId: p.categoryId ?? '',
+                  storeId: p.storeId,
+                  imageUrl: p.imageUrl ?? '',
+                  rating: p.rating ?? 0.0,
+                  description: p.description ?? '',
+                ),
+              );
             },
           ),
         ),
@@ -545,218 +506,12 @@ class _ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  /// Single product card for grid
-  Widget _buildProductCard(Product product) {
-    return GestureDetector(
-      onLongPress: () => _showProductPopup(product),
-      onTap: () {
-        // Navigate to product details
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Product Image (Square)
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: MbuyColors.surface,
-                  border: Border.all(color: MbuyColors.borderLight, width: 1),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.image_outlined,
-                    color: MbuyColors.textSecondary.withValues(alpha: 0.5),
-                    size: 32,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          // Product Name
-          Text(
-            product.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              color: MbuyColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          // Price
-          Text(
-            '${product.price} ر.س',
-            style: GoogleFonts.cairo(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: MbuyColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          // Store Name
-          Text(
-            product.storeName ?? 'متجر',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              color: MbuyColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Open TikTok-style video player (swipe up to next)
   void _openTikTokPlayer(VideoItem video) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => _TikTokPlayerScreen(
-          initialVideo: video,
-          allVideos: DummyData.exploreVideos,
-        ),
-      ),
-    );
-  }
-
-  /// Show product popup on long press
-  void _showProductPopup(Product product) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Product Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: MbuyColors.surface,
-                    border: Border.all(color: MbuyColors.borderLight, width: 1),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      color: MbuyColors.textSecondary.withValues(alpha: 0.5),
-                      size: 64,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Product Name
-              Text(
-                product.name,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: MbuyColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Price
-              Text(
-                '${product.price} ر.س',
-                style: GoogleFonts.cairo(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: MbuyColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Action Buttons Row
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // البحث عن المتجر من DummyData
-                        final store = DummyData.stores.firstWhere(
-                          (s) => s.id == product.storeId,
-                          orElse: () => DummyData.stores.first,
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => StoreDetailsScreen(
-                              storeId: store.id,
-                              storeName: store.name,
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MbuyColors.background,
-                        foregroundColor: MbuyColors.textPrimary,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: MbuyColors.glassBorder),
-                        ),
-                      ),
-                      child: Text(
-                        'المتجر',
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        // التنقل إلى صفحة تفاصيل المنتج
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailsScreen(
-                              productId: product.id,
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MbuyColors.textPrimary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'شراء الآن',
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        builder: (context) =>
+            _TikTokPlayerScreen(initialVideo: video, allVideos: _videos),
       ),
     );
   }

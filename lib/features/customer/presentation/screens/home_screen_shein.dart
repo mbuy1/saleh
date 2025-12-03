@@ -115,7 +115,11 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
           IconButton(
             icon: Stack(
               children: [
-                const Icon(Icons.notifications_none, size: 24, color: Colors.black87),
+                const Icon(
+                  Icons.notifications_none,
+                  size: 24,
+                  color: Colors.black87,
+                ),
                 Positioned(
                   right: 8,
                   top: 8,
@@ -148,7 +152,9 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
               onBagTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => CartScreen(userRole: widget.userRole)),
+                  MaterialPageRoute(
+                    builder: (_) => CartScreen(userRole: widget.userRole),
+                  ),
                 );
               },
               onHeartTap: () {
@@ -234,27 +240,27 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
       {
         'image': _getLookImage('looks/daily', 'إطلالات يومية', 140, 200),
         'name': 'إطلالات يومية',
-        'id': '1'
+        'id': '1',
       },
       {
         'image': _getLookImage('looks/modest', 'محتشمة', 140, 200),
         'name': 'محتشمة',
-        'id': '2'
+        'id': '2',
       },
       {
         'image': _getLookImage('looks/work', 'عمل', 140, 200),
         'name': 'عمل',
-        'id': '3'
+        'id': '3',
       },
       {
         'image': _getLookImage('looks/party', 'حفلات', 140, 200),
         'name': 'حفلات',
-        'id': '4'
+        'id': '4',
       },
       {
         'image': _getLookImage('looks/date', 'موعد في', 140, 200),
         'name': 'موعد في',
-        'id': '5'
+        'id': '5',
       },
     ];
 
@@ -311,77 +317,53 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
       {
         'image': _getCategoryImage('1', 'ملابس علوية'),
         'name': 'ملابس علوية',
-        'id': '1'
+        'id': '1',
       },
       {
         'image': _getCategoryImage('2', 'ملابس سفلية'),
         'name': 'ملابس سفلية',
-        'id': '2'
+        'id': '2',
       },
-      {
-        'image': _getCategoryImage('3', 'فساتين'),
-        'name': 'فساتين',
-        'id': '3'
-      },
-      {
-        'image': _getCategoryImage('4', 'بلایز'),
-        'name': 'بلایز',
-        'id': '4'
-      },
-      {
-        'image': _getCategoryImage('5', 'بدلات'),
-        'name': 'بدلات',
-        'id': '5'
-      },
+      {'image': _getCategoryImage('3', 'فساتين'), 'name': 'فساتين', 'id': '3'},
+      {'image': _getCategoryImage('4', 'بلایز'), 'name': 'بلایز', 'id': '4'},
+      {'image': _getCategoryImage('5', 'بدلات'), 'name': 'بدلات', 'id': '5'},
       {
         'image': _getCategoryImage('6', 'تيشيرتات'),
         'name': 'تيشيرتات',
-        'id': '6'
+        'id': '6',
       },
       {
         'image': _getCategoryImage('7', 'أطقم منسقة'),
         'name': 'أطقم منسقة',
-        'id': '7'
+        'id': '7',
       },
-      {
-        'image': _getCategoryImage('8', 'بناطيل'),
-        'name': 'بناطيل',
-        'id': '8'
-      },
-      {
-        'image': _getCategoryImage('9', 'الدنيم'),
-        'name': 'الدنيم',
-        'id': '9'
-      },
+      {'image': _getCategoryImage('8', 'بناطيل'), 'name': 'بناطيل', 'id': '8'},
+      {'image': _getCategoryImage('9', 'الدنيم'), 'name': 'الدنيم', 'id': '9'},
       {
         'image': _getCategoryImage('10', 'جمبسوت'),
         'name': 'جمبسوت وبوديسون',
-        'id': '10'
+        'id': '10',
       },
-      {
-        'image': _getCategoryImage('11', 'جينز'),
-        'name': 'جينز',
-        'id': '11'
-      },
+      {'image': _getCategoryImage('11', 'جينز'), 'name': 'جينز', 'id': '11'},
       {
         'image': _getCategoryImage('12', 'منسوجة'),
         'name': 'ملابس منسوجة',
-        'id': '12'
+        'id': '12',
       },
       {
         'image': _getCategoryImage('13', 'تنانير'),
         'name': 'تنانير',
-        'id': '13'
+        'id': '13',
       },
       {
         'image': _getCategoryImage('14', 'حفلات'),
         'name': 'ملابس الحفلات',
-        'id': '14'
+        'id': '14',
       },
       {
         'image': _getCategoryImage('15', 'فساتين طو'),
         'name': 'فساتين طو',
-        'id': '15'
+        'id': '15',
       },
     ];
 
@@ -424,28 +406,40 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   Widget _buildPromotionalBanners() {
     final banners = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'جاذبية أنيقة') 
-            ?? 'https://via.placeholder.com/400x120/90EE90/000000?text=جاذبية+أنيقة',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'جاذبية أنيقة',
+        ),
         'title': 'جاذبية أنيقة',
-        'id': '1'
+        'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'الضروريات الموسمية') 
-            ?? 'https://via.placeholder.com/400x120/FFB6C1/000000?text=الضروريات+الموسمية',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'الضروريات الموسمية',
+        ),
         'title': 'الضروريات الموسمية',
-        'id': '2'
+        'id': '2',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'أهم الترندات') 
-            ?? 'https://via.placeholder.com/400x120/D3D3D3/000000?text=أهم+الترندات',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'أهم الترندات',
+        ),
         'title': 'أهم الترندات',
-        'id': '3'
+        'id': '3',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(width: 400, height: 120, text: 'كاجوال') 
-            ?? 'https://via.placeholder.com/400x120/FFE4B5/000000?text=كاجوال',
+        'image': CloudflareHelper.getDefaultPlaceholderImage(
+          width: 400,
+          height: 120,
+          text: 'كاجوال',
+        ),
         'title': 'كاجوال',
-        'id': '4'
+        'id': '4',
       },
     ];
 
@@ -506,10 +500,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
               itemCount: _featuredProducts.length,
               itemBuilder: (context, index) {
                 final product = _featuredProducts[index];
-                return ProductCardCompact(
-                  product: product,
-                  width: 160,
-                );
+                return ProductCardCompact(product: product, width: 160);
               },
             ),
           ),
@@ -522,11 +513,15 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   String _getCategoryImage(String categoryId, String categoryName) {
     // محاولة استخدام R2 أولاً (إذا كانت الصور موجودة هناك)
     final r2Path = 'categories/icons/category-$categoryId.png';
-    final r2Url = CloudflareHelper.buildR2ImageUrl(r2Path, width: 80, height: 80);
+    final r2Url = CloudflareHelper.buildR2ImageUrl(
+      r2Path,
+      width: 80,
+      height: 80,
+    );
     if (r2Url != null) {
       return r2Url;
     }
-    
+
     // إذا لم تكن موجودة في R2، استخدم placeholder
     return CloudflareHelper.getDefaultPlaceholderImage(
       width: 80,
@@ -536,14 +531,23 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   }
 
   /// الحصول على صورة Look من Cloudflare أو placeholder
-  String _getLookImage(String lookPath, String lookName, int width, int height) {
+  String _getLookImage(
+    String lookPath,
+    String lookName,
+    int width,
+    int height,
+  ) {
     // محاولة استخدام R2 أولاً
     final r2Path = '$lookPath.jpg';
-    final r2Url = CloudflareHelper.buildR2ImageUrl(r2Path, width: width, height: height);
+    final r2Url = CloudflareHelper.buildR2ImageUrl(
+      r2Path,
+      width: width,
+      height: height,
+    );
     if (r2Url != null) {
       return r2Url;
     }
-    
+
     // إذا لم تكن موجودة في R2، استخدم placeholder
     return CloudflareHelper.getDefaultPlaceholderImage(
       width: width,
@@ -558,9 +562,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.black87,
-            ),
+            decoration: BoxDecoration(color: Colors.black87),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -615,4 +617,3 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
     );
   }
 }
-

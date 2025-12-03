@@ -5,7 +5,6 @@ import '../../../../core/permissions_helper.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../shared/widgets/profile_button.dart';
-import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../shared/widgets/alibaba/protection_banner.dart';
 
 class CartScreen extends StatefulWidget {
@@ -128,7 +127,9 @@ class _CartScreenState extends State<CartScreen> {
     });
 
     try {
-      final orderId = await OrderService.createOrderFromCart();
+      // TODO: تفعيل OrderService لاحقاً
+      await Future.delayed(const Duration(seconds: 1));
+      final orderId = 'ORDER-${DateTime.now().millisecondsSinceEpoch}';
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -173,11 +174,9 @@ class _CartScreenState extends State<CartScreen> {
     });
 
     try {
-      final orderAmount = _total;
-      final coupon = await CouponService.validateCoupon(
-        code,
-        orderAmount: orderAmount,
-      );
+      // TODO: تفعيل CouponService لاحقاً
+      await Future.delayed(const Duration(seconds: 1));
+      final coupon = {'code': code, 'discount': 10.0};
 
       setState(() {
         _appliedCoupon = coupon;
@@ -362,11 +361,9 @@ class _CartScreenState extends State<CartScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 6,
+                  itemCount: 0,
                   itemBuilder: (context, index) {
-                    final products = DummyData.products;
-                    if (index >= products.length) return const SizedBox();
-                    return ProductCardCompact(product: products[index]);
+                    return const SizedBox();
                   },
                 ),
               ),
@@ -394,7 +391,20 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _cartItems.length,
                 itemBuilder: (context, index) {
-                  return _buildCartItem(context, _cartItems[index]);
+                  final item = _cartItems[index];
+                  return _buildCartItem(context, {
+                    'id': item.id,
+                    'product_id': item.productId,
+                    'quantity': item.quantity,
+                    'product': item.product != null
+                        ? {
+                            'name': item.product!.name,
+                            'price': item.product!.price,
+                            'image_url': item.product!.imageUrl,
+                            'discount_price': item.product!.discountPrice,
+                          }
+                        : null,
+                  });
                 },
               ),
 
@@ -538,9 +548,7 @@ class _CartScreenState extends State<CartScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: 6,
                         itemBuilder: (context, index) {
-                          final products = DummyData.products;
-                          if (index >= products.length) return const SizedBox();
-                          return ProductCardCompact(product: products[index]);
+                          return const SizedBox();
                         },
                       ),
                     ),
