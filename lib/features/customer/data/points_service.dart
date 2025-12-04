@@ -57,19 +57,15 @@ class PointsService {
     }
 
     try {
-      // جلب points_account أولاً
-      final pointsAccount = await getPointsForCurrentUser();
-      final pointsAccountId = pointsAccount['id'] as String;
+      final result = await supabaseClient.functions.invoke(
+        'points_transactions',
+        body: {'limit': limit, 'account_type': 'customer'},
+      );
 
-      // جلب العمليات المرتبطة بهذا الحساب
-      final response = await supabaseClient
-          .from('points_transactions')
-          .select()
-          .eq('points_account_id', pointsAccountId)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return List<Map<String, dynamic>>.from(response);
+      if (result.data != null && result.data['ok'] == true) {
+        return List<Map<String, dynamic>>.from(result.data['data'] ?? []);
+      }
+      return [];
     } catch (e) {
       throw Exception('خطأ في جلب عمليات النقاط: ${e.toString()}');
     }

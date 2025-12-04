@@ -50,46 +50,32 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       final user = supabaseClient.auth.currentUser;
       if (user == null) return;
 
-      // جلب المتجر أولاً
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select('id')
-          .eq('owner_id', user.id)
-          .maybeSingle();
+      // جلب المنتجات عبر Worker API
+      final result = await ApiService.get('/secure/merchant/products');
 
-      if (storeResponse == null) {
+      if (result['ok'] == true && result['data'] != null) {
+        final products = List<Map<String, dynamic>>.from(result['data']);
+
+        // طباعة معلومات المنتجات للتشخيص
+        for (var product in products) {
+          debugPrint('📦 منتج: ${product['name']}');
+          debugPrint('   image_url: ${product['image_url']}');
+          debugPrint('   main_image_url: ${product['main_image_url']}');
+        }
+
+        setState(() {
+          _products = products;
+        });
+      } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('يجب إنشاء متجر أولاً'),
+            SnackBar(
+              content: Text(result['error'] ?? 'خطأ في جلب المنتجات'),
               backgroundColor: Colors.orange,
             ),
           );
         }
-        return;
       }
-
-      final storeId = storeResponse['id'];
-
-      // جلب منتجات المتجر مع جميع الحقول بما فيها الصور
-      final response = await supabaseClient
-          .from('products')
-          .select('*') // جلب جميع الحقول
-          .eq('store_id', storeId)
-          .order('created_at', ascending: false);
-
-      final products = List<Map<String, dynamic>>.from(response);
-
-      // طباعة معلومات المنتجات للتشخيص
-      for (var product in products) {
-        debugPrint('📦 منتج: ${product['name']}');
-        debugPrint('   image_url: ${product['image_url']}');
-        debugPrint('   main_image_url: ${product['main_image_url']}');
-      }
-
-      setState(() {
-        _products = products;
-      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -232,20 +218,16 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         throw Exception('المستخدم غير مسجل');
       }
 
-      // جلب المتجر
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select('id')
-          .eq('owner_id', user.id)
-          .maybeSingle();
+      // جلب المتجر عبر Worker API
+      final storeResult = await ApiService.get('/secure/merchant/store');
 
-      if (storeResponse == null) {
+      if (storeResult['ok'] != true || storeResult['data'] == null) {
         throw Exception(
           'لم يتم العثور على متجر. يرجى إنشاء متجر أولاً من قائمة "إعداد المتجر"',
         );
       }
 
-      final storeId = storeResponse['id'];
+      final storeId = storeResult['data']['id'];
 
       // رفع الصورة إذا تم اختيارها
       String? imageUrl;
@@ -310,10 +292,11 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
 
       debugPrint('📦 بيانات المنتج: $productData');
 
-      final result = await supabaseClient
-          .from('products')
-          .insert(productData)
-          .select();
+      // استخدام Worker API لإنشاء المنتج
+      final result = await ApiService.post(
+        '/secure/products',
+        data: productData,
+      );
 
       debugPrint('✅ تم إنشاء المنتج: $result');
 

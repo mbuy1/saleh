@@ -7,9 +7,9 @@ import '../../../../shared/widgets/shein/shein_promotional_banner.dart';
 import '../../../../core/services/cloudflare_helper.dart';
 import 'category_products_screen_shein.dart';
 import 'profile_screen.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../core/data/models.dart';
+import '../../../../core/services/api_service.dart';
 
 /// الصفحة الرئيسية بتصميم SHEIN
 class HomeScreenShein extends StatefulWidget {
@@ -47,33 +47,39 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
     });
 
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select()
-          .eq('status', 'active')
-          .order('created_at', ascending: false)
-          .limit(10);
+      // استخدام Worker API عبر ApiService
+      final result = await ApiService.get(
+        '/secure/products?limit=10&status=active',
+      );
 
-      final products = (response as List).map((data) {
-        return Product(
-          id: data['id']?.toString() ?? '',
-          name: data['name']?.toString() ?? 'منتج',
-          description: data['description']?.toString() ?? '',
-          price: (data['price'] as num?)?.toDouble() ?? 0.0,
-          categoryId: data['category_id']?.toString() ?? '',
-          storeId: data['store_id']?.toString() ?? '',
-          rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
-          reviewCount: (data['review_count'] as num?)?.toInt() ?? 0,
-          stockCount: (data['stock'] as num?)?.toInt() ?? 0,
-          imageUrl: data['image_url']?.toString(),
-        );
-      }).toList();
+      if (result['ok'] == true && result['data'] != null) {
+        final products = (result['data'] as List).map((data) {
+          return Product(
+            id: data['id']?.toString() ?? '',
+            name: data['name']?.toString() ?? 'منتج',
+            description: data['description']?.toString() ?? '',
+            price: (data['price'] as num?)?.toDouble() ?? 0.0,
+            categoryId: data['category_id']?.toString() ?? '',
+            storeId: data['store_id']?.toString() ?? '',
+            rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
+            reviewCount: (data['review_count'] as num?)?.toInt() ?? 0,
+            stockCount: (data['stock'] as num?)?.toInt() ?? 0,
+            imageUrl: data['image_url']?.toString(),
+          );
+        }).toList();
 
-      if (mounted) {
-        setState(() {
-          _featuredProducts = products;
-          _isLoadingProducts = false;
-        });
+        if (mounted) {
+          setState(() {
+            _featuredProducts = products;
+            _isLoadingProducts = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoadingProducts = false;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {

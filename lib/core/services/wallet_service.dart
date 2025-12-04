@@ -52,4 +52,28 @@ class WalletService {
     final balance = await getBalance();
     return balance >= requiredAmount;
   }
+
+  /// Get wallet transactions
+  static Future<List<dynamic>?> getWalletTransactions({
+    int limit = 10,
+    String walletType = 'customer',
+  }) async {
+    try {
+      final result = await ApiService.post(
+        '/secure/wallet/transactions',
+        data: {
+          'limit': limit,
+          'wallet_type': walletType,
+        },
+      );
+
+      if (result['ok'] == true && result['data'] != null) {
+        return result['data'] as List<dynamic>;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error getting wallet transactions: $e');
+      return null;
+    }
+  }
 }

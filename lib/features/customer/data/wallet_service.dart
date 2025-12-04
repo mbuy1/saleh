@@ -49,19 +49,12 @@ class WalletService {
     }
 
     try {
-      // جلب wallet أولاً
-      final wallet = await getWalletForCurrentUser();
-      final walletId = wallet['id'] as String;
+      final result = await api_wallet.WalletService.getWalletTransactions(
+        limit: limit,
+        walletType: 'customer',
+      );
 
-      // جلب العمليات المرتبطة بهذه المحفظة
-      final response = await supabaseClient
-          .from('wallet_transactions')
-          .select()
-          .eq('wallet_id', walletId)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return List<Map<String, dynamic>>.from(response);
+      return List<Map<String, dynamic>>.from(result ?? []);
     } catch (e) {
       throw Exception('خطأ في جلب عمليات المحفظة: ${e.toString()}');
     }
@@ -78,18 +71,11 @@ class WalletService {
     }
 
     try {
-      final response = await supabaseClient
-          .from('wallets')
-          .select()
-          .eq('owner_id', user.id)
-          .eq('type', 'merchant')
-          .maybeSingle();
-
-      if (response == null) {
+      final wallet = await api_wallet.WalletService.getWalletDetails();
+      if (wallet == null) {
         throw Exception('محفظة التاجر غير موجودة');
       }
-
-      return response;
+      return wallet;
     } catch (e) {
       throw Exception('خطأ في جلب محفظة التاجر: ${e.toString()}');
     }
@@ -111,19 +97,12 @@ class WalletService {
     }
 
     try {
-      // جلب wallet_account للتاجر
-      final wallet = await getMerchantWallet();
-      final walletId = wallet['id'] as String;
+      final result = await api_wallet.WalletService.getWalletTransactions(
+        limit: limit,
+        walletType: 'merchant',
+      );
 
-      // جلب العمليات المرتبطة بهذه المحفظة
-      final response = await supabaseClient
-          .from('wallet_transactions')
-          .select()
-          .eq('wallet_id', walletId)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return List<Map<String, dynamic>>.from(response);
+      return List<Map<String, dynamic>>.from(result ?? []);
     } catch (e) {
       throw Exception('خطأ في جلب عمليات محفظة التاجر: ${e.toString()}');
     }
