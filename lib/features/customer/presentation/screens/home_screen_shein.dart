@@ -124,8 +124,12 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                               child: Container(
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Colors.white.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(22),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.5),
+                                    width: 1,
+                                  ),
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -134,16 +138,17 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                                   children: [
                                     Icon(
                                       Icons.search,
-                                      color: Colors.grey.shade600,
+                                      color: Colors.white,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: TextField(
+                                        style: TextStyle(color: Colors.white),
                                         decoration: InputDecoration(
                                           hintText: 'البحث عن المنتجات...',
                                           hintStyle: TextStyle(
-                                            color: Colors.grey.shade500,
+                                            color: Colors.white.withOpacity(0.7),
                                             fontSize: 14,
                                           ),
                                           border: InputBorder.none,

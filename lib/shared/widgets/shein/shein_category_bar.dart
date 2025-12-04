@@ -32,14 +32,14 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       height: 48,
       child: Row(
         children: [
           // أيقونة القائمة (Hamburger Menu)
           IconButton(
             icon: const Icon(Icons.menu, size: 24),
-            color: Colors.black87,
+            color: Colors.white,
             onPressed: widget.onMenuTap ?? () {},
           ),
           
@@ -63,7 +63,7 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: isSelected ? Colors.black : Colors.transparent,
+                          color: isSelected ? Colors.white : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -71,7 +71,7 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
                     child: Text(
                       widget.categories[index],
                       style: TextStyle(
-                        color: isSelected ? Colors.black : Colors.grey.shade600,
+                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
                         fontSize: 14,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),

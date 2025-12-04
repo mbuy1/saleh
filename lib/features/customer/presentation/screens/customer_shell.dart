@@ -56,7 +56,6 @@ class _CustomerShellState extends State<CustomerShell> {
 
     return Scaffold(
       // لا يوجد AppBar - كل صفحة تدير الـ header الخاص بها
-
       body: Stack(
         children: [
           IndexedStack(index: _currentIndex, children: _screens),
