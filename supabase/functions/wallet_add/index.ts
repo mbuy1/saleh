@@ -83,9 +83,16 @@ Deno.serve(async (req) => {
     }
 
     // Create Supabase admin client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
     const supabase = createClient(
-      Deno.env.get('SB_URL') ?? '',
-      Deno.env.get('SB_SERVICE_ROLE_KEY') ?? '',
+      supabaseUrl,
+      supabaseServiceKey,
       {
         auth: {
           autoRefreshToken: false,
