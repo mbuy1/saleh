@@ -79,7 +79,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           .order('created_at', ascending: false);
 
       final products = List<Map<String, dynamic>>.from(response);
-      
+
       // طباعة معلومات المنتجات للتشخيص
       for (var product in products) {
         debugPrint('📦 منتج: ${product['name']}');
@@ -256,7 +256,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         try {
           // استخدام ApiService الذي يستخدم Cloudflare Worker
           imageUrl = await ApiService.uploadImage(_selectedImageFile!.path);
-          
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -298,7 +298,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         'stock': int.parse(_stockController.text),
         'status': 'active', // افتراضي: نشط
       };
-      
+
       // إضافة URL الصورة إذا كان موجوداً
       if (imageUrl != null && imageUrl.isNotEmpty) {
         productData['image_url'] = imageUrl;
@@ -309,16 +309,21 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       }
 
       debugPrint('📦 بيانات المنتج: $productData');
-      
-      final result = await supabaseClient.from('products').insert(productData).select();
-      
+
+      final result = await supabaseClient
+          .from('products')
+          .insert(productData)
+          .select();
+
       debugPrint('✅ تم إنشاء المنتج: $result');
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تم إضافة المنتج بنجاح!${imageUrl != null ? '\nالصورة: $imageUrl' : ''}'),
+            content: Text(
+              'تم إضافة المنتج بنجاح!${imageUrl != null ? '\nالصورة: $imageUrl' : ''}',
+            ),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
@@ -523,7 +528,10 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
               });
             },
             icon: const Icon(Icons.delete_outline, color: Colors.red),
-            label: const Text('حذف الصورة', style: TextStyle(color: Colors.red)),
+            label: const Text(
+              'حذف الصورة',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ],
@@ -549,7 +557,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         setDialogState(() {
           _selectedImageFile = file;
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -591,7 +599,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         setDialogState(() {
           _selectedImageFile = file;
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -616,10 +624,11 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
 
   Widget _buildProductImage(Map<String, dynamic> product) {
     // محاولة الحصول على URL الصورة من عدة مصادر
-    var imageUrl = product['image_url'] ?? 
-                   product['main_image_url'] ?? 
-                   product['images']?[0];
-    
+    var imageUrl =
+        product['image_url'] ??
+        product['main_image_url'] ??
+        product['images']?[0];
+
     // إذا كان images قائمة، أخذ أول عنصر
     if (imageUrl == null && product['images'] != null) {
       final images = product['images'];
@@ -627,7 +636,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         imageUrl = images[0];
       }
     }
-    
+
     if (imageUrl == null || imageUrl.toString().trim().isEmpty) {
       debugPrint('⚠️ لا توجد صورة للمنتج: ${product['name']}');
       return const Icon(Icons.shopping_bag, color: Colors.grey);

@@ -129,7 +129,9 @@ class ApiService {
       } else {
         final errorBody = response.body;
         debugPrint('❌ فشل الحصول على URL الرفع: $errorBody');
-        throw Exception('فشل الحصول على URL الرفع (${response.statusCode}): $errorBody');
+        throw Exception(
+          'فشل الحصول على URL الرفع (${response.statusCode}): $errorBody',
+        );
       }
     } catch (e) {
       debugPrint('❌ خطأ في طلب URL الرفع: $e');
@@ -161,11 +163,13 @@ class ApiService {
       // 1. Get upload URL from Cloudflare Worker
       debugPrint('📤 طلب URL لرفع الصورة...');
       final uploadData = await getImageUploadUrl(filePath.split('/').last);
-      
+
       if (uploadData['ok'] != true) {
-        throw Exception('فشل الحصول على URL الرفع: ${uploadData['error'] ?? 'خطأ غير معروف'}');
+        throw Exception(
+          'فشل الحصول على URL الرفع: ${uploadData['error'] ?? 'خطأ غير معروف'}',
+        );
       }
-      
+
       final uploadUrl = uploadData['uploadURL'] as String?;
       final viewUrl = uploadData['viewURL'] as String?;
 
