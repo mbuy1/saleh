@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../api_service.dart';
+import 'api_service.dart';
 
 /// Wallet Service
 /// Handles all wallet-related operations via API Gateway

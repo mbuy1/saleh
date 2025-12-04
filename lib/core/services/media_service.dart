@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import '../api_service.dart';
+import 'api_service.dart';
 
 /// Media Service
 /// Handles image and video uploads to Cloudflare

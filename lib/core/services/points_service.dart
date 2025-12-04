@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../api_service.dart';
+import 'api_service.dart';
 
 /// Points Service
 /// Handles all points-related operations via API Gateway

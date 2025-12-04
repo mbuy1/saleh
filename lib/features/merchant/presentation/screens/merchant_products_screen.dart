@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/supabase_client.dart';
-import '../../../../core/api_service.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../customer/presentation/screens/product_details_screen.dart';
 
 class MerchantProductsScreen extends StatefulWidget {

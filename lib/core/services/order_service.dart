@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../api_service.dart';
+import 'api_service.dart';
 
 /// Order Service
 /// Handles all order-related operations via API Gateway

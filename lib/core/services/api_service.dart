@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'supabase_client.dart';
+import '../supabase_client.dart';
 
 /// MBUY API Service
 /// Handles all API calls to Cloudflare Worker (API Gateway)
@@ -48,6 +48,60 @@ class ApiService {
         return await http.delete(url, headers: headers);
       default:
         throw Exception('Unsupported method: $method');
+    }
+  }
+
+  // ============================================================================
+  // PUBLIC API METHODS
+  // ============================================================================
+
+  /// GET request
+  static Future<Map<String, dynamic>> get(String endpoint) async {
+    try {
+      final response = await _makeAuthRequest('GET', endpoint);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ GET Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// POST request
+  static Future<Map<String, dynamic>> post(
+    String endpoint, {
+    Map<String, dynamic>? data,
+  }) async {
+    try {
+      final response = await _makeAuthRequest('POST', endpoint, body: data);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ POST Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// PUT request
+  static Future<Map<String, dynamic>> put(
+    String endpoint, {
+    Map<String, dynamic>? data,
+  }) async {
+    try {
+      final response = await _makeAuthRequest('PUT', endpoint, body: data);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ PUT Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// DELETE request
+  static Future<Map<String, dynamic>> delete(String endpoint) async {
+    try {
+      final response = await _makeAuthRequest('DELETE', endpoint);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ DELETE Error: $e');
+      return {'ok': false, 'error': e.toString()};
     }
   }
 
