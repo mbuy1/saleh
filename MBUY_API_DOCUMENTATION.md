@@ -1,161 +1,149 @@
-# 📚 MBUY API Documentation
+# 📘 توثيق MBUY API Gateway
 
-## 🎯 Overview
+## 🔧 معلومات المشروع
 
-MBUY API Gateway هو نقطة الاتصال الوحيدة بين Flutter Application وبقية الخدمات. يوفر:
-- ✅ توجيه الطلبات (Routing)
-- ✅ التحقق من JWT (Authentication)
-- ✅ رفع الوسائط (Media Uploads)
-- ✅ حماية Edge Functions
+**البنية المعمارية:** 3-Tier Architecture
+- **Flutter App** → **Cloudflare Worker** → **Supabase Edge Functions**
 
----
-
-## 🏗️ Architecture
-
-```
-Flutter App
-    ↓
-Cloudflare Worker (API Gateway)
-    ↓
-Supabase Edge Functions
-    ↓
-Supabase Database
-```
+**Worker Domain:** `https://misty-mode-b68b.baharista1.workers.dev`
 
 ---
 
-## 🔑 Authentication
+## 🔐 الأمان والمصادقة
 
-### Public Routes
-لا تتطلب Authentication
+### 1. المسارات العامة (`/public/*`)
+- **لا تتطلب JWT**
+- متاحة لجميع المستخدمين
+- مثال: `/public/register`
 
-### Secure Routes (`/secure/*`)
-تتطلب JWT Token في Header:
-```
-Authorization: Bearer <JWT_TOKEN>
-```
+### 2. المسارات الآمنة (`/secure/*`)
+- **تتطلب JWT في الـ Header:**
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+- يتم التحقق من JWT باستخدام `SUPABASE_JWKS_URL`
+- في حالة فشل التحقق → `401 Unauthorized`
 
-**كيفية الحصول على JWT:**
-```dart
-// في Flutter
-final session = await Supabase.instance.client.auth.currentSession;
-final token = session?.accessToken;
-```
-
----
-
-## 📡 API Endpoints
-
-### 1. Health Check
-
-**GET** `/`
-
-**Response:**
-```json
-{
-  "ok": true,
-  "message": "MBUY API Gateway",
-  "version": "1.0.0"
-}
-```
+### 3. Edge Functions Security
+- جميع Edge Functions تتطلب:
+  ```
+  x-internal-key: <EDGE_INTERNAL_KEY>
+  ```
+- هذا المفتاح موجود فقط في Worker ولا يتم كشفه للعميل
+- في حالة فشل التحقق → `403 Forbidden`
 
 ---
 
-### 2. Media Upload - Image
+## 📋 قائمة المسارات المكتملة
 
-**POST** `/media/image`
+### ✅ الوظائف الموجودة حالياً:
 
-**Request Body:**
-```json
+#### 🔓 Public Routes
+- `POST /public/register` - تسجيل تاجر جديد
+
+#### 🖼️ Media Routes
+- `POST /media/image` - رفع صورة
+- `POST /media/video` - رفع فيديو
+
+#### 🔒 Secure Routes
+- `POST /secure/wallet/add` - إضافة رصيد
+- `GET /secure/wallet` - الحصول على رصيد المحفظة
+- `POST /secure/points/add` - إضافة/خصم نقاط
+- `GET /secure/points` - الحصول على رصيد النقاط
+- `POST /secure/orders/create` - إنشاء طلب
+- `GET /secure/products` - قائمة المنتجات
+- `POST /secure/products` - إنشاء منتج
+- `PUT /secure/products/:id` - تحديث منتج
+- `DELETE /secure/products/:id` - حذف منتج
+- `GET /secure/stores/:id` - معلومات متجر
+- `PUT /secure/stores/:id` - تحديث متجر
+
+### ✅ Edge Functions المكتملة:
+
+1. `wallet_add` - إضافة رصيد + FCM
+2. `points_add` - إضافة/خصم نقاط + FCM
+3. `merchant_register` - تسجيل تاجر + FCM
+4. `create_order` - إنشاء طلب + معالجة دفع + FCM
+5. `products_list` - قائمة المنتجات
+6. `product_create` - إنشاء منتج
+7. `product_update` - تحديث منتج
+8. `product_delete` - حذف منتج
+9. `store_update` - تحديث متجر
+
+---
+
+## 📖 تفاصيل الاستخدام
+
+### 1️⃣ رفع الوسائط (Media Upload)
+
+#### رفع صورة
+```http
+POST /media/image
+Content-Type: application/json
+
 {
   "filename": "product.jpg"
 }
 ```
 
-**Response:**
+**الاستجابة:**
 ```json
 {
   "ok": true,
   "uploadURL": "https://upload.imagedelivery.net/...",
-  "id": "uuid-here",
-  "viewURL": "https://imagedelivery.net/account-id/image-id/public"
+  "id": "image-uuid",
+  "viewURL": "https://imagedelivery.net/.../public"
 }
 ```
 
-**Usage:**
-1. استدعاء `/media/image` للحصول على `uploadURL`
-2. رفع الصورة إلى `uploadURL` باستخدام `PUT` request
-3. استخدام `viewURL` لعرض الصورة
+**خطوات الرفع:**
+1. احصل على `uploadURL` من `/media/image`
+2. ارفع الملف إلى `uploadURL` مباشرة
+3. استخدم `viewURL` لعرض الصورة
 
-**Flutter Example:**
-```dart
-// 1. Get upload URL
-final response = await http.post(
-  Uri.parse('https://your-worker.workers.dev/media/image'),
-  body: jsonEncode({'filename': 'product.jpg'}),
-);
-final data = jsonDecode(response.body);
+#### رفع فيديو
+```http
+POST /media/video
+Content-Type: application/json
 
-// 2. Upload image
-final imageFile = File('path/to/image.jpg');
-final uploadResponse = await http.put(
-  Uri.parse(data['uploadURL']),
-  body: await imageFile.readAsBytes(),
-);
-
-// 3. Use viewURL
-final imageUrl = data['viewURL'];
-```
-
----
-
-### 3. Media Upload - Video
-
-**POST** `/media/video`
-
-**Request Body:**
-```json
 {
-  "filename": "product-demo.mp4"
+  "filename": "promo.mp4"
 }
 ```
 
-**Response:**
+**الاستجابة:**
 ```json
 {
   "ok": true,
-  "uploadURL": "https://upload.cloudflarestream.com/...",
+  "uploadURL": "https://upload.videodelivery.net/...",
   "playbackId": "video-uuid",
-  "viewURL": "https://customer-account-id.cloudflarestream.com/video-uuid/manifest/video.m3u8"
+  "viewURL": "https://customer-....cloudflarestream.com/.../manifest/video.m3u8"
 }
 ```
 
-**Usage:**
-مثل الصور، لكن للفيديوهات. استخدم `viewURL` مع video player يدعم HLS.
-
 ---
 
-### 4. Merchant Registration
+### 2️⃣ تسجيل التاجر
 
-**POST** `/public/register`
+```http
+POST /public/register
+Content-Type: application/json
 
-**Request Body:**
-```json
 {
-  "user_id": "uuid",
-  "store_name": "متجر محمد",
-  "store_description": "متجر متخصص في الإلكترونيات",
+  "user_id": "uuid-from-supabase-auth",
+  "store_name": "متجر الإلكترونيات",
+  "store_description": "متجر متخصص في الأجهزة الإلكترونية",
   "city": "الرياض"
 }
 ```
 
-**Response:**
+**الاستجابة:**
 ```json
 {
   "ok": true,
   "data": {
     "store_id": "uuid",
-    "store_name": "متجر محمد",
+    "store_name": "متجر الإلكترونيات",
     "wallet_id": "uuid",
     "points_account_id": "uuid",
     "welcome_bonus": 100
@@ -163,534 +151,401 @@ final imageUrl = data['viewURL'];
 }
 ```
 
-**Notes:**
-- ينشئ متجر جديد
-- يحدث دور المستخدم إلى `merchant`
-- ينشئ محفظة تاجر
-- يمنح 100 نقطة كمكافأة ترحيبية
+**ما يحدث في الخلفية:**
+- إنشاء متجر جديد
+- تحديث دور المستخدم إلى `merchant`
+- إنشاء محفظة بنوع `merchant`
+- إنشاء حساب نقاط مع 100 نقطة ترحيبية
+- إرسال إشعار FCM ترحيبي
 
 ---
 
-### 5. Add Wallet Funds
+### 3️⃣ المحفظة (Wallet)
 
-**POST** `/secure/wallet/add` 🔒
-
-**Headers:**
+#### الحصول على الرصيد
+```http
+GET /secure/wallet
+Authorization: Bearer <jwt>
 ```
-Authorization: Bearer <JWT_TOKEN>
-```
 
-**Request Body:**
+**الاستجابة:**
 ```json
 {
-  "amount": 100.50,
-  "source": "payment",
-  "meta": {
-    "payment_method": "card",
-    "transaction_id": "tx_12345"
+  "ok": true,
+  "data": {
+    "id": "uuid",
+    "owner_id": "user-uuid",
+    "type": "customer",
+    "balance": 500.00,
+    "created_at": "2024-12-01T10:00:00Z"
   }
 }
 ```
 
-**Response:**
+#### إضافة رصيد
+```http
+POST /secure/wallet/add
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "source": "payment",
+  "meta": {
+    "payment_method": "tap",
+    "transaction_ref": "PAY-123456"
+  }
+}
+```
+
+**الاستجابة:**
 ```json
 {
   "ok": true,
   "data": {
     "wallet_id": "uuid",
     "transaction_id": "uuid",
-    "old_balance": 50.00,
-    "new_balance": 150.50,
-    "amount_added": 100.50
+    "old_balance": 400.00,
+    "new_balance": 500.00,
+    "amount_added": 100.00
   }
 }
 ```
 
-**Sources:**
-- `payment` - دفع من بوابة دفع
-- `refund` - استرجاع مبلغ
-- `bonus` - مكافأة
-- `admin` - إضافة من Admin
+**إشعار FCM:** "تم إضافة 100 ر.س إلى محفظتك"
 
 ---
 
-### 6. Add Points
+### 4️⃣ النقاط (Points)
 
-**POST** `/secure/points/add` 🔒
-
-**Headers:**
+#### الحصول على النقاط
+```http
+GET /secure/points
+Authorization: Bearer <jwt>
 ```
-Authorization: Bearer <JWT_TOKEN>
-```
 
-**Request Body:**
-```json
+#### إضافة نقاط
+```http
+POST /secure/points/add
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
 {
   "points": 50,
-  "reason": "purchase",
+  "reason": "purchase_reward",
   "meta": {
     "order_id": "uuid"
   }
 }
 ```
 
-**Response:**
-```json
+#### خصم نقاط
+```http
+POST /secure/points/add
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
 {
-  "ok": true,
-  "data": {
-    "account_id": "uuid",
-    "transaction_id": "uuid",
-    "old_balance": 100,
-    "new_balance": 150,
-    "points_changed": 50
+  "points": -50,
+  "reason": "order_discount",
+  "meta": {
+    "order_id": "uuid"
   }
 }
 ```
 
-**Reasons:**
-- `purchase` - شراء منتج
-- `bonus` - مكافأة
-- `refund` - استرجاع
-- `signup` - تسجيل جديد
-
-**Notes:**
-- يمكن إضافة نقاط موجبة أو سالبة
-- إذا كانت سالبة، يتحقق من كفاية الرصيد
-
 ---
 
-### 7. Create Order
+### 5️⃣ الطلبات (Orders)
 
-**POST** `/secure/orders/create` 🔒
+```http
+POST /secure/orders/create
+Authorization: Bearer <jwt>
+Content-Type: application/json
 
-**Headers:**
-```
-Authorization: Bearer <JWT_TOKEN>
-```
-
-**Request Body:**
-```json
 {
   "items": [
     {
-      "product_id": "uuid",
+      "product_id": "product-uuid-1",
       "quantity": 2
+    },
+    {
+      "product_id": "product-uuid-2",
+      "quantity": 1,
+      "price": 99.99
     }
   ],
   "payment_method": "wallet",
-  "shipping_address_id": "uuid",
-  "use_points": 50,
-  "coupon_code": "SALE20"
+  "shipping_address_id": "address-uuid",
+  "use_points": 100,
+  "coupon_code": "SAVE10"
 }
 ```
 
-**Response:**
+**طرق الدفع:**
+- `cash` - نقداً عند الاستلام
+- `wallet` - من المحفظة
+- `tap` - بوابة Tap
+- `hyperpay` - بوابة HyperPay
+- `tamara` - تقسيط Tamara
+- `tabby` - تقسيط Tabby
+
+**الاستجابة:**
 ```json
 {
   "ok": true,
   "data": {
     "order_id": "uuid",
-    "total_amount": 285.50,
+    "total_amount": 285.00,
     "payment_status": "paid",
-    "payment_reference": null,
-    "points_used": 50,
-    "points_earned": 3,
-    "discount_applied": 25.00
+    "points_used": 100,
+    "points_earned": 28,
+    "discount_applied": 110.00
   }
 }
 ```
 
-**Payment Methods:**
-- `cash` - الدفع عند الاستلام
-- `wallet` - من المحفظة
-- `card` - بطاقة ائتمانية
-- `tap` - Tap Payment
-- `hyperpay` - HyperPay
-- `tamara` - Tamara (تقسيط)
-- `tabby` - Tabby (تقسيط)
-
-**Order Process:**
-1. التحقق من المنتجات والمخزون
-2. حساب المجموع (subtotal)
-3. تطبيق خصم النقاط (إذا وُجد)
-4. تطبيق كوبون الخصم (إذا وُجد)
-5. إضافة رسوم الشحن
-6. معالجة الدفع
-7. إنشاء الطلب
-8. تحديث المخزون
-9. خصم النقاط المستخدمة
-10. منح نقاط على الشراء (1% من المجموع)
-11. إرسال إشعارات FCM
+**العمليات التلقائية:**
+1. التحقق من المخزون
+2. حساب الخصومات (نقاط 0.1 ر.س + كوبونات)
+3. معالجة الدفع
+4. إنشاء الطلب وعناصره
+5. تحديث المخزون (decrement_stock)
+6. خصم النقاط المستخدمة
+7. منح نقاط جديدة (1% من الإجمالي)
+8. إرسال إشعارات FCM للعميل والتجار
 
 ---
 
-### 8. Get Wallet
+### 6️⃣ المنتجات (Products)
 
-**GET** `/secure/wallet` 🔒
+#### قائمة المنتجات
+```http
+GET /secure/products
+Authorization: Bearer <jwt>
+Content-Type: application/json
 
-**Headers:**
+{
+  "limit": 50,
+  "offset": 0
+}
 ```
-Authorization: Bearer <JWT_TOKEN>
-```
 
-**Response:**
+**الاستجابة:**
 ```json
 {
   "ok": true,
-  "data": {
-    "id": "uuid",
-    "owner_id": "uuid",
-    "type": "customer",
-    "balance": 150.50,
-    "created_at": "2025-12-03T..."
-  }
+  "data": [
+    {
+      "id": "uuid",
+      "store_id": "uuid",
+      "name": "هاتف ذكي",
+      "description": "هاتف بمواصفات عالية",
+      "price": 2999.99,
+      "stock_quantity": 15,
+      "category": "إلكترونيات",
+      "main_image_url": "https://...",
+      "images": ["https://...", "https://..."],
+      "created_at": "2024-12-01T10:00:00Z"
+    }
+  ],
+  "total": 45,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+#### إنشاء منتج
+```http
+POST /secure/products
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "name": "منتج جديد",
+  "description": "وصف المنتج",
+  "price": 199.99,
+  "stock_quantity": 50,
+  "category": "إكسسوارات",
+  "main_image_url": "https://imagedelivery.net/.../public",
+  "images": [
+    "https://imagedelivery.net/.../public",
+    "https://imagedelivery.net/.../public"
+  ]
+}
+```
+
+#### تحديث منتج
+```http
+PUT /secure/products/{product_id}
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "price": 179.99,
+  "stock_quantity": 30
+}
+```
+
+#### حذف منتج
+```http
+DELETE /secure/products/{product_id}
+Authorization: Bearer <jwt>
+```
+
+---
+
+### 7️⃣ المتاجر (Stores)
+
+#### معلومات المتجر
+```http
+GET /secure/stores/{store_id}
+Authorization: Bearer <jwt>
+```
+
+#### تحديث المتجر
+```http
+PUT /secure/stores/{store_id}
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{
+  "name": "اسم المتجر الجديد",
+  "description": "وصف محدّث",
+  "logo_url": "https://...",
+  "banner_url": "https://...",
+  "city": "جدة",
+  "phone": "0501234567"
 }
 ```
 
 ---
 
-### 9. Get Points
+## 🔔 إشعارات FCM
 
-**GET** `/secure/points` 🔒
+### الإشعارات المُرسلة تلقائياً:
 
-**Headers:**
-```
-Authorization: Bearer <JWT_TOKEN>
-```
+| العملية | المستلم | الرسالة |
+|---------|---------|---------|
+| `wallet_add` | صاحب المحفظة | "تم إضافة {amount} ر.س إلى محفظتك" |
+| `points_add` (+) | صاحب الحساب | "تم إضافة {points} نقطة إلى حسابك" |
+| `points_add` (-) | صاحب الحساب | "تم خصم {points} نقطة من حسابك" |
+| `merchant_register` | التاجر الجديد | "مرحباً بك كتاجر! تم إنشاء متجرك بنجاح" |
+| `create_order` | العميل | "تم إنشاء الطلب بنجاح - رقم الطلب: {order_id}" |
+| `create_order` | التجار | "طلب جديد رقم {order_id}" |
 
-**Response:**
-```json
-{
-  "ok": true,
-  "data": {
-    "id": "uuid",
-    "user_id": "uuid",
-    "points_balance": 250,
-    "created_at": "2025-12-03T..."
-  }
-}
-```
+**المتطلبات:**
+- `FIREBASE_SERVER_KEY` موجود في Supabase Secrets
+- `fcm_token` محفوظ في `user_profiles.fcm_token`
+
+**ملاحظة:** إذا فشل إرسال الإشعار، لن يفشل الطلب الأساسي
 
 ---
 
-## 🔐 Security
+## 🔐 المفاتيح والأسرار
 
-### Double-Gate Protection
+### Cloudflare Worker
 
-كل Edge Function محمية بطبقتين:
-
-1. **JWT Verification في Worker**
-   - يتحقق من صلاحية التوكن
-   - يستخرج `user_id`
-
-2. **Internal Key Verification في Edge Function**
-   - يتحقق من `x-internal-key` header
-   - يمنع الاستدعاء المباشر
-
+**متغيرات عامة (Plaintext):**
 ```
-Flutter → Worker (checks JWT) → Edge Function (checks INTERNAL_KEY) → Database
+CF_IMAGES_ACCOUNT_ID
+CF_STREAM_ACCOUNT_ID
+R2_BUCKET_NAME
+R2_S3_ENDPOINT
+R2_PUBLIC_URL
+SUPABASE_URL
+SUPABASE_JWKS_URL
 ```
 
----
-
-## 📨 FCM Notifications
-
-تُرسل الإشعارات تلقائياً في الحالات التالية:
-
-### Wallet Add
-```json
-{
-  "title": "تم إضافة رصيد",
-  "body": "تم إضافة 100 ر.س إلى محفظتك",
-  "data": {
-    "type": "wallet_add",
-    "amount": "100"
-  }
-}
-```
-
-### Points Add/Deduct
-```json
-{
-  "title": "تم إضافة نقاط",
-  "body": "تم إضافة 50 نقطة إلى حسابك",
-  "data": {
-    "type": "points_change",
-    "points": "50"
-  }
-}
-```
-
-### Merchant Registration
-```json
-{
-  "title": "مرحباً بك كتاجر!",
-  "body": "تم إنشاء متجرك 'اسم المتجر' بنجاح. حصلت على 100 نقطة كمكافأة ترحيبية!",
-  "data": {
-    "type": "merchant_registered",
-    "store_id": "uuid"
-  }
-}
-```
-
-### Order Created (للعميل)
-```json
-{
-  "title": "تم إنشاء الطلب بنجاح",
-  "body": "رقم الطلب: uuid - المبلغ: 285.50 ر.س",
-  "data": {
-    "type": "order_created",
-    "order_id": "uuid"
-  }
-}
-```
-
-### New Order (للتاجر)
-```json
-{
-  "title": "طلب جديد",
-  "body": "لديك طلب جديد رقم uuid",
-  "data": {
-    "type": "new_order",
-    "order_id": "uuid"
-  }
-}
-```
-
----
-
-## 🛠️ Environment Variables
-
-### Cloudflare Worker Secrets
-
+**أسرار (Secrets):**
 ```bash
-# Cloudflare Images
-CF_IMAGES_ACCOUNT_ID=<account-id>
-CF_IMAGES_API_TOKEN=<secret>
-
-# Cloudflare Stream
-CF_STREAM_ACCOUNT_ID=<account-id>
-CF_STREAM_API_TOKEN=<secret>
-
-# Cloudflare R2
-R2_ACCESS_KEY_ID=<secret>
-R2_SECRET_ACCESS_KEY=<secret>
-R2_BUCKET_NAME=<bucket-name>
-R2_S3_ENDPOINT=<endpoint>
-R2_PUBLIC_URL=<public-url>
-
-# Supabase
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_JWKS_URL=https://your-project.supabase.co/auth/v1/jwks
-SUPABASE_ANON_KEY=<secret>
-
-# Internal Security
-EDGE_INTERNAL_KEY=<secret-key>
+wrangler secret put CF_IMAGES_API_TOKEN
+wrangler secret put CF_STREAM_API_TOKEN
+wrangler secret put R2_ACCESS_KEY_ID
+wrangler secret put R2_SECRET_ACCESS_KEY
+wrangler secret put SUPABASE_ANON_KEY
+wrangler secret put EDGE_INTERNAL_KEY
 ```
 
-### Supabase Edge Function Secrets
+### Supabase Edge Functions
 
-```bash
-# Supabase
-SB_URL=https://your-project.supabase.co
-SB_SERVICE_ROLE_KEY=<secret>
+**مطلوبة:**
+```
+SB_URL (أو SUPABASE_URL)
+SB_SERVICE_ROLE_KEY (أو SUPABASE_SERVICE_ROLE_KEY)
+EDGE_INTERNAL_KEY
+```
 
-# Internal Security
-EDGE_INTERNAL_KEY=<same-as-worker>
-
-# Optional: Firebase
-FIREBASE_SERVER_KEY=<secret>
-
-# Optional: Payments
-PAYMENT_TAP_API_KEY=<secret>
-PAYMENT_HYPERPAY_API_KEY=<secret>
-PAYMENT_TAMARA_API_KEY=<secret>
-PAYMENT_TABBY_API_KEY=<secret>
-
-# Optional: Shipping
-SHIPPING_SMSA_API_KEY=<secret>
-SHIPPING_ARAMEX_API_KEY=<secret>
+**اختيارية:**
+```
+FIREBASE_SERVER_KEY
+PAYMENT_TAP_API_KEY
+PAYMENT_HYPERPAY_API_KEY
+PAYMENT_TAMARA_API_KEY
+PAYMENT_TABBY_API_KEY
+SHIPPING_SMSA_API_KEY
+SHIPPING_ARAMEX_API_KEY
 ```
 
 ---
 
-## 📦 Deployment
+## ⚠️ معالجة الأخطاء
 
-### Deploy Worker
+### تنسيق موحّد:
+```json
+{
+  "error": "Error Type",
+  "detail": "تفاصيل الخطأ"
+}
+```
 
+### أكواد الحالة:
+- `200` ✅ نجاح
+- `201` ✅ تم الإنشاء
+- `400` ❌ طلب خاطئ
+- `401` ❌ غير مصرّح
+- `403` ❌ ممنوع
+- `404` ❌ غير موجود
+- `409` ❌ تعارض
+- `500` ❌ خطأ في الخادم
+
+---
+
+## 🚀 النشر
+
+### نشر Worker:
 ```bash
 cd cloudflare
-npm install
 wrangler login
 wrangler deploy
 ```
 
-### Deploy Edge Functions
-
+### نشر Edge Functions:
 ```bash
-cd supabase
-supabase login
-supabase link --project-ref <your-project-ref>
-
-# Deploy all functions
 supabase functions deploy wallet_add
 supabase functions deploy points_add
 supabase functions deploy merchant_register
 supabase functions deploy create_order
-```
-
-### Set Secrets
-
-```bash
-# Worker secrets
-wrangler secret put CF_IMAGES_API_TOKEN
-wrangler secret put CF_STREAM_API_TOKEN
-# ... etc
-
-# Edge function secrets
-supabase secrets set EDGE_INTERNAL_KEY=your-secret-key
-supabase secrets set SB_SERVICE_ROLE_KEY=your-service-role-key
-# ... etc
+supabase functions deploy products_list
+supabase functions deploy product_create
+supabase functions deploy product_update
+supabase functions deploy product_delete
+supabase functions deploy store_update
 ```
 
 ---
 
-## 🧪 Testing
+## 📝 ملاحظات مهمة
 
-### Test Worker Locally
-
-```bash
-cd cloudflare
-wrangler dev
-```
-
-### Test Edge Functions Locally
-
-```bash
-cd supabase
-supabase functions serve wallet_add
-```
-
-### Test Endpoint
-
-```bash
-# Health check
-curl https://your-worker.workers.dev/
-
-# Create order (with JWT)
-curl -X POST https://your-worker.workers.dev/secure/orders/create \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "items": [{"product_id": "uuid", "quantity": 1}],
-    "payment_method": "cash"
-  }'
-```
+1. ✅ **جميع المسارات تعمل عبر Worker** - لا وصول مباشر من Flutter
+2. ✅ **JWT للمسارات الآمنة فقط** - `/secure/*`
+3. ✅ **Edge Functions محمية** - `x-internal-key` مطلوب
+4. ✅ **FCM اختياري** - يعمل إذا كان المفتاح موجوداً
+5. ⚠️ **بوابات الدفع** - تحتاج مفاتيح حقيقية للتفعيل
+6. ℹ️ **R2 Storage** - مُعدّ لكن غير مُستخدم حالياً
 
 ---
 
-## ❌ Error Responses
-
-جميع الأخطاء تُرجع بهذا الشكل:
-
-```json
-{
-  "error": "Error type",
-  "detail": "Detailed error message"
-}
-```
-
-### HTTP Status Codes
-
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request
-- `401` - Unauthorized (JWT invalid)
-- `403` - Forbidden (Internal key invalid)
-- `404` - Not Found
-- `409` - Conflict (e.g., merchant already exists)
-- `500` - Internal Server Error
-
----
-
-## 📱 Flutter Integration Example
-
-```dart
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-class MbuyApiClient {
-  static const String baseUrl = 'https://your-worker.workers.dev';
-
-  Future<String?> getJwtToken() async {
-    final session = await Supabase.instance.client.auth.currentSession;
-    return session?.accessToken;
-  }
-
-  Future<Map<String, dynamic>> createOrder({
-    required List<OrderItem> items,
-    required String paymentMethod,
-  }) async {
-    final token = await getJwtToken();
-    if (token == null) throw Exception('Not authenticated');
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/secure/orders/create'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'items': items.map((e) => e.toJson()).toList(),
-        'payment_method': paymentMethod,
-      }),
-    );
-
-    if (response.statusCode != 201) {
-      final error = jsonDecode(response.body);
-      throw Exception(error['detail']);
-    }
-
-    return jsonDecode(response.body);
-  }
-
-  Future<Map<String, dynamic>> uploadImage(File imageFile) async {
-    // 1. Get upload URL
-    final urlResponse = await http.post(
-      Uri.parse('$baseUrl/media/image'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'filename': 'image.jpg'}),
-    );
-
-    final urlData = jsonDecode(urlResponse.body);
-
-    // 2. Upload image
-    await http.put(
-      Uri.parse(urlData['uploadURL']),
-      body: await imageFile.readAsBytes(),
-    );
-
-    // 3. Return view URL
-    return urlData;
-  }
-}
-```
-
----
-
-## 🎉 Complete!
-
-المعمارية الآن جاهزة ومكتملة:
-- ✅ Cloudflare Worker (API Gateway)
-- ✅ 4 Edge Functions
-- ✅ JWT Verification
-- ✅ Media Uploads
-- ✅ FCM Notifications
-- ✅ Payment Integration (ready)
-- ✅ Points & Wallet System
-- ✅ Double-gate Security
-
-**Base URL:** `https://your-worker.workers.dev`
-
-استبدل `your-worker` باسم Worker الخاص بك بعد النشر.
+**آخر تحديث:** ديسمبر 2024  
+**الإصدار:** 1.0.0  
+**البنية:** MBUY 3-Tier Architecture

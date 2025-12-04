@@ -75,7 +75,7 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
                       style: TextStyle(
                         color: isSelected
                             ? Colors.white
-                            : Colors.white.withOpacity(0.7),
+                            : Colors.white.withValues(alpha: 0.7),
                         fontSize: 14,
                         fontWeight: isSelected
                             ? FontWeight.w600

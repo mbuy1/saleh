@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
-import '../../../../shared/widgets/mbuy_search_bar.dart';
 import 'explore_screen.dart';
 import 'stores_screen.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
-import 'profile_screen.dart';
 import 'map_screen.dart';
-import 'search_screen.dart';
 
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;

@@ -2,14 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/supabase_client.dart';
-import '../../../../core/services/cloudflare_images_service.dart';
+import '../../../../core/services/media_service.dart';
 import '../../data/merchant_points_service.dart';
 
 class MerchantStoreSetupScreen extends StatefulWidget {
   const MerchantStoreSetupScreen({super.key});
 
   @override
-  State<MerchantStoreSetupScreen> createState() => _MerchantStoreSetupScreenState();
+  State<MerchantStoreSetupScreen> createState() =>
+      _MerchantStoreSetupScreenState();
 }
 
 class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
@@ -113,10 +114,8 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           _isUploadingImage = true;
         });
         try {
-          logoUrl = await CloudflareImagesService.uploadImage(
-            _selectedImageFile!,
-            folder: 'stores',
-          );
+          // استخدام MediaService الذي يعمل عبر Worker
+          logoUrl = await MediaService.uploadImage(_selectedImageFile!);
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -134,16 +133,20 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       }
 
       // إنشاء متجر جديد
-      final response = await supabaseClient.from('stores').insert({
-        'owner_id': user.id,
-        'name': _nameController.text.trim(),
-        'city': _cityController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'slug': slug,
-        'visibility': 'public', // افتراضي: عام
-        'status': 'active', // افتراضي: نشط
-        if (logoUrl != null) 'logo_url': logoUrl,
-      }).select().single();
+      final response = await supabaseClient
+          .from('stores')
+          .insert({
+            'owner_id': user.id,
+            'name': _nameController.text.trim(),
+            'city': _cityController.text.trim(),
+            'description': _descriptionController.text.trim(),
+            'slug': slug,
+            'visibility': 'public', // افتراضي: عام
+            'status': 'active', // افتراضي: نشط
+            if (logoUrl != null) 'logo_url': logoUrl,
+          })
+          .select()
+          .single();
 
       setState(() {
         _store = response;
@@ -216,7 +219,9 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم دعم المتجر بنجاح! سيظهر في أعلى قائمة المتاجر لمدة 24 ساعة'),
+              content: Text(
+                'تم دعم المتجر بنجاح! سيظهر في أعلى قائمة المتاجر لمدة 24 ساعة',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -290,7 +295,9 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم إبراز المتجر على الخريطة بنجاح! سيظهر بشكل مميز لمدة 24 ساعة'),
+              content: Text(
+                'تم إبراز المتجر على الخريطة بنجاح! سيظهر بشكل مميز لمدة 24 ساعة',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -328,9 +335,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     if (_isLoading) {
       return const Scaffold(
         appBar: null,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -338,9 +343,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       appBar: AppBar(
         title: Text(_store == null ? 'إنشاء متجر' : 'إدارة المتجر'),
       ),
-      body: _store == null
-          ? _buildCreateStoreForm()
-          : _buildStoreInfo(),
+      body: _store == null ? _buildCreateStoreForm() : _buildStoreInfo(),
     );
   }
 
@@ -354,10 +357,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           children: [
             const Text(
               'إنشاء متجر جديد',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             TextFormField(
@@ -404,7 +404,9 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
             _buildImagePicker(),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: (_isCreating || _isUploadingImage) ? null : _createStore,
+              onPressed: (_isCreating || _isUploadingImage)
+                  ? null
+                  : _createStore,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -471,9 +473,17 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildInfoRow(Icons.location_city, 'المدينة', _store!['city'] ?? '-'),
+                  _buildInfoRow(
+                    Icons.location_city,
+                    'المدينة',
+                    _store!['city'] ?? '-',
+                  ),
                   const SizedBox(height: 8),
-                  _buildInfoRow(Icons.description, 'الوصف', _store!['description'] ?? '-'),
+                  _buildInfoRow(
+                    Icons.description,
+                    'الوصف',
+                    _store!['description'] ?? '-',
+                  ),
                   const SizedBox(height: 8),
                   _buildInfoRow(
                     Icons.visibility,
@@ -539,7 +549,11 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.rocket_launch),
-                      label: Text(_isBoosting ? 'جاري الدعم...' : 'دعم المتجر لمدة 24 ساعة'),
+                      label: Text(
+                        _isBoosting
+                            ? 'جاري الدعم...'
+                            : 'دعم المتجر لمدة 24 ساعة',
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
@@ -590,7 +604,11 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.location_on),
-                      label: Text(_isHighlighting ? 'جاري الإبراز...' : 'إبراز المتجر على الخريطة لمدة 24 ساعة'),
+                      label: Text(
+                        _isHighlighting
+                            ? 'جاري الإبراز...'
+                            : 'إبراز المتجر على الخريطة لمدة 24 ساعة',
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.purple,
                         foregroundColor: Colors.white,
@@ -669,13 +687,8 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       children: [
         Icon(icon, size: 20, color: Colors.grey),
         const SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Expanded(
-          child: Text(value),
-        ),
+        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(child: Text(value)),
       ],
     );
   }
@@ -744,10 +757,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       children: [
         const Text(
           'صورة المتجر',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Row(
@@ -764,19 +774,16 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: _selectedImageFile != null
-                      ? Image.file(
-                          _selectedImageFile!,
-                          fit: BoxFit.cover,
-                        )
+                      ? Image.file(_selectedImageFile!, fit: BoxFit.cover)
                       : _logoUrl != null
-                          ? Image.network(
-                              _logoUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.image, size: 50);
-                              },
-                            )
-                          : const Icon(Icons.image, size: 50),
+                      ? Image.network(
+                          _logoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.image, size: 50);
+                          },
+                        )
+                      : const Icon(Icons.image, size: 50),
                 ),
               )
             else
@@ -832,4 +839,3 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     }
   }
 }
-

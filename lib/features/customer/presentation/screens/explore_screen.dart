@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/hero_banner_carousel.dart';
+import '../../../../shared/widgets/placeholder_image.dart';
 
 class ExploreScreen extends StatefulWidget {
   final String? userRole;
@@ -176,12 +177,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 1),
                   ),
-                  child: const CircleAvatar(
-                    radius: 24,
-                    backgroundImage: NetworkImage(
-                      'https://via.placeholder.com/50',
+                  child: ClipOval(
+                    child: PlaceholderImage.circular(
+                      radius: 24,
+                      icon: Icons.store,
+                      backgroundColor: Colors.white,
                     ),
-                    backgroundColor: Colors.white,
                   ),
                 ),
                 Positioned(

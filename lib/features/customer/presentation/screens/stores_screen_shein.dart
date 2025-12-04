@@ -118,7 +118,9 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                                       decoration: InputDecoration(
                                         hintText: 'ابحث عن متجر...',
                                         hintStyle: TextStyle(
-                                          color: Colors.white.withOpacity(0.7),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.7,
+                                          ),
                                           fontSize: 14,
                                         ),
                                         border: InputBorder.none,

@@ -1,97 +1,115 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
+import '../supabase_client.dart';
 
-/// خدمة Gemini AI للتطبيق
+/// خدمة Gemini AI للتطبيق (عبر Worker API)
+/// ⚠️ تم تحديثها لاستخدام Worker بدلاً من الاتصال المباشر
 class GeminiService {
-  static GenerativeModel? _model;
-  static GenerativeModel? _visionModel;
+  static String? _workerUrl;
   static bool _isInitialized = false;
+  static final List<Map<String, String>> _chatHistory = [];
 
   /// تهيئة خدمة Gemini
   static Future<void> initialize() async {
     try {
-      final apiKey = dotenv.env['GEMINI_API_KEY'];
-      if (apiKey == null || apiKey.isEmpty) {
-        throw Exception('GEMINI_API_KEY غير موجود في ملف .env');
+      _workerUrl = dotenv.env['CF_WORKER_URL'];
+      if (_workerUrl == null || _workerUrl!.isEmpty) {
+        throw Exception('CF_WORKER_URL غير موجود في ملف .env');
       }
 
-      // نموذج النص السريع
-      _model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: apiKey,
-        generationConfig: GenerationConfig(
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        ),
-        safetySettings: [
-          SafetySetting(HarmCategory.harassment, HarmBlockThreshold.medium),
-          SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.medium),
-          SafetySetting(
-            HarmCategory.sexuallyExplicit,
-            HarmBlockThreshold.medium,
-          ),
-          SafetySetting(
-            HarmCategory.dangerousContent,
-            HarmBlockThreshold.medium,
-          ),
-        ],
-      );
-
-      // نموذج الرؤية (للصور)
-      _visionModel = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
-
       _isInitialized = true;
-      debugPrint('✅ تم تهيئة Gemini AI بنجاح');
+      debugPrint('✅ تم تهيئة Gemini AI عبر Worker بنجاح');
     } catch (e) {
       debugPrint('❌ خطأ في تهيئة Gemini: $e');
       rethrow;
     }
   }
 
+  /// الحصول على Authorization header
+  static Future<Map<String, String>> _getHeaders() async {
+    final session = supabaseClient.auth.currentSession;
+    if (session == null) {
+      throw Exception('يجب تسجيل الدخول أولاً');
+    }
+
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${session.accessToken}',
+    };
+  }
+
   /// التحقق من التهيئة
   static bool get isInitialized => _isInitialized;
 
-  /// إنشاء محادثة جديدة
-  static ChatSession createChat({List<Content>? history}) {
-    if (!_isInitialized || _model == null) {
+  /// إنشاء محادثة جديدة (محاكاة للـ API القديم)
+  static GeminiChatSession createChat({List<Map<String, String>>? history}) {
+    if (!_isInitialized) {
       throw Exception('يجب تهيئة GeminiService أولاً');
     }
-    return _model!.startChat(history: history ?? []);
+    return GeminiChatSession(history: history ?? []);
   }
 
   /// إرسال رسالة بسيطة
-  static Future<String> sendMessage(String message) async {
-    if (!_isInitialized || _model == null) {
+  static Future<String> sendMessage(String message, {String? model}) async {
+    if (!_isInitialized) {
       throw Exception('يجب تهيئة GeminiService أولاً');
     }
 
     try {
-      final response = await _model!.generateContent([Content.text(message)]);
-      return response.text ?? 'لم أتمكن من الإجابة';
-    } on GenerativeAIException catch (e) {
-      debugPrint('❌ خطأ في Gemini: ${e.message}');
-      throw Exception('خطأ في الاتصال بالذكاء الاصطناعي: ${e.message}');
+      final headers = await _getHeaders();
+      final response = await http.post(
+        Uri.parse('$_workerUrl/secure/ai/gemini/generate'),
+        headers: headers,
+        body: jsonEncode({
+          'prompt': message,
+          'model': model ?? 'gemini-1.5-flash',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['text'] ?? 'لم أتمكن من الإجابة';
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? 'خطأ في الاتصال بالذكاء الاصطناعي');
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في Gemini: $e');
+      throw Exception('خطأ في الاتصال بالذكاء الاصطناعي: $e');
     }
   }
 
-  /// إرسال رسالة مع streaming
-  static Stream<String> sendMessageStream(String message) async* {
-    if (!_isInitialized || _model == null) {
+  /// إرسال رسالة مع محادثة
+  static Future<String> sendChatMessage(
+    List<Map<String, String>> messages, {
+    String? model,
+  }) async {
+    if (!_isInitialized) {
       throw Exception('يجب تهيئة GeminiService أولاً');
     }
 
     try {
-      final stream = _model!.generateContentStream([Content.text(message)]);
-      await for (final chunk in stream) {
-        if (chunk.text != null) {
-          yield chunk.text!;
-        }
+      final headers = await _getHeaders();
+      final response = await http.post(
+        Uri.parse('$_workerUrl/secure/ai/gemini/chat'),
+        headers: headers,
+        body: jsonEncode({
+          'messages': messages,
+          'model': model ?? 'gemini-1.5-flash',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['response'] ?? 'لم أتمكن من الإجابة';
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? 'خطأ في الاتصال بالذكاء الاصطناعي');
       }
-    } on GenerativeAIException catch (e) {
-      debugPrint('❌ خطأ في Gemini Stream: ${e.message}');
+    } catch (e) {
+      debugPrint('❌ خطأ في Gemini Chat: $e');
       throw Exception('خطأ في الاتصال بالذكاء الاصطناعي');
     }
   }
@@ -120,29 +138,43 @@ ${category != null ? 'الفئة: $category' : ''}
 
   /// تحليل صورة منتج
   static Future<String> analyzeProductImage(Uint8List imageBytes) async {
-    if (!_isInitialized || _visionModel == null) {
+    if (!_isInitialized) {
       throw Exception('يجب تهيئة GeminiService أولاً');
     }
 
     try {
-      final response = await _visionModel!.generateContent([
-        Content.multi([
-          TextPart(
-            'صف هذا المنتج بالتفصيل واقترح وصفاً تسويقياً له. الرد باللغة العربية فقط.',
-          ),
-          DataPart('image/jpeg', imageBytes),
-        ]),
-      ]);
-      return response.text ?? 'لم أتمكن من تحليل الصورة';
-    } on GenerativeAIException catch (e) {
-      debugPrint('❌ خطأ في تحليل الصورة: ${e.message}');
+      final headers = await _getHeaders();
+      final base64Image = base64Encode(imageBytes);
+
+      final response = await http.post(
+        Uri.parse('$_workerUrl/secure/ai/gemini/vision'),
+        headers: headers,
+        body: jsonEncode({
+          'imageBase64': base64Image,
+          'prompt':
+              'صف هذا المنتج بالتفصيل واقترح وصفاً تسويقياً له. الرد باللغة العربية فقط.',
+          'model': 'gemini-1.5-flash',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['analysis'] ?? 'لم أتمكن من تحليل الصورة';
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? 'خطأ في تحليل الصورة');
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في تحليل الصورة: $e');
       throw Exception('خطأ في تحليل الصورة');
     }
   }
 
   /// إنشاء مساعد خدمة العملاء
-  static ChatSession createCustomerSupportChat() {
-    final systemPrompt = Content.text('''
+  static GeminiChatSession createCustomerSupportChat() {
+    final systemPrompt = {
+      'role': 'system',
+      'content': '''
 أنت مساعد خدمة عملاء لتطبيق mBuy - منصة تجارة إلكترونية سعودية.
 
 دورك:
@@ -162,14 +194,17 @@ ${category != null ? 'الفئة: $category' : ''}
 - يدعم العملاء والتجار
 - يحتوي على نظام نقاط ومحفظة
 - يدعم الكوبونات والعروض
-''');
+''',
+    };
 
     return createChat(history: [systemPrompt]);
   }
 
   /// إنشاء مساعد للتجار (mBuy Studio)
-  static ChatSession createMerchantAssistantChat() {
-    final systemPrompt = Content.text('''
+  static GeminiChatSession createMerchantAssistantChat() {
+    final systemPrompt = {
+      'role': 'system',
+      'content': '''
 أنت مساعد ذكي للتجار في mBuy Studio.
 
 دورك:
@@ -192,7 +227,8 @@ ${category != null ? 'الفئة: $category' : ''}
 - يحتوي على لوحة تحكم متقدمة
 - نظام نقاط للميزات المتقدمة
 - تقارير وتحليلات مفصلة
-''');
+''',
+    };
 
     return createChat(history: [systemPrompt]);
   }
@@ -237,25 +273,38 @@ ${category != null ? 'الفئة: $category' : ''}
     return await sendMessage(prompt);
   }
 
-  /// عد Tokens
+  /// عد Tokens (تقدير تقريبي)
   static Future<int> countTokens(String text) async {
-    if (!_isInitialized || _model == null) {
-      throw Exception('يجب تهيئة GeminiService أولاً');
-    }
-
-    try {
-      final count = await _model!.countTokens([Content.text(text)]);
-      return count.totalTokens;
-    } catch (e) {
-      debugPrint('❌ خطأ في عد Tokens: $e');
-      return 0;
-    }
+    // تقدير تقريبي: كلمة = ~1.3 token
+    final words = text.split(RegExp(r'\s+')).length;
+    return (words * 1.3).round();
   }
 
   /// تنظيف الموارد
   static void dispose() {
-    _model = null;
-    _visionModel = null;
+    _chatHistory.clear();
     _isInitialized = false;
+  }
+}
+
+/// Session محادثة Gemini (محاكاة للـ API القديم)
+class GeminiChatSession {
+  final List<Map<String, String>> history;
+
+  GeminiChatSession({required this.history});
+
+  /// إرسال رسالة في المحادثة
+  Future<String> sendMessage(String message) async {
+    history.add({'role': 'user', 'content': message});
+
+    final response = await GeminiService.sendChatMessage(history);
+
+    history.add({'role': 'assistant', 'content': response});
+    return response;
+  }
+
+  /// مسح المحادثة
+  void clear() {
+    history.clear();
   }
 }

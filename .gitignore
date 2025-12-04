@@ -49,5 +49,7 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 ios/Runner/googleservice-info.plist
 
-# Environment variables
+# Environment variables (NEVER commit these!)
 .env
+.env.local
+.env.*.local

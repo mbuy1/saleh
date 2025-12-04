@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../../../core/services/gemini_service.dart';
 import '../../../chat/domain/models/chat_message.dart';
 
@@ -17,7 +16,7 @@ class _MerchantAiAssistantScreenState extends State<MerchantAiAssistantScreen> {
   final List<ChatMessage> _messages = [];
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late ChatSession _chatSession;
+  late GeminiChatSession _chatSession;
   bool _isLoading = false;
 
   // اقتراحات سريعة
@@ -77,10 +76,10 @@ class _MerchantAiAssistantScreenState extends State<MerchantAiAssistantScreen> {
     _scrollToBottom();
 
     try {
-      final response = await _chatSession.sendMessage(Content.text(text));
+      final response = await _chatSession.sendMessage(text);
       final aiMessage = ChatMessage(
         id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-        text: response.text ?? 'عذراً، لم أتمكن من الإجابة.',
+        text: response,
         isUser: false,
         timestamp: DateTime.now(),
       );
