@@ -228,7 +228,11 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           .from('stores')
           .select('id')
           .eq('owner_id', user.id)
-          .single();
+          .maybeSingle();
+
+      if (storeResponse == null) {
+        throw Exception('لم يتم العثور على متجر. يرجى إنشاء متجر أولاً من قائمة "إعداد المتجر"');
+      }
 
       final storeId = storeResponse['id'];
 
