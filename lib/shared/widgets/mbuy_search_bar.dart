@@ -1,88 +1,51 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
-import 'profile_button.dart';
 
-/// شريط البحث الموحد مع أيقونة الحساب الشخصي
 class MbuySearchBar extends StatelessWidget {
   final String hintText;
-  final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onTap;
   final bool readOnly;
-  final bool showProfileButton;
+  final Widget? suffixIcon;
 
   const MbuySearchBar({
     super.key,
-    required this.hintText,
-    this.controller,
+    this.hintText = 'البحث',
     this.onChanged,
     this.onTap,
     this.readOnly = false,
-    this.showProfileButton = true,
+    this.suffixIcon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56,
+      height: 48,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24), // زوايا دائرية كاملة
+        border: Border.all(color: MbuyColors.border, width: 1),
       ),
-      child: Row(
-        children: [
-          // أيقونة البحث على اليسار
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Icon(
-              Icons.search,
-              color: MbuyColors.textSecondary,
-              size: 22,
-            ),
-          ),
-          // حقل النص في المنتصف
-          Expanded(
-            child: TextField(
-              controller: controller,
-              onChanged: onChanged,
-              onTap: onTap,
-              readOnly: readOnly,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: MbuyColors.textPrimary,
-                fontSize: 14,
-                fontFamily: 'Arabic',
+      child: TextField(
+        readOnly: readOnly,
+        onTap: onTap,
+        onChanged: onChanged,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: const TextStyle(color: MbuyColors.textTertiary),
+          prefixIcon: const Icon(Icons.search, color: MbuyColors.textSecondary),
+          suffixIcon:
+              suffixIcon ??
+              const Icon(
+                Icons.camera_alt_outlined,
+                color: MbuyColors.textSecondary,
               ),
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: const TextStyle(
-                  color: MbuyColors.textSecondary,
-                  fontSize: 14,
-                  fontFamily: 'Arabic',
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 16,
-                ),
-              ),
-            ),
-          ),
-          // أيقونة الحساب على اليمين
-          if (showProfileButton)
-            const Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: ProfileButton(),
-            ),
-          if (!showProfileButton) const SizedBox(width: 12),
-        ],
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
       ),
     );
   }

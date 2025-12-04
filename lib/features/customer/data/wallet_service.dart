@@ -1,4 +1,5 @@
 import '../../../../core/supabase_client.dart';
+import '../../../../core/services/wallet_service.dart' as api_wallet;
 
 class WalletService {
   /// جلب محفظة العميل الحالي
@@ -12,16 +13,12 @@ class WalletService {
     }
 
     try {
-      // جلب محفظة العميل فقط (type = 'customer')
-      final response = await supabaseClient
-          .from('wallets')
-          .select()
-          .eq('owner_id', user.id)
-          .eq('type', 'customer')
-          .maybeSingle();
+      // استخدام API Gateway بدلاً من Supabase مباشرة
+      final wallet = await api_wallet.WalletService.getWalletDetails();
 
-      if (response == null) {
-        // إذا لم توجد محفظة، نقوم بإنشائها تلقائياً
+      if (wallet == null) {
+        // إذا لم توجد محفظة، نقوم بإنشائها تلقائياً عبر Supabase
+        // (سيتم نقل هذا لاحقاً إلى API Gateway)
         final newWallet = await supabaseClient
             .from('wallets')
             .insert({'owner_id': user.id, 'type': 'customer', 'balance': 0.0})
@@ -31,7 +28,7 @@ class WalletService {
         return newWallet;
       }
 
-      return response;
+      return wallet;
     } catch (e) {
       throw Exception('خطأ في جلب المحفظة: ${e.toString()}');
     }

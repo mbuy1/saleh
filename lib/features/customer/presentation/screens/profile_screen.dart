@@ -60,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ في جلب البيانات: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -82,11 +82,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء', style: GoogleFonts.cairo()),
+            child: Text(
+              'إلغاء',
+              style: GoogleFonts.cairo(color: MbuyColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: MbuyColors.alertRed,
+            ),
             child: Text(
               'تسجيل الخروج',
               style: GoogleFonts.cairo(color: Colors.white),
@@ -104,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('خطأ في تسجيل الخروج: ${e.toString()}'),
-              backgroundColor: Colors.red,
+              backgroundColor: MbuyColors.alertRed,
             ),
           );
         }
@@ -118,31 +123,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
       useSafeArea: false,
       backgroundColor: MbuyColors.background,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: MbuyColors.primaryMaroon),
+            )
           : CustomScrollView(
               slivers: [
-                // 1. Alibaba-style Header
+                // 1. Header
                 SliverAppBar(
-                  expandedHeight: 140,
+                  expandedHeight: 120,
                   pinned: true,
                   backgroundColor: Colors.white,
                   elevation: 0,
                   automaticallyImplyLeading: false,
+                  leading: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: MbuyColors.textPrimary,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
-                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                      padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
                       color: Colors.white,
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Avatar
                           Container(
-                            width: 64,
-                            height: 64,
+                            width: 60,
+                            height: 60,
                             decoration: BoxDecoration(
-                              gradient: MbuyColors.primaryGradient,
+                              color: MbuyColors.primaryMaroon,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(
+                                color: MbuyColors.borderLight,
+                                width: 1,
+                              ),
                             ),
                             child: Center(
                               child: Text(
@@ -163,30 +180,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const SizedBox(height: 8),
                                 Text(
                                   _userProfile?['display_name'] ??
                                       'مستخدم mBuy',
                                   style: GoogleFonts.cairo(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                     color: MbuyColors.textPrimary,
                                     height: 1.2,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     const Icon(
                                       Icons.location_on_outlined,
-                                      size: 16,
+                                      size: 14,
                                       color: MbuyColors.textSecondary,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      'التوصيل إلى الرياض',
+                                      'الرياض، السعودية',
                                       style: GoogleFonts.cairo(
-                                        fontSize: 15,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w500,
                                         color: MbuyColors.textSecondary,
                                       ),
@@ -203,8 +219,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   actions: [
                     IconButton(
                       icon: const Icon(
-                        Icons.help_outline,
-                        color: MbuyColors.textSecondary,
+                        Icons.headset_mic_outlined,
+                        color: MbuyColors.textPrimary,
                         size: 24,
                       ),
                       onPressed: () {
@@ -219,36 +235,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.settings_outlined,
-                        color: MbuyColors.textSecondary,
+                        color: MbuyColors.textPrimary,
                         size: 24,
                       ),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SettingsScreen(
-                              themeProvider: ThemeProvider(),
-                            ),
+                            builder: (context) =>
+                                SettingsScreen(themeProvider: ThemeProvider()),
                           ),
                         );
                       },
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: MbuyColors.textSecondary,
-                        size: 24,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    const SizedBox(width: 8),
                   ],
                 ),
 
-                // 2. Features Bar (Horizontal Scroll)
+                // 2. Features Grid (Horizontal Scroll)
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.only(bottom: 20, top: 10),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -270,12 +278,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const BrowseHistoryScreen(),
+                                builder: (context) =>
+                                    const BrowseHistoryScreen(),
                               ),
                             );
                           }),
                           _buildFeatureItem(
-                            Icons.local_offer_outlined,
+                            Icons.confirmation_number_outlined,
                             'القسائم',
                             () {
                               Navigator.push(
@@ -299,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             },
                           ),
-                          _buildFeatureItem(Icons.stars_outlined, 'النقاط', () {
+                          _buildFeatureItem(Icons.star_outline, 'النقاط', () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -313,7 +322,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             'العناوين',
                             () {},
                           ),
-                          _buildFeatureItem(Icons.payment, 'الدفع', () {}),
+                          _buildFeatureItem(
+                            Icons.credit_card_outlined,
+                            'الدفع',
+                            () {},
+                          ),
                         ],
                       ),
                     ),
@@ -336,13 +349,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               'طلباتي',
                               style: GoogleFonts.cairo(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: MbuyColors.textPrimary,
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
+                            GestureDetector(
+                              onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -350,29 +363,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 );
                               },
-                              child: Text(
-                                'عرض الكل',
-                                style: GoogleFonts.cairo(
-                                  fontSize: 13,
-                                  color: MbuyColors.primaryPurple,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'عرض الكل',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 13,
+                                      color: MbuyColors.textSecondary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 12,
+                                    color: MbuyColors.textSecondary,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildOrderStatus(Icons.payment, 'قيد الدفع', 1, () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const OrdersScreen(status: 'pending_payment'),
-                                ),
-                              );
-                            }),
+                            _buildOrderStatus(
+                              Icons.payment_outlined,
+                              'قيد الدفع',
+                              1,
+                              () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const OrdersScreen(
+                                      status: 'pending_payment',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             _buildOrderStatus(
                               Icons.local_shipping_outlined,
                               'قيد الشحن',
@@ -381,7 +410,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(status: 'shipping'),
+                                    builder: (context) =>
+                                        const OrdersScreen(status: 'shipping'),
                                   ),
                                 );
                               },
@@ -394,7 +424,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(status: 'delivered'),
+                                    builder: (context) =>
+                                        const OrdersScreen(status: 'delivered'),
                                   ),
                                 );
                               },
@@ -407,10 +438,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(status: 'pending_review'),
+                                    builder: (context) => const OrdersScreen(
+                                      status: 'pending_review',
+                                    ),
                                   ),
                                 );
                               },
+                            ),
+                            _buildOrderStatus(
+                              Icons.assignment_return_outlined,
+                              'المرتجعات',
+                              0,
+                              () {},
                             ),
                           ],
                         ),
@@ -430,6 +469,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         MbuySectionHeader(
                           title: 'استمر في البحث عن',
                           subtitle: 'بناءً على تصفحك السابق',
+                          backgroundColor: Colors.transparent,
                         ),
                         SizedBox(
                           height: 180, // Slightly smaller cards for history
@@ -468,17 +508,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: _handleSignOut,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: Colors.red,
+                        foregroundColor: MbuyColors.textPrimary,
                         elevation: 0,
-                        side: BorderSide(
-                          color: Colors.red.withValues(alpha: 0.3),
-                        ),
+                        side: const BorderSide(color: MbuyColors.borderLight),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      icon: const Icon(Icons.logout, size: 22),
+                      icon: const Icon(Icons.logout, size: 20),
                       label: Text(
                         'تسجيل الخروج',
                         style: GoogleFonts.cairo(
@@ -500,18 +538,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 82,
-        margin: const EdgeInsets.only(left: 12),
+        width: 80,
+        margin: const EdgeInsets.only(left: 8),
         child: Column(
           children: [
             Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
+              width: 50,
+              height: 50,
+              decoration: const BoxDecoration(
                 color: MbuyColors.surface,
-                borderRadius: BorderRadius.circular(16),
+                shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: MbuyColors.primaryIndigo, size: 28),
+              child: Icon(icon, color: MbuyColors.textPrimary, size: 24),
             ),
             const SizedBox(height: 8),
             Text(
@@ -520,9 +558,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.cairo(
-                fontSize: 13,
+                fontSize: 12,
                 color: MbuyColors.textPrimary,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -531,49 +569,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildOrderStatus(IconData icon, String label, int count, [VoidCallback? onTap]) {
+  Widget _buildOrderStatus(
+    IconData icon,
+    String label,
+    int count, [
+    VoidCallback? onTap,
+  ]) {
     final orderWidget = Column(
       children: [
         Stack(
           clipBehavior: Clip.none,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: MbuyColors.surface,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: MbuyColors.primaryIndigo, size: 28),
-            ),
+            Icon(icon, color: MbuyColors.textPrimary, size: 32),
             if (count > 0)
               Positioned(
-                top: -4,
-                left: -4,
+                top: -6,
+                right: -6,
                 child: Container(
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: MbuyColors.primaryMaroon,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
-                  child: Text(
-                    count.toString(),
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      height: 1,
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  child: Center(
+                    child: Text(
+                      count.toString(),
+                      style: GoogleFonts.cairo(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        height: 1,
+                      ),
                     ),
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         Text(
           label,
           style: GoogleFonts.cairo(
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
             color: MbuyColors.textPrimary,
           ),
@@ -582,10 +624,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: orderWidget,
-      );
+      return GestureDetector(onTap: onTap, child: orderWidget);
     }
     return orderWidget;
   }

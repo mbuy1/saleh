@@ -29,7 +29,7 @@ class ProtectionBanner extends StatelessWidget {
             children: [
               const Icon(
                 Icons.security,
-                color: MbuyColors.primaryPurple,
+                color: MbuyColors.primaryMaroon,
                 size: 20,
               ),
               const SizedBox(width: 8),

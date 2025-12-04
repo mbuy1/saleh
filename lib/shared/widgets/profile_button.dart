@@ -24,7 +24,7 @@ class ProfileButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: MbuyColors.primaryPurple.withValues(alpha: 0.3),
+              color: MbuyColors.primaryMaroon.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

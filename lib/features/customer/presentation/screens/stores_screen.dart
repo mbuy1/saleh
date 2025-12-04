@@ -1,10 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
-import '../../../../core/widgets/widgets.dart';
-import '../../../../shared/widgets/store_card_compact.dart';
-import '../../../../shared/widgets/profile_button.dart';
-import '../../../../shared/widgets/alibaba/alibaba_search_bar.dart';
+import '../../../../shared/widgets/mbuy_search_bar.dart';
+import '../../../../shared/widgets/circle_item.dart';
 import '../../../../shared/widgets/category_browser_view.dart';
 import 'categories_screen.dart';
 
@@ -33,166 +31,87 @@ class _StoresScreenState extends State<StoresScreen>
 
   @override
   Widget build(BuildContext context) {
-    return MbuyScaffold(
-      backgroundColor: MbuyColors.background,
-      appBar: MbuyAppBar(
-        tabController: _tabController,
-        tabs: const ['المتاجر', 'الفئات'],
-        showProfileButton: true,
-        customProfileButton: const ProfileButton(),
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: AlibabaSearchBar(
-              hintText: 'ابحث عن متجر...',
-              onTap: () {
-                // Navigate to search
-              },
+    return Column(
+      children: [
+        // Tab Bar
+        Container(
+          color: Colors.white,
+          width: double.infinity,
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: MbuyColors.textPrimary,
+            indicatorWeight: 2,
+            labelColor: MbuyColors.textPrimary,
+            unselectedLabelColor: MbuyColors.textSecondary,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Cairo',
             ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontFamily: 'Cairo',
+            ),
+            tabs: const [
+              Tab(text: 'المتاجر'),
+              Tab(text: 'الفئات'),
+            ],
           ),
+        ),
 
-          // Tab Content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [_buildStoresTab(), _buildCategoriesTab()],
-            ),
+        // Tab Content
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [_buildStoresTab(), _buildCategoriesTab()],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildStoresTab() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1));
-      },
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Column(
-          children: [
-            // 1. Best Stores (Carousel)
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                children: [
-                  MbuySectionHeader(
-                    title: 'أفضل المتاجر',
-                    subtitle: 'المتاجر الأكثر مبيعاً هذا الأسبوع',
-                    icon: Icons.storefront,
-                    onViewMore: () {},
-                  ),
-                  SizedBox(
-                    height: 195,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final stores = DummyData.stores;
-                        if (index >= stores.length) return const SizedBox();
-                        return StoreCardCompact(store: stores[index]);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Search Bar (Full Width)
+          MbuySearchBar(
+            hintText: 'ابحث عن متجر...',
+            onTap: () {
+              // Navigate to search
+            },
+          ),
 
-            // 2. Top Rated Stores (Carousel)
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                children: [
-                  MbuySectionHeader(
-                    title: 'متاجر مميزة',
-                    subtitle: 'تقييم عالي من العملاء',
-                    icon: Icons.star_outline,
-                    onViewMore: () {},
-                  ),
-                  SizedBox(
-                    height: 195,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final stores = DummyData.stores.reversed.toList();
-                        if (index >= stores.length) return const SizedBox();
-                        return StoreCardCompact(store: stores[index]);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
+          const SizedBox(height: 24),
 
-            // 3. New Stores (Carousel)
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                children: [
-                  MbuySectionHeader(
-                    title: 'متاجر جديدة',
-                    subtitle: 'انضمت حديثاً إلى mBuy',
-                    icon: Icons.new_releases_outlined,
-                    onViewMore: () {},
-                  ),
-                  SizedBox(
-                    height: 195,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        final stores = DummyData.stores;
-                        if (index >= stores.length) return const SizedBox();
-                        return StoreCardCompact(store: stores[index]);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+          // Grid of Circular Stores
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4, // 4 items per row
+              childAspectRatio: 0.75,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 24,
             ),
+            itemCount: DummyData.stores.length,
+            itemBuilder: (context, index) {
+              final store = DummyData.stores[index];
+              return CircleItem(
+                label: store.name,
+                imageUrl:
+                    store.logoUrl, // Assuming logoUrl exists or use placeholder
+                size: 60,
+                onTap: () {
+                  // Navigate to store details
+                },
+              );
+            },
+          ),
 
-            // 4. Suggested Stores (Grid)
-            MbuySectionHeader(
-              title: 'متاجر مقترحة',
-              icon: Icons.recommend_outlined,
-              iconColor: MbuyColors.textSecondary,
-            ),
-
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.85, // Slightly taller for store cards
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: DummyData.stores.length,
-              itemBuilder: (context, index) {
-                return StoreCardCompact(
-                  store: DummyData.stores[index],
-                  width: double.infinity,
-                );
-              },
-            ),
-          ],
-        ),
+          const SizedBox(height: 80), // Bottom padding
+        ],
       ),
     );
   }
@@ -203,9 +122,7 @@ class _StoresScreenState extends State<StoresScreen>
       onViewAllCategories: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const CategoriesScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const CategoriesScreen()),
         );
       },
     );

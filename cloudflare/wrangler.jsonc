@@ -1,43 +1,37 @@
 /**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
+ * MBUY API Gateway - Cloudflare Worker Configuration
+ * For more details: https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "cloudflare",
+	"name": "misty-mode-b68b",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-11-28",
 	"observability": {
 		"enabled": true
+	},
+	
+	/**
+	 * Environment Variables (Plaintext)
+	 * These are safe to commit as they are public identifiers
+	 */
+	"vars": {
+		"CF_IMAGES_ACCOUNT_ID": "0be397f41b9240364b007e5e392c26de",
+		"CF_STREAM_ACCOUNT_ID": "0be397f41b9240364b007e5e392c26de",
+		"R2_BUCKET_NAME": "muath-saleh",
+		"R2_S3_ENDPOINT": "https://0be397f41b9240364b007e5e392c26de.r2.cloudflarestorage.com",
+		"R2_PUBLIC_URL": "https://pub-26059c033186488b9b411de8eaa60228.r2.dev",
+		"SUPABASE_URL": "https://sirqidofuvphqcxqchyc.supabase.co",
+		"SUPABASE_JWKS_URL": "https://sirqidofuvphqcxqchyc.supabase.co/auth/v1/jwks"
 	}
+	
 	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+	 * Secrets (must be set via: wrangler secret put <KEY>)
+	 * - CF_IMAGES_API_TOKEN
+	 * - CF_STREAM_API_TOKEN
+	 * - R2_ACCESS_KEY_ID
+	 * - R2_SECRET_ACCESS_KEY
+	 * - SUPABASE_ANON_KEY
+	 * - EDGE_INTERNAL_KEY
 	 */
-	// "placement": { "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" }
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" }
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

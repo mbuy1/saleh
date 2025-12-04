@@ -27,15 +27,18 @@ class ProductCardCompact extends StatelessWidget {
     final cardWidth = width == double.infinity ? null : width;
 
     return InkWell(
-      onTap: onTap ?? () {
-        // Navigate to product details if no custom onTap
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailsScreen(productId: product.id),
-          ),
-        );
-      },
+      onTap:
+          onTap ??
+          () {
+            // Navigate to product details if no custom onTap
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ProductDetailsScreen(productId: product.id),
+              ),
+            );
+          },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: cardWidth,
@@ -104,7 +107,8 @@ class ProductCardCompact extends StatelessWidget {
                           // منع الانتشار للـ InkWell
                           // ignore: use_build_context_synchronously
                           try {
-                            final canAdd = await PermissionsHelper.canAddToCart();
+                            final canAdd =
+                                await PermissionsHelper.canAddToCart();
                             if (!canAdd) {
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -117,7 +121,10 @@ class ProductCardCompact extends StatelessWidget {
                               return;
                             }
 
-                            await CartService.addToCart(product.id, quantity: 1);
+                            await CartService.addToCart(
+                              product.id,
+                              quantity: 1,
+                            );
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -141,7 +148,7 @@ class ProductCardCompact extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: MbuyColors.primaryPurple,
+                            color: MbuyColors.primaryMaroon,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(

@@ -1,817 +1,193 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/data/models.dart';
-import '../../../../core/widgets/widgets.dart';
-import '../../../../shared/widgets/product_card_compact.dart';
-import '../../data/services/explore_service.dart';
-import '../../data/models/product_model.dart';
-import 'profile_screen.dart';
 
-/// شاشة الاستكشاف - تصميم نظيف بسيط
-/// Tabs: لك / فيديو / صور
-/// ألوان: أبيض/أسود/رمادي فقط، أصفر للعروض، أحمر للتنبيهات، أخضر للنجاح
 class ExploreScreen extends StatefulWidget {
   final String? userRole;
-
   const ExploreScreen({super.key, this.userRole});
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _selectedFilterIndex = 0;
-  bool _isLoadingVideos = false;
-  bool _isLoadingProducts = false;
-  List<VideoItem> _videos = [];
-  List<ProductModel> _products = [];
-  int _currentProductPage = 0;
-
-  final List<String> _filters = [
-    'جديد',
-    'الأكثر مشاهدة',
-    'الأكثر مبيعًا',
-    'حسب موقع',
-    'المتاجر الأعلى تقييمًا',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
-    _loadVideos();
-    _loadProducts();
-  }
-
-  /// تحميل الفيديوهات من Supabase
-  Future<void> _loadVideos({bool refresh = false}) async {
-    if (_isLoadingVideos) return;
-
-    setState(() {
-      _isLoadingVideos = true;
-      if (refresh) {
-        _videos = [];
-      }
-    });
-
-    try {
-      // استخدام بيانات وهمية مؤقتاً للفيديوهات
-      await Future.delayed(const Duration(seconds: 1));
-      final videos = <VideoItem>[];
-
-      if (mounted) {
-        setState(() {
-          _videos.addAll(videos);
-          _isLoadingVideos = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingVideos = false;
-        });
-      }
-    }
-  }
-
-  /// تحميل المنتجات من Supabase
-  Future<void> _loadProducts({bool refresh = false}) async {
-    if (_isLoadingProducts) return;
-
-    setState(() {
-      _isLoadingProducts = true;
-      if (refresh) {
-        _currentProductPage = 0;
-        _products = [];
-      }
-    });
-
-    try {
-      final products = await ExploreService.getAllProducts(
-        limit: 20,
-        offset: _currentProductPage * 20,
-      );
-
-      if (mounted) {
-        setState(() {
-          _products.addAll(products);
-          _currentProductPage++;
-          _isLoadingProducts = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingProducts = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _ExploreScreenState extends State<ExploreScreen> {
+  final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: MbuyScaffold(
-        useSafeArea: false,
-        backgroundColor: Colors.white,
-        body: Column(
-          children: [
-            // هيدر بسيط بخلفية بيضاء
-            _buildGlassHeader(),
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildForYouTab(),
-                  _buildVideosTab(),
-                  _buildImagesTab(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// هيدر بسيط بخلفية بيضاء - بدون glassmorphism
-  Widget _buildGlassHeader() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: MbuyColors.borderLight, width: 0.5),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Header Row with Icons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  // Account Icon (Right) - دائرة سوداء
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: MbuyColors.textPrimary,
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  // Search Icon (Left) - أسود
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.search,
-                      color: MbuyColors.textPrimary,
-                      size: 26,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Tabs - خط سفلي رفيع فقط
-            TabBar(
-              controller: _tabController,
-              indicatorColor: MbuyColors.textPrimary,
-              indicatorWeight: 1.5,
-              labelColor: MbuyColors.textPrimary,
-              unselectedLabelColor: MbuyColors.textSecondary,
-              labelStyle: GoogleFonts.cairo(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              unselectedLabelStyle: GoogleFonts.cairo(
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-              ),
-              tabs: const [
-                Tab(text: 'لك'),
-                Tab(text: 'فيديو'),
-                Tab(text: 'صور'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Tab 1: For You (Mixed content)
-  Widget _buildForYouTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          // Video Section
-          _buildVideoSection(),
-          const SizedBox(height: 28),
-          // Image Section with Filters
-          _buildImageSection(),
-        ],
-      ),
-    );
-  }
-
-  /// Tab 2: Videos Only
-  Widget _buildVideosTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 100),
-      child: Column(
-        children: [const SizedBox(height: 16), _buildVideoSection()],
-      ),
-    );
-  }
-
-  /// Tab 3: Images Only (Marketplace Grid)
-  Widget _buildImagesTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 100),
-      child: Column(
-        children: [const SizedBox(height: 16), _buildImageSection()],
-      ),
-    );
-  }
-
-  /// TikTok-style horizontal video cards section
-  Widget _buildVideoSection() {
-    final videos = _videos;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'فيديوهات',
-            style: GoogleFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: MbuyColors.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height:
-              MediaQuery.of(context).size.height * 0.65, // 65% من ارتفاع الشاشة
-          child: PageView.builder(
-            controller: PageController(viewportFraction: 0.75), // 75% عرض
-            itemCount: videos.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: _buildVideoCard(videos[index]),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Single video card (16:9 or 4:5 aspect ratio) - بطاقة كبيرة 70% من الشاشة
-  Widget _buildVideoCard(VideoItem video) {
-    return GestureDetector(
-      onTap: () {
-        _openTikTokPlayer(video);
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Video Thumbnail - كبيرة ومرئية
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        MbuyColors.textSecondary.withValues(alpha: 0.3),
-                        MbuyColors.textPrimary,
-                      ],
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Play icon
-                      Center(
-                        child: Icon(
-                          Icons.play_circle_filled,
-                          color: Colors.white.withValues(alpha: 0.8),
-                          size: 48,
-                        ),
-                      ),
-                      // Stats Overlay (Bottom)
-                      Positioned(
-                        bottom: 8,
-                        left: 8,
-                        right: 8,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.visibility,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _formatCount(video.likes * 10),
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.favorite,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _formatCount(video.likes),
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Video Caption
-            Text(
-              video.caption,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.cairo(
-                fontSize: 14,
-                color: MbuyColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Marketplace image grid with filters
-  Widget _buildImageSection() {
-    final products = _products;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section Title
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'منتجات',
-            style: GoogleFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: MbuyColors.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Smart Filters
-        _buildSmartFilters(),
-        const SizedBox(height: 16),
-        // Product Grid
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final p = products[index];
-              return ProductCardCompact(
-                product: Product(
-                  id: p.id,
-                  name: p.name,
-                  price: p.finalPrice,
-                  categoryId: p.categoryId ?? '',
-                  storeId: p.storeId,
-                  imageUrl: p.imageUrl ?? '',
-                  rating: p.rating ?? 0.0,
-                  description: p.description ?? '',
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Smart filter chips (horizontal scroll)
-  Widget _buildSmartFilters() {
-    return SizedBox(
-      height: 36,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _filters.length,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        itemCount: 10, // Mock 10 videos
         itemBuilder: (context, index) {
-          final isSelected = _selectedFilterIndex == index;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedFilterIndex = index;
-              });
-              // إعادة تحميل البيانات مع الفلتر الجديد
-              _loadVideos(refresh: true);
-              _loadProducts(refresh: true);
-            },
-            child: Container(
-              margin: const EdgeInsets.only(left: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? MbuyColors.textPrimary
-                    : MbuyColors.background,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isSelected
-                      ? MbuyColors.textPrimary
-                      : MbuyColors.borderLight,
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                _filters[index],
-                style: GoogleFonts.cairo(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected ? Colors.white : MbuyColors.textSecondary,
-                ),
-              ),
-            ),
-          );
+          return _buildVideoItem(index);
         },
       ),
     );
   }
 
-  /// Open TikTok-style video player (swipe up to next)
-  void _openTikTokPlayer(VideoItem video) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) =>
-            _TikTokPlayerScreen(initialVideo: video, allVideos: _videos),
-      ),
-    );
-  }
-
-  /// Format count (K, M)
-  String _formatCount(int count) {
-    if (count >= 1000000) {
-      return '${(count / 1000000).toStringAsFixed(1)}M';
-    } else if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(1)}K';
-    }
-    return count.toString();
-  }
-}
-
-/// TikTok-style video player with swipe-up-to-next
-class _TikTokPlayerScreen extends StatefulWidget {
-  final VideoItem initialVideo;
-  final List<VideoItem> allVideos;
-
-  const _TikTokPlayerScreen({
-    required this.initialVideo,
-    required this.allVideos,
-  });
-
-  @override
-  State<_TikTokPlayerScreen> createState() => _TikTokPlayerScreenState();
-}
-
-class _TikTokPlayerScreenState extends State<_TikTokPlayerScreen> {
-  late PageController _pageController;
-  late int _currentIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.allVideos.indexOf(widget.initialVideo);
-    _pageController = PageController(initialPage: _currentIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            // Video PageView (Vertical Swipe)
-            PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.vertical,
-              itemCount: widget.allVideos.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                return _buildVideoPlayer(widget.allVideos[index]);
-              },
-            ),
-            // Close Button (Top Right)
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withValues(alpha: 0.5),
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVideoPlayer(VideoItem video) {
+  Widget _buildVideoItem(int index) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Video Background (Placeholder)
+        // 1. Video Placeholder (Background)
+        Container(
+          color: Colors.grey[900],
+          child: Center(
+            child: Icon(
+              Icons.play_circle_outline,
+              color: Colors.white.withValues(alpha: 0.3),
+              size: 80,
+            ),
+          ),
+        ),
+
+        // 2. Overlay Gradient
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                MbuyColors.textSecondary.withValues(alpha: 0.4),
-                MbuyColors.textPrimary,
+                Colors.black.withValues(alpha: 0.3),
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.6),
               ],
             ),
           ),
-          child: Center(
-            child: Icon(
-              Icons.play_circle_outline,
-              size: 80,
-              color: Colors.white.withValues(alpha: 0.7),
-            ),
-          ),
         ),
-        // Bottom Gradient for Text Clarity
+
+        // 3. Left Side Interaction Icons
         Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: 200,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.8),
-                ],
+          left: 16,
+          bottom: 60, // Start from bottom of screen
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildInteractionIcon(
+                Icons.favorite,
+                '12.5K',
+                color: MbuyColors.primaryMaroon,
               ),
+              _buildInteractionIcon(Icons.comment_rounded, '456'),
+              _buildInteractionIcon(Icons.share, 'Share'),
+              _buildInteractionIcon(Icons.shopping_bag_outlined, 'Buy'),
+            ],
+          ),
+        ),
+
+        // 4. Store Profile Icon (Right side, aligned with store name)
+        Positioned(
+          right: 16,
+          bottom: 60,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 24),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 24,
+                    backgroundImage: NetworkImage(
+                      'https://via.placeholder.com/50',
+                    ),
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+                Positioned(
+                  bottom: -10,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: MbuyColors.primaryMaroon,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.add, color: Colors.white, size: 16),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        // Action Buttons (Right Side)
-        _buildActionButtons(video),
-        // Video Info (Bottom)
-        _buildVideoInfo(video),
-      ],
-    );
-  }
 
-  Widget _buildActionButtons(VideoItem video) {
-    return Positioned(
-      left: 12,
-      bottom: 160,
-      child: Column(
-        children: [
-          _buildActionButton(
-            icon: Icons.favorite_rounded,
-            count: video.likes,
-            onTap: () {},
-            color: Colors.redAccent,
-          ),
-          const SizedBox(height: 20),
-          _buildActionButton(
-            icon: Icons.chat_bubble_rounded,
-            count: video.comments,
-            onTap: () {},
-          ),
-          const SizedBox(height: 20),
-          _buildActionButton(
-            icon: Icons.share_rounded,
-            count: video.shares,
-            onTap: () {},
-          ),
-          const SizedBox(height: 20),
-          _buildActionButton(
-            icon: Icons.bookmark_rounded,
-            count: video.bookmarks,
-            onTap: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required int count,
-    required VoidCallback onTap,
-    Color? color,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.black.withValues(alpha: 0.3),
-            ),
-            child: Icon(icon, color: color ?? Colors.white, size: 32),
-          ),
-          if (count > 0) ...[
-            const SizedBox(height: 4),
-            Text(
-              _formatCount(count),
-              style: GoogleFonts.cairo(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVideoInfo(VideoItem video) {
-    return Positioned(
-      bottom: 0,
-      right: 0,
-      left: 80,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        // 5. Bottom Info (Store Name, Description)
+        Positioned(
+          left: 100, // Space for left icons
+          right: 80, // Space for store profile
+          bottom: 60,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // User Info
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: MbuyColors.textPrimary,
-                    child: Text(
-                      video.userAvatar,
-                      style: GoogleFonts.cairo(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    video.userName,
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              const Text(
+                '@اسم_المتجر',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Cairo',
+                ),
               ),
-              const SizedBox(height: 12),
-              // Caption
-              Text(
-                video.caption,
-                style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
+              const SizedBox(height: 8),
+              const Text(
+                'وصف قصير للفيديو أو المنتج المعروض هنا... #موضة #جديد',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Cairo',
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 16),
-              // Buy Button
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: MbuyColors.textPrimary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.music_note, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    'الموسيقى الأصلية - اسم المتجر',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 12,
+                      fontFamily: 'Cairo',
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'شراء الآن',
-                  style: GoogleFonts.cairo(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                ],
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
-  String _formatCount(int count) {
-    if (count >= 1000000) {
-      return '${(count / 1000000).toStringAsFixed(1)}M';
-    } else if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(1)}K';
-    }
-    return count.toString();
+  Widget _buildInteractionIcon(
+    IconData icon,
+    String label, {
+    Color color = Colors.white,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

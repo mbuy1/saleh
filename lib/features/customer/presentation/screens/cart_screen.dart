@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/protection_banner.dart';
+import '../../../../shared/widgets/circle_item.dart';
 
 class CartScreen extends StatefulWidget {
   final String? userRole; // 'customer' أو 'merchant'
@@ -57,7 +58,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ في جلب السلة: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -82,7 +83,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ في تحديث الكمية: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -100,7 +101,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('تم حذف العنصر من السلة'),
-            backgroundColor: Colors.green,
+            backgroundColor: MbuyColors.primaryMaroon,
           ),
         );
       }
@@ -109,7 +110,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ في حذف العنصر: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -135,7 +136,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('تم إنشاء الطلب بنجاح! رقم الطلب: $orderId'),
-            backgroundColor: Colors.green,
+            backgroundColor: MbuyColors.primaryMaroon,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -146,7 +147,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ في إتمام الطلب: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -187,7 +188,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('تم تطبيق الكوبون بنجاح!'),
-            backgroundColor: Colors.green,
+            backgroundColor: MbuyColors.primaryMaroon,
           ),
         );
       }
@@ -201,7 +202,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
+            backgroundColor: MbuyColors.alertRed,
           ),
         );
       }
@@ -259,7 +260,9 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: MbuyColors.primaryMaroon),
+            )
           : widget.userRole == 'merchant'
           ? _buildMerchantView()
           : _cartItems.isEmpty
@@ -273,7 +276,11 @@ class _CartScreenState extends State<CartScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.remove_shopping_cart, size: 64, color: Colors.orange),
+          Icon(
+            Icons.remove_shopping_cart,
+            size: 64,
+            color: MbuyColors.secondaryBrown,
+          ),
           SizedBox(height: 16),
           Text(
             'وضع التصفح فقط',
@@ -282,7 +289,7 @@ class _CartScreenState extends State<CartScreen> {
           SizedBox(height: 8),
           Text(
             'التاجر لا يمكنه استخدام سلة العميل',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 14, color: MbuyColors.textSecondary),
             textAlign: TextAlign.center,
           ),
         ],
@@ -297,11 +304,11 @@ class _CartScreenState extends State<CartScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: MbuyColors.surface,
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.shopping_cart_outlined,
               size: 64,
               color: MbuyColors.textTertiary,
@@ -328,11 +335,12 @@ class _CartScreenState extends State<CartScreen> {
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(context), // Go back to home/explore
             style: ElevatedButton.styleFrom(
-              backgroundColor: MbuyColors.primaryPurple,
+              backgroundColor: MbuyColors.primaryMaroon,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(24),
               ),
+              elevation: 0,
             ),
             icon: const Icon(
               Icons.shopping_bag_outlined,
@@ -350,25 +358,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           const SizedBox(height: 40),
           // Suggested products even when empty
-          Column(
-            children: [
-              MbuySectionHeader(
-                title: 'منتجات قد تعجبك',
-                backgroundColor: Colors.transparent,
-              ),
-              SizedBox(
-                height: 240,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 0,
-                  itemBuilder: (context, index) {
-                    return const SizedBox();
-                  },
-                ),
-              ),
-            ],
-          ),
+          _buildSuggestedProducts(),
         ],
       ),
     );
@@ -417,13 +407,7 @@ class _CartScreenState extends State<CartScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  border: Border.all(color: MbuyColors.borderLight),
                 ),
                 child: Column(
                   children: [
@@ -438,6 +422,21 @@ class _CartScreenState extends State<CartScreen> {
                               hintText: 'أدخل كود الكوبون',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: MbuyColors.borderLight,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: MbuyColors.borderLight,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: MbuyColors.primaryMaroon,
+                                ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -462,9 +461,15 @@ class _CartScreenState extends State<CartScreen> {
                               ? null
                               : _applyCoupon,
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: MbuyColors.primaryMaroon,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           child: _isValidatingCoupon
@@ -473,6 +478,7 @@ class _CartScreenState extends State<CartScreen> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color: Colors.white,
                                   ),
                                 )
                               : const Text('تطبيق'),
@@ -486,14 +492,14 @@ class _CartScreenState extends State<CartScreen> {
                         children: [
                           const Icon(
                             Icons.check_circle,
-                            color: Colors.green,
+                            color: MbuyColors.primaryMaroon,
                             size: 16,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             'تم تطبيق الخصم: ${_buildCouponDiscountText()}',
                             style: const TextStyle(
-                              color: Colors.green,
+                              color: MbuyColors.primaryMaroon,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -501,7 +507,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ],
 
-                    const Divider(height: 24),
+                    const Divider(height: 24, color: MbuyColors.borderLight),
 
                     // Total
                     Row(
@@ -520,7 +526,7 @@ class _CartScreenState extends State<CartScreen> {
                           style: GoogleFonts.cairo(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: MbuyColors.primaryPurple,
+                            color: MbuyColors.primaryMaroon,
                           ),
                         ),
                       ],
@@ -532,30 +538,7 @@ class _CartScreenState extends State<CartScreen> {
               const SizedBox(height: 24),
 
               // 4. Suggested Products
-              Container(
-                color: Colors.white,
-                margin: const EdgeInsets.only(bottom: 8),
-                child: Column(
-                  children: [
-                    MbuySectionHeader(
-                      title: 'توصيات لك',
-                      subtitle: 'منتجات قد تعجبك',
-                    ),
-                    SizedBox(
-                      height: 240,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: 6,
-                        itemBuilder: (context, index) {
-                          return const SizedBox();
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
+              _buildSuggestedProducts(),
             ],
           ),
         ),
@@ -565,13 +548,9 @@ class _CartScreenState extends State<CartScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+            border: const Border(
+              top: BorderSide(color: MbuyColors.borderLight),
+            ),
           ),
           child: SafeArea(
             child: SizedBox(
@@ -579,10 +558,11 @@ class _CartScreenState extends State<CartScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _completeOrder,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: MbuyColors.primaryPurple,
+                  backgroundColor: MbuyColors.primaryMaroon,
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
                 child: _isLoading
@@ -610,6 +590,39 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  Widget _buildSuggestedProducts() {
+    return Column(
+      children: [
+        MbuySectionHeader(
+          title: 'توصيات لك',
+          subtitle: 'منتجات قد تعجبك',
+          backgroundColor: Colors.transparent,
+        ),
+        SizedBox(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 6,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              return CircleItem(
+                label: 'منتج ${index + 1}',
+                // imageUrl: 'https://via.placeholder.com/100',
+                icon: const Icon(
+                  Icons.shopping_bag_outlined,
+                  color: MbuyColors.textSecondary,
+                ),
+                onTap: () {},
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
   Widget _buildCartItem(BuildContext context, Map<String, dynamic> item) {
     final product = item['products'] as Map<String, dynamic>?;
     final cartItemId = item['id'] as String;
@@ -624,25 +637,19 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: MbuyColors.borderLight),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image
           Container(
-            width: 100,
-            height: 100,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(16),
+              color: MbuyColors.surface,
+              borderRadius: BorderRadius.circular(8),
               image: imageUrl != null
                   ? DecorationImage(
                       image: NetworkImage(imageUrl),
@@ -651,7 +658,11 @@ class _CartScreenState extends State<CartScreen> {
                   : null,
             ),
             child: imageUrl == null
-                ? const Icon(Icons.image, color: Colors.grey, size: 32)
+                ? const Icon(
+                    Icons.image,
+                    color: MbuyColors.textTertiary,
+                    size: 32,
+                  )
                 : null,
           ),
           const SizedBox(width: 16),
@@ -670,7 +681,7 @@ class _CartScreenState extends State<CartScreen> {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.cairo(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 14,
                           color: MbuyColors.textPrimary,
                         ),
                       ),
@@ -678,8 +689,8 @@ class _CartScreenState extends State<CartScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.close,
-                        size: 20,
-                        color: Colors.grey,
+                        size: 18,
+                        color: MbuyColors.textSecondary,
                       ),
                       onPressed: isCustomer
                           ? () => _removeItem(cartItemId)
@@ -693,9 +704,9 @@ class _CartScreenState extends State<CartScreen> {
                 Text(
                   '${productPrice.toStringAsFixed(2)} ر.س',
                   style: GoogleFonts.cairo(
-                    color: MbuyColors.primaryPurple,
+                    color: MbuyColors.primaryMaroon,
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -708,19 +719,19 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
+                          horizontal: 12,
+                          vertical: 4,
                         ),
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.grey[50],
+                          border: Border.all(color: MbuyColors.borderLight),
+                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.white,
                         ),
                         child: Text(
                           '$quantity',
                           style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -728,15 +739,6 @@ class _CartScreenState extends State<CartScreen> {
                       _buildQtyBtn(
                         Icons.add,
                         () => _updateQuantity(cartItemId, quantity + 1),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.favorite_border,
-                          size: 22,
-                          color: MbuyColors.textSecondary,
-                        ),
-                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -751,14 +753,14 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildQtyBtn(IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(4),
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
+          color: MbuyColors.surface,
+          borderRadius: BorderRadius.circular(4),
         ),
-        child: Icon(icon, size: 18, color: MbuyColors.textPrimary),
+        child: Icon(icon, size: 16, color: MbuyColors.textPrimary),
       ),
     );
   }

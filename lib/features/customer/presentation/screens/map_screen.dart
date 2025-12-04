@@ -554,7 +554,7 @@ class _MapScreenState extends State<MapScreen> {
 
           // زر اختيار المدينة (عائم في الأسفل يمين)
           Positioned(
-            bottom: 100,
+            bottom: 60,
             right: 16,
             child: Material(
               color: Colors.transparent,
@@ -610,7 +610,7 @@ class _MapScreenState extends State<MapScreen> {
           // Map Controls (Zoom, My Location)
           Positioned(
             left: 16,
-            bottom: 100,
+            bottom: 60,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
