@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../core/supabase_client.dart';
 import '../models/product_model.dart';
 
@@ -61,37 +62,31 @@ class CartService {
         return [];
       }
 
-      final response = await supabaseClient
-          .from('cart_items')
-          .select('''
-            *,
-            products!inner(
-              *,
-              stores!inner(name),
-              categories(name)
-            )
-          ''')
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
+      final result = await ApiService.get('/cart');
 
-      debugPrint('✅ تم جلب ${(response as List).length} عنصر من السلة');
+      if (result['ok'] == true && result['data'] != null) {
+        final items = (result['data'] as List);
+        debugPrint('✅ تم جلب ${items.length} عنصر من السلة');
 
-      return (response as List).map((json) {
-        // معالجة بيانات المنتج
-        final cartJson = Map<String, dynamic>.from(json);
-        if (json['products'] != null) {
-          final productJson = Map<String, dynamic>.from(json['products']);
-          if (json['products']['stores'] != null) {
-            productJson['store_name'] = json['products']['stores']['name'];
+        return items.map((json) {
+          // معالجة بيانات المنتج
+          final cartJson = Map<String, dynamic>.from(json);
+          if (json['products'] != null) {
+            final productJson = Map<String, dynamic>.from(json['products']);
+            if (json['products']['stores'] != null) {
+              productJson['store_name'] = json['products']['stores']['name'];
+            }
+            if (json['products']['categories'] != null) {
+              productJson['category_name'] =
+                  json['products']['categories']['name'];
+            }
+            cartJson['products'] = productJson;
           }
-          if (json['products']['categories'] != null) {
-            productJson['category_name'] =
-                json['products']['categories']['name'];
-          }
-          cartJson['products'] = productJson;
-        }
-        return CartItemModel.fromJson(cartJson);
-      }).toList();
+          return CartItemModel.fromJson(cartJson);
+        }).toList();
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب عناصر السلة: $e');
       return [];
@@ -99,7 +94,11 @@ class CartService {
   }
 
   /// إضافة منتج للسلة
-  static Future<bool> addToCart(String productId, {int quantity = 1}) async {
+  static Future<bool> addToCart(
+    String productId, {
+    int quantity = 1,
+    String? storeId,
+  }) async {
     try {
       final userId = supabaseClient.auth.currentUser?.id;
       if (userId == null) {
@@ -107,34 +106,22 @@ class CartService {
         return false;
       }
 
-      // التحقق من وجود المنتج في السلة
-      final existing = await supabaseClient
-          .from('cart_items')
-          .select('id, quantity')
-          .eq('user_id', userId)
-          .eq('product_id', productId)
-          .maybeSingle();
-
-      if (existing != null) {
-        // تحديث الكمية
-        await supabaseClient
-            .from('cart_items')
-            .update({'quantity': existing['quantity'] + quantity})
-            .eq('id', existing['id']);
-
-        debugPrint('✅ تم تحديث كمية المنتج في السلة');
-      } else {
-        // إضافة منتج جديد
-        await supabaseClient.from('cart_items').insert({
-          'user_id': userId,
+      final result = await ApiService.post(
+        '/cart',
+        data: {
           'product_id': productId,
           'quantity': quantity,
-        });
+          'store_id': storeId,
+        },
+      );
 
+      if (result['ok'] == true) {
         debugPrint('✅ تم إضافة المنتج للسلة');
+        return true;
       }
 
-      return true;
+      debugPrint('⚠️ فشل إضافة المنتج: ${result['error']}');
+      return false;
     } catch (e) {
       debugPrint('❌ خطأ في إضافة المنتج للسلة: $e');
       return false;
@@ -148,13 +135,17 @@ class CartService {
         return removeFromCart(cartItemId);
       }
 
-      await supabaseClient
-          .from('cart_items')
-          .update({'quantity': newQuantity})
-          .eq('id', cartItemId);
+      final result = await ApiService.put(
+        '/cart/$cartItemId',
+        data: {'quantity': newQuantity},
+      );
 
-      debugPrint('✅ تم تحديث الكمية');
-      return true;
+      if (result['ok'] == true) {
+        debugPrint('✅ تم تحديث الكمية');
+        return true;
+      }
+
+      return false;
     } catch (e) {
       debugPrint('❌ خطأ في تحديث الكمية: $e');
       return false;
@@ -164,10 +155,14 @@ class CartService {
   /// حذف منتج من السلة
   static Future<bool> removeFromCart(String cartItemId) async {
     try {
-      await supabaseClient.from('cart_items').delete().eq('id', cartItemId);
+      final result = await ApiService.delete('/cart/$cartItemId');
 
-      debugPrint('✅ تم حذف المنتج من السلة');
-      return true;
+      if (result['ok'] == true) {
+        debugPrint('✅ تم حذف المنتج من السلة');
+        return true;
+      }
+
+      return false;
     } catch (e) {
       debugPrint('❌ خطأ في حذف المنتج: $e');
       return false;
@@ -183,10 +178,14 @@ class CartService {
         return false;
       }
 
-      await supabaseClient.from('cart_items').delete().eq('user_id', userId);
+      final result = await ApiService.delete('/cart');
 
-      debugPrint('✅ تم مسح السلة بالكامل');
-      return true;
+      if (result['ok'] == true) {
+        debugPrint('✅ تم مسح السلة بالكامل');
+        return true;
+      }
+
+      return false;
     } catch (e) {
       debugPrint('❌ خطأ في مسح السلة: $e');
       return false;
