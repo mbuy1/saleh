@@ -87,24 +87,18 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      body: CustomScrollView(
-        slivers: [
-          // بانر ممتد لأعلى الشاشة
-          SliverToBoxAdapter(
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.35,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF00D9B3),
-                    const Color(0xFF00B38F),
-                  ],
-                ),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [const Color(0xFF00D9B3), const Color(0xFF00B38F)],
+          ),
+        ),
+        child: CustomScrollView(
+          slivers: [
+            // بانر ممتد لأعلى الشاشة
+            SliverToBoxAdapter(
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10),
@@ -133,11 +127,16 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(22),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.search,
-                                        color: Colors.grey.shade600, size: 20),
+                                    Icon(
+                                      Icons.search,
+                                      color: Colors.grey.shade600,
+                                      size: 20,
+                                    ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: TextField(
@@ -200,10 +199,9 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                 ),
               ),
             ),
-          ),
 
-          // المحتوى الرئيسي
-          SliverList(
+            // المحتوى الرئيسي
+            SliverList(
             delegate: SliverChildListDelegate([
               // 1. Hero Banner الرئيسي (Carousel)
               SheinBannerCarousel(
@@ -245,6 +243,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
             ]),
           ),
         ],
+        ),
       ),
       drawer: _buildDrawer(),
     );

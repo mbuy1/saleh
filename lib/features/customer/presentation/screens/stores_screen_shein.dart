@@ -70,21 +70,18 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      body: CustomScrollView(
-        slivers: [
-          // بانر ممتد لأعلى الشاشة
-          SliverToBoxAdapter(
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.35,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFFFF6B6B), const Color(0xFFFF5252)],
-                ),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [const Color(0xFFFF6B6B), const Color(0xFFFF5252)],
+          ),
+        ),
+        child: CustomScrollView(
+          slivers: [
+            // بانر ممتد لأعلى الشاشة
+            SliverToBoxAdapter(
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10),
@@ -185,10 +182,9 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                 ),
               ),
             ),
-          ),
 
-          // المحتوى الرئيسي
-          SliverList(
+            // المحتوى الرئيسي
+            SliverList(
             delegate: SliverChildListDelegate([
               // 1. Hero Banner الرئيسي (Carousel)
               SheinBannerCarousel(
@@ -236,6 +232,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
             ]),
           ),
         ],
+        ),
       ),
       drawer: _buildDrawer(),
     );
