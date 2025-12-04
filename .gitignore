@@ -53,3 +53,11 @@ ios/Runner/googleservice-info.plist
 .env
 .env.local
 .env.*.local
+
+# Node modules (backend dependencies tracked separately)
+node_modules/
+**/node_modules/
+
+# Backend folders (moved to separate repos)
+cloudflare/
+supabase/
