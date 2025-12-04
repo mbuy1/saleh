@@ -31,8 +31,7 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
+    return SizedBox(
       height: 48,
       child: Row(
         children: [
@@ -42,7 +41,7 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
             color: Colors.white,
             onPressed: widget.onMenuTap ?? () {},
           ),
-          
+
           // قائمة الفئات القابلة للتمرير
           Expanded(
             child: ListView.builder(
@@ -59,7 +58,10 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
                     widget.onCategoryChanged?.call(index);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
@@ -71,9 +73,13 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
                     child: Text(
                       widget.categories[index],
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.7),
                         fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -86,4 +92,3 @@ class _SheinCategoryBarState extends State<SheinCategoryBar> {
     );
   }
 }
-

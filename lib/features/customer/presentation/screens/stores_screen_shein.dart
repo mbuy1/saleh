@@ -104,42 +104,28 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                             const SizedBox(width: 12),
                             // شريط البحث في المنتصف
                             Expanded(
-                              child: Container(
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.5),
-                                    width: 1,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                    size: 20,
                                   ),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.search,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: TextField(
-                                        style: TextStyle(color: Colors.white),
-                                        decoration: InputDecoration(
-                                          hintText: 'ابحث عن متجر...',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white.withOpacity(0.7),
-                                            fontSize: 14,
-                                          ),
-                                          border: InputBorder.none,
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextField(
+                                      style: TextStyle(color: Colors.white),
+                                      decoration: InputDecoration(
+                                        hintText: 'ابحث عن متجر...',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 14,
                                         ),
+                                        border: InputBorder.none,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 12),
