@@ -71,111 +71,100 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       body: CustomScrollView(
         slivers: [
-          // بانر رئيسي كبير مع شريط البحث والفئات عليه
+          // بانر ممتد لأعلى الشاشة
           SliverToBoxAdapter(
-            child: Stack(
-              children: [
-                // البانر الخلفي
-                Container(
-                  height: 280,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFFFF6B6B),
-                        const Color(0xFFFF5252),
-                      ],
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      // أيقونة الإشعارات في الأعلى يسار
-                      Positioned(
-                        top: 40,
-                        left: 16,
-                        child: IconButton(
-                          icon: Stack(
-                            children: [
-                              const Icon(
-                                Icons.notifications_none,
-                                size: 28,
-                                color: Colors.white,
-                              ),
-                              Positioned(
-                                right: 4,
-                                top: 4,
-                                child: Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          onPressed: () {},
-                        ),
-                      ),
-                      // شعار mBuy في الأعلى
-                      Positioned(
-                        top: 45,
-                        right: 16,
-                        child: Text(
-                          'mBuy',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.35,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFFFF6B6B),
+                    const Color(0xFFFF5252),
+                  ],
                 ),
-                // المحتوى: شريط البحث والفئات
-                Positioned(
-                  top: 95,
-                  left: 0,
-                  right: 0,
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10),
                   child: Column(
                     children: [
-                      // شريط البحث البسيط
+                      // شريط البحث مع mBuy والإشعارات
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Container(
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.grey.shade600, size: 20),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'ابحث عن متجر...',
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 14,
+                        child: Row(
+                          children: [
+                            // اسم mBuy على اليمين
+                            Text(
+                              'mBuy',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            // شريط البحث في المنتصف
+                            Expanded(
+                              child: Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.search,
+                                        color: Colors.grey.shade600, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          hintText: 'ابحث عن متجر...',
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey.shade500,
+                                            fontSize: 14,
+                                          ),
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
                                     ),
-                                    border: InputBorder.none,
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 12),
+                            // أيقونة الإشعارات على اليسار
+                            Stack(
+                              children: [
+                                Icon(
+                                  Icons.notifications_none,
+                                  size: 28,
+                                  color: Colors.white,
+                                ),
+                                Positioned(
+                                  right: 4,
+                                  top: 0,
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      // شريط الفئات ملتصق تماماً
+                      // شريط الفئات ملتصق مباشرة
                       SheinCategoryBar(
                         categories: _categories,
                         initialIndex: _selectedCategoryIndex,
@@ -192,7 +181,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
 

@@ -173,7 +173,11 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
                             children: [
-                              Icon(Icons.search, color: Colors.grey.shade600, size: 20),
+                              Icon(
+                                Icons.search,
+                                color: Colors.grey.shade600,
+                                size: 20,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: TextField(
