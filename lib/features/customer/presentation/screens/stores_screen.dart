@@ -1,11 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/data/dummy_data.dart';
-import '../../../../shared/widgets/mbuy_search_bar.dart';
+import '../../../../shared/widgets/modern_hero_section.dart';
+import '../../../../shared/widgets/stats_card.dart';
+import '../../../../shared/widgets/brand_card.dart';
 import '../../../../shared/widgets/circle_item.dart';
-import '../../../../shared/widgets/category_browser_view.dart';
-import '../../../../shared/widgets/hero_banner_carousel.dart';
-import 'categories_screen.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -18,38 +16,19 @@ class _StoresScreenState extends State<StoresScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  // بيانات البانر للمتاجر
-  final List<BannerItem> _storeBanners = [
-    BannerItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
-      title: 'متاجر مميزة',
-      subtitle: 'اكتشف أفضل المتاجر في MBUY',
-      buttonText: 'استكشف',
-      onTap: () {},
-    ),
-    BannerItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=800',
-      title: 'عروض حصرية',
-      subtitle: 'خصومات تصل إلى 50% من متاجر مختارة',
-      buttonText: 'تسوق الآن',
-      onTap: () {},
-    ),
-    BannerItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800',
-      title: 'متاجر جديدة',
-      subtitle: 'انضمت مؤخراً إلى MBUY',
-      buttonText: 'اكتشف',
-      onTap: () {},
-    ),
+  final List<String> _tabs = [
+    'الكل',
+    'أزياء',
+    'إلكترونيات',
+    'منزل',
+    'مطاعم',
+    'جمال',
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: _tabs.length, vsync: this);
   }
 
   @override
@@ -62,28 +41,38 @@ class _StoresScreenState extends State<StoresScreen>
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Modern Hero Section
+        const ModernHeroSection(
+          title: 'المتاجر',
+          subtitle: 'اكتشف أفضل المتاجر المحلية',
+          icon: Icons.storefront_outlined,
+          iconColor: Color(0xFF00D9B3),
+          height: 180,
+        ),
+
         // Tab Bar
         Container(
           color: Colors.white,
           width: double.infinity,
+          height: 50,
           child: TabBar(
             controller: _tabController,
-            indicatorColor: MbuyColors.textPrimary,
-            indicatorWeight: 2,
-            labelColor: MbuyColors.textPrimary,
-            unselectedLabelColor: MbuyColors.textSecondary,
+            isScrollable: true,
+            indicatorColor: const Color(0xFF00D9B3),
+            indicatorWeight: 3,
+            labelColor: const Color(0xFF212529),
+            unselectedLabelColor: const Color(0xFF6C757D),
             labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               fontFamily: 'Cairo',
+              fontSize: 14,
             ),
             unselectedLabelStyle: const TextStyle(
               fontWeight: FontWeight.normal,
               fontFamily: 'Cairo',
+              fontSize: 14,
             ),
-            tabs: const [
-              Tab(text: 'المتاجر'),
-              Tab(text: 'الفئات'),
-            ],
+            tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
           ),
         ),
 
@@ -91,181 +80,188 @@ class _StoresScreenState extends State<StoresScreen>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [_buildStoresTab(), _buildCategoriesTab()],
+            children: _tabs.map((tab) => _buildStoresTab(tab)).toList(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStoresTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hero Banner
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: HeroBannerCarousel(
-              banners: _storeBanners,
-              height: 180,
-              bottomRadius: const BorderRadius.all(Radius.circular(16)),
-            ),
-          ),
+  Widget _buildStoresTab(String category) {
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
 
-          const SizedBox(height: 20),
-
-          // Search Bar (Full Width)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: MbuySearchBar(
-              hintText: 'ابحث عن متجر...',
-              onTap: () {
-                // Navigate to search
-              },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Grid of Circular Stores
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, // 4 items per row
-                childAspectRatio: 0.75,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 24,
+            // Stats Cards Grid
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.3,
+                children: [
+                  StatsCard(
+                    value: '250+',
+                    label: 'متجر نشط',
+                    color: Colors.green.shade100,
+                    icon: Icons.store_outlined,
+                  ),
+                  StatsCard(
+                    value: '4.8',
+                    label: 'متوسط التقييم',
+                    color: Colors.amber.shade100,
+                    icon: Icons.star_outline,
+                  ),
+                  StatsCard(
+                    value: '15',
+                    label: 'وقت الاستجابة (دقيقة)',
+                    color: Colors.blue.shade100,
+                    icon: Icons.access_time_outlined,
+                  ),
+                  StatsCard(
+                    value: '95%',
+                    label: 'معدل الرضا',
+                    color: Colors.purple.shade100,
+                    icon: Icons.thumb_up_outlined,
+                  ),
+                ],
               ),
-              itemCount: DummyData.stores.length,
-              itemBuilder: (context, index) {
-                final store = DummyData.stores[index];
-                return CircleItem(
-                  label: store.name,
-                  imageUrl: store
-                      .logoUrl, // Assuming logoUrl exists or use placeholder
-                  size: 60,
-                  onTap: () {
-                    // Navigate to store details
-                  },
-                );
-              },
             ),
-          ),
 
-          const SizedBox(height: 80), // Bottom padding
-        ],
+            const SizedBox(height: 32),
+
+            // Featured Stores Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'متاجر مميزة',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Cairo',
+                      color: Color(0xFF212529),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'عرض الكل',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        color: Color(0xFF00D9B3),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Featured Stores Horizontal List
+            SizedBox(
+              height: 110,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  BrandCard(
+                    name: 'متجر الموضة',
+                    backgroundColor: const Color(0xFF212529),
+                    textColor: Colors.white,
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 12),
+                  BrandCard(
+                    name: 'تك ستور',
+                    backgroundColor: const Color(0xFF007BFF),
+                    textColor: Colors.white,
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 12),
+                  BrandCard(
+                    name: 'خصم 30%',
+                    backgroundColor: const Color(0xFFDC3545),
+                    textColor: Colors.white,
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 12),
+                  BrandCard(
+                    name: 'هوم ديكور',
+                    backgroundColor: const Color(0xFFF5E6D3),
+                    textColor: Colors.black,
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 12),
+                  BrandCard(
+                    name: 'بيوتي سنتر',
+                    backgroundColor: const Color(0xFFFFC0CB),
+                    textColor: Colors.black,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // All Stores Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'جميع المتاجر - $category',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Cairo',
+                  color: Color(0xFF212529),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Stores Grid
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 24,
+                ),
+                itemCount: DummyData.stores.length,
+                itemBuilder: (context, index) {
+                  final store = DummyData.stores[index];
+                  return CircleItem(
+                    label: store.name,
+                    imageUrl: store.logoUrl,
+                    size: 60,
+                    onTap: () {
+                      // Navigate to store details
+                    },
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 100), // Bottom padding
+          ],
+        ),
       ),
     );
-  }
-
-  Widget _buildCategoriesTab() {
-    return CategoryBrowserView(
-      mainCategories: _getMainStoreCategories(),
-      onViewAllCategories: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CategoriesScreen()),
-        );
-      },
-    );
-  }
-
-  List<MainCategory> _getMainStoreCategories() {
-    return [
-      MainCategory(
-        id: '1',
-        name: 'متاجر أزياء',
-        icon: Icons.checkroom,
-        subCategories: [
-          SubCategory(id: '1-1', name: 'ملابس نسائية', icon: Icons.woman),
-          SubCategory(id: '1-2', name: 'ملابس رجالية', icon: Icons.man),
-          SubCategory(id: '1-3', name: 'ملابس أطفال', icon: Icons.child_care),
-          SubCategory(id: '1-4', name: 'أحذية', icon: Icons.verified_user),
-          SubCategory(id: '1-5', name: 'إكسسوارات', icon: Icons.watch),
-        ],
-      ),
-      MainCategory(
-        id: '2',
-        name: 'متاجر إلكترونيات',
-        icon: Icons.phone_android,
-        subCategories: [
-          SubCategory(id: '2-1', name: 'هواتف وأجهزة', icon: Icons.smartphone),
-          SubCategory(id: '2-2', name: 'حواسيب', icon: Icons.laptop),
-          SubCategory(id: '2-3', name: 'أجهزة منزلية', icon: Icons.tv),
-          SubCategory(id: '2-4', name: 'كاميرات', icon: Icons.camera_alt),
-          SubCategory(
-            id: '2-5',
-            name: 'ألعاب فيديو',
-            icon: Icons.sports_esports,
-          ),
-        ],
-      ),
-      MainCategory(
-        id: '3',
-        name: 'منزل وديكور',
-        icon: Icons.home_outlined,
-        subCategories: [
-          SubCategory(id: '3-1', name: 'أثاث', icon: Icons.chair),
-          SubCategory(id: '3-2', name: 'ديكورات', icon: Icons.format_paint),
-          SubCategory(id: '3-3', name: 'مفروشات', icon: Icons.bed),
-          SubCategory(id: '3-4', name: 'إضاءة', icon: Icons.lightbulb),
-          SubCategory(id: '3-5', name: 'أدوات مطبخ', icon: Icons.kitchen),
-        ],
-      ),
-      MainCategory(
-        id: '4',
-        name: 'جمال وعناية',
-        icon: Icons.face,
-        subCategories: [
-          SubCategory(id: '4-1', name: 'عطور', icon: Icons.spa),
-          SubCategory(id: '4-2', name: 'مكياج', icon: Icons.brush),
-          SubCategory(
-            id: '4-3',
-            name: 'عناية شخصية',
-            icon: Icons.face_retouching_natural,
-          ),
-          SubCategory(id: '4-4', name: 'صالونات', icon: Icons.content_cut),
-        ],
-      ),
-      MainCategory(
-        id: '5',
-        name: 'مطاعم وكافيهات',
-        icon: Icons.restaurant,
-        subCategories: [
-          SubCategory(id: '5-1', name: 'مطاعم', icon: Icons.restaurant_menu),
-          SubCategory(id: '5-2', name: 'كافيهات', icon: Icons.local_cafe),
-          SubCategory(id: '5-3', name: 'حلويات', icon: Icons.cake),
-          SubCategory(id: '5-4', name: 'وجبات سريعة', icon: Icons.fastfood),
-        ],
-      ),
-      MainCategory(
-        id: '6',
-        name: 'رياضة ولياقة',
-        icon: Icons.sports_soccer,
-        subCategories: [
-          SubCategory(
-            id: '6-1',
-            name: 'ملابس رياضية',
-            icon: Icons.sports_handball,
-          ),
-          SubCategory(
-            id: '6-2',
-            name: 'معدات رياضية',
-            icon: Icons.fitness_center,
-          ),
-          SubCategory(
-            id: '6-3',
-            name: 'نوادي رياضية',
-            icon: Icons.sports_gymnastics,
-          ),
-          SubCategory(id: '6-4', name: 'مكملات غذائية', icon: Icons.restaurant),
-        ],
-      ),
-    ];
   }
 }
