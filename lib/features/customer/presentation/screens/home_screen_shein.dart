@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/shein/shein_search_bar.dart';
 import '../../../../shared/widgets/shein/shein_category_bar.dart';
 import '../../../../shared/widgets/shein/shein_banner_carousel.dart';
 import '../../../../shared/widgets/shein/shein_look_card.dart';
@@ -7,10 +6,7 @@ import '../../../../shared/widgets/shein/shein_category_icon.dart';
 import '../../../../shared/widgets/shein/shein_promotional_banner.dart';
 import '../../../../core/services/cloudflare_helper.dart';
 import 'category_products_screen_shein.dart';
-import 'cart_screen.dart';
-import 'favorites_screen.dart';
 import 'profile_screen.dart';
-import '../../data/cart_service.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../core/data/models.dart';
@@ -27,7 +23,6 @@ class HomeScreenShein extends StatefulWidget {
 
 class _HomeScreenSheinState extends State<HomeScreenShein> {
   int _selectedCategoryIndex = 1; // "نساء" هو الافتراضي
-  int _cartItemCount = 0;
   List<Product> _featuredProducts = [];
   bool _isLoadingProducts = false;
 
@@ -43,21 +38,7 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   @override
   void initState() {
     super.initState();
-    _loadCartCount();
     _loadFeaturedProducts();
-  }
-
-  Future<void> _loadCartCount() async {
-    try {
-      final items = await CartService.getCartItems();
-      if (mounted) {
-        setState(() {
-          _cartItemCount = items.length;
-        });
-      }
-    } catch (e) {
-      // تجاهل الخطأ
-    }
   }
 
   Future<void> _loadFeaturedProducts() async {
@@ -180,32 +161,38 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                   right: 0,
                   child: Column(
                     children: [
-                      // شريط البحث
+                      // شريط البحث البسيط
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SheinSearchBar(
-                          hintText: 'البحث',
-                          bagBadgeCount: _cartItemCount,
-                          hasMessageNotification: true,
-                          onSearchTap: () {},
-                          onBagTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CartScreen(userRole: widget.userRole),
+                        child: Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.grey.shade600, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'البحث عن المنتجات...',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 14,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
                               ),
-                            );
-                          },
-                          onHeartTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                            );
-                          },
-                          onMessageTap: () {},
+                            ],
+                          ),
                         ),
                       ),
-                      // إلصاق شريط الفئات مباشرة (بدون مسافة)
+                      const SizedBox(height: 2),
+                      // شريط الفئات ملتصق تماماً
                       SheinCategoryBar(
                         categories: _categories,
                         initialIndex: _selectedCategoryIndex,
@@ -233,17 +220,20 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
               SheinBannerCarousel(
                 banners: [
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop',
                     'title': 'ألوان الشتاء الرائجة',
                     'subtitle': 'اكتشفي أحدث صيحات الموضة',
                   },
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1558769132-cb1aea1f8cf5?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1558769132-cb1aea1f8cf5?w=800&h=600&fit=crop',
                     'title': 'عروض خاصة',
                     'subtitle': 'خصومات تصل إلى 70%',
                   },
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop',
                     'title': 'مجموعات جديدة',
                     'subtitle': 'تسوقي أحدث الإطلالات',
                   },
@@ -274,27 +264,32 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   Widget _buildLooksSection() {
     final looks = [
       {
-        'image': 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=280&h=400&fit=crop',
         'name': 'إطلالات يومية',
         'id': '1',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=280&h=400&fit=crop',
         'name': 'محتشمة',
         'id': '2',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=280&h=400&fit=crop',
         'name': 'عمل',
         'id': '3',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=280&h=400&fit=crop',
         'name': 'حفلات',
         'id': '4',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
         'name': 'موعد في',
         'id': '5',
       },
@@ -351,53 +346,92 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
     // استخدام صور Cloudflare إذا كانت متاحة، وإلا placeholder
     final categories = [
       {
-        'image': 'https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=200&h=200&fit=crop',
         'name': 'ملابس علوية',
         'id': '1',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1624206112918-f140f087f9db?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1624206112918-f140f087f9db?w=200&h=200&fit=crop',
         'name': 'ملابس سفلية',
         'id': '2',
       },
-      {'image': 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=200&fit=crop', 'name': 'فساتين', 'id': '3'},
-      {'image': 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=200&fit=crop', 'name': 'بلایز', 'id': '4'},
-      {'image': 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=200&h=200&fit=crop', 'name': 'بدلات', 'id': '5'},
       {
-        'image': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=200&fit=crop',
+        'name': 'فساتين',
+        'id': '3',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=200&fit=crop',
+        'name': 'بلایز',
+        'id': '4',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=200&h=200&fit=crop',
+        'name': 'بدلات',
+        'id': '5',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
         'name': 'تيشيرتات',
         'id': '6',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=200&fit=crop',
         'name': 'أطقم منسقة',
         'id': '7',
       },
-      {'image': 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200&h=200&fit=crop', 'name': 'بناطيل', 'id': '8'},
-      {'image': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop', 'name': 'الدنيم', 'id': '9'},
       {
-        'image': 'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200&h=200&fit=crop',
+        'name': 'بناطيل',
+        'id': '8',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop',
+        'name': 'الدنيم',
+        'id': '9',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=200&h=200&fit=crop',
         'name': 'جمبسوت وبوديسون',
         'id': '10',
       },
-      {'image': 'https://images.unsplash.com/photo-1475178626620-a4d074967452?w=200&h=200&fit=crop', 'name': 'جينز', 'id': '11'},
       {
-        'image': 'https://images.unsplash.com/photo-1467043237213-65f2da53396f?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1475178626620-a4d074967452?w=200&h=200&fit=crop',
+        'name': 'جينز',
+        'id': '11',
+      },
+      {
+        'image':
+            'https://images.unsplash.com/photo-1467043237213-65f2da53396f?w=200&h=200&fit=crop',
         'name': 'ملابس منسوجة',
         'id': '12',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=200&h=200&fit=crop',
         'name': 'تنانير',
         'id': '13',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=200&fit=crop',
         'name': 'ملابس الحفلات',
         'id': '14',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=200&h=200&fit=crop',
         'name': 'فساتين طو',
         'id': '15',
       },
@@ -592,10 +626,6 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
             title: const Text('المفضلة'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-              );
             },
           ),
         ],

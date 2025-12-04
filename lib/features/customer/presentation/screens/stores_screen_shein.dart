@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/shein/shein_search_bar.dart';
 import '../../../../shared/widgets/shein/shein_category_bar.dart';
 import '../../../../shared/widgets/shein/shein_banner_carousel.dart';
 import '../../../../shared/widgets/shein/shein_look_card.dart';
@@ -11,11 +10,8 @@ import '../../../../shared/widgets/store_card_compact.dart';
 import '../../../../core/data/repositories/store_repository.dart';
 import '../../../../core/data/models.dart';
 import 'store_details_screen.dart';
-import 'cart_screen.dart';
-import 'favorites_screen.dart';
 import 'profile_screen.dart';
 import 'category_products_screen_shein.dart';
-import '../../data/cart_service.dart';
 
 /// صفحة المتاجر بتصميم SHEIN
 class StoresScreenShein extends StatefulWidget {
@@ -29,7 +25,6 @@ class StoresScreenShein extends StatefulWidget {
 
 class _StoresScreenSheinState extends State<StoresScreenShein> {
   int _selectedCategoryIndex = 0;
-  int _cartItemCount = 0;
   List<Store> _stores = [];
   bool _isLoading = true;
 
@@ -46,21 +41,7 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   @override
   void initState() {
     super.initState();
-    _loadCartCount();
     _loadStores();
-  }
-
-  Future<void> _loadCartCount() async {
-    try {
-      final items = await CartService.getCartItems();
-      if (mounted) {
-        setState(() {
-          _cartItemCount = items.length;
-        });
-      }
-    } catch (e) {
-      // تجاهل الخطأ
-    }
   }
 
   Future<void> _loadStores() async {
@@ -163,31 +144,38 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
                   right: 0,
                   child: Column(
                     children: [
-                      // شريط البحث
+                      // شريط البحث البسيط
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SheinSearchBar(
-                          hintText: 'ابحث عن متجر...',
-                          bagBadgeCount: _cartItemCount,
-                          hasMessageNotification: true,
-                          onSearchTap: () {},
-                          onBagTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CartScreen(userRole: widget.userRole),
+                        child: Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, color: Colors.grey.shade600, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'ابحث عن متجر...',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 14,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
                               ),
-                            );
-                          },
-                          onHeartTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                            );
-                          },
+                            ],
+                          ),
                         ),
                       ),
-                      // إلصاق شريط الفئات مباشرة (بدون مسافة)
+                      const SizedBox(height: 2),
+                      // شريط الفئات ملتصق تماماً
                       SheinCategoryBar(
                         categories: _categories,
                         initialIndex: _selectedCategoryIndex,
@@ -215,17 +203,20 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
               SheinBannerCarousel(
                 banners: [
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
                     'title': 'اكتشف المتاجر',
                     'subtitle': 'تسوق من أفضل المتاجر المحلية',
                   },
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop',
                     'title': 'عروض المتاجر',
                     'subtitle': 'خصومات حصرية وعروض مميزة',
                   },
                   {
-                    'imageUrl': 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop',
+                    'imageUrl':
+                        'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop',
                     'title': 'متاجر مميزة',
                     'subtitle': 'اكتشف أفضل العلامات التجارية',
                   },
@@ -262,17 +253,20 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildLooksSection() {
     final looks = [
       {
-        'image': 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
         'name': 'متاجر نسائية',
         'id': '1',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=280&h=400&fit=crop',
         'name': 'متاجر رجالية',
         'id': '2',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=280&h=400&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=280&h=400&fit=crop',
         'name': 'متاجر إلكترونيات',
         'id': '3',
       },
@@ -337,37 +331,44 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildCategoryIconsGrid() {
     final categories = [
       {
-        'image': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=200&fit=crop',
         'name': 'ملابس',
         'id': '1',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=200&h=200&fit=crop',
         'name': 'إلكترونيات',
         'id': '2',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&h=200&fit=crop',
         'name': 'منزلية',
         'id': '3',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=200&h=200&fit=crop',
         'name': 'أحذية',
         'id': '4',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=200&h=200&fit=crop',
         'name': 'إكسسوارات',
         'id': '5',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=200&h=200&fit=crop',
         'name': 'رياضة',
         'id': '6',
       },
       {
-        'image': 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=200&h=200&fit=crop',
+        'image':
+            'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=200&h=200&fit=crop',
         'name': 'حقائب',
         'id': '7',
       },
