@@ -202,47 +202,47 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
 
             // المحتوى الرئيسي
             SliverList(
-            delegate: SliverChildListDelegate([
-              // 1. Hero Banner الرئيسي (Carousel)
-              SheinBannerCarousel(
-                banners: [
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop',
-                    'title': 'ألوان الشتاء الرائجة',
-                    'subtitle': 'اكتشفي أحدث صيحات الموضة',
-                  },
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1558769132-cb1aea1f8cf5?w=800&h=600&fit=crop',
-                    'title': 'عروض خاصة',
-                    'subtitle': 'خصومات تصل إلى 70%',
-                  },
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop',
-                    'title': 'مجموعات جديدة',
-                    'subtitle': 'تسوقي أحدث الإطلالات',
-                  },
-                ],
-              ),
+              delegate: SliverChildListDelegate([
+                // 1. Hero Banner الرئيسي (Carousel)
+                SheinBannerCarousel(
+                  banners: [
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop',
+                      'title': 'ألوان الشتاء الرائجة',
+                      'subtitle': 'اكتشفي أحدث صيحات الموضة',
+                    },
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1558769132-cb1aea1f8cf5?w=800&h=600&fit=crop',
+                      'title': 'عروض خاصة',
+                      'subtitle': 'خصومات تصل إلى 70%',
+                    },
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop',
+                      'title': 'مجموعات جديدة',
+                      'subtitle': 'تسوقي أحدث الإطلالات',
+                    },
+                  ],
+                ),
 
-              // 2. صف أفقي من Looks (بطاقات مع صور عارضات)
-              _buildLooksSection(),
+                // 2. صف أفقي من Looks (بطاقات مع صور عارضات)
+                _buildLooksSection(),
 
-              // 3. شبكة من الأيقونات الدائرية للفئات
-              _buildCategoryIconsGrid(),
+                // 3. شبكة من الأيقونات الدائرية للفئات
+                _buildCategoryIconsGrid(),
 
-              // 4. بانرات ترويجية إضافية
-              _buildPromotionalBanners(),
+                // 4. بانرات ترويجية إضافية
+                _buildPromotionalBanners(),
 
-              // 5. منتجات مميزة
-              _buildFeaturedProductsSection(),
+                // 5. منتجات مميزة
+                _buildFeaturedProductsSection(),
 
-              const SizedBox(height: 80), // مساحة للشريط السفلي
-            ]),
-          ),
-        ],
+                const SizedBox(height: 80), // مساحة للشريط السفلي
+              ]),
+            ),
+          ],
         ),
       ),
       drawer: _buildDrawer(),

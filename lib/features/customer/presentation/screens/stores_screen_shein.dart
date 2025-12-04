@@ -185,53 +185,53 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
 
             // المحتوى الرئيسي
             SliverList(
-            delegate: SliverChildListDelegate([
-              // 1. Hero Banner الرئيسي (Carousel)
-              SheinBannerCarousel(
-                banners: [
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
-                    'title': 'اكتشف المتاجر',
-                    'subtitle': 'تسوق من أفضل المتاجر المحلية',
-                  },
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop',
-                    'title': 'عروض المتاجر',
-                    'subtitle': 'خصومات حصرية وعروض مميزة',
-                  },
-                  {
-                    'imageUrl':
-                        'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop',
-                    'title': 'متاجر مميزة',
-                    'subtitle': 'اكتشف أفضل العلامات التجارية',
-                  },
-                ],
-              ),
+              delegate: SliverChildListDelegate([
+                // 1. Hero Banner الرئيسي (Carousel)
+                SheinBannerCarousel(
+                  banners: [
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+                      'title': 'اكتشف المتاجر',
+                      'subtitle': 'تسوق من أفضل المتاجر المحلية',
+                    },
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop',
+                      'title': 'عروض المتاجر',
+                      'subtitle': 'خصومات حصرية وعروض مميزة',
+                    },
+                    {
+                      'imageUrl':
+                          'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop',
+                      'title': 'متاجر مميزة',
+                      'subtitle': 'اكتشف أفضل العلامات التجارية',
+                    },
+                  ],
+                ),
 
-              // 2. صف أفقي من Looks (بطاقات مع صور عارضات)
-              _buildLooksSection(),
+                // 2. صف أفقي من Looks (بطاقات مع صور عارضات)
+                _buildLooksSection(),
 
-              // 3. شبكة من الأيقونات الدائرية للفئات
-              _buildCategoryIconsGrid(),
+                // 3. شبكة من الأيقونات الدائرية للفئات
+                _buildCategoryIconsGrid(),
 
-              // 4. بانرات ترويجية إضافية
-              _buildPromotionalBanners(),
+                // 4. بانرات ترويجية إضافية
+                _buildPromotionalBanners(),
 
-              // 5. قائمة المتاجر
-              if (_isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else
-                _buildStoresGrid(),
+                // 5. قائمة المتاجر
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else
+                  _buildStoresGrid(),
 
-              const SizedBox(height: 80), // مساحة للشريط السفلي
-            ]),
-          ),
-        ],
+                const SizedBox(height: 80), // مساحة للشريط السفلي
+              ]),
+            ),
+          ],
         ),
       ),
       drawer: _buildDrawer(),
