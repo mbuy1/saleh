@@ -36,7 +36,9 @@ class MbuySearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: MbuyColors.textTertiary),
-          prefixIcon: prefixIcon ?? const Icon(Icons.search, color: MbuyColors.textSecondary),
+          prefixIcon:
+              prefixIcon ??
+              const Icon(Icons.search, color: MbuyColors.textSecondary),
           suffixIcon:
               suffixIcon ??
               const Icon(

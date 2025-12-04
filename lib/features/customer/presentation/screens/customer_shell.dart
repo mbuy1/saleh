@@ -28,8 +28,11 @@ class CustomerShell extends StatefulWidget {
 }
 
 class _CustomerShellState extends State<CustomerShell> {
-  int _currentIndex = 0; // Home is default
-  Offset _fabPosition = const Offset(20, 100); // Initial position for draggable button
+  int _currentIndex = 2; // Home هي الصفحة الرئيسية (index 2)
+  Offset _fabPosition = const Offset(
+    20,
+    100,
+  ); // Initial position for draggable button
 
   // Screens
   late List<Widget> _screens;
@@ -38,9 +41,9 @@ class _CustomerShellState extends State<CustomerShell> {
   void initState() {
     super.initState();
     _screens = [
-      const ExploreScreen(), // 0: Explore (Video) - تبديل المواقع
+      const ExploreScreen(), // 0: Explore (Video)
       const StoresScreen(), // 1: Stores
-      const HomeScreen(), // 2: Home (الصفحة الرئيسية) - تبديل المواقع
+      const HomeScreen(), // 2: Home (الصفحة الرئيسية) - الافتراضية
       const CartScreen(), // 3: Cart
       const MapScreen(), // 4: Map
     ];
@@ -113,7 +116,7 @@ class _CustomerShellState extends State<CustomerShell> {
       body: Stack(
         children: [
           IndexedStack(index: _currentIndex, children: _screens),
-          
+
           // Draggable Dashboard Button (only if merchant access)
           if (widget.appModeProvider.hasMerchantAccess())
             Positioned(
@@ -251,11 +254,7 @@ class _CustomerShellState extends State<CustomerShell> {
             widget.appModeProvider.setMerchantMode();
           },
           customBorder: const CircleBorder(),
-          child: const Icon(
-            Icons.dashboard_outlined,
-            color: Colors.white,
-            size: 28,
-          ),
+          child: const Icon(Icons.storefront, color: Colors.white, size: 26),
         ),
       ),
     );
