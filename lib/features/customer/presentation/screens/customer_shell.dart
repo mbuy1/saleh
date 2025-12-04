@@ -29,7 +29,7 @@ class CustomerShell extends StatefulWidget {
 }
 
 class _CustomerShellState extends State<CustomerShell> {
-  int _currentIndex = 0; // Home is now 0 (Shein style)
+  int _currentIndex = 0; // Home is default
 
   // Screens
   late List<Widget> _screens;
@@ -38,9 +38,9 @@ class _CustomerShellState extends State<CustomerShell> {
   void initState() {
     super.initState();
     _screens = [
-      const ExploreScreen(), // 0: Explore (Video)
+      const HomeScreen(), // 0: Home (الصفحة الرئيسية)
       const StoresScreen(), // 1: Stores
-      const HomeScreen(), // 2: Home
+      const ExploreScreen(), // 2: Explore (Video)
       const CartScreen(), // 3: Cart
       const MapScreen(), // 4: Map
     ];
@@ -49,11 +49,11 @@ class _CustomerShellState extends State<CustomerShell> {
   @override
   Widget build(BuildContext context) {
     // Check if we are on the Explore screen (Video) to change UI style
-    final bool isExplore = _currentIndex == 0;
+    final bool isExplore = _currentIndex == 2;
 
     return Scaffold(
       // Header (Only show on Home and Stores)
-      appBar: (_currentIndex == 1 || _currentIndex == 2)
+      appBar: (_currentIndex == 0 || _currentIndex == 1)
           ? PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: AppBar(
@@ -171,9 +171,9 @@ class _CustomerShellState extends State<CustomerShell> {
           ),
           items: [
             _buildNavItem(
-              label: 'اكسبلور',
-              icon: Icons.explore_outlined,
-              activeIcon: Icons.explore,
+              label: 'الرئيسية',
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
             ),
             _buildNavItem(
               label: 'المتاجر',
@@ -181,9 +181,9 @@ class _CustomerShellState extends State<CustomerShell> {
               activeIcon: Icons.storefront,
             ),
             _buildNavItem(
-              label: 'الرئيسية',
-              icon: Icons.home_outlined,
-              activeIcon: Icons.home,
+              label: 'اكسبلور',
+              icon: Icons.explore_outlined,
+              activeIcon: Icons.explore,
             ),
             _buildNavItem(
               label: 'حقيبة التسوق',
