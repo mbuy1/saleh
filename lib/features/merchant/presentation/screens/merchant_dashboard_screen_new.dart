@@ -6,10 +6,7 @@ import '../../../../core/app_config.dart';
 class MerchantDashboardScreenNew extends StatefulWidget {
   final AppModeProvider appModeProvider;
 
-  const MerchantDashboardScreenNew({
-    super.key,
-    required this.appModeProvider,
-  });
+  const MerchantDashboardScreenNew({super.key, required this.appModeProvider});
 
   @override
   State<MerchantDashboardScreenNew> createState() =>
@@ -36,10 +33,7 @@ class _MerchantDashboardScreenNewState
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF667eea),
-                      Color(0xFF764ba2),
-                    ],
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                   ),
                 ),
                 child: SafeArea(
@@ -213,7 +207,9 @@ class _MerchantDashboardScreenNewState
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF667eea).withValues(alpha: 0.1),
+                            color: const Color(
+                              0xFF667eea,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
@@ -231,9 +227,7 @@ class _MerchantDashboardScreenNewState
                     const SizedBox(height: 24),
                     SizedBox(
                       height: 200,
-                      child: LineChart(
-                        _buildLineChartData(),
-                      ),
+                      child: LineChart(_buildLineChartData()),
                     ),
                   ],
                 ),
@@ -330,11 +324,7 @@ class _MerchantDashboardScreenNewState
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                child: Icon(icon, color: Colors.white, size: 24),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -431,11 +421,7 @@ class _MerchantDashboardScreenNewState
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+              child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -466,10 +452,7 @@ class _MerchantDashboardScreenNewState
         drawVerticalLine: false,
         horizontalInterval: 5000,
         getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: Colors.grey.shade200,
-            strokeWidth: 1,
-          );
+          return FlLine(color: Colors.grey.shade200, strokeWidth: 1);
         },
       ),
       titlesData: FlTitlesData(
@@ -477,9 +460,7 @@ class _MerchantDashboardScreenNewState
         rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,

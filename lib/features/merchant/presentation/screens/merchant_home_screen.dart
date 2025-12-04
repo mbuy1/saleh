@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
-import 'merchant_dashboard_screen_new.dart';
+import 'merchant_dashboard_screen.dart';
 import 'merchant_products_screen.dart';
 import 'merchant_community_screen.dart';
 import 'merchant_messages_screen.dart';
@@ -26,9 +26,7 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      MerchantDashboardScreenNew(
-        appModeProvider: widget.appModeProvider,
-      ),
+      MerchantDashboardScreen(appModeProvider: widget.appModeProvider),
       const MerchantCommunityScreen(),
       const MerchantProductsScreen(),
       const MerchantMessagesScreen(),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/shein/shein_top_bar.dart';
 import '../../../../shared/widgets/shein/shein_search_bar.dart';
 import '../../../../shared/widgets/shein/shein_category_bar.dart';
 import '../../../../shared/widgets/shein/shein_banner_carousel.dart';
@@ -91,77 +90,121 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: SheinTopBar(
-        logoText: 'mBuy',
-        actions: [
-          IconButton(
-            icon: Stack(
+      body: CustomScrollView(
+        slivers: [
+          // بانر رئيسي كبير مع شريط البحث والفئات عليه
+          SliverToBoxAdapter(
+            child: Stack(
               children: [
-                const Icon(
-                  Icons.notifications_none,
-                  size: 24,
-                  color: Colors.black87,
-                ),
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
+                // البانر الخلفي
+                Container(
+                  height: 280,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFFF6B6B),
+                        const Color(0xFFFF5252),
+                      ],
                     ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // أيقونة الإشعارات في الأعلى يسار
+                      Positioned(
+                        top: 40,
+                        left: 16,
+                        child: IconButton(
+                          icon: Stack(
+                            children: [
+                              const Icon(
+                                Icons.notifications_none,
+                                size: 28,
+                                color: Colors.white,
+                              ),
+                              Positioned(
+                                right: 4,
+                                top: 4,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          onPressed: () {},
+                        ),
+                      ),
+                      // شعار mBuy في الأعلى
+                      Positioned(
+                        top: 45,
+                        right: 16,
+                        child: Text(
+                          'mBuy',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // المحتوى: شريط البحث والفئات
+                Positioned(
+                  top: 95,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      // شريط البحث
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: SheinSearchBar(
+                          hintText: 'ابحث عن متجر...',
+                          bagBadgeCount: _cartItemCount,
+                          hasMessageNotification: true,
+                          onSearchTap: () {},
+                          onBagTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CartScreen(userRole: widget.userRole),
+                              ),
+                            );
+                          },
+                          onHeartTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+                            );
+                          },
+                        ),
+                      ),
+                      // إلصاق شريط الفئات مباشرة (بدون مسافة)
+                      SheinCategoryBar(
+                        categories: _categories,
+                        initialIndex: _selectedCategoryIndex,
+                        onCategoryChanged: (index) {
+                          setState(() {
+                            _selectedCategoryIndex = index;
+                          });
+                          _loadStores();
+                        },
+                        onMenuTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: CustomScrollView(
-        slivers: [
-          // شريط البحث
-          SliverToBoxAdapter(
-            child: SheinSearchBar(
-              hintText: 'ابحث عن متجر...',
-              bagBadgeCount: _cartItemCount,
-              hasMessageNotification: true,
-              onSearchTap: () {
-                // Navigate to search
-              },
-              onBagTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CartScreen(userRole: widget.userRole),
-                  ),
-                );
-              },
-              onHeartTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                );
-              },
-            ),
-          ),
-
-          // قائمة الفئات
-          SliverToBoxAdapter(
-            child: SheinCategoryBar(
-              categories: _categories,
-              initialIndex: _selectedCategoryIndex,
-              onCategoryChanged: (index) {
-                setState(() {
-                  _selectedCategoryIndex = index;
-                });
-                _loadStores();
-              },
-              onMenuTap: () {
-                Scaffold.of(context).openDrawer();
-              },
             ),
           ),
 
@@ -172,29 +215,17 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
               SheinBannerCarousel(
                 banners: [
                   {
-                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
-                      width: 400,
-                      height: 320,
-                      text: 'اكتشف المتاجر',
-                    ),
+                    'imageUrl': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
                     'title': 'اكتشف المتاجر',
                     'subtitle': 'تسوق من أفضل المتاجر المحلية',
                   },
                   {
-                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
-                      width: 400,
-                      height: 320,
-                      text: 'عروض المتاجر',
-                    ),
+                    'imageUrl': 'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop',
                     'title': 'عروض المتاجر',
                     'subtitle': 'خصومات حصرية وعروض مميزة',
                   },
                   {
-                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
-                      width: 400,
-                      height: 320,
-                      text: 'متاجر مميزة',
-                    ),
+                    'imageUrl': 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=600&fit=crop',
                     'title': 'متاجر مميزة',
                     'subtitle': 'اكتشف أفضل العلامات التجارية',
                   },
@@ -231,29 +262,17 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildLooksSection() {
     final looks = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'متاجر نسائية',
-        ),
+        'image': 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
         'name': 'متاجر نسائية',
         'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'متاجر رجالية',
-        ),
+        'image': 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=280&h=400&fit=crop',
         'name': 'متاجر رجالية',
         'id': '2',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'متاجر إلكترونيات',
-        ),
+        'image': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=280&h=400&fit=crop',
         'name': 'متاجر إلكترونيات',
         'id': '3',
       },
@@ -318,82 +337,69 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildCategoryIconsGrid() {
     final categories = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 80,
-          height: 80,
-          text: 'ملابس',
-        ),
+        'image': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=200&fit=crop',
         'name': 'ملابس',
         'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 80,
-          height: 80,
-          text: 'إلكترونيات',
-        ),
+        'image': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=200&h=200&fit=crop',
         'name': 'إلكترونيات',
         'id': '2',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 80,
-          height: 80,
-          text: 'منزلية',
-        ),
+        'image': 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&h=200&fit=crop',
         'name': 'منزلية',
         'id': '3',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 80,
-          height: 80,
-          text: 'أحذية',
-        ),
+        'image': 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=200&h=200&fit=crop',
         'name': 'أحذية',
         'id': '4',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 80,
-          height: 80,
-          text: 'إكسسوارات',
-        ),
+        'image': 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=200&h=200&fit=crop',
         'name': 'إكسسوارات',
         'id': '5',
+      },
+      {
+        'image': 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=200&h=200&fit=crop',
+        'name': 'رياضة',
+        'id': '6',
+      },
+      {
+        'image': 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=200&h=200&fit=crop',
+        'name': 'حقائب',
+        'id': '7',
       },
     ];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-        ),
+      height: 140,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          return SheinCategoryIcon(
-            imageUrl: category['image']!,
-            categoryName: category['name']!,
-            size: 65,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => CategoryProductsScreenShein(
-                    categoryId: category['id']!,
-                    categoryName: category['name']!,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: SheinCategoryIcon(
+              imageUrl: category['image']!,
+              categoryName: category['name']!,
+              size: 75,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CategoryProductsScreenShein(
+                      categoryId: category['id']!,
+                      categoryName: category['name']!,
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
