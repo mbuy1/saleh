@@ -72,7 +72,9 @@ class _CustomerShellState extends State<CustomerShell> {
                         },
                       )
                     : null,
-                titleSpacing: widget.appModeProvider.hasMerchantAccess() ? 0 : 16,
+                titleSpacing: widget.appModeProvider.hasMerchantAccess()
+                    ? 0
+                    : 16,
                 title: Row(
                   children: [
                     // Search Bar

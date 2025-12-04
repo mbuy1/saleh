@@ -181,10 +181,11 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in points_add:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        detail: error.message,
+        detail: errorMessage,
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

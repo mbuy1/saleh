@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
     const orderItemsData = [];
 
     for (const item of items) {
-      const product = products?.find(p => p.id === item.product_id);
+      const product = products?.find((p: any) => p.id === item.product_id);
       if (!product) {
         return new Response(
           JSON.stringify({ error: 'Product not found', detail: `Product ${item.product_id} not found` }),
@@ -480,10 +480,11 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in create_order:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        detail: error.message,
+        detail: errorMessage,
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
