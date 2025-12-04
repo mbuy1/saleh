@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/points_service.dart';
 import '../../../../core/firebase_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
+import '../../../../shared/widgets/error_widget/error_state_widget.dart';
 
 class CustomerPointsScreen extends StatefulWidget {
   const CustomerPointsScreen({super.key});
@@ -61,34 +63,23 @@ class _CustomerPointsScreenState extends State<CustomerPointsScreen> {
       appBar: AppBar(
         title: const Text('النقاط'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadPointsData,
+          Semantics(
+            label: 'تحديث النقاط',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadPointsData,
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _error != null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'حدث خطأ',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(_error!, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadPointsData,
-                    child: const Text('إعادة المحاولة'),
-                  ),
-                ],
-              ),
+          ? ErrorStateWidget(
+              message: 'فشل تحميل بيانات النقاط',
+              details: _error,
+              onRetry: _loadPointsData,
             )
           : RefreshIndicator(
               onRefresh: _loadPointsData,
@@ -289,5 +280,25 @@ class _CustomerPointsScreenState extends State<CustomerPointsScreen> {
     } catch (e) {
       return dateStr;
     }
+  }
+
+  Widget _buildSkeletonLoader() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Skeleton Balance Card
+        SkeletonLoader(
+          width: double.infinity,
+          height: 150,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        const SizedBox(height: 24),
+        // Skeleton Section Title
+        SkeletonLoader(width: 150, height: 20),
+        const SizedBox(height: 16),
+        // Skeleton Transactions
+        ...List.generate(5, (index) => const SkeletonListItem()),
+      ],
+    );
   }
 }

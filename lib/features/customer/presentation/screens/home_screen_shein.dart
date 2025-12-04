@@ -190,26 +190,35 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
           // المحتوى الرئيسي
           SliverList(
             delegate: SliverChildListDelegate([
-              // 1. البانر الرئيسي (Carousel)
+              // 1. Hero Banner الرئيسي (Carousel)
               SheinBannerCarousel(
                 banners: [
                   {
                     'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
                       width: 400,
-                      height: 280,
+                      height: 320,
                       text: 'ألوان الشتاء الرائجة',
                     ),
                     'title': 'ألوان الشتاء الرائجة',
-                    'buttonText': 'تسوقي الآن',
+                    'subtitle': 'اكتشفي أحدث صيحات الموضة',
                   },
                   {
                     'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
                       width: 400,
-                      height: 280,
+                      height: 320,
                       text: 'عروض خاصة',
                     ),
                     'title': 'عروض خاصة',
-                    'buttonText': 'تسوقي الآن',
+                    'subtitle': 'خصومات تصل إلى 70%',
+                  },
+                  {
+                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
+                      width: 400,
+                      height: 320,
+                      text: 'مجموعات جديدة',
+                    ),
+                    'title': 'مجموعات جديدة',
+                    'subtitle': 'تسوقي أحدث الإطلالات',
                   },
                 ],
               ),

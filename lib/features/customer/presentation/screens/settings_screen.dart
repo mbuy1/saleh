@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/services/preferences_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'change_password_screen.dart';
 import 'privacy_security_screen.dart';
 import 'terms_screen.dart';
@@ -73,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -432,6 +433,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        SkeletonLoader(width: 120, height: 20),
+        const SizedBox(height: 16),
+        ...List.generate(4, (index) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: SkeletonListItem(),
+        )),
+      ],
     );
   }
 }

@@ -38,9 +38,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: MbuyColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
+        leading: Semantics(
+          label: 'رجوع',
+          button: true,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: MbuyColors.textPrimary),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         actions: [
           IconButton(

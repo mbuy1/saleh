@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import '../../../auth/data/auth_service.dart';
 import 'customer_wallet_screen.dart';
 import 'customer_points_screen.dart';
@@ -123,9 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       useSafeArea: false,
       backgroundColor: MbuyColors.background,
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: MbuyColors.primaryMaroon),
-            )
+          ? _buildSkeletonLoader()
           : CustomScrollView(
               slivers: [
                 // 1. Header
@@ -627,5 +626,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return GestureDetector(onTap: onTap, child: orderWidget);
     }
     return orderWidget;
+  }
+
+  Widget _buildSkeletonLoader() {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Skeleton Profile Header
+                SkeletonLoader(width: 100, height: 100, borderRadius: BorderRadius.circular(50)),
+                const SizedBox(height: 16),
+                SkeletonLoader(width: 150, height: 20),
+                const SizedBox(height: 8),
+                SkeletonLoader(width: 100, height: 16),
+                const SizedBox(height: 24),
+                // Skeleton Feature Items
+                ...List.generate(6, (index) => const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: SkeletonListItem(),
+                )),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

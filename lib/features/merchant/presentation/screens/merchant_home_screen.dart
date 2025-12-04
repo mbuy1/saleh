@@ -5,6 +5,7 @@ import 'merchant_products_screen.dart';
 import 'merchant_community_screen.dart';
 import 'merchant_messages_screen.dart';
 import 'merchant_profile_screen.dart';
+import 'merchant_store_management_screen.dart';
 import '../widgets/merchant_bottom_bar.dart';
 
 class MerchantHomeScreen extends StatefulWidget {
@@ -18,7 +19,6 @@ class MerchantHomeScreen extends StatefulWidget {
 
 class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   int _currentIndex = 0;
-  VoidCallback? _showStoreMenuCallback;
 
   late final List<Widget> _screens;
 
@@ -28,9 +28,6 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
     _screens = [
       MerchantDashboardScreen(
         appModeProvider: widget.appModeProvider,
-        onStoreMenuReady: (callback) {
-          _showStoreMenuCallback = callback;
-        },
       ),
       const MerchantCommunityScreen(),
       const MerchantProductsScreen(),
@@ -61,14 +58,13 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
           );
         },
         onStoreTap: () {
-          // Navigate to dashboard first
-          setState(() {
-            _currentIndex = 0;
-          });
-          // Show store menu after a short delay
-          Future.delayed(const Duration(milliseconds: 300), () {
-            _showStoreMenuCallback?.call();
-          });
+          // Navigate to full store management screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MerchantStoreManagementScreen(),
+            ),
+          );
         },
       ),
     );

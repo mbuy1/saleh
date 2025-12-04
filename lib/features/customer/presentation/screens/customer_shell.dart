@@ -10,6 +10,7 @@ import 'cart_screen.dart';
 import 'profile_screen.dart';
 import 'map_screen.dart';
 import 'categories_screen.dart';
+import 'search_screen.dart';
 
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -58,7 +59,20 @@ class _CustomerShellState extends State<CustomerShell> {
               child: AppBar(
                 backgroundColor: Colors.white,
                 elevation: 0,
-                titleSpacing: 16,
+                leading: widget.appModeProvider.hasMerchantAccess()
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.dashboard_outlined,
+                          color: MbuyColors.textPrimary,
+                          size: 26,
+                        ),
+                        tooltip: 'العودة إلى لوحة التحكم',
+                        onPressed: () {
+                          widget.appModeProvider.setMerchantMode();
+                        },
+                      )
+                    : null,
+                titleSpacing: widget.appModeProvider.hasMerchantAccess() ? 0 : 16,
                 title: Row(
                   children: [
                     // Search Bar
@@ -67,7 +81,12 @@ class _CustomerShellState extends State<CustomerShell> {
                         hintText: 'البحث',
                         readOnly: true,
                         onTap: () {
-                          // TODO: Navigate to search
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SearchScreen(),
+                            ),
+                          );
                         },
                         suffixIcon: const Icon(
                           Icons.camera_alt_outlined,

@@ -31,5 +31,13 @@ class AppModeProvider extends ChangeNotifier {
   void setMerchantMode() {
     setMode(AppMode.merchant);
   }
+
+  /// التحقق من وجود صلاحيات تاجر
+  /// TODO: يجب التحقق من قاعدة البيانات أو Supabase
+  bool hasMerchantAccess() {
+    // في الوقت الحالي، نرجع true للجميع
+    // يمكن لاحقاً التحقق من user role في Supabase
+    return true;
+  }
 }
 

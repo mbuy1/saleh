@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/supabase_client.dart';
-import '../../../../core/services/cloudflare_images_service.dart';
+import '../../../../core/api_service.dart';
 import '../../../customer/presentation/screens/product_details_screen.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
@@ -71,15 +71,24 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
 
       final storeId = storeResponse['id'];
 
-      // جلب منتجات المتجر
+      // جلب منتجات المتجر مع جميع الحقول بما فيها الصور
       final response = await supabaseClient
           .from('products')
-          .select()
+          .select('*') // جلب جميع الحقول
           .eq('store_id', storeId)
           .order('created_at', ascending: false);
 
+      final products = List<Map<String, dynamic>>.from(response);
+      
+      // طباعة معلومات المنتجات للتشخيص
+      for (var product in products) {
+        debugPrint('📦 منتج: ${product['name']}');
+        debugPrint('   image_url: ${product['image_url']}');
+        debugPrint('   main_image_url: ${product['main_image_url']}');
+      }
+
       setState(() {
-        _products = List<Map<String, dynamic>>.from(response);
+        _products = products;
       });
     } catch (e) {
       if (mounted) {
@@ -231,7 +240,9 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           .maybeSingle();
 
       if (storeResponse == null) {
-        throw Exception('لم يتم العثور على متجر. يرجى إنشاء متجر أولاً من قائمة "إعداد المتجر"');
+        throw Exception(
+          'لم يتم العثور على متجر. يرجى إنشاء متجر أولاً من قائمة "إعداد المتجر"',
+        );
       }
 
       final storeId = storeResponse['id'];
@@ -243,19 +254,34 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           _isUploadingImage = true;
         });
         try {
-          imageUrl = await CloudflareImagesService.uploadImage(
-            _selectedImageFile!,
-            folder: 'products',
-          );
+          // استخدام ApiService الذي يستخدم Cloudflare Worker
+          imageUrl = await ApiService.uploadImage(_selectedImageFile!.path);
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم رفع الصورة بنجاح'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 1),
+              ),
+            );
+          }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('خطأ في رفع الصورة: ${e.toString()}'),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
               ),
             );
           }
+          // لا نتابع إنشاء المنتج إذا فشل رفع الصورة
+          setState(() {
+            _isUploadingImage = false;
+            _isCreating = false;
+          });
+          return;
         } finally {
           setState(() {
             _isUploadingImage = false;
@@ -264,26 +290,41 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       }
 
       // إنشاء منتج جديد
-      await supabaseClient.from('products').insert({
+      final productData = {
         'store_id': storeId,
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'price': double.parse(_priceController.text),
         'stock': int.parse(_stockController.text),
         'status': 'active', // افتراضي: نشط
-        if (imageUrl != null) 'image_url': imageUrl,
-        if (imageUrl != null) 'main_image_url': imageUrl,
-      });
+      };
+      
+      // إضافة URL الصورة إذا كان موجوداً
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        productData['image_url'] = imageUrl;
+        productData['main_image_url'] = imageUrl;
+        debugPrint('✅ سيتم حفظ الصورة: $imageUrl');
+      } else {
+        debugPrint('⚠️ لا توجد صورة لحفظها');
+      }
+
+      debugPrint('📦 بيانات المنتج: $productData');
+      
+      final result = await supabaseClient.from('products').insert(productData).select();
+      
+      debugPrint('✅ تم إنشاء المنتج: $result');
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم إضافة المنتج بنجاح!'),
+          SnackBar(
+            content: Text('تم إضافة المنتج بنجاح!${imageUrl != null ? '\nالصورة: $imageUrl' : ''}'),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
           ),
         );
-        _loadProducts(); // إعادة تحميل القائمة
+        // إعادة تحميل القائمة
+        await _loadProducts();
       }
     } catch (e) {
       if (mounted) {
@@ -306,7 +347,16 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المنتجات')),
+      appBar: AppBar(
+        title: const Text('المنتجات'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // العودة إلى لوحة التحكم
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _products.isEmpty
@@ -373,20 +423,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
           ),
-          child:
-              (product['image_url'] != null ||
-                  product['main_image_url'] != null)
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    product['image_url'] ?? product['main_image_url'],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.shopping_bag, color: Colors.grey);
-                    },
-                  ),
-                )
-              : const Icon(Icons.shopping_bag, color: Colors.grey),
+          child: _buildProductImage(product),
         ),
         title: Text(product['name'] ?? 'بدون اسم'),
         subtitle: Text(
@@ -412,43 +449,83 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
+        // عرض الصورة المختارة
+        if (_selectedImageFile != null)
+          Container(
+            width: double.infinity,
+            height: 150,
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(_selectedImageFile!, fit: BoxFit.cover),
+            ),
+          )
+        else
+          Container(
+            width: double.infinity,
+            height: 150,
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, style: BorderStyle.solid),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[200],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.image, size: 50, color: Colors.grey),
+                const SizedBox(height: 8),
+                Text(
+                  'لم يتم اختيار صورة',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+              ],
+            ),
+          ),
         Row(
           children: [
-            // عرض الصورة المختارة
-            if (_selectedImageFile != null)
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(_selectedImageFile!, fit: BoxFit.cover),
-                ),
-              )
-            else
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[200],
-                ),
-                child: const Icon(Icons.image, size: 50, color: Colors.grey),
-              ),
-            const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () => _pickImageInDialog(setDialogState),
                 icon: const Icon(Icons.photo_library),
-                label: const Text('اختر صورة'),
+                label: const Text('اختر من المعرض'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _pickImageFromCamera(setDialogState),
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('التقط صورة'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
             ),
           ],
         ),
+        if (_selectedImageFile != null) ...[
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: () {
+              setState(() {
+                _selectedImageFile = null;
+              });
+              setDialogState(() {
+                _selectedImageFile = null;
+              });
+            },
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            label: const Text('حذف الصورة', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ],
     );
   }
@@ -458,19 +535,30 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 90,
       );
 
       if (image != null) {
+        final file = File(image.path);
         setState(() {
-          _selectedImageFile = File(image.path);
+          _selectedImageFile = file;
         });
         // تحديث Dialog أيضاً
         setDialogState(() {
-          _selectedImageFile = File(image.path);
+          _selectedImageFile = file;
         });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم اختيار الصورة بنجاح'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -482,5 +570,96 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         );
       }
     }
+  }
+
+  /// التقاط صورة من الكاميرا داخل Dialog
+  Future<void> _pickImageFromCamera(StateSetter setDialogState) async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 90,
+      );
+
+      if (image != null) {
+        final file = File(image.path);
+        setState(() {
+          _selectedImageFile = file;
+        });
+        // تحديث Dialog أيضاً
+        setDialogState(() {
+          _selectedImageFile = file;
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم التقاط الصورة بنجاح'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في التقاط الصورة: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildProductImage(Map<String, dynamic> product) {
+    // محاولة الحصول على URL الصورة من عدة مصادر
+    var imageUrl = product['image_url'] ?? 
+                   product['main_image_url'] ?? 
+                   product['images']?[0];
+    
+    // إذا كان images قائمة، أخذ أول عنصر
+    if (imageUrl == null && product['images'] != null) {
+      final images = product['images'];
+      if (images is List && images.isNotEmpty) {
+        imageUrl = images[0];
+      }
+    }
+    
+    if (imageUrl == null || imageUrl.toString().trim().isEmpty) {
+      debugPrint('⚠️ لا توجد صورة للمنتج: ${product['name']}');
+      return const Icon(Icons.shopping_bag, color: Colors.grey);
+    }
+
+    final url = imageUrl.toString().trim();
+    debugPrint('🖼️ جاري تحميل الصورة للمنتج ${product['name']}: $url');
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.network(
+        url,
+        fit: BoxFit.cover,
+        width: 50,
+        height: 50,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          debugPrint('❌ خطأ في تحميل الصورة: $error');
+          debugPrint('❌ URL: $url');
+          debugPrint('❌ المنتج: ${product['name']}');
+          return const Icon(Icons.broken_image, color: Colors.grey, size: 30);
+        },
+      ),
+    );
   }
 }

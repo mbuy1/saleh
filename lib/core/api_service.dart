@@ -57,16 +57,32 @@ class ApiService {
 
   /// Get upload URL for image
   static Future<Map<String, dynamic>> getImageUploadUrl(String filename) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/media/image'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'filename': filename}),
-    );
+    try {
+      debugPrint('📡 طلب URL الرفع من Cloudflare Worker...');
+      final response = await http.post(
+        Uri.parse('$baseUrl/media/image'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'filename': filename}),
+      );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to get image upload URL: ${response.body}');
+      debugPrint('📥 استجابة Worker: ${response.statusCode}');
+      debugPrint('📥 محتوى الاستجابة: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        debugPrint('✅ تم الحصول على URL الرفع بنجاح');
+        return data;
+      } else {
+        final errorBody = response.body;
+        debugPrint('❌ فشل الحصول على URL الرفع: $errorBody');
+        throw Exception('فشل الحصول على URL الرفع (${response.statusCode}): $errorBody');
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في طلب URL الرفع: $e');
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('خطأ في طلب URL الرفع: ${e.toString()}');
     }
   }
 
@@ -87,22 +103,49 @@ class ApiService {
 
   /// Upload image file to Cloudflare Images
   static Future<String> uploadImage(String filePath) async {
-    // 1. Get upload URL
-    final uploadData = await getImageUploadUrl(filePath.split('/').last);
-    final uploadUrl = uploadData['uploadURL'];
-    final viewUrl = uploadData['viewURL'];
+    try {
+      // 1. Get upload URL from Cloudflare Worker
+      debugPrint('📤 طلب URL لرفع الصورة...');
+      final uploadData = await getImageUploadUrl(filePath.split('/').last);
+      
+      if (uploadData['ok'] != true) {
+        throw Exception('فشل الحصول على URL الرفع: ${uploadData['error'] ?? 'خطأ غير معروف'}');
+      }
+      
+      final uploadUrl = uploadData['uploadURL'] as String?;
+      final viewUrl = uploadData['viewURL'] as String?;
 
-    // 2. Upload file
-    final file = await http.MultipartFile.fromPath('file', filePath);
-    final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
-    request.files.add(file);
+      if (uploadUrl == null || viewUrl == null) {
+        throw Exception('لم يتم الحصول على URL الرفع من Cloudflare Worker');
+      }
 
-    final response = await request.send();
+      debugPrint('✅ تم الحصول على URL الرفع: $uploadUrl');
 
-    if (response.statusCode == 200) {
-      return viewUrl;
-    } else {
-      throw Exception('Failed to upload image');
+      // 2. Upload file to Cloudflare Images
+      debugPrint('📤 جاري رفع الصورة إلى Cloudflare Images...');
+      final file = await http.MultipartFile.fromPath('file', filePath);
+      final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+      request.files.add(file);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('📥 استجابة رفع الصورة: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('✅ تم رفع الصورة بنجاح: $viewUrl');
+        return viewUrl;
+      } else {
+        final errorBody = response.body;
+        debugPrint('❌ فشل رفع الصورة: $errorBody');
+        throw Exception('فشل رفع الصورة (${response.statusCode}): $errorBody');
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في رفع الصورة: $e');
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('خطأ في رفع الصورة: ${e.toString()}');
     }
   }
 

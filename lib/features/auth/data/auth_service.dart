@@ -37,9 +37,7 @@ class AuthService {
       final response = await supabaseClient.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'display_name': displayName,
-        },
+        data: {'display_name': displayName},
       );
 
       if (response.user == null) {
@@ -49,10 +47,12 @@ class AuthService {
 
       final user = response.user!;
       debugPrint('✅ تم إنشاء حساب المستخدم: ${user.email}');
-      
+
       // التحقق من وجود Session بعد التسجيل
       if (response.session == null) {
-        debugPrint('⚠️ لا توجد جلسة بعد التسجيل - قد يتطلب تأكيد البريد الإلكتروني');
+        debugPrint(
+          '⚠️ لا توجد جلسة بعد التسجيل - قد يتطلب تأكيد البريد الإلكتروني',
+        );
         // إذا لم تكن هناك جلسة، جرب تسجيل الدخول مباشرة
         try {
           final signInResponse = await supabaseClient.auth.signInWithPassword(
@@ -91,7 +91,9 @@ class AuthService {
           'balance': 0,
           'currency': 'SAR',
         });
-        debugPrint('✅ تم إنشاء wallet بنوع: ${role == "merchant" ? "merchant" : "customer"}');
+        debugPrint(
+          '✅ تم إنشاء wallet بنوع: ${role == "merchant" ? "merchant" : "customer"}',
+        );
       } catch (e) {
         // إذا فشل الإدراج، ربما السجل موجود مسبقاً
         debugPrint('⚠️ تحذير: فشل إنشاء wallet: $e');
@@ -101,9 +103,11 @@ class AuthService {
       if (role == 'merchant' && storeName != null) {
         try {
           debugPrint('🏪 جاري إنشاء متجر للتاجر...');
-          
+
           final response = await http.post(
-            Uri.parse('https://misty-mode-b68b.baharista1.workers.dev/public/register'),
+            Uri.parse(
+              'https://misty-mode-b68b.baharista1.workers.dev/public/register',
+            ),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'user_id': user.id,
@@ -152,21 +156,29 @@ class AuthService {
         password: password,
       );
 
-      debugPrint('📊 Response: user=${response.user?.id}, session=${response.session != null}');
+      debugPrint(
+        '📊 Response: user=${response.user?.id}, session=${response.session != null}',
+      );
       debugPrint('📊 User email: ${response.user?.email}');
-      debugPrint('📊 User confirmed: ${response.user?.emailConfirmedAt != null}');
+      debugPrint(
+        '📊 User confirmed: ${response.user?.emailConfirmedAt != null}',
+      );
 
       if (response.session == null) {
         debugPrint('❌ فشل تسجيل الدخول: لا توجد جلسة');
         debugPrint('❌ User ID: ${response.user?.id}');
         debugPrint('❌ Email confirmed: ${response.user?.emailConfirmedAt}');
-        
+
         // إذا كان المستخدم موجود لكن بدون Session، قد يكون Email غير مؤكد
         if (response.user != null && response.user!.emailConfirmedAt == null) {
-          throw Exception('يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.');
+          throw Exception(
+            'يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.',
+          );
         }
-        
-        throw Exception('فشل تسجيل الدخول - لا توجد جلسة. يرجى المحاولة مرة أخرى.');
+
+        throw Exception(
+          'فشل تسجيل الدخول - لا توجد جلسة. يرجى المحاولة مرة أخرى.',
+        );
       }
 
       debugPrint('✅ تم تسجيل الدخول بنجاح: ${response.user?.email}');
@@ -179,21 +191,25 @@ class AuthService {
     } on AuthException catch (e) {
       debugPrint('❌ خطأ في المصادقة: ${e.message}');
       debugPrint('❌ Error code: ${e.statusCode}');
-      
+
       // معالجة أنواع الأخطاء المختلفة
       final errorMessage = e.message.toLowerCase();
-      
-      if (errorMessage.contains('invalid login credentials') || 
+
+      if (errorMessage.contains('invalid login credentials') ||
           errorMessage.contains('invalid credentials') ||
           errorMessage.contains('wrong password')) {
         throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
       } else if (errorMessage.contains('email not confirmed') ||
-                 errorMessage.contains('email not verified') ||
-                 errorMessage.contains('confirmation')) {
-        throw Exception('يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.');
+          errorMessage.contains('email not verified') ||
+          errorMessage.contains('confirmation')) {
+        throw Exception(
+          'يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.',
+        );
       } else if (errorMessage.contains('too many requests') ||
-                 errorMessage.contains('rate limit')) {
-        throw Exception('تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.');
+          errorMessage.contains('rate limit')) {
+        throw Exception(
+          'تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.',
+        );
       } else if (errorMessage.contains('user not found')) {
         throw Exception('البريد الإلكتروني غير مسجل. يرجى إنشاء حساب جديد.');
       } else {
@@ -202,7 +218,7 @@ class AuthService {
     } catch (e) {
       debugPrint('❌ خطأ غير متوقع: $e');
       debugPrint('❌ Error type: ${e.runtimeType}');
-      
+
       // إرجاع رسالة واضحة
       if (e.toString().contains('Exception')) {
         rethrow; // إذا كان Exception مخصص، أرجعه كما هو

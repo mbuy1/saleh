@@ -4,6 +4,7 @@ import '../../../../core/data/dummy_data.dart';
 import '../../../../shared/widgets/mbuy_search_bar.dart';
 import '../../../../shared/widgets/circle_item.dart';
 import '../../../../shared/widgets/category_browser_view.dart';
+import '../../../../shared/widgets/hero_banner_carousel.dart';
 import 'categories_screen.dart';
 
 class StoresScreen extends StatefulWidget {
@@ -16,6 +17,34 @@ class StoresScreen extends StatefulWidget {
 class _StoresScreenState extends State<StoresScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  // بيانات البانر للمتاجر
+  final List<BannerItem> _storeBanners = [
+    BannerItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
+      title: 'متاجر مميزة',
+      subtitle: 'اكتشف أفضل المتاجر في MBUY',
+      buttonText: 'استكشف',
+      onTap: () {},
+    ),
+    BannerItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=800',
+      title: 'عروض حصرية',
+      subtitle: 'خصومات تصل إلى 50% من متاجر مختارة',
+      buttonText: 'تسوق الآن',
+      onTap: () {},
+    ),
+    BannerItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800',
+      title: 'متاجر جديدة',
+      subtitle: 'انضمت مؤخراً إلى MBUY',
+      buttonText: 'اكتشف',
+      onTap: () {},
+    ),
+  ];
 
   @override
   void initState() {
@@ -71,43 +100,61 @@ class _StoresScreenState extends State<StoresScreen>
 
   Widget _buildStoresTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Hero Banner
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: HeroBannerCarousel(
+              banners: _storeBanners,
+              height: 180,
+              bottomRadius: const BorderRadius.all(Radius.circular(16)),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
           // Search Bar (Full Width)
-          MbuySearchBar(
-            hintText: 'ابحث عن متجر...',
-            onTap: () {
-              // Navigate to search
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: MbuySearchBar(
+              hintText: 'ابحث عن متجر...',
+              onTap: () {
+                // Navigate to search
+              },
+            ),
           ),
 
           const SizedBox(height: 24),
 
           // Grid of Circular Stores
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4, // 4 items per row
-              childAspectRatio: 0.75,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 24,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // 4 items per row
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 24,
+              ),
+              itemCount: DummyData.stores.length,
+              itemBuilder: (context, index) {
+                final store = DummyData.stores[index];
+                return CircleItem(
+                  label: store.name,
+                  imageUrl: store
+                      .logoUrl, // Assuming logoUrl exists or use placeholder
+                  size: 60,
+                  onTap: () {
+                    // Navigate to store details
+                  },
+                );
+              },
             ),
-            itemCount: DummyData.stores.length,
-            itemBuilder: (context, index) {
-              final store = DummyData.stores[index];
-              return CircleItem(
-                label: store.name,
-                imageUrl:
-                    store.logoUrl, // Assuming logoUrl exists or use placeholder
-                size: 60,
-                onTap: () {
-                  // Navigate to store details
-                },
-              );
-            },
           ),
 
           const SizedBox(height: 80), // Bottom padding

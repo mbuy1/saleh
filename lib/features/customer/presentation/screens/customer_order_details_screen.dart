@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/order_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 
 class CustomerOrderDetailsScreen extends StatefulWidget {
   final String orderId;
@@ -101,19 +102,30 @@ class _CustomerOrderDetailsScreenState
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => Navigator.pop(context),
+          Semantics(
+            label: 'رجوع',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _orderDetails == null
-          ? const Center(
-              child: Text(
-                'لا توجد تفاصيل',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'لا توجد تفاصيل',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                ],
               ),
             )
           : SingleChildScrollView(
@@ -263,6 +275,34 @@ class _CustomerOrderDetailsScreenState
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Skeleton Order Status
+          SkeletonLoader(width: 150, height: 30, borderRadius: BorderRadius.circular(8)),
+          const SizedBox(height: 24),
+          // Skeleton Order Info
+          ...List.generate(4, (index) => const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: SkeletonListItem(),
+          )),
+          const SizedBox(height: 24),
+          // Skeleton Order Items Title
+          SkeletonLoader(width: 120, height: 20),
+          const SizedBox(height: 12),
+          // Skeleton Order Items
+          ...List.generate(3, (index) => const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: SkeletonListItem(),
+          )),
+        ],
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'category_products_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -59,16 +60,32 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => Navigator.pop(context),
+          Semantics(
+            label: 'رجوع',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _categories.isEmpty
-          ? const Center(child: Text('لا توجد فئات متاحة'))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.category_outlined, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'لا توجد فئات متاحة',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            )
           : GridView.builder(
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -126,6 +143,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.0,
+      ),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return SkeletonLoader(
+          width: double.infinity,
+          height: double.infinity,
+          borderRadius: BorderRadius.circular(16),
+        );
+      },
     );
   }
 }

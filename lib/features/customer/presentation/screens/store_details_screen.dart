@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/firebase_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'product_details_screen.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
@@ -88,22 +89,30 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('قريباً: مشاركة المتجر')),
-              );
-            },
+          Semantics(
+            label: 'مشاركة المتجر',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('قريباً: مشاركة المتجر')),
+                );
+              },
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => Navigator.pop(context),
+          Semantics(
+            label: 'رجوع',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -326,6 +335,42 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Skeleton Store Image
+          SkeletonLoader(
+            width: double.infinity,
+            height: 200,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Skeleton Store Name
+                SkeletonLoader(width: 200, height: 24),
+                const SizedBox(height: 12),
+                // Skeleton Description
+                SkeletonLoader(width: double.infinity, height: 16),
+                const SizedBox(height: 8),
+                SkeletonLoader(width: 150, height: 16),
+                const SizedBox(height: 24),
+                // Skeleton Products Title
+                SkeletonLoader(width: 120, height: 20),
+                const SizedBox(height: 16),
+                // Skeleton Products Grid
+                SkeletonGrid(itemCount: 4, crossAxisCount: 2),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

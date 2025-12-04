@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/app_config.dart';
@@ -7,16 +6,16 @@ import '../../../../core/theme/app_theme.dart';
 import 'merchant_store_setup_screen.dart';
 import 'merchant_promotions_screen.dart';
 import 'merchant_help_center_screen.dart';
+import 'merchant_products_screen.dart';
+import 'merchant_orders_screen.dart';
 import '../../../../shared/widgets/mbuy_logo.dart';
 
 class MerchantDashboardScreen extends StatefulWidget {
   final AppModeProvider appModeProvider;
-  final Function(VoidCallback)? onStoreMenuReady;
 
   const MerchantDashboardScreen({
     super.key,
     required this.appModeProvider,
-    this.onStoreMenuReady,
   });
 
   @override
@@ -48,10 +47,6 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Register the showStoreMenu callback
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onStoreMenuReady?.call(showStoreMenu);
-    });
   }
 
   @override
@@ -67,6 +62,9 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           // Shortcuts Section (replaced with chart)
           SliverToBoxAdapter(child: _buildShortcutsSection()),
 
+          // Store Management Section (Full Width)
+          SliverToBoxAdapter(child: _buildStoreManagementSection()),
+
           // Main Menu Grid
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -78,22 +76,6 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                 mainAxisSpacing: 12,
               ),
               delegate: SliverChildListDelegate([
-                _buildMenuCard(
-                  icon: Icons.store_outlined,
-                  title: 'خدمات التاجر',
-                  subtitle: 'إدارة المتجر والمنتجات',
-                  gradient: LinearGradient(
-                    colors: [Colors.blue.shade400, Colors.blue.shade600],
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MerchantStoreSetupScreen(),
-                      ),
-                    );
-                  },
-                ),
                 _buildMenuCard(
                   icon: Icons.loyalty,
                   title: 'الولاء',
@@ -284,22 +266,6 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-  Widget _buildLinkActionButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.all(6),
-          child: Icon(icon, size: 18, color: MbuyColors.textSecondary),
-        ),
-      ),
-    );
-  }
 
   Widget _buildShortcutsSection() {
     // This section replaces "اختصاراتك" with the chart
@@ -812,6 +778,185 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
+  Widget _buildStoreManagementSection() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade400, Colors.blue.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MerchantStoreSetupScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.store_outlined,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'خدمات التاجر',
+                            style: GoogleFonts.cairo(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'إدارة المتجر والمنتجات والطلبات',
+                            style: GoogleFonts.cairo(
+                              fontSize: 14,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Quick Actions
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickAction(
+                        icon: Icons.inventory_2_outlined,
+                        label: 'المنتجات',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MerchantProductsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickAction(
+                        icon: Icons.settings_outlined,
+                        label: 'الإعدادات',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MerchantStoreSetupScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickAction(
+                        icon: Icons.receipt_long_outlined,
+                        label: 'الطلبات',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MerchantOrdersScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.white, size: 24),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: GoogleFonts.cairo(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHelpSupportSection() {
     return InkWell(
       onTap: () {
@@ -861,219 +1006,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
     );
   }
 
-  void showStoreMenu() {
-    _showStoreMenuBottomSheet();
-  }
-
-  void _showStoreMenuBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Store Link Section with actions
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: MbuyColors.surface,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'رابط المتجر',
-                    style: GoogleFonts.cairo(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: MbuyColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          storeLink,
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            color: MbuyColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      _buildLinkActionButton(
-                        icon: Icons.qr_code,
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showSnackBar('سيتم إضافة QR Code قريباً');
-                        },
-                      ),
-                      const SizedBox(width: 4),
-                      _buildLinkActionButton(
-                        icon: Icons.copy,
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: storeLink));
-                          Navigator.pop(context);
-                          _showSnackBar('تم نسخ الرابط');
-                        },
-                      ),
-                      const SizedBox(width: 4),
-                      _buildLinkActionButton(
-                        icon: Icons.share,
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showSnackBar('سيتم إضافة المشاركة قريباً');
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Grid of square icons
-            SizedBox(
-              height: 200, // Fixed height to prevent overflow
-              child: GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.0,
-                children: [
-                  _buildSquareMenuOption(
-                    icon: Icons.store,
-                    title: 'عرض المتجر',
-                    color: Colors.blue,
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const MerchantStoreSetupScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.settings,
-                    title: 'إدارة المتجر',
-                    color: Colors.grey,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSnackBar('سيتم إضافة إدارة المتجر قريباً');
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.palette,
-                    title: 'مظهر المتجر',
-                    color: Colors.purple,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSnackBar('سيتم إضافة مظهر المتجر قريباً');
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.edit,
-                    title: 'تحرير المتجر',
-                    color: Colors.orange,
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const MerchantStoreSetupScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.person,
-                    title: 'تعديل معلومات الحساب',
-                    color: Colors.teal,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSnackBar('سيتم إضافة تعديل معلومات الحساب قريباً');
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.lock,
-                    title: 'تغيير كلمة المرور',
-                    color: Colors.indigo,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSnackBar('سيتم إضافة تغيير كلمة المرور قريباً');
-                    },
-                  ),
-                  _buildSquareMenuOption(
-                    icon: Icons.delete_outline,
-                    title: 'حذف المتجر',
-                    color: Colors.red,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSnackBar('سيتم إضافة حذف المتجر قريباً');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSquareMenuOption({
-    required IconData icon,
-    required String title,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  title,
-                  style: GoogleFonts.cairo(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: MbuyColors.textPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Removed _showStoreMenuBottomSheet and related methods - now using MerchantStoreManagementScreen instead
 
   void _showNotificationsBottomSheet() {
     showModalBottomSheet(

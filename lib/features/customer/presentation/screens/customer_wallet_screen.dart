@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/wallet_service.dart';
 import '../../../../core/firebase_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
+import '../../../../shared/widgets/error_widget/error_state_widget.dart';
 
 class CustomerWalletScreen extends StatefulWidget {
   const CustomerWalletScreen({super.key});
@@ -72,35 +74,31 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadWalletData,
+          Semantics(
+            label: 'تحديث المحفظة',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadWalletData,
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => Navigator.pop(context),
+          Semantics(
+            label: 'رجوع',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _error != null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'خطأ: $_error',
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadWalletData,
-                    child: const Text('إعادة المحاولة'),
-                  ),
-                ],
-              ),
+          ? ErrorStateWidget(
+              message: 'فشل تحميل بيانات المحفظة',
+              details: _error,
+              onRetry: _loadWalletData,
             )
           : RefreshIndicator(
               onRefresh: _loadWalletData,
@@ -223,6 +221,29 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
             fontSize: 16,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Skeleton Balance Card
+          SkeletonLoader(
+            width: double.infinity,
+            height: 120,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          const SizedBox(height: 24),
+          // Skeleton Section Title
+          SkeletonLoader(width: 150, height: 20),
+          const SizedBox(height: 16),
+          // Skeleton Transactions
+          ...List.generate(5, (index) => const SkeletonListItem()),
+        ],
       ),
     );
   }

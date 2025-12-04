@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../core/services/order_service.dart';
 import '../../../../core/firebase_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/protection_banner.dart';
 import '../../../../shared/widgets/circle_item.dart';
@@ -314,9 +315,7 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: MbuyColors.primaryMaroon),
-            )
+          ? _buildSkeletonLoader()
           : widget.userRole == 'merchant'
           ? _buildMerchantView()
           : _cartItems.isEmpty
@@ -509,33 +508,38 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed:
-                              _isValidatingCoupon || _appliedCoupon != null
-                              ? null
-                              : _applyCoupon,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: MbuyColors.primaryMaroon,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                        Semantics(
+                          label: 'تطبيق كوبون الخصم',
+                          button: true,
+                          enabled: !_isValidatingCoupon && _appliedCoupon == null,
+                          child: ElevatedButton(
+                            onPressed:
+                                _isValidatingCoupon || _appliedCoupon != null
+                                ? null
+                                : _applyCoupon,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: MbuyColors.primaryMaroon,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            child: _isValidatingCoupon
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('تطبيق'),
                           ),
-                          child: _isValidatingCoupon
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text('تطبيق'),
                         ),
                       ],
                     ),
@@ -609,33 +613,38 @@ class _CartScreenState extends State<CartScreen> {
           child: SafeArea(
             child: SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _completeOrder,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: MbuyColors.primaryMaroon,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+              child: Semantics(
+                label: 'إتمام الطلب بمبلغ ${_total.toStringAsFixed(2)} ريال',
+                button: true,
+                enabled: !_isLoading,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _completeOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: MbuyColors.primaryMaroon,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'إتمام الطلب (${_total.toStringAsFixed(2)} ر.س)',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : Text(
-                        'إتمام الطلب (${_total.toStringAsFixed(2)} ر.س)',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
               ),
             ),
           ),
@@ -816,6 +825,22 @@ class _CartScreenState extends State<CartScreen> {
         ),
         child: Icon(icon, size: 16, color: MbuyColors.textPrimary),
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Skeleton Cart Items
+        ...List.generate(3, (index) => const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: SkeletonListItem(hasTrailing: false),
+        )),
+        const SizedBox(height: 24),
+        // Skeleton Total Card
+        SkeletonLoader(width: double.infinity, height: 100, borderRadius: BorderRadius.circular(12)),
+      ],
     );
   }
 }

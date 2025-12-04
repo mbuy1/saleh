@@ -168,26 +168,35 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
           // المحتوى الرئيسي
           SliverList(
             delegate: SliverChildListDelegate([
-              // 1. البانر الرئيسي (Carousel)
+              // 1. Hero Banner الرئيسي (Carousel)
               SheinBannerCarousel(
                 banners: [
                   {
                     'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
                       width: 400,
-                      height: 280,
+                      height: 320,
                       text: 'اكتشف المتاجر',
                     ),
                     'title': 'اكتشف المتاجر',
-                    'buttonText': 'تصفح الآن',
+                    'subtitle': 'تسوق من أفضل المتاجر المحلية',
                   },
                   {
                     'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
                       width: 400,
-                      height: 280,
+                      height: 320,
                       text: 'عروض المتاجر',
                     ),
                     'title': 'عروض المتاجر',
-                    'buttonText': 'تصفح الآن',
+                    'subtitle': 'خصومات حصرية وعروض مميزة',
+                  },
+                  {
+                    'imageUrl': CloudflareHelper.getDefaultPlaceholderImage(
+                      width: 400,
+                      height: 320,
+                      text: 'متاجر مميزة',
+                    ),
+                    'title': 'متاجر مميزة',
+                    'subtitle': 'اكتشف أفضل العلامات التجارية',
                   },
                 ],
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'product_details_screen.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -66,33 +67,33 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => Navigator.pop(context),
+          Semantics(
+            label: 'رجوع',
+            button: true,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _products.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.inventory_2_outlined,
-                    size: 80,
-                    color: Colors.grey[400],
-                  ),
+                  Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'لا توجد منتجات في هذه الفئة',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'تحقق لاحقاً للمزيد من المنتجات',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -230,6 +231,20 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: 6,
+      itemBuilder: (context, index) => const SkeletonProductCard(),
     );
   }
 }

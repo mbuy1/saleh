@@ -67,6 +67,23 @@ class PreferencesService {
     return prefs.getString('fcm_token');
   }
 
+  // ==================== Search History ====================
+
+  /// حفظ سجل البحث
+  static Future<bool> saveSearchHistory(List<String> searches) async {
+    return await prefs.setStringList('search_history', searches);
+  }
+
+  /// جلب سجل البحث
+  static List<String> getSearchHistory() {
+    return prefs.getStringList('search_history') ?? [];
+  }
+
+  /// مسح سجل البحث
+  static Future<bool> clearSearchHistory() async {
+    return await prefs.remove('search_history');
+  }
+
   // ==================== General ====================
 
   /// حذف جميع البيانات المحفوظة

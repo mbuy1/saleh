@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/order_service.dart';
+import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'customer_order_details_screen.dart';
 
 class CustomerOrdersScreen extends StatefulWidget {
@@ -96,21 +97,29 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('طلباتي'),
+        title: Semantics(
+          label: 'طلباتي',
+          header: true,
+          child: const Text('طلباتي'),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? _buildSkeletonLoader()
           : _orders.isEmpty
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.receipt_long_outlined,
-                          size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
+                      Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
                       Text(
                         'لا توجد طلبات',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                        style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ابدأ التسوق الآن',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -178,6 +187,13 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return ListView(
+      padding: const EdgeInsets.all(8),
+      children: List.generate(5, (index) => const SkeletonListItem()),
     );
   }
 }
