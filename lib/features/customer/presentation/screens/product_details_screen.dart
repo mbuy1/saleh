@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/firebase_service.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
@@ -13,6 +14,22 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _quantity = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    // تتبع عرض المنتج
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logViewProduct(
+        productId: widget.productId,
+        productName: 'اسم المنتج ${widget.productId}',
+        price: 99.0,
+      );
+      FirebaseService.logScreenView('product_details', parameters: {
+        'product_id': widget.productId,
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

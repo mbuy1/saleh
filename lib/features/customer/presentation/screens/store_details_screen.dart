@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../../core/firebase_service.dart';
 import 'product_details_screen.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
@@ -25,6 +26,17 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
   void initState() {
     super.initState();
     _loadStoreDetails();
+    // تتبع عرض المتجر
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logViewStore(
+        storeId: widget.storeId,
+        storeName: widget.storeName,
+      );
+      FirebaseService.logScreenView('store_details', parameters: {
+        'store_id': widget.storeId,
+        'store_name': widget.storeName,
+      });
+    });
   }
 
   Future<void> _loadStoreDetails() async {

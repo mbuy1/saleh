@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../customer/data/wallet_service.dart';
+import '../../../../core/services/wallet_service.dart';
 
 class MerchantWalletScreen extends StatefulWidget {
   const MerchantWalletScreen({super.key});
@@ -27,15 +27,28 @@ class _MerchantWalletScreenState extends State<MerchantWalletScreen> {
     });
 
     try {
-      final wallet = await WalletService.getMerchantWallet();
-      final transactions =
-          await WalletService.getMerchantWalletTransactions(limit: 10);
-
-      setState(() {
-        _wallet = wallet;
-        _transactions = transactions;
-        _isLoading = false;
-      });
+      // استخدام Service Layer الجديد
+      final walletDetails = await WalletService.getWalletDetails();
+      final balance = await WalletService.getBalance();
+      
+      if (walletDetails != null && walletDetails['type'] == 'merchant') {
+        setState(() {
+          _wallet = {
+            'id': walletDetails['id'],
+            'balance': balance,
+            'type': 'merchant',
+          };
+          // TODO: جلب المعاملات من API Gateway عند توفرها
+          _transactions = [];
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _wallet = {'balance': 0.0, 'type': 'merchant'};
+          _transactions = [];
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();

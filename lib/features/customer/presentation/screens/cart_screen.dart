@@ -4,6 +4,8 @@ import '../../data/services/cart_service.dart';
 import '../../../../core/permissions_helper.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
+import '../../../../core/services/order_service.dart';
+import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared/widgets/alibaba/protection_banner.dart';
 import '../../../../shared/widgets/circle_item.dart';
@@ -29,6 +31,10 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     _loadCart();
+    // تتبع عرض السلة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('cart');
+    });
   }
 
   Future<void> _loadCart() async {
@@ -119,28 +125,76 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _completeOrder() async {
     final canCreate = await PermissionsHelper.canCreateOrder();
-    if (!canCreate) return;
+    if (!canCreate) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('ليس لديك صلاحية لإنشاء طلب'),
+            backgroundColor: MbuyColors.alertRed,
+          ),
+        );
+      }
+      return;
+    }
 
-    if (_cartItems.isEmpty) return;
+    if (_cartItems.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('السلة فارغة'),
+            backgroundColor: MbuyColors.alertRed,
+          ),
+        );
+      }
+      return;
+    }
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // TODO: تفعيل OrderService لاحقاً
-      await Future.delayed(const Duration(seconds: 1));
-      final orderId = 'ORDER-${DateTime.now().millisecondsSinceEpoch}';
+      // تحويل CartItems إلى format مناسب لـ OrderService
+      final cartItemsForOrder = _cartItems.map((item) {
+        return {
+          'product_id': item.productId,
+          'quantity': item.quantity,
+          'price': item.product?.finalPrice ?? 0.0,
+        };
+      }).toList();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('تم إنشاء الطلب بنجاح! رقم الطلب: $orderId'),
-            backgroundColor: MbuyColors.primaryMaroon,
-            duration: const Duration(seconds: 3),
-          ),
+      // استخدام OrderService لإنشاء الطلب
+      final result = await OrderService.createOrder(
+        cartItems: cartItemsForOrder,
+        deliveryAddress: 'عنوان التوصيل', // TODO: جلب من إعدادات المستخدم
+        paymentMethod: 'wallet', // TODO: السماح للمستخدم باختيار طريقة الدفع
+        couponCode: _appliedCoupon?['code'],
+      );
+
+      if (result != null && result['ok'] == true) {
+        final orderId = result['data']?['order_id'] ?? 'غير معروف';
+        final totalAmount = result['data']?['total_amount'] as double? ?? 0.0;
+        final couponCode = _appliedCoupon?['code'];
+        
+        // تتبع إتمام الطلب
+        await FirebaseService.logPlaceOrder(
+          orderId: orderId.toString(),
+          totalAmount: totalAmount,
+          couponCode: couponCode,
         );
-        _loadCart();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('تم إنشاء الطلب بنجاح! رقم الطلب: $orderId'),
+              backgroundColor: MbuyColors.primaryMaroon,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          _loadCart();
+        }
+      } else {
+        throw Exception(result?['error'] ?? 'فشل إنشاء الطلب');
       }
     } catch (e) {
       if (mounted) {

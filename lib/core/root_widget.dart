@@ -4,6 +4,7 @@ import '../features/auth/presentation/screens/auth_screen.dart';
 import '../core/supabase_client.dart';
 import '../core/app_config.dart';
 import '../core/theme/theme_provider.dart';
+import '../core/firebase_service.dart';
 import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
 import '../features/merchant/presentation/screens/merchant_home_screen.dart';
@@ -92,6 +93,9 @@ class _RootWidgetState extends State<RootWidget> {
     }
 
     if (user != null) {
+      // تعيين User ID في Analytics
+      await FirebaseService.setUserId(user.id);
+      
       // جلب role من user_profiles
       try {
         final response = await supabaseClient

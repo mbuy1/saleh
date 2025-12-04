@@ -47,12 +47,86 @@ Deno.serve(async (req) => {
     const body: CreateOrderRequest = await req.json();
     const { user_id, items, payment_method, shipping_address_id, use_points, coupon_code, meta } = body;
 
-    // Validate input
-    if (!user_id || !items || items.length === 0 || !payment_method) {
+    // Enhanced input validation
+    const missingFields = [];
+    if (!user_id) missingFields.push('user_id');
+    if (!items || !Array.isArray(items)) missingFields.push('items');
+    if (!payment_method) missingFields.push('payment_method');
+
+    if (missingFields.length > 0) {
       return new Response(
-        JSON.stringify({ error: 'Bad request', detail: 'Missing required fields' }),
+        JSON.stringify({ error: 'Bad request', detail: `Missing required fields: ${missingFields.join(', ')}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Validate UUID format
+    if (typeof user_id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user_id)) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Invalid user_id format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate items array
+    if (items.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Items array cannot be empty' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (items.length > 50) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Maximum 50 items per order' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate each item
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.product_id) {
+        return new Response(
+          JSON.stringify({ error: 'Bad request', detail: `Item ${i + 1}: Missing product_id` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (typeof item.quantity !== 'number' || item.quantity <= 0 || item.quantity > 1000) {
+        return new Response(
+          JSON.stringify({ error: 'Bad request', detail: `Item ${i + 1}: Invalid quantity (must be 1-1000)` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Validate payment method
+    const validPaymentMethods = ['cash', 'card', 'wallet', 'tap', 'hyperpay', 'tamara', 'tabby'];
+    if (!validPaymentMethods.includes(payment_method.toLowerCase())) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: `Invalid payment method. Must be one of: ${validPaymentMethods.join(', ')}` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate use_points if provided
+    if (use_points !== undefined && use_points !== null) {
+      if (typeof use_points !== 'number' || use_points < 0 || !Number.isInteger(use_points)) {
+        return new Response(
+          JSON.stringify({ error: 'Bad request', detail: 'use_points must be a non-negative integer' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Validate coupon_code if provided
+    if (coupon_code !== undefined && coupon_code !== null) {
+      if (typeof coupon_code !== 'string' || coupon_code.trim().length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'Bad request', detail: 'coupon_code must be a non-empty string' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Create Supabase admin client

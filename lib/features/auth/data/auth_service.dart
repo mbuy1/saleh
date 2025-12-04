@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 import '../../../core/supabase_client.dart';
 
 class AuthService {
@@ -7,12 +9,16 @@ class AuthService {
   ///
   /// يقوم بـ:
   /// 1. إنشاء حساب في Supabase Auth
-  /// 2. إنشاء row في user_profiles مع role = 'customer'
+  /// 2. إنشاء row في user_profiles مع الدور المحدد
+  /// 3. إذا كان تاجر: إنشاء متجر تلقائياً عبر API
   ///
   /// Parameters:
   /// - email: البريد الإلكتروني
   /// - password: كلمة المرور
   /// - displayName: الاسم المعروض
+  /// - role: دور المستخدم ('customer' أو 'merchant')
+  /// - storeName: اسم المتجر (مطلوب للتاجر)
+  /// - city: المدينة (مطلوب للتاجر)
   ///
   /// Returns: User object من Supabase
   /// Throws: Exception في حالة الفشل
@@ -20,6 +26,9 @@ class AuthService {
     required String email,
     required String password,
     required String displayName,
+    String role = 'customer',
+    String? storeName,
+    String? city,
   }) async {
     try {
       debugPrint('📝 محاولة تسجيل مستخدم جديد: $email');
@@ -65,9 +74,10 @@ class AuthService {
       try {
         await supabaseClient.from('user_profiles').insert({
           'id': user.id,
-          'role': 'customer',
+          'role': role,
           'display_name': displayName,
         });
+        debugPrint('✅ تم إنشاء user_profile بدور: $role');
       } catch (e) {
         // إذا فشل الإدراج، ربما السجل موجود مسبقاً
         debugPrint('⚠️ تحذير: فشل إنشاء user_profile: $e');
@@ -77,17 +87,43 @@ class AuthService {
       try {
         await supabaseClient.from('wallets').insert({
           'owner_id': user.id,
-          'type': 'customer',
+          'type': role == 'merchant' ? 'merchant' : 'customer',
           'balance': 0,
           'currency': 'SAR',
         });
+        debugPrint('✅ تم إنشاء wallet بنوع: ${role == "merchant" ? "merchant" : "customer"}');
       } catch (e) {
         // إذا فشل الإدراج، ربما السجل موجود مسبقاً
         debugPrint('⚠️ تحذير: فشل إنشاء wallet: $e');
       }
 
-      // ملاحظة: points_accounts يتم إنشاؤه فقط عند تحويل المستخدم إلى تاجر (role = 'merchant')
-      // النقاط هي "رصيد خدمات" للتاجر فقط، وليست للعميل
+      // 4. إذا كان تاجر: إنشاء متجر تلقائياً
+      if (role == 'merchant' && storeName != null) {
+        try {
+          debugPrint('🏪 جاري إنشاء متجر للتاجر...');
+          
+          final response = await http.post(
+            Uri.parse('https://misty-mode-b68b.baharista1.workers.dev/public/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'user_id': user.id,
+              'store_name': storeName,
+              'city': city ?? '',
+            }),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            debugPrint('✅ تم إنشاء المتجر بنجاح!');
+            debugPrint('✅ حصل التاجر على 100 نقطة ترحيبية');
+          } else {
+            debugPrint('⚠️ فشل إنشاء المتجر: ${response.body}');
+            // لا نرمي خطأ هنا - يمكن للتاجر إنشاء المتجر لاحقاً
+          }
+        } catch (e) {
+          debugPrint('⚠️ تحذير: فشل إنشاء المتجر: $e');
+          // لا نرمي خطأ هنا - يمكن للتاجر إنشاء المتجر لاحقاً
+        }
+      }
 
       return user;
     } catch (e) {

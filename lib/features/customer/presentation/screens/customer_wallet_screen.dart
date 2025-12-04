@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../data/wallet_service.dart';
+import '../../../../core/services/wallet_service.dart';
+import '../../../../core/firebase_service.dart';
 
 class CustomerWalletScreen extends StatefulWidget {
   const CustomerWalletScreen({super.key});
@@ -18,6 +19,10 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
   void initState() {
     super.initState();
     _loadWalletData();
+    // تتبع عرض المحفظة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('customer_wallet');
+    });
   }
 
   Future<void> _loadWalletData() async {
@@ -27,15 +32,30 @@ class _CustomerWalletScreenState extends State<CustomerWalletScreen> {
     });
 
     try {
-      final wallet = await WalletService.getWalletForCurrentUser();
-      final transactions =
-          await WalletService.getWalletTransactionsForCurrentUser(limit: 10);
-
-      setState(() {
-        _wallet = wallet;
-        _transactions = transactions;
-        _isLoading = false;
-      });
+      // استخدام Service Layer الجديد
+      final walletDetails = await WalletService.getWalletDetails();
+      final balance = await WalletService.getBalance();
+      
+      if (walletDetails != null) {
+        setState(() {
+          _wallet = {
+            'id': walletDetails['id'],
+            'balance': balance,
+            'type': walletDetails['type'] ?? 'customer',
+          };
+          // TODO: جلب المعاملات من API Gateway عند توفرها
+          _transactions = [];
+          _isLoading = false;
+        });
+        // تتبع عرض المحفظة مع الرصيد
+        FirebaseService.logViewWallet(balance: balance);
+      } else {
+        setState(() {
+          _wallet = {'balance': 0.0, 'type': 'customer'};
+          _transactions = [];
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();

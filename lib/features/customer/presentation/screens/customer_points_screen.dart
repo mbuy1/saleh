@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:saleh/features/customer/data/points_service.dart';
+import '../../../../core/services/points_service.dart';
+import '../../../../core/firebase_service.dart';
 
 class CustomerPointsScreen extends StatefulWidget {
   const CustomerPointsScreen({super.key});
@@ -18,6 +19,10 @@ class _CustomerPointsScreenState extends State<CustomerPointsScreen> {
   void initState() {
     super.initState();
     _loadPointsData();
+    // تتبع عرض النقاط
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseService.logScreenView('customer_points');
+    });
   }
 
   Future<void> _loadPointsData() async {
@@ -27,16 +32,21 @@ class _CustomerPointsScreenState extends State<CustomerPointsScreen> {
     });
 
     try {
-      final account = await PointsService.getPointsForCurrentUser();
-      final transactions = await PointsService.getLastPointsTransactions(
-        limit: 20,
-      );
+      // استخدام Service Layer الجديد
+      final pointsDetails = await PointsService.getPointsDetails();
+      final balance = await PointsService.getBalance();
 
       setState(() {
-        _pointsAccount = account;
-        _transactions = transactions;
+        _pointsAccount = {
+          'balance': balance,
+          'id': pointsDetails?['id'],
+        };
+        // TODO: جلب المعاملات من API Gateway عند توفرها
+        _transactions = [];
         _isLoading = false;
       });
+      // تتبع عرض النقاط مع الرصيد
+      FirebaseService.logViewPoints(balance: balance);
     } catch (e) {
       setState(() {
         _error = e.toString();

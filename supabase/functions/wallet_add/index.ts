@@ -38,17 +38,46 @@ Deno.serve(async (req) => {
     const body: WalletAddRequest = await req.json();
     const { user_id, amount, source, meta } = body;
 
-    // Validate input
-    if (!user_id || !amount || !source) {
+    // Enhanced input validation
+    const missingFields = [];
+    if (!user_id) missingFields.push('user_id');
+    if (amount === undefined || amount === null) missingFields.push('amount');
+    if (!source) missingFields.push('source');
+
+    if (missingFields.length > 0) {
       return new Response(
-        JSON.stringify({ error: 'Bad request', detail: 'Missing required fields: user_id, amount, source' }),
+        JSON.stringify({ error: 'Bad request', detail: `Missing required fields: ${missingFields.join(', ')}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (amount <= 0) {
+    // Validate UUID format
+    if (typeof user_id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user_id)) {
       return new Response(
-        JSON.stringify({ error: 'Bad request', detail: 'Amount must be positive' }),
+        JSON.stringify({ error: 'Bad request', detail: 'Invalid user_id format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate amount
+    if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Amount must be a positive number' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (amount > 1000000) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Amount exceeds maximum limit (1,000,000)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate source
+    if (typeof source !== 'string' || source.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Bad request', detail: 'Source must be a non-empty string' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

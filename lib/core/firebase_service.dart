@@ -95,11 +95,20 @@ class FirebaseService {
   // ==================== Analytics Events ====================
 
   /// تتبع عرض شاشة
-  static Future<void> logScreenView(String screenName) async {
+  static Future<void> logScreenView(String screenName, {Map<String, Object>? parameters}) async {
     await _analytics?.logScreenView(
       screenName: screenName,
       screenClass: screenName,
     );
+    if (parameters != null && parameters.isNotEmpty) {
+      await _analytics?.logEvent(
+        name: 'screen_view',
+        parameters: {
+          'screen_name': screenName,
+          ...parameters,
+        },
+      );
+    }
     debugPrint('📊 Analytics: عرض شاشة $screenName');
   }
 
@@ -185,6 +194,154 @@ class FirebaseService {
     debugPrint('📊 Analytics: بحث عن "$searchTerm"');
   }
 
+  /// تتبع عرض منتج
+  static Future<void> logViewProduct({
+    required String productId,
+    String? productName,
+    String? category,
+    double? price,
+    String? currency = 'SAR',
+  }) async {
+    await _analytics?.logViewItem(
+      currency: currency,
+      value: price ?? 0,
+      items: [
+        AnalyticsEventItem(
+          itemId: productId,
+          itemName: productName ?? 'Unknown',
+          itemCategory: category,
+          price: price ?? 0,
+        ),
+      ],
+    );
+    debugPrint('📊 Analytics: عرض منتج $productName');
+  }
+
+  /// تتبع إضافة للمفضلة
+  static Future<void> logAddToWishlist({
+    required String productId,
+    String? productName,
+    double? price,
+  }) async {
+    await _analytics?.logAddToWishlist(
+      currency: 'SAR',
+      value: price ?? 0,
+      items: [
+        AnalyticsEventItem(
+          itemId: productId,
+          itemName: productName ?? 'Unknown',
+          price: price ?? 0,
+        ),
+      ],
+    );
+    debugPrint('📊 Analytics: إضافة للمفضلة $productName');
+  }
+
+  /// تتبع مشاركة
+  static Future<void> logShare({
+    required String contentType,
+    String? itemId,
+    String? method,
+  }) async {
+    await _analytics?.logShare(
+      contentType: contentType,
+      itemId: itemId ?? '',
+      method: method ?? '',
+    );
+    debugPrint('📊 Analytics: مشاركة $contentType');
+  }
+
+  /// تتبع عرض كوبون
+  static Future<void> logViewCoupon({
+    required String couponCode,
+    String? couponName,
+  }) async {
+    await _analytics?.logEvent(
+      name: 'view_coupon',
+      parameters: {
+        'coupon_code': couponCode,
+        if (couponName != null) 'coupon_name': couponName,
+      },
+    );
+    debugPrint('📊 Analytics: عرض كوبون $couponCode');
+  }
+
+  /// تتبع استخدام كوبون
+  static Future<void> logApplyCoupon({
+    required String couponCode,
+    double? discountAmount,
+  }) async {
+    await _analytics?.logEvent(
+      name: 'apply_coupon',
+      parameters: {
+        'coupon_code': couponCode,
+        if (discountAmount != null) 'discount_amount': discountAmount,
+        'currency': 'SAR',
+      },
+    );
+    debugPrint('📊 Analytics: استخدام كوبون $couponCode');
+  }
+
+  /// تتبع عرض المحفظة
+  static Future<void> logViewWallet({double? balance}) async {
+    await _analytics?.logEvent(
+      name: 'view_wallet',
+      parameters: {
+        if (balance != null) 'balance': balance,
+        'currency': 'SAR',
+      },
+    );
+    debugPrint('📊 Analytics: عرض المحفظة');
+  }
+
+  /// تتبع إضافة رصيد
+  static Future<void> logAddFunds({
+    required double amount,
+    required String paymentMethod,
+  }) async {
+    await _analytics?.logEvent(
+      name: 'add_funds',
+      parameters: {
+        'amount': amount,
+        'payment_method': paymentMethod,
+        'currency': 'SAR',
+      },
+    );
+    debugPrint('📊 Analytics: إضافة رصيد $amount SAR');
+  }
+
+  /// تتبع عرض النقاط
+  static Future<void> logViewPoints({int? balance}) async {
+    await _analytics?.logEvent(
+      name: 'view_points',
+      parameters: {
+        if (balance != null) 'points_balance': balance,
+      },
+    );
+    debugPrint('📊 Analytics: عرض النقاط');
+  }
+
+  /// تتبع استخدام النقاط
+  static Future<void> logUsePoints({
+    required int points,
+    required String reason,
+  }) async {
+    await _analytics?.logEvent(
+      name: 'use_points',
+      parameters: {
+        'points': points,
+        'reason': reason,
+      },
+    );
+    debugPrint('📊 Analytics: استخدام $points نقاط');
+  }
+
+  /// تتبع فتح التطبيق
+  static Future<void> logAppOpen() async {
+    await _analytics?.logAppOpen();
+    debugPrint('📊 Analytics: فتح التطبيق');
+  }
+
   /// تتبع حدث مخصص
   static Future<void> logCustomEvent(
     String eventName,
@@ -192,6 +349,20 @@ class FirebaseService {
   ) async {
     await _analytics?.logEvent(name: eventName, parameters: parameters);
     debugPrint('📊 Analytics: حدث مخصص $eventName');
+  }
+
+  /// تعيين User Properties
+  static Future<void> setUserProperty(String name, String? value) async {
+    if (value != null) {
+      await _analytics?.setUserProperty(name: name, value: value);
+      debugPrint('📊 Analytics: تعيين خاصية المستخدم $name = $value');
+    }
+  }
+
+  /// تعيين User ID
+  static Future<void> setUserId(String? userId) async {
+    await _analytics?.setUserId(id: userId);
+    debugPrint('📊 Analytics: تعيين User ID = $userId');
   }
 
   // ==================== FCM Token Management ====================
