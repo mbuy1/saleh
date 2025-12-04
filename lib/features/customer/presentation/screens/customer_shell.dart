@@ -55,63 +55,7 @@ class _CustomerShellState extends State<CustomerShell> {
     final bool isExplore = _currentIndex == 0;
 
     return Scaffold(
-      // Header (Only show on Home and Stores) - بعد التبديل: الرئيسية=2، المتاجر=1
-      appBar: (_currentIndex == 2 || _currentIndex == 1)
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(60),
-              child: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                automaticallyImplyLeading: false,
-                titleSpacing: 16,
-                title: Row(
-                  children: [
-                    // Search Bar with Profile Icon inside
-                    Expanded(
-                      child: MbuySearchBar(
-                        hintText: 'البحث في MBUY',
-                        readOnly: true,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SearchScreen(),
-                            ),
-                          );
-                        },
-                        prefixIcon: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ProfileScreen(),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00D9B3),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        suffixIcon: const Icon(
-                          Icons.camera_alt_outlined,
-                          color: MbuyColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          : null,
+      // لا يوجد AppBar - كل صفحة تدير الـ header الخاص بها
 
       body: Stack(
         children: [
