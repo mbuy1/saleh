@@ -24,8 +24,11 @@
 ## 🛠️ التقنيات المستخدمة
 
 - **Flutter** 3.10+ - إطار العمل الأساسي
-- **Supabase** - قاعدة البيانات والمصادقة
-- **Cloudflare Images** - تخزين وإدارة الصور
+- **Supabase** - قاعدة البيانات والمصادقة (Backend: [mbuy-backend](https://github.com/mbuy1/mbuy-backend))
+- **Cloudflare Worker** - API Gateway (Worker: [mbuy-worker](https://github.com/mbuy1/mbuy-worker))
+- **Cloudflare R2** - تخزين وإدارة الصور
+
+📖 **معلومات إضافية:** راجع [BACKEND-REPOS.md](BACKEND-REPOS.md) لمعرفة هيكل البنية التحتية
 
 ## 📱 البدء السريع
 
@@ -134,4 +137,15 @@ flutter test
 
 ---
 
-**آخر تحديث:** نوفمبر 2025
+## 🗂️ Backend Repositories
+
+Backend code has been moved to separate repositories for better organization:
+
+- **Backend (Supabase):** [github.com/mbuy1/mbuy-backend](https://github.com/mbuy1/mbuy-backend)
+- **Worker (Cloudflare):** [github.com/mbuy1/mbuy-worker](https://github.com/mbuy1/mbuy-worker)
+
+📄 See [BACKEND-REPOS.md](BACKEND-REPOS.md) for full migration details and local development setup.
+
+---
+
+**آخر تحديث:** يناير 2025
