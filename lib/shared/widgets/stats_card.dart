@@ -36,13 +36,9 @@ class StatsCard extends StatelessWidget {
         children: [
           // الأيقونة (اختياري)
           if (icon != null)
-            Icon(
-              icon,
-              color: color ?? const Color(0x4000D9B3),
-              size: 24,
-            ),
+            Icon(icon, color: color ?? const Color(0x4000D9B3), size: 24),
           const SizedBox(height: 8),
-          
+
           // القيمة الرئيسية
           Text(
             value,
@@ -53,9 +49,9 @@ class StatsCard extends StatelessWidget {
               fontFamily: 'Cairo',
             ),
           ),
-          
+
           const SizedBox(height: 4),
-          
+
           // التسمية
           Text(
             label,

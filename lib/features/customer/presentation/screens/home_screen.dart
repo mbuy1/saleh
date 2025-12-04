@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/modern_hero_section.dart';
 import '../../../../shared/widgets/stats_card.dart';
 import '../../../../shared/widgets/brand_card.dart';
+import 'categories_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  int _selectedTabIndex = 0;
 
   final List<String> _tabs = [
     'الرئيسية',
@@ -20,66 +20,92 @@ class _HomeScreenState extends State<HomeScreen>
     'رجال',
     'منزل',
     'أطفال',
-    'جمال'
+    'جمال',
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Modern Hero Section
-        const ModernHeroSection(
-          title: 'MBUY',
-          subtitle: 'متجرك الإلكتروني الشامل',
-          icon: Icons.shopping_bag_outlined,
-          iconColor: Color(0xFF00D9B3),
-          height: 180,
-        ),
-
-        // Tab Bar
+        // Tab Bar - قابل للسحب فقط عند النقر يتغير المحتوى
         Container(
           color: Colors.white,
           width: double.infinity,
           height: 50,
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicatorColor: const Color(0xFF00D9B3),
-            indicatorWeight: 3,
-            labelColor: const Color(0xFF212529),
-            unselectedLabelColor: const Color(0xFF6C757D),
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Cairo',
-              fontSize: 14,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.normal,
-              fontFamily: 'Cairo',
-              fontSize: 14,
-            ),
-            tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+          child: Row(
+            children: [
+              // زر القائمة (3 خطوط) على اليسار
+              IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Color(0xFF212529),
+                  size: 24,
+                ),
+                tooltip: 'الفئات',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CategoriesScreen(),
+                    ),
+                  );
+                },
+              ),
+              // شريط الفئات القابل للتمرير
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  itemCount: _tabs.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = _selectedTabIndex == index;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedTabIndex = index;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: isSelected
+                                  ? const Color(0xFF00D9B3)
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          _tabs[index],
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            fontFamily: 'Cairo',
+                            fontSize: 14,
+                            color: isSelected
+                                ? const Color(0xFF212529)
+                                : const Color(0xFF6C757D),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
 
         // Tab Content
         Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: _tabs.map((tab) => _buildTabContent(tab)).toList(),
-          ),
+          child: _buildTabContent(_tabs[_selectedTabIndex]),
         ),
       ],
     );

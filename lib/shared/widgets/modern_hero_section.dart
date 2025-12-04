@@ -26,10 +26,7 @@ class ModernHeroSection extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            const Color(0xFFF8F9FA),
-            Colors.white,
-          ],
+          colors: [const Color(0xFFF8F9FA), Colors.white],
         ),
       ),
       child: Stack(
@@ -86,11 +83,7 @@ class ModernHeroSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 40,
-                ),
+                child: Icon(icon, color: Colors.white, size: 40),
               ),
             ),
           ),

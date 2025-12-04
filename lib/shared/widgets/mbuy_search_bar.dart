@@ -7,6 +7,7 @@ class MbuySearchBar extends StatelessWidget {
   final VoidCallback? onTap;
   final bool readOnly;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
 
   const MbuySearchBar({
     super.key,
@@ -15,6 +16,7 @@ class MbuySearchBar extends StatelessWidget {
     this.onTap,
     this.readOnly = false,
     this.suffixIcon,
+    this.prefixIcon,
   });
 
   @override
@@ -34,7 +36,7 @@ class MbuySearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: MbuyColors.textTertiary),
-          prefixIcon: const Icon(Icons.search, color: MbuyColors.textSecondary),
+          prefixIcon: prefixIcon ?? const Icon(Icons.search, color: MbuyColors.textSecondary),
           suffixIcon:
               suffixIcon ??
               const Icon(

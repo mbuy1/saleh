@@ -45,7 +45,8 @@ class BrandCard extends StatelessWidget {
                   width: 60,
                   height: 60,
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => _buildTextFallback(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildTextFallback(),
                 )
               : _buildTextFallback(),
         ),

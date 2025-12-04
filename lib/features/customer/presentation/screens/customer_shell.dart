@@ -9,7 +9,6 @@ import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'profile_screen.dart';
 import 'map_screen.dart';
-import 'categories_screen.dart';
 import 'search_screen.dart';
 
 class CustomerShell extends StatefulWidget {
@@ -30,6 +29,7 @@ class CustomerShell extends StatefulWidget {
 
 class _CustomerShellState extends State<CustomerShell> {
   int _currentIndex = 0; // Home is default
+  Offset _fabPosition = const Offset(20, 100); // Initial position for draggable button
 
   // Screens
   late List<Widget> _screens;
@@ -38,9 +38,9 @@ class _CustomerShellState extends State<CustomerShell> {
   void initState() {
     super.initState();
     _screens = [
-      const HomeScreen(), // 0: Home (الصفحة الرئيسية)
+      const ExploreScreen(), // 0: Explore (Video) - تبديل المواقع
       const StoresScreen(), // 1: Stores
-      const ExploreScreen(), // 2: Explore (Video)
+      const HomeScreen(), // 2: Home (الصفحة الرئيسية) - تبديل المواقع
       const CartScreen(), // 3: Cart
       const MapScreen(), // 4: Map
     ];
@@ -49,38 +49,24 @@ class _CustomerShellState extends State<CustomerShell> {
   @override
   Widget build(BuildContext context) {
     // Check if we are on the Explore screen (Video) to change UI style
-    final bool isExplore = _currentIndex == 2;
+    final bool isExplore = _currentIndex == 0;
 
     return Scaffold(
-      // Header (Only show on Home and Stores)
-      appBar: (_currentIndex == 0 || _currentIndex == 1)
+      // Header (Only show on Home and Stores) - بعد التبديل: الرئيسية=2، المتاجر=1
+      appBar: (_currentIndex == 2 || _currentIndex == 1)
           ? PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: AppBar(
                 backgroundColor: Colors.white,
                 elevation: 0,
-                leading: widget.appModeProvider.hasMerchantAccess()
-                    ? IconButton(
-                        icon: const Icon(
-                          Icons.dashboard_outlined,
-                          color: MbuyColors.textPrimary,
-                          size: 26,
-                        ),
-                        tooltip: 'العودة إلى لوحة التحكم',
-                        onPressed: () {
-                          widget.appModeProvider.setMerchantMode();
-                        },
-                      )
-                    : null,
-                titleSpacing: widget.appModeProvider.hasMerchantAccess()
-                    ? 0
-                    : 16,
+                automaticallyImplyLeading: false,
+                titleSpacing: 16,
                 title: Row(
                   children: [
-                    // Search Bar
+                    // Search Bar with Profile Icon inside
                     Expanded(
                       child: MbuySearchBar(
-                        hintText: 'البحث',
+                        hintText: 'البحث في MBUY',
                         readOnly: true,
                         onTap: () {
                           Navigator.push(
@@ -90,44 +76,33 @@ class _CustomerShellState extends State<CustomerShell> {
                             ),
                           );
                         },
+                        prefixIcon: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF00D9B3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
                         suffixIcon: const Icon(
                           Icons.camera_alt_outlined,
                           color: MbuyColors.textSecondary,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Categories Button
-                    IconButton(
-                      icon: const Icon(
-                        Icons.grid_view_outlined,
-                        color: MbuyColors.textPrimary,
-                        size: 26,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CategoriesScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    // Profile Button
-                    IconButton(
-                      icon: const Icon(
-                        Icons.person_outline,
-                        color: MbuyColors.textPrimary,
-                        size: 26,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfileScreen(),
-                          ),
-                        );
-                      },
                     ),
                   ],
                 ),
@@ -135,7 +110,36 @@ class _CustomerShellState extends State<CustomerShell> {
             )
           : null,
 
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: Stack(
+        children: [
+          IndexedStack(index: _currentIndex, children: _screens),
+          
+          // Draggable Dashboard Button (only if merchant access)
+          if (widget.appModeProvider.hasMerchantAccess())
+            Positioned(
+              left: _fabPosition.dx,
+              top: _fabPosition.dy,
+              child: Draggable(
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: _buildDashboardButton(isDragging: true),
+                ),
+                childWhenDragging: Container(),
+                onDragEnd: (details) {
+                  setState(() {
+                    // Keep button within screen bounds
+                    final screenSize = MediaQuery.of(context).size;
+                    _fabPosition = Offset(
+                      details.offset.dx.clamp(0, screenSize.width - 60),
+                      details.offset.dy.clamp(0, screenSize.height - 200),
+                    );
+                  });
+                },
+                child: _buildDashboardButton(),
+              ),
+            ),
+        ],
+      ),
 
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -173,9 +177,9 @@ class _CustomerShellState extends State<CustomerShell> {
           ),
           items: [
             _buildNavItem(
-              label: 'الرئيسية',
-              icon: Icons.home_outlined,
-              activeIcon: Icons.home,
+              label: 'اكسبلور',
+              icon: Icons.explore_outlined,
+              activeIcon: Icons.explore,
             ),
             _buildNavItem(
               label: 'المتاجر',
@@ -183,9 +187,9 @@ class _CustomerShellState extends State<CustomerShell> {
               activeIcon: Icons.storefront,
             ),
             _buildNavItem(
-              label: 'اكسبلور',
-              icon: Icons.explore_outlined,
-              activeIcon: Icons.explore,
+              label: 'الرئيسية',
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
             ),
             _buildNavItem(
               label: 'حقيبة التسوق',
@@ -218,6 +222,42 @@ class _CustomerShellState extends State<CustomerShell> {
         child: Icon(activeIcon, size: 24),
       ),
       label: label,
+    );
+  }
+
+  Widget _buildDashboardButton({bool isDragging = false}) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF00D9B3), Color(0xFF00A896)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00D9B3).withValues(alpha: 0.4),
+            blurRadius: isDragging ? 20 : 12,
+            offset: Offset(0, isDragging ? 8 : 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            widget.appModeProvider.setMerchantMode();
+          },
+          customBorder: const CircleBorder(),
+          child: const Icon(
+            Icons.dashboard_outlined,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
+      ),
     );
   }
 }
