@@ -50,12 +50,16 @@ class CloudflareImagesService {
       final uploadDataResponse = await http.post(
         Uri.parse('$_workerUrl/media/image'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'filename': file.path.split(Platform.pathSeparator).last}),
+        body: jsonEncode({
+          'filename': file.path.split(Platform.pathSeparator).last,
+        }),
       );
 
       if (uploadDataResponse.statusCode != 200) {
         final error = jsonDecode(uploadDataResponse.body);
-        throw Exception('فشل الحصول على URL الرفع: ${error['error'] ?? uploadDataResponse.statusCode}');
+        throw Exception(
+          'فشل الحصول على URL الرفع: ${error['error'] ?? uploadDataResponse.statusCode}',
+        );
       }
 
       final uploadData = jsonDecode(uploadDataResponse.body);

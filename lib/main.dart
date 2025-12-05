@@ -5,9 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
-// ملاحظة: تم نقل Cloudflare و Gemini إلى API Gateway (Worker)
-// import 'core/services/cloudflare_images_service.dart';
-// import 'core/services/gemini_service.dart';
+import 'core/services/cloudflare_images_service.dart';
+import 'core/services/gemini_service.dart';
 import 'core/services/preferences_service.dart';
 import 'core/firebase_service.dart';
 import 'features/customer/presentation/screens/customer_support_chat_screen.dart';
@@ -113,13 +112,21 @@ Future<void> main() async {
     debugPrint('⚠️ خطأ في تهيئة Supabase: $e');
   }
 
-  // ملاحظة: Cloudflare Images و Gemini AI يعملان الآن عبر API Gateway (Worker)
-  // لا حاجة لتهيئتهم محلياً
-  debugPrint('✅ سيتم استخدام Cloudflare Images عبر API Gateway');
-  debugPrint('✅ سيتم استخدام Gemini AI عبر API Gateway');
+  // تهيئة Gemini AI عبر Worker API
+  try {
+    await GeminiService.initialize();
+    debugPrint('✅ تم تهيئة Gemini AI عبر Worker بنجاح');
+  } catch (e) {
+    debugPrint('⚠️ خطأ في تهيئة Gemini AI: $e');
+  }
 
-  // تحذير: CloudflareImagesService القديم لا يزال موجوداً للاستخدام المباشر إذا لزم الأمر
-  // لكن يُفضل استخدام MediaService الذي يعمل عبر Worker
+  // تهيئة Cloudflare Images عبر Worker API
+  try {
+    await CloudflareImagesService.initialize();
+    debugPrint('✅ تم تهيئة Cloudflare Images عبر Worker بنجاح');
+  } catch (e) {
+    debugPrint('⚠️ خطأ في تهيئة Cloudflare Images: $e');
+  }
 
   // تهيئة Theme Provider
   final themeProvider = ThemeProvider();
