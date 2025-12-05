@@ -8,6 +8,7 @@ import '../core/firebase_service.dart';
 import '../shared/widgets/mbuy_loader.dart';
 import '../features/customer/presentation/screens/customer_shell.dart';
 import '../features/merchant/presentation/screens/merchant_home_screen.dart';
+import 'services/api_service.dart';
 
 class RootWidget extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -76,10 +77,12 @@ class _RootWidgetState extends State<RootWidget> {
     debugPrint('🔍 Session expires at: ${session?.expiresAt}');
     debugPrint('🔍 User ID: ${user?.id}');
     debugPrint('🔍 Email confirmed: ${user?.emailConfirmedAt != null}');
-    
+
     // التحقق من انتهاء الجلسة
     if (session != null && session.expiresAt != null) {
-      final expiresAt = DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000);
+      final expiresAt = DateTime.fromMillisecondsSinceEpoch(
+        session.expiresAt! * 1000,
+      );
       final now = DateTime.now();
       if (expiresAt.isBefore(now)) {
         debugPrint('⚠️ الجلسة منتهية - محاولة تحديث...');
@@ -95,7 +98,7 @@ class _RootWidgetState extends State<RootWidget> {
     if (user != null) {
       // تعيين User ID في Analytics
       await FirebaseService.setUserId(user.id);
-      
+
       // جلب role من user_profiles
       try {
         final response = await supabaseClient
@@ -106,7 +109,7 @@ class _RootWidgetState extends State<RootWidget> {
 
         if (response != null) {
           final role = response['role'] as String? ?? 'customer';
-          
+
           debugPrint('✅ تم جلب role: $role');
           debugPrint('✅ User ID: ${user.id}');
           debugPrint('✅ Display Name: ${response['display_name']}');
@@ -124,20 +127,19 @@ class _RootWidgetState extends State<RootWidget> {
             }
           });
         } else {
-          // إذا لم يوجد سجل في user_profiles، أنشئه الآن
-          await supabaseClient.from('user_profiles').insert({
-            'id': user.id,
-            'role': 'customer',
-            'display_name': user.email?.split('@')[0] ?? 'مستخدم',
-          });
-
-          // أنشئ محفظة للمستخدم
-          await supabaseClient.from('wallets').insert({
-            'owner_id': user.id,
-            'type': 'customer',
-            'balance': 0,
-            'currency': 'SAR',
-          });
+          // إذا لم يوجد سجل في user_profiles، أنشئه عبر Worker API
+          try {
+            await ApiService.post(
+              '/secure/auth/initialize-user',
+              data: {
+                'role': 'customer',
+                'display_name': user.email?.split('@')[0] ?? 'مستخدم',
+              },
+            );
+            debugPrint('✅ تم إنشاء user_profile + wallet عبر Worker API');
+          } catch (e) {
+            debugPrint('⚠️ فشل إنشاء user_profile/wallet: $e');
+          }
 
           setState(() {
             _user = user;

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'supabase_client.dart';
 import 'services/preferences_service.dart';
+import 'services/api_service.dart';
 
 /// خدمة Firebase المركزية
 /// تدير Analytics و FCM (Push Notifications)
@@ -23,8 +24,10 @@ class FirebaseService {
     _localNotifications = FlutterLocalNotificationsPlugin();
 
     // إعداد Android
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+
     // إعداد iOS
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -95,7 +98,10 @@ class FirebaseService {
   // ==================== Analytics Events ====================
 
   /// تتبع عرض شاشة
-  static Future<void> logScreenView(String screenName, {Map<String, Object>? parameters}) async {
+  static Future<void> logScreenView(
+    String screenName, {
+    Map<String, Object>? parameters,
+  }) async {
     await _analytics?.logScreenView(
       screenName: screenName,
       screenClass: screenName,
@@ -103,10 +109,7 @@ class FirebaseService {
     if (parameters != null && parameters.isNotEmpty) {
       await _analytics?.logEvent(
         name: 'screen_view',
-        parameters: {
-          'screen_name': screenName,
-          ...parameters,
-        },
+        parameters: {'screen_name': screenName, ...parameters},
       );
     }
     debugPrint('📊 Analytics: عرض شاشة $screenName');
@@ -286,10 +289,7 @@ class FirebaseService {
   static Future<void> logViewWallet({double? balance}) async {
     await _analytics?.logEvent(
       name: 'view_wallet',
-      parameters: {
-        if (balance != null) 'balance': balance,
-        'currency': 'SAR',
-      },
+      parameters: {if (balance != null) 'balance': balance, 'currency': 'SAR'},
     );
     debugPrint('📊 Analytics: عرض المحفظة');
   }
@@ -314,9 +314,7 @@ class FirebaseService {
   static Future<void> logViewPoints({int? balance}) async {
     await _analytics?.logEvent(
       name: 'view_points',
-      parameters: {
-        if (balance != null) 'points_balance': balance,
-      },
+      parameters: {if (balance != null) 'points_balance': balance},
     );
     debugPrint('📊 Analytics: عرض النقاط');
   }
@@ -328,10 +326,7 @@ class FirebaseService {
   }) async {
     await _analytics?.logEvent(
       name: 'use_points',
-      parameters: {
-        'points': points,
-        'reason': reason,
-      },
+      parameters: {'points': points, 'reason': reason},
     );
     debugPrint('📊 Analytics: استخدام $points نقاط');
   }
@@ -373,30 +368,29 @@ class FirebaseService {
       // حفظ في SharedPreferences
       await PreferencesService.saveFCMToken(token);
 
-      // حفظ في Supabase (إذا كان المستخدم مسجل دخول)
+      // حفظ في Supabase عبر Worker API (إذا كان المستخدم مسجل دخول)
       final user = supabaseClient.auth.currentUser;
       if (user != null) {
         try {
-          // التحقق إذا كان Token موجود
-          final existing = await supabaseClient
-              .from('user_fcm_tokens')
-              .select('id')
-              .eq('user_id', user.id)
-              .eq('token', token)
-              .maybeSingle();
+          // استخدام Worker API بدلاً من الاتصال المباشر
+          final response = await ApiService.post(
+            '/secure/notifications/register-token',
+            data: {
+              'fcm_token': token,
+              'device_type': 'mobile', // يمكن تحديده بشكل أدق (android/ios)
+            },
+          );
 
-          if (existing == null) {
-            // إضافة Token جديد
-            await supabaseClient.from('user_fcm_tokens').insert({
-              'user_id': user.id,
-              'token': token,
-              'device_type': 'mobile', // يمكن تحديده بشكل أدق
-              'created_at': DateTime.now().toIso8601String(),
-            });
-            debugPrint('✅ تم حفظ FCM Token في قاعدة البيانات');
+          if (response['ok'] == true) {
+            final action = response['data']?['action'];
+            debugPrint(
+              '✅ تم ${action == 'updated' ? 'تحديث' : 'حفظ'} FCM Token في قاعدة البيانات',
+            );
+          } else {
+            debugPrint('⚠️ فشل حفظ FCM Token: ${response['error']}');
           }
         } catch (e) {
-          debugPrint('⚠️ خطأ في حفظ FCM Token في Supabase: $e');
+          debugPrint('⚠️ خطأ في حفظ FCM Token عبر Worker API: $e');
           // لا نوقف التطبيق إذا فشل حفظ Token
         }
       }
@@ -448,12 +442,12 @@ class FirebaseService {
   /// معالجة النقر على الإشعار
   static void _handleNotificationTap(RemoteMessage message) {
     final data = message.data;
-    
+
     // التوجيه بناءً على نوع الإشعار
     if (data.containsKey('type')) {
       final type = data['type'] as String;
       debugPrint('🔔 نوع الإشعار: $type');
-      
+
       // يمكن إضافة منطق التوجيه هنا
       // مثال: إذا كان type == 'order' → التوجيه إلى شاشة الطلبات
       // يمكن استخدام Navigator أو AppRouter هنا

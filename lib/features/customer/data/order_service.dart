@@ -44,37 +44,26 @@ class OrderService {
     // حساب المجموع الكلي باستخدام calculateTotal
     final total = CartService.calculateTotal(cartItems);
 
-    // إنشاء طلب جديد
-    final order = await supabaseClient
-        .from('orders')
-        .insert({
-          'customer_id': user.id,
-          'total_amount': total,
-          'status': 'pending', // حالة أولية: في الانتظار
-        })
-        .select('id')
-        .single();
+    // إنشاء الطلب عبر Worker API (يشمل: create order + bulk insert items + delete cart)
+    final response = await ApiService.post(
+      '/secure/orders/create-from-cart',
+      data: {
+        'cart_id': cartId,
+        'delivery_address': 'عنوان التوصيل', // TODO: جلب من إعدادات المستخدم
+        'payment_method': 'wallet', // TODO: السماح للمستخدم باختيار طريقة الدفع
+        'total_amount': total,
+      },
+    );
 
-    final orderId = order['id'] as String;
-
-    // إنشاء order_items لكل عنصر في السلة
-    for (var cartItem in cartItems) {
-      final product = cartItem.product;
-      if (product != null) {
-        await supabaseClient.from('order_items').insert({
-          'order_id': orderId,
-          'product_id': product.id,
-          'quantity': cartItem.quantity,
-          'price': product.price, // حفظ السعر وقت الطلب
-        });
+    if (response['ok'] == true) {
+      final orderId = response['data']?['order_id'] as String?;
+      if (orderId == null) {
+        throw Exception('فشل في الحصول على رقم الطلب');
       }
+      return orderId;
+    } else {
+      throw Exception(response['error'] ?? 'فشل في إنشاء الطلب');
     }
-
-    // حذف عناصر السلة بعد تحويلها إلى طلب
-    // (لا نحتاج تحديث status لأن جدول carts لا يحتوي على status)
-    await supabaseClient.from('cart_items').delete().eq('cart_id', cartId);
-
-    return orderId;
   }
 
   /// جلب طلبات العميل

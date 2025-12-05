@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/supabase_client.dart';
+import '../../../core/services/api_service.dart';
 
 class AuthService {
   /// تسجيل مستخدم جديد
@@ -70,33 +71,23 @@ class AuthService {
         debugPrint('✅ تم إنشاء جلسة تلقائياً بعد التسجيل');
       }
 
-      // 2. إنشاء row في user_profiles
+      // 2. إنشاء user_profile + wallet عبر Worker API (دفعة واحدة)
       try {
-        await supabaseClient.from('user_profiles').insert({
-          'id': user.id,
-          'role': role,
-          'display_name': displayName,
-        });
-        debugPrint('✅ تم إنشاء user_profile بدور: $role');
-      } catch (e) {
-        // إذا فشل الإدراج، ربما السجل موجود مسبقاً
-        debugPrint('⚠️ تحذير: فشل إنشاء user_profile: $e');
-      }
-
-      // 3. إنشاء wallet للمستخدم الجديد
-      try {
-        await supabaseClient.from('wallets').insert({
-          'owner_id': user.id,
-          'type': role == 'merchant' ? 'merchant' : 'customer',
-          'balance': 0,
-          'currency': 'SAR',
-        });
-        debugPrint(
-          '✅ تم إنشاء wallet بنوع: ${role == "merchant" ? "merchant" : "customer"}',
+        final response = await ApiService.post(
+          '/secure/auth/initialize-user',
+          data: {'role': role, 'display_name': displayName},
         );
+
+        if (response['ok'] == true) {
+          debugPrint('✅ تم إنشاء user_profile + wallet بدور: $role');
+        } else {
+          debugPrint(
+            '⚠️ تحذير: فشل إنشاء user_profile/wallet: ${response['error']}',
+          );
+        }
       } catch (e) {
         // إذا فشل الإدراج، ربما السجل موجود مسبقاً
-        debugPrint('⚠️ تحذير: فشل إنشاء wallet: $e');
+        debugPrint('⚠️ تحذير: فشل إنشاء user_profile/wallet عبر Worker: $e');
       }
 
       // 4. إذا كان تاجر: إنشاء متجر تلقائياً

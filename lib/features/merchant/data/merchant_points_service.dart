@@ -1,8 +1,9 @@
 import '../../../core/supabase_client.dart';
+import '../../../core/services/api_service.dart';
 
 class MerchantPointsService {
   /// جلب رصيد نقاط التاجر الحالي
-  /// 
+  ///
   /// Returns: رصيد النقاط (int)
   /// Throws: Exception إذا لم يكن المستخدم مسجل أو لم يوجد حساب نقاط
   static Future<int> getMerchantPointsBalance() async {
@@ -30,20 +31,24 @@ class MerchantPointsService {
     }
   }
 
-  /// إنشاء حساب نقاط للتاجر (إذا لم يكن موجوداً)
+  /// إنشاء حساب نقاط للتاجر (إذا لم يكن موجوداً) - عبر Worker API
   static Future<void> _createPointsAccount(String userId) async {
     try {
-      await supabaseClient.from('points_accounts').insert({
-        'user_id': userId,
-        'points_balance': 0,
-      });
+      final response = await ApiService.post(
+        '/secure/merchant/points/create-account',
+        data: {'initial_balance': 0},
+      );
+
+      if (response['ok'] == true) {
+        // تم الإنشاء بنجاح
+      }
     } catch (e) {
       // قد يكون الحساب موجوداً بالفعل، نتجاهل الخطأ
     }
   }
 
   /// جلب قائمة الميزات المتاحة للتاجر
-  /// 
+  ///
   /// Returns: List من الميزات (feature_actions) حيث is_enabled = true
   /// Throws: Exception في حالة الفشل
   static Future<List<Map<String, dynamic>>> getAvailableFeatureActions() async {
@@ -61,11 +66,11 @@ class MerchantPointsService {
   }
 
   /// صرف نقاط لاستخدام ميزة
-  /// 
+  ///
   /// Parameters:
   /// - featureKey: مفتاح الميزة (مثل 'boost_store', 'explore_video')
   /// - meta: بيانات إضافية (اختياري) - مثل store_id, product_id
-  /// 
+  ///
   /// Returns: true إذا تم الصرف بنجاح، false إذا لم تكن النقاط كافية
   /// Throws: Exception في حالة الفشل
   static Future<bool> spendPointsForFeature(
@@ -92,7 +97,8 @@ class MerchantPointsService {
       }
 
       final pointsAccountId = pointsAccountResponse['id'] as String;
-      final currentBalance = (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
+      final currentBalance =
+          (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
 
       // 2. جلب سجل feature_actions للـ featureKey
       final featureResponse = await supabaseClient
@@ -113,23 +119,17 @@ class MerchantPointsService {
         return false; // لا توجد نقاط كافية
       }
 
-      // 4. خصم النقاط (update points_accounts.balance)
-      final newBalance = currentBalance - cost;
-      await supabaseClient
-          .from('points_accounts')
-          .update({'points_balance': newBalance})
-          .eq('id', pointsAccountId);
+      // 4. صرف النقاط عبر Worker API (يشمل: update balance + insert transaction)
+      final response = await ApiService.post(
+        '/secure/merchant/points/spend',
+        data: {'feature_key': featureKey, 'cost': cost, 'meta': meta ?? {}},
+      );
 
-      // 5. إضافة سجل في points_transactions
-      await supabaseClient.from('points_transactions').insert({
-        'points_account_id': pointsAccountId,
-        'type': 'spend_feature',
-        'feature_key': featureKey,
-        'points_change': -cost,
-        'meta': meta ?? {},
-      });
-
-      return true; // تم الصرف بنجاح
+      if (response['ok'] == true) {
+        return true; // تم الصرف بنجاح
+      } else {
+        throw Exception(response['error'] ?? 'فشل صرف النقاط');
+      }
     } catch (e) {
       // إذا كانت الرسالة مخصصة، نعيدها كما هي
       if (e.toString().contains('غير موجودة') ||
@@ -142,10 +142,10 @@ class MerchantPointsService {
   }
 
   /// جلب عمليات نقاط التاجر
-  /// 
+  ///
   /// Parameters:
   /// - limit: عدد العمليات المطلوبة (افتراضي: 20)
-  /// 
+  ///
   /// Returns: List من عمليات النقاط مرتبة حسب التاريخ (الأحدث أولاً)
   /// Throws: Exception إذا لم يكن المستخدم مسجل
   static Future<List<Map<String, dynamic>>> getMerchantPointsTransactions({
@@ -185,11 +185,11 @@ class MerchantPointsService {
   }
 
   /// شراء نقاط (للتاجر)
-  /// 
+  ///
   /// Parameters:
   /// - points: عدد النقاط المراد شراؤها
   /// - meta: بيانات إضافية (مثل payment_id)
-  /// 
+  ///
   /// Returns: true إذا تم الشراء بنجاح
   /// Throws: Exception في حالة الفشل
   static Future<bool> purchasePoints(
@@ -220,46 +220,43 @@ class MerchantPointsService {
         // إنشاء حساب نقاط جديد
         final createResponse = await supabaseClient
             .from('points_accounts')
-            .insert({
-              'user_id': user.id,
-              'points_balance': points,
-            })
+            .insert({'user_id': user.id, 'points_balance': points})
             .select()
             .single();
         pointsAccountId = createResponse['id'] as String;
         currentBalance = points;
       } else {
         pointsAccountId = pointsAccountResponse['id'] as String;
-        currentBalance = (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
-
-        // زيادة الرصيد
-        await supabaseClient
-            .from('points_accounts')
-            .update({'points_balance': currentBalance + points})
-            .eq('id', pointsAccountId);
+        currentBalance =
+            (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
       }
 
-      // إضافة سجل في points_transactions
-      await supabaseClient.from('points_transactions').insert({
-        'points_account_id': pointsAccountId,
-        'type': 'purchase',
-        'feature_key': null,
-        'points_change': points,
-        'meta': meta ?? {},
-      });
+      // شراء النقاط عبر Worker API (يشمل: update balance + insert transaction)
+      final response = await ApiService.post(
+        '/secure/merchant/points/purchase',
+        data: {
+          'points': points,
+          'payment_method': 'wallet',
+          'meta': meta ?? {},
+        },
+      );
 
-      return true;
+      if (response['ok'] == true) {
+        return true;
+      } else {
+        throw Exception(response['error'] ?? 'فشل شراء النقاط');
+      }
     } catch (e) {
       throw Exception('خطأ في شراء النقاط: ${e.toString()}');
     }
   }
 
   /// دعم المتجر لمدة محددة (Boost Store)
-  /// 
+  ///
   /// Parameters:
   /// - storeId: معرف المتجر
   /// - featureKey: مفتاح الميزة (افتراضي: 'boost_store_24h')
-  /// 
+  ///
   /// Returns: true إذا تم الدعم بنجاح، false إذا لم تكن النقاط كافية
   /// Throws: Exception في حالة الفشل
   static Future<bool> boostStore(
@@ -306,10 +303,7 @@ class MerchantPointsService {
       // 4. صرف النقاط باستخدام spendPointsForFeature
       final success = await spendPointsForFeature(
         featureKey,
-        meta: {
-          'store_id': storeId,
-          'duration_hours': durationHours,
-        },
+        meta: {'store_id': storeId, 'duration_hours': durationHours},
       );
 
       if (!success) {
@@ -322,9 +316,7 @@ class MerchantPointsService {
       // 6. تحديث جدول stores
       await supabaseClient
           .from('stores')
-          .update({
-            'boosted_until': boostedUntil.toIso8601String(),
-          })
+          .update({'boosted_until': boostedUntil.toIso8601String()})
           .eq('id', storeId);
 
       return true; // تم الدعم بنجاح
@@ -341,11 +333,11 @@ class MerchantPointsService {
   }
 
   /// إبراز المتجر على الخريطة لمدة محددة (Highlight Store on Map)
-  /// 
+  ///
   /// Parameters:
   /// - storeId: معرف المتجر
   /// - featureKey: مفتاح الميزة (افتراضي: 'map_highlight_24h')
-  /// 
+  ///
   /// Returns: true إذا تم الإبراز بنجاح، false إذا لم تكن النقاط كافية
   /// Throws: Exception في حالة الفشل
   static Future<bool> highlightStoreOnMap(
@@ -392,10 +384,7 @@ class MerchantPointsService {
       // 4. صرف النقاط باستخدام spendPointsForFeature
       final success = await spendPointsForFeature(
         featureKey,
-        meta: {
-          'store_id': storeId,
-          'duration_hours': durationHours,
-        },
+        meta: {'store_id': storeId, 'duration_hours': durationHours},
       );
 
       if (!success) {
@@ -408,9 +397,7 @@ class MerchantPointsService {
       // 6. تحديث جدول stores
       await supabaseClient
           .from('stores')
-          .update({
-            'map_highlight_until': highlightUntil.toIso8601String(),
-          })
+          .update({'map_highlight_until': highlightUntil.toIso8601String()})
           .eq('id', storeId);
 
       return true; // تم الإبراز بنجاح
@@ -426,4 +413,3 @@ class MerchantPointsService {
     }
   }
 }
-
