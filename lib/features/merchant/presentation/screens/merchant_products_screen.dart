@@ -227,8 +227,6 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         );
       }
 
-      final storeId = storeResult['data']['id'];
-
       // رفع الصورة إذا تم اختيارها
       String? imageUrl;
       if (_selectedImageFile != null) {

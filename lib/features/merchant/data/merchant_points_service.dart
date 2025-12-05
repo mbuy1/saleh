@@ -83,46 +83,10 @@ class MerchantPointsService {
     }
 
     try {
-      // 1. جلب حساب نقاط التاجر
-      final pointsAccountResponse = await supabaseClient
-          .from('points_accounts')
-          .select()
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-      if (pointsAccountResponse == null) {
-        // إنشاء حساب نقاط إذا لم يكن موجوداً
-        await _createPointsAccount(user.id);
-        throw Exception('لا توجد نقاط كافية');
-      }
-
-      final pointsAccountId = pointsAccountResponse['id'] as String;
-      final currentBalance =
-          (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
-
-      // 2. جلب سجل feature_actions للـ featureKey
-      final featureResponse = await supabaseClient
-          .from('feature_actions')
-          .select()
-          .eq('key', featureKey)
-          .eq('is_enabled', true)
-          .maybeSingle();
-
-      if (featureResponse == null) {
-        throw Exception('الميزة غير موجودة أو غير مفعلة');
-      }
-
-      final cost = (featureResponse['default_cost'] as num?)?.toInt() ?? 0;
-
-      // 3. التحقق أن balance >= cost
-      if (currentBalance < cost) {
-        return false; // لا توجد نقاط كافية
-      }
-
-      // 4. صرف النقاط عبر Worker API (يشمل: update balance + insert transaction)
+      // صرف النقاط عبر Worker API (يشمل: validate feature + check balance + update + insert transaction)
       final response = await ApiService.post(
         '/secure/merchant/points/spend',
-        data: {'feature_key': featureKey, 'cost': cost, 'meta': meta ?? {}},
+        data: {'feature_key': featureKey, 'meta': meta ?? {}},
       );
 
       if (response['ok'] == true) {
@@ -206,32 +170,7 @@ class MerchantPointsService {
     }
 
     try {
-      // جلب أو إنشاء حساب نقاط
-      final pointsAccountResponse = await supabaseClient
-          .from('points_accounts')
-          .select()
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-      String pointsAccountId;
-      int currentBalance;
-
-      if (pointsAccountResponse == null) {
-        // إنشاء حساب نقاط جديد
-        final createResponse = await supabaseClient
-            .from('points_accounts')
-            .insert({'user_id': user.id, 'points_balance': points})
-            .select()
-            .single();
-        pointsAccountId = createResponse['id'] as String;
-        currentBalance = points;
-      } else {
-        pointsAccountId = pointsAccountResponse['id'] as String;
-        currentBalance =
-            (pointsAccountResponse['points_balance'] as num?)?.toInt() ?? 0;
-      }
-
-      // شراء النقاط عبر Worker API (يشمل: update balance + insert transaction)
+      // شراء النقاط عبر Worker API (يشمل: create account if needed + update balance + insert transaction)
       final response = await ApiService.post(
         '/secure/merchant/points/purchase',
         data: {
