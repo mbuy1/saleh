@@ -542,18 +542,32 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildTabButton(
-                icon: Icons.video_library,
-                label: 'mbuy studio',
-                subtitle: 'الفيديو والصوت والصورة',
+                icon: Icons.shopping_bag,
+                label: 'تصفح المنتجات',
+                subtitle: 'عرض منتجات السوق',
                 gradient: LinearGradient(
-                  colors: [Colors.orange.shade400, Colors.orange.shade600],
+                  colors: [Colors.green.shade400, Colors.green.shade600],
                 ),
                 onTap: () {
-                  _showSnackBar('سيتم إضافة mbuy studio قريباً');
+                  // التبديل إلى وضع العميل
+                  widget.appModeProvider.setMode(AppMode.customer);
                 },
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+        // زر mbuy studio في صف منفصل
+        _buildTabButton(
+          icon: Icons.video_library,
+          label: 'mbuy studio',
+          subtitle: 'الفيديو والصوت والصورة',
+          gradient: LinearGradient(
+            colors: [Colors.orange.shade400, Colors.orange.shade600],
+          ),
+          onTap: () {
+            _showSnackBar('سيتم إضافة mbuy studio قريباً');
+          },
         ),
       ],
     );
