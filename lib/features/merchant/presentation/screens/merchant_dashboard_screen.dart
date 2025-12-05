@@ -9,14 +9,17 @@ import 'merchant_help_center_screen.dart';
 import 'merchant_products_screen.dart';
 import 'merchant_orders_screen.dart';
 import '../../../../shared/widgets/mbuy_logo.dart';
+// الشاشات الجديدة
+import 'merchant_analytics_screen_new.dart';
+import 'merchant_reviews_screen.dart';
+import 'merchant_coupons_screen.dart';
+import 'merchant_banners_screen.dart';
+import 'merchant_videos_screen.dart';
 
 class MerchantDashboardScreen extends StatefulWidget {
   final AppModeProvider appModeProvider;
 
-  const MerchantDashboardScreen({
-    super.key,
-    required this.appModeProvider,
-  });
+  const MerchantDashboardScreen({super.key, required this.appModeProvider});
 
   @override
   State<MerchantDashboardScreen> createState() =>
@@ -76,6 +79,92 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                 mainAxisSpacing: 12,
               ),
               delegate: SliverChildListDelegate([
+                _buildMenuCard(
+                  icon: Icons.analytics,
+                  title: 'الإحصائيات',
+                  subtitle: 'تحليلات المتجر',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const MerchantAnalyticsScreenNew(),
+                      ),
+                    );
+                  },
+                  badge: 'جديد',
+                ),
+                _buildMenuCard(
+                  icon: Icons.star_rate,
+                  title: 'التقييمات',
+                  subtitle: 'إدارة المراجعات',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFf5576c), Color(0xFFf093fb)],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantReviewsScreen(),
+                      ),
+                    );
+                  },
+                  badge: 'جديد',
+                ),
+                _buildMenuCard(
+                  icon: Icons.local_offer,
+                  title: 'الكوبونات',
+                  subtitle: 'إدارة الخصومات',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantCouponsScreen(),
+                      ),
+                    );
+                  },
+                  badge: 'جديد',
+                ),
+                _buildMenuCard(
+                  icon: Icons.image,
+                  title: 'البانرات',
+                  subtitle: 'إعلانات المتجر',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantBannersScreen(),
+                      ),
+                    );
+                  },
+                  badge: 'جديد',
+                ),
+                _buildMenuCard(
+                  icon: Icons.video_library,
+                  title: 'الفيديوهات',
+                  subtitle: 'إدارة المحتوى',
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MerchantVideosScreen(),
+                      ),
+                    );
+                  },
+                  badge: 'جديد',
+                ),
                 _buildMenuCard(
                   icon: Icons.loyalty,
                   title: 'الولاء',
@@ -265,7 +354,6 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
       ),
     );
   }
-
 
   Widget _buildShortcutsSection() {
     // This section replaces "اختصاراتك" with the chart
@@ -870,7 +958,8 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MerchantProductsScreen(),
+                              builder: (context) =>
+                                  const MerchantProductsScreen(),
                             ),
                           );
                         },
@@ -885,7 +974,8 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MerchantStoreSetupScreen(),
+                              builder: (context) =>
+                                  const MerchantStoreSetupScreen(),
                             ),
                           );
                         },
@@ -900,7 +990,8 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MerchantOrdersScreen(),
+                              builder: (context) =>
+                                  const MerchantOrdersScreen(),
                             ),
                           );
                         },

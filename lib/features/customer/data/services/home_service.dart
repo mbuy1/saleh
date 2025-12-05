@@ -1,42 +1,36 @@
 import 'package:flutter/foundation.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/product_model.dart';
 import '../models/category_model.dart';
 import '../models/store_model.dart';
 
-/// خدمة الصفحة الرئيسية - جلب البيانات من Supabase
+/// خدمة الصفحة الرئيسية - جلب البيانات من Worker API
 class HomeService {
   /// جلب المنتجات المميزة (Best Offers)
   static Future<List<ProductModel>> getFeaturedProducts({
     int limit = 10,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .not('discount_price', 'is', null)
-          .gt('stock_quantity', 0)
-          .order('created_at', ascending: false)
-          .limit(limit);
+      final response = await ApiService.getFeaturedProducts(limit: limit);
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج مميز');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = response['data'] as List;
+        debugPrint('✅ تم جلب ${products.length} منتج مميز');
 
-      return (response as List).map((json) {
-        // دمج بيانات المتجر والفئة
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        return products.map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
+      }
+
+      debugPrint('⚠️ لا توجد منتجات مميزة: ${response['error'] ?? 'Unknown'}');
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المنتجات المميزة: $e');
       return [];
@@ -46,30 +40,26 @@ class HomeService {
   /// جلب المنتجات الجديدة (New Arrivals)
   static Future<List<ProductModel>> getNewArrivals({int limit = 10}) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .gt('stock_quantity', 0)
-          .order('created_at', ascending: false)
-          .limit(limit);
+      final response = await ApiService.getNewArrivals(limit: limit);
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج جديد');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = response['data'] as List;
+        debugPrint('✅ تم جلب ${products.length} منتج جديد');
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        return products.map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
+      }
+
+      debugPrint('⚠️ لا توجد منتجات جديدة: ${response['error'] ?? 'Unknown'}');
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المنتجات الجديدة: $e');
       return [];
@@ -79,31 +69,26 @@ class HomeService {
   /// جلب المنتجات الأكثر مبيعاً (Best Sellers)
   static Future<List<ProductModel>> getBestSellers({int limit = 10}) async {
     try {
-      // يمكن تحسينها لاحقاً بناءً على عدد الطلبات
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .gt('stock_quantity', 0)
-          .order('rating', ascending: false)
-          .limit(limit);
+      final response = await ApiService.getBestSellers(limit: limit);
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج الأكثر مبيعاً');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = response['data'] as List;
+        debugPrint('✅ تم جلب ${products.length} منتج الأكثر مبيعاً');
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        return products.map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
+      }
+
+      debugPrint('⚠️ لا توجد منتجات: ${response['error'] ?? 'Unknown'}');
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المنتجات الأكثر مبيعاً: $e');
       return [];
@@ -113,18 +98,19 @@ class HomeService {
   /// جلب الفئات الرئيسية
   static Future<List<CategoryModel>> getMainCategories({int limit = 20}) async {
     try {
-      final response = await supabaseClient
-          .from('categories')
-          .select('*, products!inner(count)')
-          .eq('is_active', true)
-          .order('display_order', ascending: true)
-          .limit(limit);
+      final response = await ApiService.getCategories();
 
-      debugPrint('✅ تم جلب ${(response as List).length} فئة');
+      if (response['ok'] == true && response['data'] != null) {
+        final categories = (response['data'] as List).take(limit).toList();
+        debugPrint('✅ تم جلب ${categories.length} فئة');
 
-      return (response as List).map((json) {
-        return CategoryModel.fromJson(json);
-      }).toList();
+        return categories.map((json) {
+          return CategoryModel.fromJson(json);
+        }).toList();
+      }
+
+      debugPrint('⚠️ لا توجد فئات: ${response['error'] ?? 'Unknown'}');
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب الفئات: $e');
       return [];
@@ -134,18 +120,23 @@ class HomeService {
   /// جلب المتاجر المميزة
   static Future<List<StoreModel>> getFeaturedStores({int limit = 10}) async {
     try {
-      final response = await supabaseClient
-          .from('stores')
-          .select('*, products(count)')
-          .eq('is_active', true)
-          .order('rating', ascending: false)
-          .limit(limit);
+      final response = await ApiService.getStores(
+        limit: limit,
+        sortBy: 'rating',
+        descending: true,
+      );
 
-      debugPrint('✅ تم جلب ${(response as List).length} متجر مميز');
+      if (response['ok'] == true && response['data'] != null) {
+        final stores = response['data'] as List;
+        debugPrint('✅ تم جلب ${stores.length} متجر مميز');
 
-      return (response as List).map((json) {
-        return StoreModel.fromJson(json);
-      }).toList();
+        return stores.map((json) {
+          return StoreModel.fromJson(json);
+        }).toList();
+      }
+
+      debugPrint('⚠️ لا توجد متاجر: ${response['error'] ?? 'Unknown'}');
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المتاجر المميزة: $e');
       return [];

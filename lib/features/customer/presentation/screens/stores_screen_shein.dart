@@ -252,11 +252,13 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
         'id': '3',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 140,
-          height: 200,
-          text: 'متاجر منزلية',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 140,
+              height: 200,
+              text: 'متاجر منزلية',
+            ) ??
+            'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=280&h=400&fit=crop',
         'name': 'متاجر منزلية',
         'id': '4',
       },
@@ -286,16 +288,21 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
               itemCount: looks.length,
               itemBuilder: (context, index) {
                 final look = looks[index];
+                final imageUrl =
+                    look['image'] ??
+                    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=280&h=400&fit=crop';
+                final name = look['name'] ?? 'متجر';
+                final id = look['id'] ?? '0';
                 return SheinLookCard(
-                  imageUrl: look['image']!,
-                  categoryName: look['name']!,
+                  imageUrl: imageUrl,
+                  categoryName: name,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CategoryProductsScreenShein(
-                          categoryId: look['id']!,
-                          categoryName: look['name']!,
+                          categoryId: id,
+                          categoryName: name,
                         ),
                       ),
                     );
@@ -391,20 +398,24 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
   Widget _buildPromotionalBanners() {
     final banners = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'متاجر مميزة',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'متاجر مميزة',
+            ) ??
+            'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=120&fit=crop',
         'title': 'متاجر مميزة',
         'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'عروض خاصة',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'عروض خاصة',
+            ) ??
+            'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=120&fit=crop',
         'title': 'عروض خاصة',
         'id': '2',
       },
@@ -412,16 +423,19 @@ class _StoresScreenSheinState extends State<StoresScreenShein> {
 
     return Column(
       children: banners.map((banner) {
+        final imageUrl = banner['image'] as String;
+        final title = banner['title'] as String;
+        final id = banner['id'] as String;
         return SheinPromotionalBanner(
-          imageUrl: banner['image']!,
-          title: banner['title'],
+          imageUrl: imageUrl,
+          title: title,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => CategoryProductsScreenShein(
-                  categoryId: banner['id']!,
-                  categoryName: banner['title']!,
+                  categoryId: id,
+                  categoryName: title,
                 ),
               ),
             );

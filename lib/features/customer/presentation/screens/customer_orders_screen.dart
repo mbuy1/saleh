@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/order_service.dart';
+import '../../../../core/services/order_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'customer_order_details_screen.dart';
 
@@ -106,34 +106,38 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
       body: _isLoading
           ? _buildSkeletonLoader()
           : _orders.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
-                      const SizedBox(height: 16),
-                      Text(
-                        'لا توجد طلبات',
-                        style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'ابدأ التسوق الآن',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadOrders,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: _orders.length,
-                    itemBuilder: (context, index) {
-                      return _buildOrderCard(_orders[index]);
-                    },
+                  const SizedBox(height: 16),
+                  Text(
+                    'لا توجد طلبات',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'ابدأ التسوق الآن',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadOrders,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  return _buildOrderCard(_orders[index]);
+                },
+              ),
+            ),
     );
   }
 
@@ -152,8 +156,7 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (createdAt != null)
-              Text('تاريخ: ${createdAt.substring(0, 10)}'),
+            if (createdAt != null) Text('تاريخ: ${createdAt.substring(0, 10)}'),
             Text(
               '${totalAmount.toStringAsFixed(2)} ر.س',
               style: const TextStyle(
@@ -182,7 +185,8 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CustomerOrderDetailsScreen(orderId: orderId),
+              builder: (context) =>
+                  CustomerOrderDetailsScreen(orderId: orderId),
             ),
           );
         },
@@ -197,4 +201,3 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
     );
   }
 }
-

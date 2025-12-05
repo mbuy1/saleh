@@ -238,4 +238,29 @@ class ExploreService {
       return [];
     }
   }
+
+  /// Get explore videos (placeholder for video feature)
+  /// Returns empty list - repository will use DummyData as fallback
+  static Future<List<dynamic>> getExploreVideos({
+    String? filter,
+    int? page,
+    int? pageSize,
+  }) async {
+    // Return empty list - repository will use DummyData
+    return [];
+  }
+
+  /// Get video by ID (placeholder for video feature)
+  /// Returns null - repository will use DummyData as fallback
+  static Future<dynamic> getVideoById(String videoId) async {
+    // Return null - repository will use DummyData
+    return null;
+  }
+
+  /// Get videos by product (placeholder for video feature)
+  /// Returns empty list - repository will use DummyData as fallback
+  static Future<List<dynamic>> getVideosByProduct(String productId) async {
+    // Return empty list - repository will use DummyData
+    return [];
+  }
 }

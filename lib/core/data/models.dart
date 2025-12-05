@@ -88,6 +88,24 @@ class Store {
     this.longitude,
     this.city,
   });
+
+  /// Create Store from JSON (API response)
+  factory Store.fromJson(Map<String, dynamic> json) {
+    return Store(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      logoUrl: json['logo_url'] as String?,
+      coverUrl: json['cover_url'] as String?,
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      followersCount: (json['followers_count'] as num?)?.toInt() ?? 0,
+      isVerified: json['is_verified'] as bool? ?? false,
+      isBoosted: json['is_boosted'] as bool? ?? false,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      city: json['city'] as String?,
+    );
+  }
 }
 
 class VideoItem {

@@ -79,4 +79,51 @@ class OrderService {
 
     return true;
   }
+
+  /// Get customer orders via API Gateway
+  static Future<List<Map<String, dynamic>>> getCustomerOrders() async {
+    try {
+      final result = await ApiService.get('/secure/orders');
+      if (result['orders'] != null) {
+        return List<Map<String, dynamic>>.from(result['orders']);
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error getting customer orders: $e');
+      return [];
+    }
+  }
+
+  /// Get order details via API Gateway
+  static Future<Map<String, dynamic>?> getOrderDetails(String orderId) async {
+    try {
+      final result = await ApiService.post(
+        '/secure/orders/details',
+        data: {'order_id': orderId},
+      );
+      return result;
+    } catch (e) {
+      debugPrint('Error getting order details: $e');
+      return null;
+    }
+  }
+
+  /// Get store orders for merchant via API Gateway
+  static Future<List<Map<String, dynamic>>> getStoreOrders(
+    String storeId,
+  ) async {
+    try {
+      final result = await ApiService.post(
+        '/secure/orders/store',
+        data: {'store_id': storeId},
+      );
+      if (result['orders'] != null) {
+        return List<Map<String, dynamic>>.from(result['orders']);
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error getting store orders: $e');
+      return [];
+    }
+  }
 }

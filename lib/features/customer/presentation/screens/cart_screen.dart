@@ -8,7 +8,7 @@ import '../../../../core/services/order_service.dart';
 import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import '../../../../shared/widgets/profile_button.dart';
-import '../../../../shared/widgets/alibaba/protection_banner.dart';
+import '../../../../shared_widgets/cards/protection_banner.dart';
 import '../../../../shared/widgets/circle_item.dart';
 
 class CartScreen extends StatefulWidget {
@@ -176,14 +176,14 @@ class _CartScreenState extends State<CartScreen> {
         final orderId = result['data']?['order_id'] ?? 'غير معروف';
         final totalAmount = result['data']?['total_amount'] as double? ?? 0.0;
         final couponCode = _appliedCoupon?['code'];
-        
+
         // تتبع إتمام الطلب
         await FirebaseService.logPlaceOrder(
           orderId: orderId.toString(),
           totalAmount: totalAmount,
           couponCode: couponCode,
         );
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -511,7 +511,8 @@ class _CartScreenState extends State<CartScreen> {
                         Semantics(
                           label: 'تطبيق كوبون الخصم',
                           button: true,
-                          enabled: !_isValidatingCoupon && _appliedCoupon == null,
+                          enabled:
+                              !_isValidatingCoupon && _appliedCoupon == null,
                           child: ElevatedButton(
                             onPressed:
                                 _isValidatingCoupon || _appliedCoupon != null
@@ -833,13 +834,20 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         // Skeleton Cart Items
-        ...List.generate(3, (index) => const Padding(
-          padding: EdgeInsets.only(bottom: 12),
-          child: SkeletonListItem(hasTrailing: false),
-        )),
+        ...List.generate(
+          3,
+          (index) => const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: SkeletonListItem(hasTrailing: false),
+          ),
+        ),
         const SizedBox(height: 24),
         // Skeleton Total Card
-        SkeletonLoader(width: double.infinity, height: 100, borderRadius: BorderRadius.circular(12)),
+        SkeletonLoader(
+          width: double.infinity,
+          height: 100,
+          borderRadius: BorderRadius.circular(12),
+        ),
       ],
     );
   }

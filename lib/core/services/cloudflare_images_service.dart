@@ -11,12 +11,12 @@ class CloudflareImagesService {
 
   /// تهيئة الخدمة (يجب استدعاؤها مرة واحدة في بداية التطبيق)
   static Future<void> initialize() async {
-    _accountId = dotenv.env['CLOUDFLARE_ACCOUNT_ID'];
+    _accountId = dotenv.env['CF_ACCOUNT_ID'];
     _apiToken = dotenv.env['CLOUDFLARE_IMAGES_TOKEN'];
     _baseUrl = dotenv.env['CLOUDFLARE_IMAGES_BASE_URL'];
 
     if (_accountId == null || _accountId!.isEmpty) {
-      throw Exception('CLOUDFLARE_ACCOUNT_ID غير موجود في ملف .env');
+      throw Exception('CF_ACCOUNT_ID غير موجود في ملف .env');
     }
 
     if (_apiToken == null || _apiToken!.isEmpty) {
@@ -29,16 +29,13 @@ class CloudflareImagesService {
   }
 
   /// رفع صورة إلى Cloudflare Images
-  /// 
+  ///
   /// [file]: ملف الصورة المراد رفعه
   /// [folder]: مجلد الصورة (مثل 'stores' أو 'products')
-  /// 
+  ///
   /// Returns: URL الصورة النهائي
   /// Throws: Exception في حالة الفشل
-  static Future<String> uploadImage(
-    File file, {
-    required String folder,
-  }) async {
+  static Future<String> uploadImage(File file, {required String folder}) async {
     // التحقق من التهيئة
     if (_accountId == null || _apiToken == null || _baseUrl == null) {
       await initialize();
@@ -72,9 +69,7 @@ class CloudflareImagesService {
       request.files.add(multipartFile);
 
       // إضافة metadata (folder)
-      request.fields['metadata'] = jsonEncode({
-        'folder': folder,
-      });
+      request.fields['metadata'] = jsonEncode({'folder': folder});
 
       // إرسال الطلب
       final streamedResponse = await request.send();
@@ -119,4 +114,3 @@ class CloudflareImagesService {
         _baseUrl!.isNotEmpty;
   }
 }
-

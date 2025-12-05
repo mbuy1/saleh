@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -115,16 +116,20 @@ class GeminiService {
   }
 
   /// توليد وصف منتج
-  static Future<String> generateProductDescription(
-    String productName, {
+  static Future<String> generateProductDescription({
+    required String productName,
     String? category,
+    String? features,
+    String? price,
   }) async {
     final prompt =
         '''
 أنت مسوق محترف. اكتب وصفاً تسويقياً جذاباً وقصيراً (3-5 أسطر) للمنتج التالي:
 
 المنتج: $productName
-${category != null ? 'الفئة: $category' : ''}
+${category != null && category.isNotEmpty ? 'الفئة: $category' : ''}
+${features != null && features.isNotEmpty ? 'المميزات: $features' : ''}
+${price != null && price.isNotEmpty ? 'السعر: $price' : ''}
 
 الوصف يجب أن يكون:
 - جذاب ومشوق
@@ -136,8 +141,43 @@ ${category != null ? 'الفئة: $category' : ''}
     return await sendMessage(prompt);
   }
 
-  /// تحليل صورة منتج
-  static Future<String> analyzeProductImage(Uint8List imageBytes) async {
+  /// تحليل صورة منتج (من ملف)
+  static Future<String> analyzeProductImage(File imageFile) async {
+    if (!_isInitialized) {
+      throw Exception('يجب تهيئة GeminiService أولاً');
+    }
+
+    try {
+      final headers = await _getHeaders();
+      final imageBytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(imageBytes);
+
+      final response = await http.post(
+        Uri.parse('$_workerUrl/secure/ai/gemini/vision'),
+        headers: headers,
+        body: jsonEncode({
+          'imageBase64': base64Image,
+          'prompt':
+              'صف هذا المنتج بالتفصيل واقترح وصفاً تسويقياً له. الرد باللغة العربية فقط.',
+          'model': 'gemini-1.5-flash',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['analysis'] ?? 'لم أتمكن من تحليل الصورة';
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception(error['detail'] ?? 'خطأ في تحليل الصورة');
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في تحليل الصورة: $e');
+      throw Exception('خطأ في تحليل الصورة');
+    }
+  }
+
+  /// تحليل صورة منتج (من bytes)
+  static Future<String> analyzeProductImageBytes(Uint8List imageBytes) async {
     if (!_isInitialized) {
       throw Exception('يجب تهيئة GeminiService أولاً');
     }
@@ -268,6 +308,211 @@ ${category != null ? 'الفئة: $category' : ''}
 - مدة الكوبون
 - شروط الاستخدام
 - رسالة تسويقية للكوبون
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// توليد كلمات مفتاحية SEO
+  static Future<List<String>> generateKeywords({
+    required String productName,
+    String? description,
+  }) async {
+    final prompt =
+        '''
+أنت خبير SEO. اقترح 15-20 كلمة مفتاحية مناسبة للمنتج التالي:
+
+المنتج: $productName
+${description != null && description.isNotEmpty ? 'الوصف: $description' : ''}
+
+اكتب الكلمات المفتاحية فقط، كل كلمة في سطر جديد، بدون ترقيم أو نقاط.
+''';
+
+    final response = await sendMessage(prompt);
+    return response
+        .split('\n')
+        .map((k) => k.trim())
+        .where((k) => k.isNotEmpty)
+        .toList();
+  }
+
+  /// مقارنة منتجات
+  static Future<String> compareProducts({
+    required String product1,
+    required String product2,
+  }) async {
+    final prompt =
+        '''
+أنت خبير في المنتجات. قارن بين المنتجين التاليين بشكل مفصل:
+
+المنتج الأول: $product1
+المنتج الثاني: $product2
+
+قم بتقديم:
+1. مقارنة شاملة للميزات
+2. نقاط القوة والضعف لكل منتج
+3. لمن يناسب كل منتج
+4. توصية نهائية
+
+اكتب بالعربية الفصحى وبتنسيق واضح.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// تحسين وصف منتج
+  static Future<String> improveDescription({
+    required String originalDescription,
+  }) async {
+    final prompt =
+        '''
+أنت مسوق محترف. حسّن الوصف التالي ليكون أكثر جاذبية وتسويقية:
+
+الوصف الأصلي:
+$originalDescription
+
+قم بتحسينه ليكون:
+- أكثر جاذبية وإقناعاً
+- يبرز الفوائد والميزات
+- يستخدم لغة عاطفية مؤثرة
+- مناسب للسوق العربي
+- محافظ على المعلومات الأساسية
+
+اكتب الوصف المحسّن فقط بدون مقدمات.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// توليد أفكار عروض
+  static Future<String> generatePromoIdeas({
+    required String storeType,
+    String? products,
+    String? occasion,
+  }) async {
+    final prompt =
+        '''
+أنت خبير تسويق. اقترح 5-7 أفكار إبداعية للعروض والكوبونات:
+
+نوع المتجر: $storeType
+${products != null && products.isNotEmpty ? 'المنتجات الرئيسية: $products' : ''}
+${occasion != null && occasion.isNotEmpty ? 'المناسبة: $occasion' : ''}
+
+لكل فكرة اذكر:
+- اسم العرض/الكوبون
+- نوع الخصم (نسبة أو قيمة ثابتة)
+- الشروط والأحكام
+- رسالة تسويقية مقترحة
+- المدة المقترحة
+
+اجعل الأفكار متنوعة ومناسبة للسوق السعودي.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// توليد استراتيجية تسويقية
+  static Future<String> generateMarketingStrategy({
+    required String product,
+    required String targetAudience,
+    String? budget,
+    String? goals,
+  }) async {
+    final prompt =
+        '''
+أنت مستشار تسويق رقمي محترف. ضع خطة تسويقية شاملة:
+
+المنتج/المتجر: $product
+الجمهور المستهدف: $targetAudience
+${budget != null && budget.isNotEmpty ? 'الميزانية: $budget' : ''}
+${goals != null && goals.isNotEmpty ? 'الأهداف: $goals' : ''}
+
+قدم خطة تشمل:
+1. تحليل السوق والمنافسين
+2. الرسائل التسويقية الرئيسية
+3. القنوات التسويقية المناسبة
+4. أفكار للمحتوى
+5. استراتيجية العروض والخصومات
+6. مؤشرات الأداء الرئيسية (KPIs)
+7. الجدول الزمني المقترح
+
+ركز على السوق السعودي والخليجي.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// تحليل التقييمات
+  static Future<String> analyzeReviews({required String reviews}) async {
+    final prompt =
+        '''
+أنت محلل بيانات متخصص في تجربة العملاء. حلل التقييمات التالية:
+
+التقييمات:
+$reviews
+
+قدم تحليلاً شاملاً يتضمن:
+1. ملخص المشاعر العامة (إيجابي/سلبي/محايد)
+2. النقاط الإيجابية الأكثر تكراراً
+3. النقاط السلبية والشكاوى
+4. اقتراحات للتحسين
+5. الكلمات المفتاحية الأكثر استخداماً
+6. درجة الرضا التقديرية (من 10)
+
+قدم النتائج بشكل منظم ومفيد للتاجر.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// توليد رد على مراجعة
+  static Future<String> generateReviewResponse({
+    required String review,
+    String? rating,
+    String? tone,
+  }) async {
+    final toneDesc = tone ?? 'احترافي';
+    final prompt =
+        '''
+أنت متخصص في خدمة العملاء. اكتب رداً مناسباً على المراجعة التالية:
+
+المراجعة: $review
+${rating != null && rating.isNotEmpty ? 'التقييم: $rating من 5' : ''}
+النبرة المطلوبة: $toneDesc
+
+الرد يجب أن يكون:
+- مناسباً لنوع المراجعة (إيجابية/سلبية)
+- بنبرة $toneDesc
+- يشكر العميل
+- يعالج أي شكوى بذكاء
+- قصير ومؤثر (3-5 أسطر)
+- يعكس اهتمام المتجر بعملائه
+
+اكتب الرد فقط بدون مقدمات.
+''';
+
+    return await sendMessage(prompt);
+  }
+
+  /// ترجمة نص
+  static Future<String> translateText({
+    required String text,
+    required String targetLanguage,
+  }) async {
+    final prompt =
+        '''
+ترجم النص التالي إلى اللغة $targetLanguage.
+
+النص:
+$text
+
+الترجمة يجب أن تكون:
+- دقيقة ومهنية
+- تحافظ على المعنى الأصلي
+- مناسبة للتسويق والتجارة الإلكترونية
+- طبيعية وسلسة
+
+اكتب الترجمة فقط بدون أي شروحات.
 ''';
 
     return await sendMessage(prompt);

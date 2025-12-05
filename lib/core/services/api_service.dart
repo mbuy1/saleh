@@ -343,6 +343,156 @@ class ApiService {
   }
 
   // ============================================================================
+  // PRODUCTS OPERATIONS (PUBLIC)
+  // ============================================================================
+
+  /// Get products with optional filters (public - no auth required)
+  static Future<Map<String, dynamic>> getProducts({
+    int? limit,
+    int? offset,
+    String? categoryId,
+    String? storeId,
+    String? status,
+    String? sortBy,
+    bool? descending,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+      if (limit != null) queryParams['limit'] = limit.toString();
+      if (offset != null) queryParams['offset'] = offset.toString();
+      if (categoryId != null) queryParams['category_id'] = categoryId;
+      if (storeId != null) queryParams['store_id'] = storeId;
+      if (status != null) queryParams['status'] = status;
+      if (sortBy != null) queryParams['sort_by'] = sortBy;
+      if (descending != null) queryParams['desc'] = descending.toString();
+
+      final uri = Uri.parse(
+        '$baseUrl/public/products',
+      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await http.get(uri);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getProducts Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get featured products (with discounts)
+  static Future<Map<String, dynamic>> getFeaturedProducts({
+    int limit = 10,
+  }) async {
+    return getProducts(limit: limit, sortBy: 'discount', descending: true);
+  }
+
+  /// Get new arrivals
+  static Future<Map<String, dynamic>> getNewArrivals({int limit = 10}) async {
+    return getProducts(limit: limit, sortBy: 'created_at', descending: true);
+  }
+
+  /// Get best sellers
+  static Future<Map<String, dynamic>> getBestSellers({int limit = 10}) async {
+    return getProducts(limit: limit, sortBy: 'sales_count', descending: true);
+  }
+
+  /// Get product by ID (public)
+  static Future<Map<String, dynamic>> getProductById(String productId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/public/products/$productId'),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getProductById Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // STORES OPERATIONS (PUBLIC)
+  // ============================================================================
+
+  /// Get all stores (public - no auth required)
+  static Future<Map<String, dynamic>> getStores({
+    int? limit,
+    int? offset,
+    String? city,
+    bool? isVerified,
+    bool? isBoosted,
+    String? sortBy,
+    bool? descending,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+      if (limit != null) queryParams['limit'] = limit.toString();
+      if (offset != null) queryParams['offset'] = offset.toString();
+      if (city != null) queryParams['city'] = city;
+      if (isVerified != null) {
+        queryParams['is_verified'] = isVerified.toString();
+      }
+      if (isBoosted != null) queryParams['is_boosted'] = isBoosted.toString();
+      if (sortBy != null) queryParams['sort_by'] = sortBy;
+      if (descending != null) queryParams['desc'] = descending.toString();
+
+      final uri = Uri.parse(
+        '$baseUrl/public/stores',
+      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await http.get(uri);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getStores Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get store by ID (public)
+  static Future<Map<String, dynamic>> getStoreById(String storeId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/public/stores/$storeId'),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getStoreById Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get store products (public)
+  static Future<Map<String, dynamic>> getStoreProducts(
+    String storeId, {
+    int? limit,
+    int? offset,
+  }) async {
+    return getProducts(storeId: storeId, limit: limit, offset: offset);
+  }
+
+  // ============================================================================
+  // CATEGORIES OPERATIONS (PUBLIC)
+  // ============================================================================
+
+  /// Get all categories (public)
+  static Future<Map<String, dynamic>> getCategories() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/public/categories'));
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getCategories Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get category products (public)
+  static Future<Map<String, dynamic>> getCategoryProducts(
+    String categoryId, {
+    int? limit,
+    int? offset,
+  }) async {
+    return getProducts(categoryId: categoryId, limit: limit, offset: offset);
+  }
+
+  // ============================================================================
   // HEALTH CHECK
   // ============================================================================
 
@@ -358,6 +508,432 @@ class ApiService {
     } catch (e) {
       debugPrint('Health check failed: $e');
       return false;
+    }
+  }
+
+  // ============================================================================
+  // MERCHANT ANALYTICS
+  // ============================================================================
+
+  /// Get product analytics for merchant
+  static Future<Map<String, dynamic>> getProductAnalytics({
+    String period = '30d',
+  }) async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/analytics/products?period=$period',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getProductAnalytics Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get order analytics for merchant
+  static Future<Map<String, dynamic>> getOrderAnalytics({
+    String period = '30d',
+  }) async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/analytics/orders?period=$period',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getOrderAnalytics Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get customer analytics for merchant
+  static Future<Map<String, dynamic>> getCustomerAnalytics({
+    String period = '30d',
+  }) async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/analytics/customers?period=$period',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getCustomerAnalytics Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get revenue analytics for merchant
+  static Future<Map<String, dynamic>> getRevenueAnalytics({
+    String period = '30d',
+  }) async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/analytics/revenue?period=$period',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getRevenueAnalytics Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // MERCHANT REVIEWS
+  // ============================================================================
+
+  /// Get merchant reviews
+  static Future<Map<String, dynamic>> getMerchantReviews({
+    int? limit,
+    int? offset,
+    int? rating,
+    bool? hasReply,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+      if (limit != null) queryParams['limit'] = limit.toString();
+      if (offset != null) queryParams['offset'] = offset.toString();
+      if (rating != null) queryParams['rating'] = rating.toString();
+      if (hasReply != null) queryParams['has_reply'] = hasReply.toString();
+
+      final uri = Uri.parse(
+        '$baseUrl/secure/merchant/reviews',
+      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await _makeAuthRequest(
+        'GET',
+        uri.path + (uri.query.isNotEmpty ? '?${uri.query}' : ''),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getMerchantReviews Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Reply to a review
+  static Future<Map<String, dynamic>> replyToReview(
+    String reviewId,
+    String reply,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/merchant/reviews/$reviewId/reply',
+        body: {'reply': reply},
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ replyToReview Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // MERCHANT COUPONS
+  // ============================================================================
+
+  /// Get merchant coupons
+  static Future<Map<String, dynamic>> getMerchantCoupons() async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/coupons',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getMerchantCoupons Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Create a new coupon
+  static Future<Map<String, dynamic>> createCoupon(
+    Map<String, dynamic> couponData,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/merchant/coupons',
+        body: couponData,
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ createCoupon Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Update a coupon
+  static Future<Map<String, dynamic>> updateCoupon(
+    String couponId,
+    Map<String, dynamic> couponData,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'PUT',
+        '/secure/merchant/coupons/$couponId',
+        body: couponData,
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ updateCoupon Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Delete a coupon
+  static Future<Map<String, dynamic>> deleteCoupon(String couponId) async {
+    try {
+      final response = await _makeAuthRequest(
+        'DELETE',
+        '/secure/merchant/coupons/$couponId',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ deleteCoupon Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Apply coupon code
+  static Future<Map<String, dynamic>> applyCoupon(
+    String couponCode,
+    double orderTotal,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/public/coupons/apply'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'code': couponCode, 'order_total': orderTotal}),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ applyCoupon Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // MERCHANT BANNERS
+  // ============================================================================
+
+  /// Get merchant banners
+  static Future<Map<String, dynamic>> getMerchantBanners() async {
+    try {
+      final response = await _makeAuthRequest(
+        'GET',
+        '/secure/merchant/banners',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getMerchantBanners Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Create a new banner
+  static Future<Map<String, dynamic>> createBanner(
+    Map<String, dynamic> bannerData,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/merchant/banners',
+        body: bannerData,
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ createBanner Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Update a banner
+  static Future<Map<String, dynamic>> updateBanner(
+    String bannerId,
+    Map<String, dynamic> bannerData,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'PUT',
+        '/secure/merchant/banners/$bannerId',
+        body: bannerData,
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ updateBanner Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Delete a banner
+  static Future<Map<String, dynamic>> deleteBanner(String bannerId) async {
+    try {
+      final response = await _makeAuthRequest(
+        'DELETE',
+        '/secure/merchant/banners/$bannerId',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ deleteBanner Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Reorder banners
+  static Future<Map<String, dynamic>> reorderBanners(
+    List<String> bannerIds,
+  ) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/merchant/banners/reorder',
+        body: {'order': bannerIds},
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ reorderBanners Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get public banners
+  static Future<Map<String, dynamic>> getPublicBanners({
+    String? storeId,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+      if (storeId != null) queryParams['store_id'] = storeId;
+
+      final uri = Uri.parse(
+        '$baseUrl/public/banners',
+      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await http.get(uri);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getPublicBanners Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // MERCHANT VIDEOS
+  // ============================================================================
+
+  /// Get merchant videos
+  static Future<Map<String, dynamic>> getMerchantVideos() async {
+    try {
+      final response = await _makeAuthRequest('GET', '/secure/merchant/videos');
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getMerchantVideos Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Delete a video
+  static Future<Map<String, dynamic>> deleteVideo(String videoId) async {
+    try {
+      final response = await _makeAuthRequest(
+        'DELETE',
+        '/secure/merchant/videos/$videoId',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ deleteVideo Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Get public videos (feed)
+  static Future<Map<String, dynamic>> getPublicVideos({
+    int? limit,
+    int? offset,
+    String? storeId,
+    String? productId,
+  }) async {
+    try {
+      final queryParams = <String, String>{};
+      if (limit != null) queryParams['limit'] = limit.toString();
+      if (offset != null) queryParams['offset'] = offset.toString();
+      if (storeId != null) queryParams['store_id'] = storeId;
+      if (productId != null) queryParams['product_id'] = productId;
+
+      final uri = Uri.parse(
+        '$baseUrl/public/videos',
+      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+      final response = await http.get(uri);
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ getPublicVideos Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Like a video
+  static Future<Map<String, dynamic>> likeVideo(String videoId) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/videos/$videoId/like',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ likeVideo Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Share a video
+  static Future<Map<String, dynamic>> shareVideo(String videoId) async {
+    try {
+      final response = await _makeAuthRequest(
+        'POST',
+        '/secure/videos/$videoId/share',
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ shareVideo Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  /// Record video view
+  static Future<Map<String, dynamic>> recordVideoView(String videoId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/public/videos/$videoId/view'),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ recordVideoView Error: $e');
+      return {'ok': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================================================
+  // GLOBAL SEARCH
+  // ============================================================================
+
+  /// Global search across products, stores, and videos
+  static Future<Map<String, dynamic>> globalSearch(
+    String query, {
+    int limit = 20,
+  }) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/public/search?q=${Uri.encodeComponent(query)}&limit=$limit',
+        ),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('❌ globalSearch Error: $e');
+      return {'ok': false, 'error': e.toString()};
     }
   }
 }

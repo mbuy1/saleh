@@ -10,7 +10,7 @@ import 'customer_points_screen.dart';
 import 'favorites_screen.dart';
 import 'browse_history_screen.dart';
 import 'coupons_screen.dart';
-import 'orders_screen.dart';
+import 'customer_orders_screen.dart';
 import 'settings_screen.dart';
 import 'help_support_screen.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -358,7 +358,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(),
+                                    builder: (context) =>
+                                        const CustomerOrdersScreen(),
                                   ),
                                 );
                               },
@@ -394,9 +395,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(
-                                      status: 'pending_payment',
-                                    ),
+                                    builder: (context) =>
+                                        const CustomerOrdersScreen(),
                                   ),
                                 );
                               },
@@ -410,7 +410,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const OrdersScreen(status: 'shipping'),
+                                        const CustomerOrdersScreen(),
                                   ),
                                 );
                               },
@@ -424,7 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const OrdersScreen(status: 'delivered'),
+                                        const CustomerOrdersScreen(),
                                   ),
                                 );
                               },
@@ -437,9 +437,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const OrdersScreen(
-                                      status: 'pending_review',
-                                    ),
+                                    builder: (context) =>
+                                        const CustomerOrdersScreen(),
                                   ),
                                 );
                               },
@@ -637,17 +636,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 // Skeleton Profile Header
-                SkeletonLoader(width: 100, height: 100, borderRadius: BorderRadius.circular(50)),
+                SkeletonLoader(
+                  width: 100,
+                  height: 100,
+                  borderRadius: BorderRadius.circular(50),
+                ),
                 const SizedBox(height: 16),
                 SkeletonLoader(width: 150, height: 20),
                 const SizedBox(height: 8),
                 SkeletonLoader(width: 100, height: 16),
                 const SizedBox(height: 24),
                 // Skeleton Feature Items
-                ...List.generate(6, (index) => const Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: SkeletonListItem(),
-                )),
+                ...List.generate(
+                  6,
+                  (index) => const Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: SkeletonListItem(),
+                  ),
+                ),
               ],
             ),
           ),

@@ -1,7 +1,7 @@
 import '../../../../core/supabase_client.dart';
 import '../../../../core/permissions_helper.dart';
 import '../../../../core/services/api_service.dart';
-import 'cart_service.dart';
+import 'services/cart_service.dart';
 
 class OrderService {
   /// تحويل السلة إلى طلب
@@ -41,8 +41,8 @@ class OrderService {
 
     final cartId = cart['id'] as String;
 
-    // حساب المجموع الكلي
-    final total = await CartService.getCartTotal();
+    // حساب المجموع الكلي باستخدام calculateTotal
+    final total = CartService.calculateTotal(cartItems);
 
     // إنشاء طلب جديد
     final order = await supabaseClient
@@ -59,13 +59,13 @@ class OrderService {
 
     // إنشاء order_items لكل عنصر في السلة
     for (var cartItem in cartItems) {
-      final product = cartItem['products'] as Map<String, dynamic>?;
+      final product = cartItem.product;
       if (product != null) {
         await supabaseClient.from('order_items').insert({
           'order_id': orderId,
-          'product_id': product['id'],
-          'quantity': cartItem['quantity'],
-          'price': product['price'], // حفظ السعر وقت الطلب
+          'product_id': product.id,
+          'quantity': cartItem.quantity,
+          'price': product.price, // حفظ السعر وقت الطلب
         });
       }
     }
@@ -104,9 +104,7 @@ class OrderService {
     try {
       final result = await ApiService.post(
         '/secure/orders/details',
-        data: {
-          'order_id': orderId,
-        },
+        data: {'order_id': orderId},
       );
 
       if (result['ok'] == true && result['data'] != null) {
@@ -127,9 +125,7 @@ class OrderService {
     try {
       final result = await ApiService.post(
         '/secure/orders/store',
-        data: {
-          'store_id': storeId,
-        },
+        data: {'store_id': storeId},
       );
 
       if (result['ok'] == true && result['data'] != null) {

@@ -460,38 +460,46 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   Widget _buildPromotionalBanners() {
     final banners = [
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'جاذبية أنيقة',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'جاذبية أنيقة',
+            ) ??
+            'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=120&fit=crop',
         'title': 'جاذبية أنيقة',
         'id': '1',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'الضروريات الموسمية',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'الضروريات الموسمية',
+            ) ??
+            'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=120&fit=crop',
         'title': 'الضروريات الموسمية',
         'id': '2',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'أهم الترندات',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'أهم الترندات',
+            ) ??
+            'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=120&fit=crop',
         'title': 'أهم الترندات',
         'id': '3',
       },
       {
-        'image': CloudflareHelper.getDefaultPlaceholderImage(
-          width: 400,
-          height: 120,
-          text: 'كاجوال',
-        ),
+        'image':
+            CloudflareHelper.getDefaultPlaceholderImage(
+              width: 400,
+              height: 120,
+              text: 'كاجوال',
+            ) ??
+            'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=120&fit=crop',
         'title': 'كاجوال',
         'id': '4',
       },
@@ -499,16 +507,19 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
 
     return Column(
       children: banners.map((banner) {
+        final imageUrl = banner['image'] as String;
+        final title = banner['title'] as String;
+        final id = banner['id'] as String;
         return SheinPromotionalBanner(
-          imageUrl: banner['image']!,
-          title: banner['title'],
+          imageUrl: imageUrl,
+          title: title,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => CategoryProductsScreenShein(
-                  categoryId: banner['id']!,
-                  categoryName: banner['title']!,
+                  categoryId: id,
+                  categoryName: title,
                 ),
               ),
             );

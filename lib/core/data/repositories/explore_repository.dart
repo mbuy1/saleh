@@ -1,11 +1,11 @@
 import '../dummy_data.dart';
 import '../models.dart';
-import '../../../features/customer/data/explore_service.dart';
+import '../../../features/customer/data/services/explore_service.dart';
 
 /// Repository لفيديوهات Explore - يوفر واجهة موحدة للوصول للبيانات
 class ExploreRepository {
   /// جلب جميع الفيديوهات مع Pagination
-  /// 
+  ///
   /// [filter]: نوع الفلتر ('new', 'trending', 'top_selling', 'by_location', 'top_rated')
   Future<List<VideoItem>> getExploreFeed({
     String filter = 'new',
@@ -22,7 +22,7 @@ class ExploreRepository {
 
       // إذا كانت هناك بيانات، نعيدها
       if (videos.isNotEmpty) {
-        return videos;
+        return videos.cast<VideoItem>();
       }
 
       // إذا لم تكن هناك بيانات، نستخدم DummyData كـ fallback
@@ -72,7 +72,7 @@ class ExploreRepository {
     try {
       // محاولة جلب من Supabase
       final videos = await ExploreService.getVideosByProduct(productId);
-      if (videos.isNotEmpty) return videos;
+      if (videos.isNotEmpty) return videos.cast<VideoItem>();
     } catch (e) {
       // تجاهل الخطأ والمتابعة إلى DummyData
     }
@@ -92,7 +92,7 @@ class ExploreRepository {
         page: 0,
         pageSize: limit,
       );
-      if (videos.isNotEmpty) return videos;
+      if (videos.isNotEmpty) return videos.cast<VideoItem>();
     } catch (e) {
       // تجاهل الخطأ والمتابعة إلى DummyData
     }

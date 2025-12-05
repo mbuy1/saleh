@@ -61,10 +61,7 @@ class WalletService {
     try {
       final result = await ApiService.post(
         '/secure/wallet/transactions',
-        data: {
-          'limit': limit,
-          'wallet_type': walletType,
-        },
+        data: {'limit': limit, 'wallet_type': walletType},
       );
 
       if (result['ok'] == true && result['data'] != null) {

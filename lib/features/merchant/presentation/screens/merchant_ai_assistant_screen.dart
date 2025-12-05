@@ -31,7 +31,10 @@ class _MerchantAiAssistantScreenState extends State<MerchantAiAssistantScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeChat();
+    // تأخير التهيئة حتى يكون الـ context جاهز
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeChat();
+    });
   }
 
   void _initializeChat() {
@@ -39,7 +42,9 @@ class _MerchantAiAssistantScreenState extends State<MerchantAiAssistantScreen> {
       _chatSession = GeminiService.createMerchantAssistantChat();
       _addWelcomeMessage();
     } catch (e) {
-      _showError('فشل في تهيئة المساعد الذكي: $e');
+      if (mounted) {
+        _showError('فشل في تهيئة المساعد الذكي: $e');
+      }
     }
   }
 

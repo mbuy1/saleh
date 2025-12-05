@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/supabase_client.dart';
-import '../../../customer/data/order_service.dart';
+import '../../../../core/services/order_service.dart';
 import 'merchant_order_details_screen.dart';
 
 class MerchantOrdersScreen extends StatefulWidget {
@@ -115,36 +115,37 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('طلبات المتجر'),
-      ),
+      appBar: AppBar(title: const Text('طلبات المتجر')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _orders.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.receipt_long_outlined,
-                          size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        'لا توجد طلبات',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                    ],
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 64,
+                    color: Colors.grey,
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadStoreAndOrders,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: _orders.length,
-                    itemBuilder: (context, index) {
-                      return _buildOrderCard(_orders[index]);
-                    },
+                  SizedBox(height: 16),
+                  Text(
+                    'لا توجد طلبات',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
-                ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadStoreAndOrders,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  return _buildOrderCard(_orders[index]);
+                },
+              ),
+            ),
     );
   }
 
@@ -211,4 +212,3 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
     return orderId.length > 8 ? orderId.substring(orderId.length - 8) : orderId;
   }
 }
-

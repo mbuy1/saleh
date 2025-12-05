@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/data/models.dart';
 import '../../features/customer/presentation/screens/product_details_screen.dart';
-import '../../features/customer/data/cart_service.dart';
+import '../../features/customer/data/services/cart_service.dart';
 import '../../core/permissions_helper.dart';
 
 /// بطاقة منتج مدمجة للاستخدام في القوائم الأفقية
