@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/product_model.dart';
 import '../models/category_model.dart';
 import '../models/store_model.dart';
 
-/// خدمة صفحة Explore - البحث والاستكشاف
+/// خدمة صفحة Explore - البحث والاستكشاف (عبر Worker API)
 class ExploreService {
   /// البحث في المنتجات
   static Future<List<ProductModel>> searchProducts(
@@ -17,31 +17,38 @@ class ExploreService {
         return getAllProducts(limit: limit, offset: offset);
       }
 
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .gt('stock_quantity', 0)
-          .or('name.ilike.%$query%,description.ilike.%$query%')
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
+      // استخدام Worker API للبحث
+      final response = await ApiService.getProducts(
+        limit: limit,
+        offset: offset,
+        status: 'active',
+      );
 
-      debugPrint('✅ تم العثور على ${(response as List).length} منتج');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = (response['data'] as List)
+            .where((json) {
+              final name = json['name']?.toString().toLowerCase() ?? '';
+              final desc = json['description']?.toString().toLowerCase() ?? '';
+              final searchQuery = query.toLowerCase();
+              return name.contains(searchQuery) || desc.contains(searchQuery);
+            })
+            .map((json) {
+              final productJson = Map<String, dynamic>.from(json);
+              if (json['stores'] != null) {
+                productJson['store_name'] = json['stores']['name'];
+              }
+              if (json['categories'] != null) {
+                productJson['category_name'] = json['categories']['name'];
+              }
+              return ProductModel.fromJson(productJson);
+            })
+            .toList();
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        debugPrint('✅ تم العثور على ${products.length} منتج');
+        return products;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في البحث: $e');
       return [];
@@ -54,30 +61,30 @@ class ExploreService {
     int offset = 0,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .gt('stock_quantity', 0)
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
+      // استخدام Worker API
+      final response = await ApiService.getProducts(
+        limit: limit,
+        offset: offset,
+        status: 'active',
+      );
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = (response['data'] as List).map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        debugPrint('✅ تم جلب ${products.length} منتج');
+        return products;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المنتجات: $e');
       return [];
@@ -91,31 +98,30 @@ class ExploreService {
     int offset = 0,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories!inner(name)
-          ''')
-          .eq('is_active', true)
-          .eq('category_id', categoryId)
-          .gt('stock_quantity', 0)
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
+      // استخدام Worker API مع فلتر الفئة
+      final response = await ApiService.getCategoryProducts(
+        categoryId,
+        limit: limit,
+        offset: offset,
+      );
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج من الفئة');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = (response['data'] as List).map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        debugPrint('✅ تم جلب ${products.length} منتج من الفئة');
+        return products;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب منتجات الفئة: $e');
       return [];
@@ -129,31 +135,30 @@ class ExploreService {
     int offset = 0,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .eq('store_id', storeId)
-          .gt('stock_quantity', 0)
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
+      // استخدام Worker API مع فلتر المتجر
+      final response = await ApiService.getStoreProducts(
+        storeId,
+        limit: limit,
+        offset: offset,
+      );
 
-      debugPrint('✅ تم جلب ${(response as List).length} منتج من المتجر');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = (response['data'] as List).map((json) {
+          final productJson = Map<String, dynamic>.from(json);
+          if (json['stores'] != null) {
+            productJson['store_name'] = json['stores']['name'];
+          }
+          if (json['categories'] != null) {
+            productJson['category_name'] = json['categories']['name'];
+          }
+          return ProductModel.fromJson(productJson);
+        }).toList();
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        debugPrint('✅ تم جلب ${products.length} منتج من المتجر');
+        return products;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب منتجات المتجر: $e');
       return [];
@@ -163,17 +168,19 @@ class ExploreService {
   /// جلب جميع الفئات
   static Future<List<CategoryModel>> getAllCategories() async {
     try {
-      final response = await supabaseClient
-          .from('categories')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order', ascending: true);
+      // استخدام Worker API
+      final response = await ApiService.getCategories();
 
-      debugPrint('✅ تم جلب ${(response as List).length} فئة');
+      if (response['ok'] == true && response['data'] != null) {
+        final categories = (response['data'] as List).map((json) {
+          return CategoryModel.fromJson(json);
+        }).toList();
 
-      return (response as List).map((json) {
-        return CategoryModel.fromJson(json);
-      }).toList();
+        debugPrint('✅ تم جلب ${categories.length} فئة');
+        return categories;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب الفئات: $e');
       return [];
@@ -183,17 +190,19 @@ class ExploreService {
   /// جلب جميع المتاجر
   static Future<List<StoreModel>> getAllStores() async {
     try {
-      final response = await supabaseClient
-          .from('stores')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', ascending: false);
+      // استخدام Worker API
+      final response = await ApiService.getStores();
 
-      debugPrint('✅ تم جلب ${(response as List).length} متجر');
+      if (response['ok'] == true && response['data'] != null) {
+        final stores = (response['data'] as List).map((json) {
+          return StoreModel.fromJson(json);
+        }).toList();
 
-      return (response as List).map((json) {
-        return StoreModel.fromJson(json);
-      }).toList();
+        debugPrint('✅ تم جلب ${stores.length} متجر');
+        return stores;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في جلب المتاجر: $e');
       return [];
@@ -207,32 +216,36 @@ class ExploreService {
     int limit = 50,
   }) async {
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select('''
-            *,
-            stores!inner(name),
-            categories(name)
-          ''')
-          .eq('is_active', true)
-          .gte('price', minPrice)
-          .lte('price', maxPrice)
-          .gt('stock_quantity', 0)
-          .order('price', ascending: true)
-          .limit(limit);
+      // استخدام Worker API وفلترة محلياً
+      final response = await ApiService.getProducts(
+        limit: limit * 2, // جلب المزيد للفلترة
+        status: 'active',
+      );
 
-      debugPrint('✅ تم فلترة ${(response as List).length} منتج');
+      if (response['ok'] == true && response['data'] != null) {
+        final products = (response['data'] as List)
+            .where((json) {
+              final price = (json['price'] as num?)?.toDouble() ?? 0.0;
+              return price >= minPrice && price <= maxPrice;
+            })
+            .take(limit)
+            .map((json) {
+              final productJson = Map<String, dynamic>.from(json);
+              if (json['stores'] != null) {
+                productJson['store_name'] = json['stores']['name'];
+              }
+              if (json['categories'] != null) {
+                productJson['category_name'] = json['categories']['name'];
+              }
+              return ProductModel.fromJson(productJson);
+            })
+            .toList();
 
-      return (response as List).map((json) {
-        final productJson = Map<String, dynamic>.from(json);
-        if (json['stores'] != null) {
-          productJson['store_name'] = json['stores']['name'];
-        }
-        if (json['categories'] != null) {
-          productJson['category_name'] = json['categories']['name'];
-        }
-        return ProductModel.fromJson(productJson);
-      }).toList();
+        debugPrint('✅ تم فلترة ${products.length} منتج');
+        return products;
+      }
+
+      return [];
     } catch (e) {
       debugPrint('❌ خطأ في فلترة المنتجات: $e');
       return [];
