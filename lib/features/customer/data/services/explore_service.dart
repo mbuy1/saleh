@@ -25,7 +25,9 @@ class ExploreService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = (response['data'] as List)
+        final data = response['data'];
+        final productsList = (data is List) ? data : [];
+        final products = productsList
             .where((json) {
               final name = json['name']?.toString().toLowerCase() ?? '';
               final desc = json['description']?.toString().toLowerCase() ?? '';
@@ -69,7 +71,9 @@ class ExploreService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = (response['data'] as List).map((json) {
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final products = dataList.map((json) {
           final productJson = Map<String, dynamic>.from(json);
           if (json['stores'] != null) {
             productJson['store_name'] = json['stores']['name'];
@@ -106,7 +110,9 @@ class ExploreService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = (response['data'] as List).map((json) {
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final products = dataList.map((json) {
           final productJson = Map<String, dynamic>.from(json);
           if (json['stores'] != null) {
             productJson['store_name'] = json['stores']['name'];
@@ -143,7 +149,9 @@ class ExploreService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = (response['data'] as List).map((json) {
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final products = dataList.map((json) {
           final productJson = Map<String, dynamic>.from(json);
           if (json['stores'] != null) {
             productJson['store_name'] = json['stores']['name'];
@@ -172,8 +180,10 @@ class ExploreService {
       final response = await ApiService.getCategories();
 
       if (response['ok'] == true && response['data'] != null) {
-        final categories = (response['data'] as List).map((json) {
-          return CategoryModel.fromJson(json);
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final categories = dataList.map((json) {
+          return CategoryModel.fromJson(json as Map<String, dynamic>);
         }).toList();
 
         debugPrint('✅ تم جلب ${categories.length} فئة');
@@ -194,8 +204,10 @@ class ExploreService {
       final response = await ApiService.getStores();
 
       if (response['ok'] == true && response['data'] != null) {
-        final stores = (response['data'] as List).map((json) {
-          return StoreModel.fromJson(json);
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final stores = dataList.map((json) {
+          return StoreModel.fromJson(json as Map<String, dynamic>);
         }).toList();
 
         debugPrint('✅ تم جلب ${stores.length} متجر');
@@ -223,7 +235,9 @@ class ExploreService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = (response['data'] as List)
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final products = dataList
             .where((json) {
               final price = (json['price'] as num?)?.toDouble() ?? 0.0;
               return price >= minPrice && price <= maxPrice;

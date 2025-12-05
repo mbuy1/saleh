@@ -65,7 +65,8 @@ class WalletService {
       );
 
       if (result['ok'] == true && result['data'] != null) {
-        return result['data'] as List<dynamic>;
+        final data = result['data'];
+        return (data is List) ? data : [];
       }
       return [];
     } catch (e) {

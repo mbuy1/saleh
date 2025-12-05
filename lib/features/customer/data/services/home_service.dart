@@ -14,7 +14,8 @@ class HomeService {
       final response = await ApiService.getFeaturedProducts(limit: limit);
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = response['data'] as List;
+        final data = response['data'];
+        final products = (data is List) ? data : [];
         debugPrint('✅ تم جلب ${products.length} منتج مميز');
 
         return products.map((json) {
@@ -43,7 +44,8 @@ class HomeService {
       final response = await ApiService.getNewArrivals(limit: limit);
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = response['data'] as List;
+        final data = response['data'];
+        final products = (data is List) ? data : [];
         debugPrint('✅ تم جلب ${products.length} منتج جديد');
 
         return products.map((json) {
@@ -72,7 +74,8 @@ class HomeService {
       final response = await ApiService.getBestSellers(limit: limit);
 
       if (response['ok'] == true && response['data'] != null) {
-        final products = response['data'] as List;
+        final data = response['data'];
+        final products = (data is List) ? data : [];
         debugPrint('✅ تم جلب ${products.length} منتج الأكثر مبيعاً');
 
         return products.map((json) {
@@ -101,7 +104,9 @@ class HomeService {
       final response = await ApiService.getCategories();
 
       if (response['ok'] == true && response['data'] != null) {
-        final categories = (response['data'] as List).take(limit).toList();
+        final data = response['data'];
+        final dataList = (data is List) ? data : [];
+        final categories = dataList.take(limit).toList();
         debugPrint('✅ تم جلب ${categories.length} فئة');
 
         return categories.map((json) {
@@ -127,7 +132,8 @@ class HomeService {
       );
 
       if (response['ok'] == true && response['data'] != null) {
-        final stores = response['data'] as List;
+        final data = response['data'];
+        final stores = (data is List) ? data : [];
         debugPrint('✅ تم جلب ${stores.length} متجر مميز');
 
         return stores.map((json) {

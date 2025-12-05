@@ -39,7 +39,8 @@ class _MerchantReviewsScreenState extends State<MerchantReviewsScreen> {
       final response = await ApiService.getMerchantReviews();
 
       if (response['ok'] == true || response['success'] == true) {
-        final reviewsData = response['data'] as List? ?? [];
+        final data = response['data'];
+        final reviewsData = (data is List) ? data : [];
         _reviews = reviewsData.map((r) => r as Map<String, dynamic>).toList();
 
         // حساب الإحصائيات

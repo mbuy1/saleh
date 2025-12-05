@@ -111,15 +111,15 @@ class OrderStatusService {
     String orderId,
   ) async {
     try {
-      final response = await supabaseClient
-          .from('order_status_history')
-          .select()
-          .eq('order_id', orderId)
-          .order('created_at', ascending: false);
+      final response =
+          await supabaseClient
+                  .from('order_status_history')
+                  .select()
+                  .eq('order_id', orderId)
+                  .order('created_at', ascending: false)
+              as List;
 
-      return (response as List)
-          .map((json) => OrderStatusHistory.fromJson(json))
-          .toList();
+      return response.map((json) => OrderStatusHistory.fromJson(json)).toList();
     } catch (e, stackTrace) {
       logger.error(
         'Failed to fetch order status history',

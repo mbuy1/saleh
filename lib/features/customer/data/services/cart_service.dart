@@ -65,7 +65,8 @@ class CartService {
       final result = await ApiService.get('/cart');
 
       if (result['ok'] == true && result['data'] != null) {
-        final items = (result['data'] as List);
+        final data = result['data'];
+        final items = (data is List) ? data : [];
         debugPrint('✅ تم جلب ${items.length} عنصر من السلة');
 
         return items.map((json) {

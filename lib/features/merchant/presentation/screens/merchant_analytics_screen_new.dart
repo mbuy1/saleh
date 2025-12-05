@@ -534,7 +534,8 @@ class _MerchantAnalyticsScreenNewState
   }
 
   Widget _buildRecentOrdersSection() {
-    final recentOrders = _analyticsData?['recentOrders'] as List? ?? [];
+    final recentOrdersData = _analyticsData?['recentOrders'];
+    final recentOrders = (recentOrdersData is List) ? recentOrdersData : [];
 
     return Container(
       padding: const EdgeInsets.all(20),

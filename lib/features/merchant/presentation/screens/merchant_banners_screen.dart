@@ -34,7 +34,8 @@ class _MerchantBannersScreenState extends State<MerchantBannersScreen> {
       final response = await ApiService.getMerchantBanners();
 
       if (response['ok'] == true || response['success'] == true) {
-        final bannersData = response['data'] as List? ?? [];
+        final data = response['data'];
+        final bannersData = (data is List) ? data : [];
         _banners = bannersData.map((b) => b as Map<String, dynamic>).toList();
       } else {
         _loadDummyData();

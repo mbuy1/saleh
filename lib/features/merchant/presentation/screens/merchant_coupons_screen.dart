@@ -32,7 +32,8 @@ class _MerchantCouponsScreenState extends State<MerchantCouponsScreen> {
       final result = await ApiService.get('/secure/merchant/coupons');
 
       if (result['ok'] == true) {
-        _coupons = result['data'] ?? [];
+        final data = result['data'];
+        _coupons = (data is List) ? data : [];
       } else {
         _error = result['error'] ?? 'فشل في تحميل الكوبونات';
       }

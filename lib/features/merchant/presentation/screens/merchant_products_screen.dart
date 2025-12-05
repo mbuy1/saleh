@@ -53,10 +53,14 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       // جلب المنتجات عبر Worker API
       final result = await ApiService.get('/secure/merchant/products');
 
-      if (result['ok'] == true && result['data'] != null) {
-        final products = List<Map<String, dynamic>>.from(result['data']);
+      if (result['ok'] == true) {
+        final data = result['data'];
+        final products = (data is List)
+            ? List<Map<String, dynamic>>.from(data)
+            : <Map<String, dynamic>>[];
 
         // طباعة معلومات المنتجات للتشخيص
+        debugPrint('✅ تم جلب ${products.length} منتج');
         for (var product in products) {
           debugPrint('📦 منتج: ${product['name']}');
           debugPrint('   image_url: ${product['image_url']}');
@@ -67,20 +71,30 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           _products = products;
         });
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['error'] ?? 'خطأ في جلب المنتجات'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+        // فقط عرض الخطأ في حالة الأخطاء الحقيقية (ليس NOT_FOUND)
+        final errorCode = result['error_code'];
+        if (errorCode != null && errorCode != 'NOT_FOUND') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['error'] ?? 'خطأ في جلب المنتجات'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         }
+        // في حالة NOT_FOUND، نترك القائمة فارغة بدون عرض رسالة خطأ
+        setState(() {
+          _products = [];
+        });
       }
     } catch (e) {
+      // فقط عرض الأخطاء الحقيقية (مشاكل الاتصال، إلخ)
+      debugPrint('❌ خطأ في جلب المنتجات: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في جلب المنتجات: ${e.toString()}'),
+            content: Text('خطأ في الاتصال بالخادم'),
             backgroundColor: Colors.red,
           ),
         );

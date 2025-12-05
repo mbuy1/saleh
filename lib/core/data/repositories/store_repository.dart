@@ -27,8 +27,11 @@ class StoreRepository {
         );
 
         if (response['ok'] == true && response['data'] != null) {
-          final storesData = response['data'] as List;
-          allStores = storesData.map((json) => Store.fromJson(json)).toList();
+          final data = response['data'];
+          final storesData = (data is List) ? data : [];
+          allStores = storesData
+              .map((json) => Store.fromJson(json as Map<String, dynamic>))
+              .toList();
           debugPrint('✅ تم جلب ${allStores.length} متجر من Worker API');
           _updateCache(allStores);
         } else {
@@ -81,8 +84,11 @@ class StoreRepository {
       final response = await ApiService.getStores(isBoosted: true, limit: 50);
 
       if (response['ok'] == true && response['data'] != null) {
-        final storesData = response['data'] as List;
-        final stores = storesData.map((json) => Store.fromJson(json)).toList();
+        final data = response['data'];
+        final storesData = (data is List) ? data : [];
+        final stores = storesData
+            .map((json) => Store.fromJson(json as Map<String, dynamic>))
+            .toList();
         debugPrint('✅ تم جلب ${stores.length} متجر مدعوم');
         return stores;
       }
@@ -104,8 +110,11 @@ class StoreRepository {
       final response = await ApiService.getStores(isVerified: true, limit: 50);
 
       if (response['ok'] == true && response['data'] != null) {
-        final storesData = response['data'] as List;
-        final stores = storesData.map((json) => Store.fromJson(json)).toList();
+        final data = response['data'];
+        final storesData = (data is List) ? data : [];
+        final stores = storesData
+            .map((json) => Store.fromJson(json as Map<String, dynamic>))
+            .toList();
         debugPrint('✅ تم جلب ${stores.length} متجر موثق');
         return stores;
       }

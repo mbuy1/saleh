@@ -33,7 +33,8 @@ class _MerchantVideosScreenState extends State<MerchantVideosScreen> {
       final result = await ApiService.get('/secure/merchant/videos');
 
       if (result['ok'] == true) {
-        _videos = result['data'] ?? [];
+        final data = result['data'];
+        _videos = (data is List) ? data : [];
       } else {
         _error = result['error'] ?? 'فشل في تحميل الفيديوهات';
       }
