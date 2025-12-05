@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../supabase_client.dart';
+import '../errors/app_error_codes.dart';
+import 'logger_service.dart';
 
 /// MBUY API Service
 /// Handles all API calls to Cloudflare Worker (API Gateway)
@@ -9,26 +12,35 @@ class ApiService {
   static const String baseUrl =
       'https://misty-mode-b68b.baharista1.workers.dev';
 
+  // Retry configuration
+  static const int maxRetries = 3;
+  static const Duration retryDelay = Duration(seconds: 2);
+  static const List<int> retryableStatusCodes = [408, 429, 500, 502, 503, 504];
+
   /// Get JWT token from current session
   static Future<String?> _getJwtToken() async {
     try {
       final session = supabaseClient.auth.currentSession;
       return session?.accessToken;
     } catch (e) {
-      debugPrint('Error getting JWT: $e');
+      logger.error('Error getting JWT', error: e);
       return null;
     }
   }
 
-  /// Helper: Make authenticated request
+  /// Helper: Make authenticated request with retry logic
   static Future<http.Response> _makeAuthRequest(
     String method,
     String endpoint, {
     Map<String, dynamic>? body,
+    bool enableRetry = true,
   }) async {
     final jwt = await _getJwtToken();
     if (jwt == null) {
-      throw Exception('User not authenticated');
+      throw AppException(
+        errorCode: AppErrorCode.unauthorized,
+        message: 'يجب تسجيل الدخول أولاً',
+      );
     }
 
     final url = Uri.parse('$baseUrl$endpoint');
@@ -37,17 +49,90 @@ class ApiService {
       'Content-Type': 'application/json',
     };
 
-    switch (method.toUpperCase()) {
-      case 'GET':
-        return await http.get(url, headers: headers);
-      case 'POST':
-        return await http.post(url, headers: headers, body: json.encode(body));
-      case 'PUT':
-        return await http.put(url, headers: headers, body: json.encode(body));
-      case 'DELETE':
-        return await http.delete(url, headers: headers);
-      default:
-        throw Exception('Unsupported method: $method');
+    int attempt = 0;
+    while (true) {
+      attempt++;
+
+      try {
+        logger.debug(
+          '$method $endpoint (attempt $attempt/$maxRetries)',
+          tag: 'API',
+        );
+
+        final http.Response response;
+        switch (method.toUpperCase()) {
+          case 'GET':
+            response = await http
+                .get(url, headers: headers)
+                .timeout(const Duration(seconds: 30));
+            break;
+          case 'POST':
+            response = await http
+                .post(url, headers: headers, body: json.encode(body))
+                .timeout(const Duration(seconds: 30));
+            break;
+          case 'PUT':
+            response = await http
+                .put(url, headers: headers, body: json.encode(body))
+                .timeout(const Duration(seconds: 30));
+            break;
+          case 'DELETE':
+            response = await http
+                .delete(url, headers: headers)
+                .timeout(const Duration(seconds: 30));
+            break;
+          default:
+            throw Exception('Unsupported method: $method');
+        }
+
+        // Success or non-retryable error
+        if (response.statusCode < 500 ||
+            !enableRetry ||
+            attempt >= maxRetries) {
+          logger.debug(
+            '$method $endpoint → ${response.statusCode}',
+            tag: 'API',
+            data: response.body.length > 200
+                ? '${response.body.substring(0, 200)}...'
+                : response.body,
+          );
+          return response;
+        }
+
+        // Retryable error
+        if (retryableStatusCodes.contains(response.statusCode)) {
+          logger.warning(
+            'Retryable error ${response.statusCode}, retrying in ${retryDelay.inSeconds}s...',
+            tag: 'API',
+          );
+          await Future.delayed(retryDelay * attempt);
+          continue;
+        }
+
+        return response;
+      } on SocketException catch (e) {
+        if (!enableRetry || attempt >= maxRetries) {
+          logger.error('Network error', error: e, tag: 'API');
+          throw AppException.network('تحقق من اتصالك بالإنترنت');
+        }
+
+        logger.warning('Network error, retrying...', tag: 'API');
+        await Future.delayed(retryDelay * attempt);
+      } on http.ClientException catch (e) {
+        logger.error('HTTP client error', error: e, tag: 'API');
+        throw AppException.network(e.message);
+      } on TimeoutException catch (e) {
+        if (!enableRetry || attempt >= maxRetries) {
+          logger.error('Request timeout', error: e, tag: 'API');
+          throw AppException(
+            errorCode: AppErrorCode.timeout,
+            message: 'انتهت مهلة الطلب',
+          );
+        }
+
+        logger.warning('Timeout, retrying...', tag: 'API');
+        await Future.delayed(retryDelay * attempt);
+      }
     }
   }
 
@@ -56,13 +141,35 @@ class ApiService {
   // ============================================================================
 
   /// GET request
-  static Future<Map<String, dynamic>> get(String endpoint) async {
+  static Future<Map<String, dynamic>> get(
+    String endpoint, {
+    bool enableRetry = true,
+  }) async {
     try {
-      final response = await _makeAuthRequest('GET', endpoint);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ GET Error: $e');
-      return {'ok': false, 'error': e.toString()};
+      final response = await _makeAuthRequest(
+        'GET',
+        endpoint,
+        enableRetry: enableRetry,
+      );
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+
+      // Handle error responses
+      if (response.statusCode >= 400) {
+        _handleErrorResponse(response.statusCode, data);
+      }
+
+      return data;
+    } on AppException {
+      rethrow;
+    } catch (e, stackTrace) {
+      logger.error(
+        'GET request failed',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'API',
+      );
+      throw AppException.server(e.toString());
     }
   }
 
@@ -70,13 +177,34 @@ class ApiService {
   static Future<Map<String, dynamic>> post(
     String endpoint, {
     Map<String, dynamic>? data,
+    bool enableRetry = true,
   }) async {
     try {
-      final response = await _makeAuthRequest('POST', endpoint, body: data);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ POST Error: $e');
-      return {'ok': false, 'error': e.toString()};
+      final response = await _makeAuthRequest(
+        'POST',
+        endpoint,
+        body: data,
+        enableRetry: enableRetry,
+      );
+
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Handle error responses
+      if (response.statusCode >= 400) {
+        _handleErrorResponse(response.statusCode, responseData);
+      }
+
+      return responseData;
+    } on AppException {
+      rethrow;
+    } catch (e, stackTrace) {
+      logger.error(
+        'POST request failed',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'API',
+      );
+      throw AppException.server(e.toString());
     }
   }
 
@@ -84,13 +212,75 @@ class ApiService {
   static Future<Map<String, dynamic>> put(
     String endpoint, {
     Map<String, dynamic>? data,
+    bool enableRetry = true,
   }) async {
     try {
-      final response = await _makeAuthRequest('PUT', endpoint, body: data);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ PUT Error: $e');
-      return {'ok': false, 'error': e.toString()};
+      final response = await _makeAuthRequest(
+        'PUT',
+        endpoint,
+        body: data,
+        enableRetry: enableRetry,
+      );
+
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      // Handle error responses
+      if (response.statusCode >= 400) {
+        _handleErrorResponse(response.statusCode, responseData);
+      }
+
+      return responseData;
+    } on AppException {
+      rethrow;
+    } catch (e, stackTrace) {
+      logger.error(
+        'PUT request failed',
+        error: e,
+        stackTrace: stackTrace,
+        tag: 'API',
+      );
+      throw AppException.server(e.toString());
+    }
+  }
+
+  /// Handle error responses from API
+  static void _handleErrorResponse(int statusCode, Map<String, dynamic> data) {
+    // Try to parse error from response
+    if (data.containsKey('error_code')) {
+      throw AppException.fromResponse(data);
+    }
+
+    // Fallback based on status code
+    switch (statusCode) {
+      case 400:
+        throw AppException(
+          errorCode: AppErrorCode.validationError,
+          message: data['error']?.toString() ?? 'بيانات غير صحيحة',
+          details: data['details'],
+        );
+      case 401:
+        throw AppException(
+          errorCode: AppErrorCode.unauthorized,
+          message: 'يجب تسجيل الدخول',
+        );
+      case 403:
+        throw AppException(
+          errorCode: AppErrorCode.forbidden,
+          message: 'ليس لديك صلاحية الوصول',
+        );
+      case 404:
+        throw AppException(
+          errorCode: AppErrorCode.notFound,
+          message: data['error']?.toString() ?? 'العنصر غير موجود',
+        );
+      case 429:
+        throw AppException(
+          errorCode: AppErrorCode.rateLimitExceeded,
+          message: 'تم تجاوز عدد الطلبات المسموحة',
+          details: data,
+        );
+      default:
+        throw AppException.server(data['error']?.toString());
     }
   }
 
