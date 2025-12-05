@@ -1,7 +1,7 @@
 -- إضافة منتجات تجريبية لاختبار التطبيق
 -- تأكد من تشغيل هذا في Supabase SQL Editor
 
--- Insert sample products
+-- Insert sample products (one per category)
 INSERT INTO products (
   store_id,
   category_id,
@@ -21,16 +21,16 @@ SELECT
   'Sample Product for ' || name,
   'منتج تجريبي لـ ' || name_ar,
   'This is a sample product for testing purposes. منتج تجريبي للاختبار.',
-  RANDOM() * 500 + 50, -- random price between 50-550
+  FLOOR(RANDOM() * 500 + 50)::numeric, -- random price between 50-550
   CASE 
-    WHEN RANDOM() > 0.5 THEN (RANDOM() * 500 + 50) * 0.8 
+    WHEN RANDOM() > 0.5 THEN FLOOR((RANDOM() * 500 + 50) * 0.8)::numeric
     ELSE NULL 
   END, -- 50% chance of discount
   CASE 
     WHEN RANDOM() > 0.5 THEN 20 
     ELSE NULL 
   END,
-  FLOOR(RANDOM() * 100 + 10), -- random stock 10-110
+  FLOOR(RANDOM() * 100 + 10)::integer, -- random stock 10-110
   true,
   'active'
 FROM categories
