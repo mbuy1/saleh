@@ -1,6 +1,5 @@
 /// خدمة Logging مركزية
-///
-/// توفر logging موحد عبر التطبيق مع مستويات مختلفة
+library;
 
 import 'package:flutter/foundation.dart';
 

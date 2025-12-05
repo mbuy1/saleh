@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -118,9 +119,6 @@ class ApiService {
 
         logger.warning('Network error, retrying...', tag: 'API');
         await Future.delayed(retryDelay * attempt);
-      } on http.ClientException catch (e) {
-        logger.error('HTTP client error', error: e, tag: 'API');
-        throw AppException.network(e.message);
       } on TimeoutException catch (e) {
         if (!enableRetry || attempt >= maxRetries) {
           logger.error('Request timeout', error: e, tag: 'API');
@@ -129,9 +127,11 @@ class ApiService {
             message: 'انتهت مهلة الطلب',
           );
         }
-
-        logger.warning('Timeout, retrying...', tag: 'API');
+        logger.warning('Request timeout, retrying...', tag: 'API');
         await Future.delayed(retryDelay * attempt);
+      } on http.ClientException catch (e) {
+        logger.error('HTTP client error', error: e, tag: 'API');
+        throw AppException.network(e.message);
       }
     }
   }

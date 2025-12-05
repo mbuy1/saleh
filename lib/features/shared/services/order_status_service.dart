@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
-import '../../core/supabase_client.dart';
-import '../../core/services/api_service.dart';
-import '../../core/services/logger_service.dart';
+import '../../../core/supabase_client.dart';
+import '../../../core/services/api_service.dart';
+import '../../../core/services/logger_service.dart';
 
 /// Order Status Types
 enum OrderStatus {
@@ -77,7 +76,7 @@ class OrderStatusService {
       }
 
       // Insert new status history entry
-      final response = await supabaseClient
+      await supabaseClient
           .from('order_status_history')
           .insert({
             'order_id': orderId,
