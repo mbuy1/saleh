@@ -273,18 +273,16 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
 
       // إنشاء منتج جديد
       final productData = {
-        'store_id': storeId,
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'price': double.parse(_priceController.text),
-        'stock': int.parse(_stockController.text),
-        'status': 'active', // افتراضي: نشط
+        'stock_quantity': int.parse(_stockController.text),
       };
 
       // إضافة URL الصورة إذا كان موجوداً
       if (imageUrl != null && imageUrl.isNotEmpty) {
-        productData['image_url'] = imageUrl;
         productData['main_image_url'] = imageUrl;
+        productData['images'] = [imageUrl];
         debugPrint('✅ سيتم حفظ الصورة: $imageUrl');
       } else {
         debugPrint('⚠️ لا توجد صورة لحفظها');
