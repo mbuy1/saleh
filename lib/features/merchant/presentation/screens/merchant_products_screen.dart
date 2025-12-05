@@ -276,7 +276,9 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'price': double.parse(_priceController.text),
-        'stock_quantity': int.parse(_stockController.text),
+        'stock': int.parse(_stockController.text),
+        'status': 'active',
+        'is_active': true,
       };
 
       // إضافة URL الصورة إذا كان موجوداً
