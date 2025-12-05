@@ -47,10 +47,8 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
     });
 
     try {
-      // استخدام Worker API عبر ApiService
-      final result = await ApiService.get(
-        '/secure/products?limit=10&status=active',
-      );
+      // استخدام Worker API عبر ApiService (public endpoint)
+      final result = await ApiService.getProducts(limit: 10, status: 'active');
 
       if (result['ok'] == true && result['data'] != null) {
         final products = (result['data'] as List).map((data) {
