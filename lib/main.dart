@@ -6,23 +6,8 @@ import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
-import 'core/services/gemini_service.dart';
 import 'core/services/preferences_service.dart';
 import 'core/firebase_service.dart';
-import 'features/customer/presentation/screens/customer_support_chat_screen.dart';
-import 'features/merchant/presentation/screens/merchant_ai_assistant_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/mbuy_tools_screen.dart';
-// AI Tools Screens
-import 'features/merchant/presentation/screens/ai_tools/product_description_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/image_analysis_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/keywords_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/compare_products_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/improve_description_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/promo_ideas_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/marketing_strategy_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/reviews_analysis_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/review_response_screen.dart';
-import 'features/merchant/presentation/screens/ai_tools/translate_screen.dart';
 import 'core/root_widget.dart' as app;
 import 'core/app_router.dart';
 import 'core/app_config.dart';
@@ -110,14 +95,6 @@ Future<void> main() async {
     // إذا فشل تهيئة Supabase، نتابع بدونها (للتطوير فقط)
     // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase
     debugPrint('⚠️ خطأ في تهيئة Supabase: $e');
-  }
-
-  // تهيئة Gemini AI عبر Worker API
-  try {
-    await GeminiService.initialize();
-    debugPrint('✅ تم تهيئة Gemini AI عبر Worker بنجاح');
-  } catch (e) {
-    debugPrint('⚠️ خطأ في تهيئة Gemini AI: $e');
   }
 
   // تهيئة Cloudflare Images عبر Worker API
@@ -282,44 +259,6 @@ Route<dynamic>? _generateRoute(
     case AppRouter.merchantTransactions:
       return MaterialPageRoute(
         builder: (_) => const MerchantTransactionsScreen(),
-      );
-    case AppRouter.merchantAiAssistant:
-      return MaterialPageRoute(
-        builder: (_) => const MerchantAiAssistantScreen(),
-      );
-
-    // AI Tools Routes
-    case '/merchant/ai-tools':
-      return MaterialPageRoute(builder: (_) => const MbuyToolsScreen());
-    case '/merchant/ai-tools/product-description':
-      return MaterialPageRoute(
-        builder: (_) => const ProductDescriptionScreen(),
-      );
-    case '/merchant/ai-tools/image-analysis':
-      return MaterialPageRoute(builder: (_) => const ImageAnalysisScreen());
-    case '/merchant/ai-tools/keywords':
-      return MaterialPageRoute(builder: (_) => const KeywordsScreen());
-    case '/merchant/ai-tools/compare-products':
-      return MaterialPageRoute(builder: (_) => const CompareProductsScreen());
-    case '/merchant/ai-tools/improve-description':
-      return MaterialPageRoute(
-        builder: (_) => const ImproveDescriptionScreen(),
-      );
-    case '/merchant/ai-tools/promo-ideas':
-      return MaterialPageRoute(builder: (_) => const PromoIdeasScreen());
-    case '/merchant/ai-tools/marketing-strategy':
-      return MaterialPageRoute(builder: (_) => const MarketingStrategyScreen());
-    case '/merchant/ai-tools/reviews-analysis':
-      return MaterialPageRoute(builder: (_) => const ReviewsAnalysisScreen());
-    case '/merchant/ai-tools/review-response':
-      return MaterialPageRoute(builder: (_) => const ReviewResponseScreen());
-    case '/merchant/ai-tools/translate':
-      return MaterialPageRoute(builder: (_) => const TranslateScreen());
-
-    // Chat & Support Routes
-    case AppRouter.customerSupportChat:
-      return MaterialPageRoute(
-        builder: (_) => const CustomerSupportChatScreen(),
       );
 
     // Merchant Routes with Arguments

@@ -225,30 +225,6 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                     _showSnackBar('سيتم إضافة ادعمني ودادعمك قريباً');
                   },
                 ),
-                _buildMenuCard(
-                  icon: Icons.auto_awesome,
-                  title: 'المساعد الذكي',
-                  subtitle: 'مدعوم بـ Gemini AI',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                  ),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/merchant/ai-assistant');
-                  },
-                  badge: 'جديد',
-                ),
-                _buildMenuCard(
-                  icon: Icons.build_circle,
-                  title: 'أدوات mBuy',
-                  subtitle: 'أدوات ذكية مدعومة بـ AI',
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF10B981), Color(0xFF059669)],
-                  ),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/merchant/ai-tools');
-                  },
-                  badge: 'AI',
-                ),
               ]),
             ),
           ),

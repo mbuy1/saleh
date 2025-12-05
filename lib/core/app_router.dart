@@ -47,28 +47,6 @@ class AppRouter {
   static const String merchantInvoices = '/merchant/invoices';
   static const String merchantPaymentMethods = '/merchant/payment-methods';
   static const String merchantTransactions = '/merchant/transactions';
-  static const String merchantAiAssistant = '/merchant/ai-assistant';
-
-  // AI Tools Routes
-  static const String merchantAiContentGenerator =
-      '/merchant/ai-tools/content-generator';
-  static const String merchantAiProductOptimizer =
-      '/merchant/ai-tools/product-optimizer';
-  static const String merchantAiPhotoEditor = '/merchant/ai-tools/photo-editor';
-  static const String merchantAiCompetitorAnalysis =
-      '/merchant/ai-tools/competitor-analysis';
-  static const String merchantAiCustomerSegmentation =
-      '/merchant/ai-tools/customer-segmentation';
-  static const String merchantAiBusinessInsights =
-      '/merchant/ai-tools/business-insights';
-  static const String merchantAiAutoResponder =
-      '/merchant/ai-tools/auto-responder';
-  static const String merchantAiSalesForecast =
-      '/merchant/ai-tools/sales-forecast';
-  static const String merchantAiPricingStrategy =
-      '/merchant/ai-tools/pricing-strategy';
-  static const String merchantAiMarketingAssistant =
-      '/merchant/ai-tools/marketing-assistant';
 
   // Additional Customer Routes
   static const String cart = '/cart';
@@ -78,9 +56,6 @@ class AppRouter {
   // Auth Routes
   static const String authLogin = '/auth/login';
   static const String authRegister = '/auth/register';
-
-  // Chat & Support
-  static const String customerSupportChat = '/customer-support-chat';
 
   /// Helper method to navigate to a route
   static void navigateTo(
