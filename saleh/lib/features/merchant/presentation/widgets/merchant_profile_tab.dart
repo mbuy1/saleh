@@ -3,6 +3,7 @@ import '../../../../core/app_config.dart';
 import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/data/auth_service.dart';
+import '../../../auth/data/auth_repository.dart';
 import '../screens/merchant_store_setup_screen.dart';
 import '../screens/merchant_points_screen.dart';
 
@@ -31,13 +32,13 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) return;
 
       final response = await supabaseClient
           .from('user_profiles')
           .select()
-          .eq('id', user.id)
+          .eq('id', userId)
           .maybeSingle();
 
       setState(() {
@@ -97,8 +98,6 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
 
   @override
   Widget build(BuildContext context) {
-    final user = supabaseClient.auth.currentUser;
-
     return Scaffold(
       backgroundColor: MbuyColors.background,
       appBar: AppBar(
@@ -144,13 +143,18 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
                   const SizedBox(height: 8),
 
                   // البريد الإلكتروني
-                  Text(
-                    user?.email ?? '',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: MbuyColors.textSecondary,
-                      fontFamily: 'Arabic',
-                    ),
+                  FutureBuilder<String?>(
+                    future: AuthRepository.getUserEmail(),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: MbuyColors.textSecondary,
+                          fontFamily: 'Arabic',
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 8),
 

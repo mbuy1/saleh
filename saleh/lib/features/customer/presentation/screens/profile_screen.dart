@@ -5,7 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/widgets.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import '../../../auth/data/auth_service.dart';
-import '../../../../core/services/mbuy_auth_helper.dart';
+import '../../../auth/data/auth_repository.dart';
 import 'customer_wallet_screen.dart';
 import 'customer_points_screen.dart';
 import 'favorites_screen.dart';
@@ -43,15 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      // Try MBUY Auth first
-      String? userId = await MbuyAuthHelper.getCurrentUserId();
-      
-      // Fallback to Supabase Auth
-      if (userId == null) {
-        final user = supabaseClient.auth.currentUser;
-        userId = user?.id;
-      }
-      
+      // Get user ID from MBUY Auth
+      final userId = await AuthRepository.getUserId();
       if (userId == null) return;
 
       final response = await supabaseClient

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/session/store_session.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../auth/data/auth_repository.dart';
 import 'merchant_dashboard_screen.dart';
 import 'merchant_products_screen.dart';
 import 'merchant_community_screen.dart';
@@ -45,10 +45,9 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
     try {
       final storeSession = context.read<StoreSession>();
       
-      // جلب معلومات المستخدم الحالي
-      final user = supabaseClient.auth.currentUser;
-      final userId = user?.id;
-      final userEmail = user?.email;
+      // جلب معلومات المستخدم الحالي من MBUY Auth
+      final userId = await AuthRepository.getUserId();
+      final userEmail = await AuthRepository.getUserEmail();
       
       debugPrint('🔍 [MerchantHome] بدء جلب معلومات المتجر...');
       debugPrint('🔍 [MerchantHome] User ID من Flutter: $userId');

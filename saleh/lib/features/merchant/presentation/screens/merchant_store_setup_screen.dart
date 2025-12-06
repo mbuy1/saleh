@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/session/store_session.dart';
 import '../../data/merchant_points_service.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantStoreSetupScreen extends StatefulWidget {
   const MerchantStoreSetupScreen({super.key});
@@ -101,8 +101,8 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('المستخدم غير مسجل');
       }
 

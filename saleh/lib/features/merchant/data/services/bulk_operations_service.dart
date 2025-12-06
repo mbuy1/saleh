@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
 import '../models/bulk_operation_model.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// خدمة العمليات المجمعة (Bulk Operations)
 class BulkOperationsService {
@@ -12,8 +12,8 @@ class BulkOperationsService {
     Map<String, dynamic>? updateData, // For update operations
     Map<String, dynamic>? parameters,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -47,8 +47,8 @@ class BulkOperationsService {
 
   /// جلب حالة عملية مجمعة
   static Future<BulkOperationModel?> getBulkOperationStatus(String operationId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -71,8 +71,8 @@ class BulkOperationsService {
     List<String>? productIds,
     Map<String, dynamic>? filters,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -98,8 +98,8 @@ class BulkOperationsService {
 
   /// استيراد المنتجات (CSV/Excel)
   static Future<BulkOperationModel> importProducts(String fileUrl) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 

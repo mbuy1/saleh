@@ -1,11 +1,11 @@
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
+import '../../auth/data/auth_repository.dart';
 
 class FavoritesService {
   /// التحقق إذا كان المنتج في المفضلة
   static Future<bool> isFavorite(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return false;
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return false;
 
     try {
       final result = await ApiService.get('/favorites/check/$productId');
@@ -17,8 +17,8 @@ class FavoritesService {
 
   /// إضافة منتج للمفضلة
   static Future<void> addToFavorites(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -34,8 +34,10 @@ class FavoritesService {
 
   /// إزالة منتج من المفضلة
   static Future<void> removeFromFavorites(String favoriteId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return;
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
+      throw Exception('يجب تسجيل الدخول أولاً');
+    }
 
     await ApiService.delete('/favorites/$favoriteId');
   }
@@ -64,8 +66,8 @@ class FavoritesService {
 
   /// جلب المنتجات المفضلة
   static Future<List<Map<String, dynamic>>> getFavorites() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return [];
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return [];
 
     try {
       final result = await ApiService.get('/favorites');

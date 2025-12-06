@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
-import 'mbuy_auth_service.dart';
-import '../../../core/services/mbuy_auth_helper.dart';
+import 'auth_repository.dart';
 
+/// Auth Service - Uses MBUY Custom Auth only
+/// No Supabase Auth dependency
 class AuthService {
   /// تسجيل مستخدم جديد
   ///
   /// يقوم بـ:
-  /// 1. إنشاء حساب في Supabase Auth
+  /// 1. إنشاء حساب في MBUY Auth
   /// 2. إنشاء row في user_profiles مع الدور المحدد
   /// 3. إذا كان تاجر: إنشاء متجر تلقائياً عبر API
   ///
@@ -21,9 +20,9 @@ class AuthService {
   /// - storeName: اسم المتجر (مطلوب للتاجر)
   /// - city: المدينة (مطلوب للتاجر)
   ///
-  /// Returns: User object من Supabase
+  /// Returns: Map with user data
   /// Throws: Exception في حالة الفشل
-  static Future<User> signUp({
+  static Future<Map<String, dynamic>> signUp({
     required String email,
     required String password,
     required String displayName,
@@ -34,42 +33,15 @@ class AuthService {
     try {
       debugPrint('📝 محاولة تسجيل مستخدم جديد: $email');
 
-      // 1. إنشاء حساب في Supabase Auth
-      final response = await supabaseClient.auth.signUp(
+      // 1. إنشاء حساب في MBUY Auth
+      final result = await AuthRepository.register(
         email: email,
         password: password,
-        data: {'display_name': displayName},
+        fullName: displayName,
       );
 
-      if (response.user == null) {
-        debugPrint('❌ فشل إنشاء الحساب: لا يوجد مستخدم');
-        throw Exception('فشل إنشاء الحساب');
-      }
-
-      final user = response.user!;
-      debugPrint('✅ تم إنشاء حساب المستخدم: ${user.email}');
-
-      // التحقق من وجود Session بعد التسجيل
-      if (response.session == null) {
-        debugPrint(
-          '⚠️ لا توجد جلسة بعد التسجيل - قد يتطلب تأكيد البريد الإلكتروني',
-        );
-        // إذا لم تكن هناك جلسة، جرب تسجيل الدخول مباشرة
-        try {
-          final signInResponse = await supabaseClient.auth.signInWithPassword(
-            email: email,
-            password: password,
-          );
-          if (signInResponse.session != null) {
-            debugPrint('✅ تم تسجيل الدخول تلقائياً بعد التسجيل');
-          }
-        } catch (e) {
-          debugPrint('⚠️ فشل تسجيل الدخول التلقائي: $e');
-          // لا نرمي خطأ هنا - المستخدم يمكنه تسجيل الدخول لاحقاً
-        }
-      } else {
-        debugPrint('✅ تم إنشاء جلسة تلقائياً بعد التسجيل');
-      }
+      final user = result['user'] as Map<String, dynamic>;
+      debugPrint('✅ تم إنشاء حساب المستخدم: ${user['email']}');
 
       // 2. إنشاء user_profile + wallet عبر Worker API (دفعة واحدة)
       try {
@@ -90,13 +62,13 @@ class AuthService {
         debugPrint('⚠️ تحذير: فشل إنشاء user_profile/wallet عبر Worker: $e');
       }
 
-      // 4. إذا كان تاجر: إنشاء متجر تلقائياً عبر Worker API
+      // 3. إذا كان تاجر: إنشاء متجر تلقائياً عبر Worker API
       if (role == 'merchant' && storeName != null) {
         try {
           debugPrint('🏪 جاري إنشاء متجر للتاجر...');
 
           // استخدام Worker API الجديد (لا نرسل user_id - يتم جلبها من JWT)
-          final result = await ApiService.post(
+          final storeResult = await ApiService.post(
             '/secure/merchant/store',
             data: {
               'name': storeName,
@@ -108,11 +80,11 @@ class AuthService {
             },
           );
 
-          if (result['ok'] == true) {
+          if (storeResult['ok'] == true) {
             debugPrint('✅ تم إنشاء المتجر بنجاح!');
             debugPrint('✅ حصل التاجر على 100 نقطة ترحيبية');
           } else {
-            debugPrint('⚠️ فشل إنشاء المتجر: ${result['error'] ?? result['message']}');
+            debugPrint('⚠️ فشل إنشاء المتجر: ${storeResult['error'] ?? storeResult['message']}');
             // لا نرمي خطأ هنا - يمكن للتاجر إنشاء المتجر لاحقاً
           }
         } catch (e) {
@@ -121,7 +93,7 @@ class AuthService {
         }
       }
 
-      return user;
+      return result;
     } catch (e) {
       throw Exception('خطأ في التسجيل: ${e.toString()}');
     }
@@ -133,89 +105,25 @@ class AuthService {
   /// - email: البريد الإلكتروني
   /// - password: كلمة المرور
   ///
-  /// Returns: Session object من Supabase
+  /// Returns: Map with user and token data
   /// Throws: Exception في حالة الفشل
-  static Future<Session> signIn({
+  static Future<Map<String, dynamic>> signIn({
     required String email,
     required String password,
   }) async {
     try {
       debugPrint('🔐 محاولة تسجيل الدخول: $email');
-      debugPrint('🔐 كلمة المرور: ${password.length} أحرف');
 
-      final response = await supabaseClient.auth.signInWithPassword(
-        email: email.trim().toLowerCase(),
+      final result = await AuthRepository.login(
+        email: email,
         password: password,
       );
 
-      debugPrint(
-        '📊 Response: user=${response.user?.id}, session=${response.session != null}',
-      );
-      debugPrint('📊 User email: ${response.user?.email}');
-      debugPrint(
-        '📊 User confirmed: ${response.user?.emailConfirmedAt != null}',
-      );
-
-      if (response.session == null) {
-        debugPrint('❌ فشل تسجيل الدخول: لا توجد جلسة');
-        debugPrint('❌ User ID: ${response.user?.id}');
-        debugPrint('❌ Email confirmed: ${response.user?.emailConfirmedAt}');
-
-        // إذا كان المستخدم موجود لكن بدون Session، قد يكون Email غير مؤكد
-        if (response.user != null && response.user!.emailConfirmedAt == null) {
-          throw Exception(
-            'يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.',
-          );
-        }
-
-        throw Exception(
-          'فشل تسجيل الدخول - لا توجد جلسة. يرجى المحاولة مرة أخرى.',
-        );
-      }
-
-      debugPrint('✅ تم تسجيل الدخول بنجاح: ${response.user?.email}');
-      debugPrint(
-        '📱 Session ID: ${response.session!.accessToken.substring(0, 20)}...',
-      );
-      debugPrint('📱 Session expires at: ${response.session!.expiresAt}');
-
-      return response.session!;
-    } on AuthException catch (e) {
-      debugPrint('❌ خطأ في المصادقة: ${e.message}');
-      debugPrint('❌ Error code: ${e.statusCode}');
-
-      // معالجة أنواع الأخطاء المختلفة
-      final errorMessage = e.message.toLowerCase();
-
-      if (errorMessage.contains('invalid login credentials') ||
-          errorMessage.contains('invalid credentials') ||
-          errorMessage.contains('wrong password')) {
-        throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-      } else if (errorMessage.contains('email not confirmed') ||
-          errorMessage.contains('email not verified') ||
-          errorMessage.contains('confirmation')) {
-        throw Exception(
-          'يرجى تأكيد البريد الإلكتروني أولاً. تحقق من بريدك الوارد.',
-        );
-      } else if (errorMessage.contains('too many requests') ||
-          errorMessage.contains('rate limit')) {
-        throw Exception(
-          'تم تجاوز عدد المحاولات المسموح بها. يرجى المحاولة لاحقاً.',
-        );
-      } else if (errorMessage.contains('user not found')) {
-        throw Exception('البريد الإلكتروني غير مسجل. يرجى إنشاء حساب جديد.');
-      } else {
-        throw Exception('خطأ في تسجيل الدخول: ${e.message}');
-      }
+      debugPrint('✅ تم تسجيل الدخول بنجاح: ${result['user']?['email']}');
+      return result;
     } catch (e) {
-      debugPrint('❌ خطأ غير متوقع: $e');
-      debugPrint('❌ Error type: ${e.runtimeType}');
-
-      // إرجاع رسالة واضحة
-      if (e.toString().contains('Exception')) {
-        rethrow; // إذا كان Exception مخصص، أرجعه كما هو
-      }
-      throw Exception('خطأ في تسجيل الدخول: ${e.toString()}');
+      debugPrint('❌ خطأ في تسجيل الدخول: $e');
+      rethrow;
     }
   }
 
@@ -224,21 +132,8 @@ class AuthService {
   /// Throws: Exception في حالة الفشل
   static Future<void> signOut() async {
     try {
-      // Logout from MBUY Auth
-      try {
-        await MbuyAuthService.logout();
-        debugPrint('[AuthService] ✅ MBUY Auth logout successful');
-      } catch (e) {
-        debugPrint('[AuthService] ⚠️ MBUY Auth logout error: $e');
-      }
-
-      // Logout from Supabase Auth (for backward compatibility)
-      try {
-        await supabaseClient.auth.signOut();
-        debugPrint('[AuthService] ✅ Supabase Auth logout successful');
-      } catch (e) {
-        debugPrint('[AuthService] ⚠️ Supabase Auth logout error: $e');
-      }
+      await AuthRepository.logout();
+      debugPrint('[AuthService] ✅ Logout successful');
     } catch (e) {
       throw Exception('خطأ في تسجيل الخروج: ${e.toString()}');
     }
@@ -246,38 +141,39 @@ class AuthService {
 
   /// جلب المستخدم الحالي
   ///
-  /// Returns: User object إذا كان المستخدم مسجل، null إذا لم يكن مسجل
-  /// Uses MBUY Auth first, falls back to Supabase Auth
-  static Future<User?> getCurrentUser() async {
-    // Try MBUY Auth first
+  /// Returns: Map with user data if logged in, null otherwise
+  static Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
-      final mbuyUser = await MbuyAuthHelper.getCurrentUser();
-      if (mbuyUser != null) {
-        // Convert MbuyUser to Supabase User-like object
-        // For now, return null and let Supabase handle it
-        // This maintains backward compatibility
-        debugPrint('[AuthService] MBUY Auth user found: ${mbuyUser.email}');
+      final isLoggedIn = await AuthRepository.isLoggedIn();
+      if (!isLoggedIn) {
+        return null;
       }
-    } catch (e) {
-      debugPrint('[AuthService] MBUY Auth error: $e');
-    }
 
-    // Fallback to Supabase Auth for backward compatibility
-    return supabaseClient.auth.currentUser;
+      // Verify token by calling /auth/me
+      final user = await AuthRepository.getCurrentUser();
+      return user;
+    } catch (e) {
+      debugPrint('[AuthService] Error getting current user: $e');
+      // Clear invalid token
+      await AuthRepository.logout();
+      return null;
+    }
   }
 
   /// التحقق من حالة تسجيل الدخول
   ///
   /// Returns: true إذا كان المستخدم مسجل، false إذا لم يكن
   static Future<bool> isSignedIn() async {
-    // Check MBUY Auth first
-    final mbuyLoggedIn = await MbuyAuthService.isLoggedIn();
-    if (mbuyLoggedIn) {
-      return true;
-    }
+    return await AuthRepository.isLoggedIn();
+  }
 
-    // Fallback to Supabase Auth
-    final user = await getCurrentUser();
-    return user != null;
+  /// Get current user ID
+  static Future<String?> getCurrentUserId() async {
+    return await AuthRepository.getUserId();
+  }
+
+  /// Get current user email
+  static Future<String?> getCurrentUserEmail() async {
+    return await AuthRepository.getUserEmail();
   }
 }

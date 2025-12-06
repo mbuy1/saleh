@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
 import '../models/wishlist_model.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// خدمة قائمة الأمنيات (Wishlist)
 /// مختلف عن Favorites - قائمة أمنيات مستقلة
 class WishlistService {
   /// جلب جميع المنتجات في قائمة الأمنيات
   static Future<List<WishlistItem>> getWishlist() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -35,8 +35,8 @@ class WishlistService {
 
   /// إضافة منتج إلى قائمة الأمنيات
   static Future<void> addToWishlist(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -52,8 +52,8 @@ class WishlistService {
 
   /// إزالة منتج من قائمة الأمنيات
   static Future<void> removeFromWishlist(String wishlistId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -66,8 +66,8 @@ class WishlistService {
 
   /// التحقق إذا كان المنتج في قائمة الأمنيات
   static Future<bool> isInWishlist(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return false;
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return false;
 
     try {
       final result = await ApiService.get('/secure/customer/wishlist/check/$productId');
@@ -104,8 +104,8 @@ class WishlistService {
 
   /// حذف جميع المنتجات من قائمة الأمنيات
   static Future<void> clearWishlist() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 

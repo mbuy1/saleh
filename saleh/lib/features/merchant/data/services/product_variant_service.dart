@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
 import '../models/product_variant_model.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// خدمة إدارة Product Variants (المقاسات والألوان والخيارات)
 class ProductVariantService {
   /// جلب جميع Variants لمنتج محدد
   static Future<List<ProductVariantModel>> getProductVariants(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -37,8 +37,8 @@ class ProductVariantService {
     String? sku,
     String? imageUrl,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -72,8 +72,8 @@ class ProductVariantService {
     String? imageUrl,
     bool? isActive,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -100,8 +100,8 @@ class ProductVariantService {
 
   /// حذف Variant
   static Future<void> deleteVariant(String variantId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 
@@ -114,8 +114,8 @@ class ProductVariantService {
 
   /// جلب Variant Options Definitions (تعريفات الخيارات)
   static Future<List<VariantOptionDefinition>> getVariantOptions(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('يجب تسجيل الدخول أولاً');
     }
 

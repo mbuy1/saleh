@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/services/order_service.dart';
 import '../../../../core/session/store_session.dart';
 import 'merchant_order_details_screen.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantOrdersScreen extends StatefulWidget {
   const MerchantOrdersScreen({super.key});
@@ -29,8 +29,8 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null || !mounted) return;
 
       // جلب store_id من StoreSession Provider
       final storeSession = context.read<StoreSession>();

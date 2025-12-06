@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
 import '../models/recently_viewed_model.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// خدمة المنتجات التي تم عرضها مؤخراً
 class RecentlyViewedService {
   /// تسجيل عرض منتج
   static Future<void> recordView(String productId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return; // لا نسجل إذا لم يكن المستخدم مسجلاً
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return; // لا نسجل إذا لم يكن المستخدم مسجلاً
 
     try {
       await ApiService.post(
@@ -23,8 +23,8 @@ class RecentlyViewedService {
 
   /// جلب المنتجات المعروضة مؤخراً
   static Future<List<RecentlyViewedItem>> getRecentlyViewed({int limit = 20}) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return [];
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return [];
 
     try {
       final result = await ApiService.get('/secure/customer/recently-viewed?limit=$limit');
@@ -48,8 +48,8 @@ class RecentlyViewedService {
 
   /// حذف منتج من قائمة المعروضة مؤخراً
   static Future<void> removeFromRecentlyViewed(String recentlyViewedId) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return;
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return;
 
     try {
       await ApiService.delete('/secure/customer/recently-viewed/$recentlyViewedId');
@@ -60,8 +60,8 @@ class RecentlyViewedService {
 
   /// حذف جميع المنتجات المعروضة مؤخراً
   static Future<void> clearRecentlyViewed() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) return;
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) return;
 
     try {
       await ApiService.delete('/secure/customer/recently-viewed/clear');

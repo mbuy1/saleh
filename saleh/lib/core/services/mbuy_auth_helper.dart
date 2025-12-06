@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
-import '../../features/auth/data/mbuy_auth_service.dart';
+import '../../features/auth/data/auth_repository.dart';
+
+// DEPRECATED: Use AuthRepository directly instead
+// This file is kept for backward compatibility only
 
 /// Helper class to provide Supabase-like User object from MBUY Auth
 class MbuyUser {
@@ -37,12 +40,11 @@ class MbuyUser {
 /// Helper class to check auth state similar to Supabase
 class MbuyAuthHelper {
   /// Get current user (similar to supabaseClient.auth.currentUser)
+  /// DEPRECATED: Use AuthRepository.getCurrentUser() instead
+  @Deprecated('Use AuthRepository.getCurrentUser() instead')
   static Future<MbuyUser?> getCurrentUser() async {
     try {
-      final userInfo = await MbuyAuthService.getCurrentUserInfo();
-      if (userInfo == null) {
-        return null;
-      }
+      final userInfo = await AuthRepository.getCurrentUser();
       return MbuyUser.fromMap(userInfo);
     } catch (e) {
       debugPrint('[MbuyAuthHelper] Error getting current user: $e');
@@ -51,24 +53,31 @@ class MbuyAuthHelper {
   }
 
   /// Check if user is signed in
+  /// DEPRECATED: Use AuthRepository.isLoggedIn() instead
+  @Deprecated('Use AuthRepository.isLoggedIn() instead')
   static Future<bool> isSignedIn() async {
-    return await MbuyAuthService.isLoggedIn();
+    return await AuthRepository.isLoggedIn();
   }
 
   /// Get current user ID (similar to supabaseClient.auth.currentUser?.id)
-  /// This is a convenience method for backward compatibility
+  /// DEPRECATED: Use AuthRepository.getUserId() instead
+  @Deprecated('Use AuthRepository.getUserId() instead')
   static Future<String?> getCurrentUserId() async {
-    return await MbuyAuthService.getUserId();
+    return await AuthRepository.getUserId();
   }
 
   /// Get current user email
+  /// DEPRECATED: Use AuthRepository.getUserEmail() instead
+  @Deprecated('Use AuthRepository.getUserEmail() instead')
   static Future<String?> getCurrentUserEmail() async {
-    return await MbuyAuthService.getUserEmail();
+    return await AuthRepository.getUserEmail();
   }
 
   /// Check if user is authenticated (similar to supabaseClient.auth.currentUser != null)
+  /// DEPRECATED: Use AuthRepository.isLoggedIn() instead
+  @Deprecated('Use AuthRepository.isLoggedIn() instead')
   static Future<bool> hasCurrentUser() async {
-    return await MbuyAuthService.isLoggedIn();
+    return await AuthRepository.isLoggedIn();
   }
 }
 

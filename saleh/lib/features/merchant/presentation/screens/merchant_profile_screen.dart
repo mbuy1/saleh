@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/supabase_client.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// شاشة الملف الشخصي للتاجر
 class MerchantProfileScreen extends StatefulWidget {
@@ -27,12 +28,12 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user != null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId != null) {
         final response = await supabaseClient
             .from('user_profiles')
             .select()
-            .eq('id', user.id)
+            .eq('id', userId)
             .maybeSingle();
 
         setState(() {

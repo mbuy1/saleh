@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// شاشة تغيير كلمة المرور
 class ChangePasswordScreen extends StatefulWidget {
@@ -40,12 +39,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     });
 
     try {
-      // التحقق من كلمة المرور الحالية (اختياري - Supabase لا يدعم التحقق المباشر)
-      // يمكن إضافة التحقق من خلال re-authentication إذا لزم الأمر
-      
-      // تحديث كلمة المرور
-      await supabaseClient.auth.updateUser(
-        UserAttributes(password: _newPasswordController.text),
+      // تحديث كلمة المرور عبر Worker API
+      await AuthRepository.changePassword(
+        currentPassword: _currentPasswordController.text,
+        newPassword: _newPasswordController.text,
       );
 
       if (mounted) {

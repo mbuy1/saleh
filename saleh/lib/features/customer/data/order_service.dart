@@ -2,6 +2,7 @@ import '../../../../core/supabase_client.dart';
 import '../../../../core/permissions_helper.dart';
 import '../../../../core/services/api_service.dart';
 import 'services/cart_service.dart';
+import '../../auth/data/auth_repository.dart';
 
 class OrderService {
   /// تحويل السلة إلى طلب
@@ -15,8 +16,8 @@ class OrderService {
   /// Returns: ID الطلب الجديد
   /// Throws: Exception إذا كان المستخدم ليس customer
   static Future<String> createOrderFromCart() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -36,7 +37,7 @@ class OrderService {
     final cart = await supabaseClient
         .from('carts')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .single();
 
     final cartId = cart['id'] as String;
@@ -70,8 +71,8 @@ class OrderService {
   ///
   /// Returns: List of orders
   static Future<List<Map<String, dynamic>>> getCustomerOrders() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       return [];
     }
 

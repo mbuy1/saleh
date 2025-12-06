@@ -1,4 +1,5 @@
 import '../core/supabase_client.dart';
+import '../features/auth/data/auth_repository.dart';
 
 /// نموذج الصلاحيات (Permissions Model) للتطبيق
 ///
@@ -12,8 +13,8 @@ class PermissionsHelper {
   ///
   /// Returns: 'admin', 'merchant', 'customer', أو null إذا لم يكن مسجل
   static Future<String?> getCurrentUserRole() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       return null;
     }
 
@@ -21,7 +22,7 @@ class PermissionsHelper {
       final response = await supabaseClient
           .from('user_profiles')
           .select('role')
-          .eq('id', user.id)
+          .eq('id', userId)
           .maybeSingle();
 
       return response?['role'] as String?;

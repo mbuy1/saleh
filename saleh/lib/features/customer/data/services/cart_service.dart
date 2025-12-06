@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/services/api_service.dart';
-import '../../../../core/supabase_client.dart';
 import '../models/product_model.dart';
+import '../../../auth/data/auth_repository.dart';
 
 /// نموذج عنصر السلة من قاعدة البيانات
 class CartItemModel {
@@ -56,7 +56,7 @@ class CartService {
   /// جلب عناصر السلة للمستخدم الحالي
   static Future<List<CartItemModel>> getCartItems() async {
     try {
-      final userId = supabaseClient.auth.currentUser?.id;
+      final userId = await AuthRepository.getUserId();
       if (userId == null) {
         debugPrint('⚠️ المستخدم غير مسجل الدخول');
         return [];
@@ -101,7 +101,7 @@ class CartService {
     String? storeId,
   }) async {
     try {
-      final userId = supabaseClient.auth.currentUser?.id;
+      final userId = await AuthRepository.getUserId();
       if (userId == null) {
         debugPrint('⚠️ المستخدم غير مسجل الدخول');
         return false;
@@ -173,7 +173,7 @@ class CartService {
   /// مسح السلة بالكامل
   static Future<bool> clearCart() async {
     try {
-      final userId = supabaseClient.auth.currentUser?.id;
+      final userId = await AuthRepository.getUserId();
       if (userId == null) {
         debugPrint('⚠️ المستخدم غير مسجل الدخول');
         return false;

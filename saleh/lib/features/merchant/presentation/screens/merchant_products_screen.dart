@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../customer/presentation/screens/product_details_screen.dart';
 import '../../../../core/app_router.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
   const MerchantProductsScreen({super.key});
@@ -117,8 +117,8 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) return;
 
       // جلب المنتجات عبر Worker API
       final result = await ApiService.get('/secure/merchant/products');
@@ -330,8 +330,8 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('المستخدم غير مسجل');
       }
 
@@ -503,8 +503,8 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('المستخدم غير مسجل');
       }
 

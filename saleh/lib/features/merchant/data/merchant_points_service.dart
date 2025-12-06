@@ -1,5 +1,6 @@
 import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
+import '../../auth/data/auth_repository.dart';
 
 class MerchantPointsService {
   /// جلب رصيد نقاط التاجر الحالي
@@ -7,8 +8,8 @@ class MerchantPointsService {
   /// Returns: رصيد النقاط (int)
   /// Throws: Exception إذا لم يكن المستخدم مسجل أو لم يوجد حساب نقاط
   static Future<int> getMerchantPointsBalance() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -16,12 +17,12 @@ class MerchantPointsService {
       final response = await supabaseClient
           .from('points_accounts')
           .select('points_balance')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .maybeSingle();
 
       if (response == null) {
         // إذا لم يوجد حساب نقاط، ننشئه تلقائياً
-        await _createPointsAccount(user.id);
+        await _createPointsAccount(userId);
         return 0;
       }
 
@@ -77,8 +78,8 @@ class MerchantPointsService {
     String featureKey, {
     Map<String, dynamic>? meta,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -115,8 +116,8 @@ class MerchantPointsService {
   static Future<List<Map<String, dynamic>>> getMerchantPointsTransactions({
     int limit = 20,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -125,7 +126,7 @@ class MerchantPointsService {
       final pointsAccountResponse = await supabaseClient
           .from('points_accounts')
           .select('id')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .maybeSingle();
 
       if (pointsAccountResponse == null) {
@@ -160,8 +161,8 @@ class MerchantPointsService {
     int points, {
     Map<String, dynamic>? meta,
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -202,8 +203,8 @@ class MerchantPointsService {
     String storeId, {
     String featureKey = 'boost_store_24h',
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -219,7 +220,7 @@ class MerchantPointsService {
         throw Exception('المتجر غير موجود');
       }
 
-      if (storeResponse['owner_id'] != user.id) {
+      if (storeResponse['owner_id'] != userId) {
         throw Exception('ليس لديك صلاحية لدعم هذا المتجر');
       }
 
@@ -283,8 +284,8 @@ class MerchantPointsService {
     String storeId, {
     String featureKey = 'map_highlight_24h',
   }) async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -300,7 +301,7 @@ class MerchantPointsService {
         throw Exception('المتجر غير موجود');
       }
 
-      if (storeResponse['owner_id'] != user.id) {
+      if (storeResponse['owner_id'] != userId) {
         throw Exception('ليس لديك صلاحية لإبراز هذا المتجر على الخريطة');
       }
 

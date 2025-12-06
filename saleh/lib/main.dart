@@ -93,10 +93,11 @@ Future<void> main() async {
     debugPrint('⚠️ خطأ في تهيئة Firebase: $e');
   }
 
-  // تهيئة Supabase مع حفظ الجلسة
+  // تهيئة Supabase (للوصول إلى Database فقط - لا Auth)
+  // Note: Supabase Auth is disabled, we use MBUY Custom Auth only
   try {
     await initSupabase();
-    debugPrint('✅ تم تهيئة Supabase بنجاح');
+    debugPrint('✅ تم تهيئة Supabase (Database only - Auth disabled)');
   } catch (e) {
     // إذا فشل تهيئة Supabase، نتابع بدونها (للتطوير فقط)
     // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase

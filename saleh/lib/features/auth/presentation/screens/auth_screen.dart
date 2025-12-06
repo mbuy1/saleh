@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../data/mbuy_auth_service.dart';
-import '../../../../core/services/api_service.dart';
+import '../../data/auth_repository.dart';
+import '../../data/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -43,10 +43,17 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (_isSignUp) {
         // تسجيل جديد
-        final result = await MbuyAuthService.register(
+        final result = await AuthService.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          fullName: _displayNameController.text.trim(),
+          displayName: _displayNameController.text.trim(),
+          role: _selectedRole,
+          storeName: _selectedRole == 'merchant'
+              ? _storeNameController.text.trim()
+              : null,
+          city: _selectedRole == 'merchant'
+              ? _cityController.text.trim()
+              : null,
         );
 
         if (mounted) {
@@ -54,7 +61,7 @@ class _AuthScreenState extends State<AuthScreen> {
           debugPrint('✅ تم تسجيل المستخدم: ${user['email']}');
 
           // التحقق من وجود token بعد التسجيل
-          final isLoggedIn = await MbuyAuthService.isLoggedIn();
+          final isLoggedIn = await AuthRepository.isLoggedIn();
           if (mounted && isLoggedIn) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -63,22 +70,6 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             );
 
-            // إذا كان تاجر، قم بإنشاء المتجر عبر API
-            if (_selectedRole == 'merchant') {
-              try {
-                await ApiService.post(
-                  '/secure/merchant/store',
-                  data: {
-                    'name': _storeNameController.text.trim(),
-                    'city': _cityController.text.trim(),
-                  },
-                );
-                debugPrint('✅ تم إنشاء المتجر بنجاح');
-              } catch (e) {
-                debugPrint('⚠️ فشل إنشاء المتجر: $e');
-                // لا نرمي خطأ - يمكن إنشاء المتجر لاحقاً
-              }
-            }
 
             // الانتظار قليلاً ثم إعادة بناء
             await Future.delayed(const Duration(milliseconds: 500));
@@ -104,7 +95,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
         debugPrint('🔐 محاولة تسجيل الدخول: $email');
 
-        final result = await MbuyAuthService.login(
+        final result = await AuthService.signIn(
           email: email,
           password: password,
         );
@@ -114,7 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
           debugPrint('✅ تم تسجيل الدخول: ${user['email']}');
 
           // التحقق من أن Token محفوظ
-          final isLoggedIn = await MbuyAuthService.isLoggedIn();
+          final isLoggedIn = await AuthRepository.isLoggedIn();
           if (mounted && isLoggedIn) {
             debugPrint('✅ Token محفوظ بنجاح');
             ScaffoldMessenger.of(context).showSnackBar(

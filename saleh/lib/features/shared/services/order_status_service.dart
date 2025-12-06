@@ -1,6 +1,7 @@
 import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/logger_service.dart';
+import '../../auth/data/auth_repository.dart';
 
 /// Order Status Types
 enum OrderStatus {
@@ -70,8 +71,8 @@ class OrderStatusService {
         tag: 'OrderStatus',
       );
 
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('User not authenticated');
       }
 
@@ -82,7 +83,7 @@ class OrderStatusService {
             'order_id': orderId,
             'status': newStatus.value,
             'notes': notes,
-            'changed_by': user.id,
+            'changed_by': userId,
           })
           .select()
           .single();
