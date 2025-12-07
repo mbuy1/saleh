@@ -22,23 +22,81 @@ class HomeScreenShein extends StatefulWidget {
 }
 
 class _HomeScreenSheinState extends State<HomeScreenShein> {
-  int _selectedCategoryIndex = 1; // "نساء" هو الافتراضي
+  int _selectedCategoryIndex = 0; // "كل" هو الافتراضي
   List<Product> _featuredProducts = [];
   bool _isLoadingProducts = false;
-
-  final List<String> _categories = [
-    'كل',
-    'نساء',
-    'المنزل + الحيوانات الأليفة',
-    'رجال',
-    'أحذية',
-    'منتج',
-  ];
+  List<Map<String, dynamic>> _productCategories = [];
+  bool _isLoadingCategories = false;
 
   @override
   void initState() {
     super.initState();
+    _loadProductCategories();
     _loadFeaturedProducts();
+  }
+
+  Future<void> _loadProductCategories() async {
+    setState(() {
+      _isLoadingCategories = true;
+    });
+
+    try {
+      final response = await ApiService.get(
+        '/public/categories',
+        requireAuth: false,
+      );
+
+      if (response['ok'] == true && response['data'] != null) {
+        final allCategories = List<Map<String, dynamic>>.from(response['data']);
+
+        // تصفية الفئات الرئيسية فقط (parent_id == null) وفعالة
+        final mainCategories = allCategories
+            .where(
+              (cat) => cat['parent_id'] == null && (cat['is_active'] == true),
+            )
+            .toList();
+
+        // ترتيب حسب display_order
+        mainCategories.sort((a, b) {
+          final orderA = a['display_order'] as int? ?? 0;
+          final orderB = b['display_order'] as int? ?? 0;
+          return orderA.compareTo(orderB);
+        });
+
+        // إضافة "كل" في البداية
+        final categoriesList = [
+          {'id': null, 'name': 'كل', 'display_order': -1},
+        ];
+        categoriesList.addAll(mainCategories);
+
+        if (mounted) {
+          setState(() {
+            _productCategories = categoriesList;
+            _isLoadingCategories = false;
+          });
+        }
+      } else {
+        // لا نستخدم fallback بأرقام ثابتة - نترك القائمة فارغة
+        if (mounted) {
+          setState(() {
+            _productCategories = [
+              {'id': null, 'name': 'كل', 'display_order': -1},
+            ];
+            _isLoadingCategories = false;
+          });
+        }
+      }
+    } catch (e) {
+      // لا نستخدم fallback بأرقام ثابتة - نترك القائمة فارغة
+      if (mounted) {
+        setState(() {
+          _productCategories = [
+            {'id': null, 'name': 'كل', 'display_order': -1},
+          ];
+          _isLoadingCategories = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadFeaturedProducts() async {
@@ -48,7 +106,19 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
 
     try {
       // استخدام Worker API عبر ApiService (public endpoint)
-      final result = await ApiService.getProducts(limit: 10, status: 'active');
+      // إذا كان هناك فئة محددة، نستخدم UUID الخاص بها
+      String? categoryId;
+      if (_selectedCategoryIndex > 0 &&
+          _selectedCategoryIndex < _productCategories.length) {
+        final selectedCategory = _productCategories[_selectedCategoryIndex];
+        categoryId = selectedCategory['id']?.toString();
+      }
+
+      final result = await ApiService.getProducts(
+        limit: 10,
+        status: 'active',
+        categoryId: categoryId,
+      );
 
       if (result['ok'] == true && result['data'] != null) {
         final products = (result['data'] as List).map((data) {
@@ -101,98 +171,74 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
         ),
         child: CustomScrollView(
           slivers: [
+            // Padding في الأعلى لتجنب التداخل مع شريط البحث Sticky (72 = ارتفاع شريط البحث)
+            SliverToBoxAdapter(
+              child: SizedBox(height: MediaQuery.of(context).padding.top + 72),
+            ),
             // بانر ممتد لأعلى الشاشة
             SliverToBoxAdapter(
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Column(
-                    children: [
-                      // شريط البحث مع mBuy والإشعارات
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            // اسم mBuy على اليمين
-                            Text(
-                              'mBuy',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  children: [
+                    // اسم mBuy (بدون شريط البحث - موجود في StickySearchBar)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Text(
+                            'mBuy',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const Spacer(),
+                          // أيقونة الإشعارات
+                          Stack(
+                            children: [
+                              Icon(
+                                Icons.notifications_none,
+                                size: 28,
                                 color: Colors.white,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            // شريط البحث في المنتصف
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.search,
-                                    color: Colors.white,
-                                    size: 20,
+                              Positioned(
+                                right: 4,
+                                top: 0,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        hintText: 'البحث عن المنتجات...',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.7,
-                                          ),
-                                          fontSize: 14,
-                                        ),
-                                        border: InputBorder.none,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            // أيقونة الإشعارات على اليسار
-                            Stack(
-                              children: [
-                                Icon(
-                                  Icons.notifications_none,
-                                  size: 28,
-                                  color: Colors.white,
-                                ),
-                                Positioned(
-                                  right: 4,
-                                  top: 0,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ),
-                      // شريط الفئات ملتصق مباشرة
-                      SheinCategoryBar(
-                        categories: _categories,
-                        initialIndex: _selectedCategoryIndex,
-                        onCategoryChanged: (index) {
-                          setState(() {
-                            _selectedCategoryIndex = index;
-                          });
-                          _loadFeaturedProducts();
-                        },
-                        onMenuTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    // شريط الفئات ملتصق مباشرة (فئات المنتجات)
+                    _isLoadingCategories
+                        ? const SizedBox(height: 48)
+                        : SheinCategoryBar(
+                            categories: _productCategories
+                                .map((cat) => cat['name'] as String)
+                                .toList(),
+                            initialIndex: _selectedCategoryIndex,
+                            onCategoryChanged: (index) {
+                              setState(() {
+                                _selectedCategoryIndex = index;
+                              });
+                              _loadFeaturedProducts();
+                            },
+                            onMenuTap: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                          ),
+                  ],
                 ),
               ),
             ),
@@ -247,38 +293,25 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   }
 
   Widget _buildLooksSection() {
-    final looks = [
-      {
-        'image':
-            'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=280&h=400&fit=crop',
-        'name': 'إطلالات يومية',
-        'id': '1',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=280&h=400&fit=crop',
-        'name': 'محتشمة',
-        'id': '2',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=280&h=400&fit=crop',
-        'name': 'عمل',
-        'id': '3',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=280&h=400&fit=crop',
-        'name': 'حفلات',
-        'id': '4',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=280&h=400&fit=crop',
-        'name': 'موعد في',
-        'id': '5',
-      },
-    ];
+    // استخدام الفئات الحقيقية من قاعدة البيانات بدلاً من الأرقام الثابتة
+    // نستخدم أول 5 فئات من _productCategories (تخطي "كل")
+    final looks = _productCategories
+        .where((cat) => cat['id'] != null)
+        .take(5)
+        .map(
+          (cat) => {
+            'image':
+                'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=280&h=400&fit=crop',
+            'name': cat['name']?.toString() ?? 'فئة',
+            'id': cat['id']?.toString() ?? '',
+          },
+        )
+        .toList();
+
+    // إذا لم تكن هناك فئات كافية، نستخدم قائمة فارغة
+    if (looks.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -308,15 +341,18 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
                   imageUrl: look['image']!,
                   categoryName: look['name']!,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryProductsScreenShein(
-                          categoryId: look['id']!,
-                          categoryName: look['name']!,
+                    final categoryId = look['id']?.toString();
+                    if (categoryId != null && categoryId.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CategoryProductsScreenShein(
+                            categoryId: categoryId,
+                            categoryName: look['name']?.toString() ?? 'فئة',
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                 );
               },
@@ -328,99 +364,23 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   }
 
   Widget _buildCategoryIconsGrid() {
-    // استخدام صور Cloudflare إذا كانت متاحة، وإلا placeholder
-    final categories = [
-      {
-        'image':
-            'https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=200&h=200&fit=crop',
-        'name': 'ملابس علوية',
-        'id': '1',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1624206112918-f140f087f9db?w=200&h=200&fit=crop',
-        'name': 'ملابس سفلية',
-        'id': '2',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=200&fit=crop',
-        'name': 'فساتين',
-        'id': '3',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=200&h=200&fit=crop',
-        'name': 'بلایز',
-        'id': '4',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=200&h=200&fit=crop',
-        'name': 'بدلات',
-        'id': '5',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
-        'name': 'تيشيرتات',
-        'id': '6',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=200&fit=crop',
-        'name': 'أطقم منسقة',
-        'id': '7',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200&h=200&fit=crop',
-        'name': 'بناطيل',
-        'id': '8',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop',
-        'name': 'الدنيم',
-        'id': '9',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=200&h=200&fit=crop',
-        'name': 'جمبسوت وبوديسون',
-        'id': '10',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1475178626620-a4d074967452?w=200&h=200&fit=crop',
-        'name': 'جينز',
-        'id': '11',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1467043237213-65f2da53396f?w=200&h=200&fit=crop',
-        'name': 'ملابس منسوجة',
-        'id': '12',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=200&h=200&fit=crop',
-        'name': 'تنانير',
-        'id': '13',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=200&h=200&fit=crop',
-        'name': 'ملابس الحفلات',
-        'id': '14',
-      },
-      {
-        'image':
-            'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?w=200&h=200&fit=crop',
-        'name': 'فساتين طو',
-        'id': '15',
-      },
-    ];
+    // استخدام الفئات الحقيقية من قاعدة البيانات بدلاً من الأرقام الثابتة
+    final categories = _productCategories
+        .where((cat) => cat['id'] != null)
+        .map(
+          (cat) => {
+            'image':
+                'https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=200&h=200&fit=crop',
+            'name': cat['name']?.toString() ?? 'فئة',
+            'id': cat['id']?.toString() ?? '',
+          },
+        )
+        .toList();
+
+    // إذا لم تكن هناك فئات، نستخدم قائمة فارغة
+    if (categories.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -438,15 +398,18 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
               categoryName: category['name']!,
               size: 75,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CategoryProductsScreenShein(
-                      categoryId: category['id']!,
-                      categoryName: category['name']!,
+                final categoryId = category['id']?.toString();
+                if (categoryId != null && categoryId.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CategoryProductsScreenShein(
+                        categoryId: categoryId,
+                        categoryName: category['name']?.toString() ?? 'فئة',
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           );
@@ -456,52 +419,30 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
   }
 
   Widget _buildPromotionalBanners() {
-    final banners = [
-      {
-        'image':
-            CloudflareHelper.getDefaultPlaceholderImage(
-              width: 400,
-              height: 120,
-              text: 'جاذبية أنيقة',
-            ) ??
-            'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=120&fit=crop',
-        'title': 'جاذبية أنيقة',
-        'id': '1',
-      },
-      {
-        'image':
-            CloudflareHelper.getDefaultPlaceholderImage(
-              width: 400,
-              height: 120,
-              text: 'الضروريات الموسمية',
-            ) ??
-            'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=120&fit=crop',
-        'title': 'الضروريات الموسمية',
-        'id': '2',
-      },
-      {
-        'image':
-            CloudflareHelper.getDefaultPlaceholderImage(
-              width: 400,
-              height: 120,
-              text: 'أهم الترندات',
-            ) ??
-            'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=120&fit=crop',
-        'title': 'أهم الترندات',
-        'id': '3',
-      },
-      {
-        'image':
-            CloudflareHelper.getDefaultPlaceholderImage(
-              width: 400,
-              height: 120,
-              text: 'كاجوال',
-            ) ??
-            'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=120&fit=crop',
-        'title': 'كاجوال',
-        'id': '4',
-      },
-    ];
+    // استخدام الفئات الحقيقية من قاعدة البيانات بدلاً من الأرقام الثابتة
+    // نستخدم أول 4 فئات من _productCategories (تخطي "كل")
+    final banners = _productCategories
+        .where((cat) => cat['id'] != null)
+        .take(4)
+        .map(
+          (cat) => {
+            'image':
+                CloudflareHelper.getDefaultPlaceholderImage(
+                  width: 400,
+                  height: 120,
+                  text: cat['name']?.toString() ?? 'فئة',
+                ) ??
+                'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=120&fit=crop',
+            'title': cat['name']?.toString() ?? 'فئة',
+            'id': cat['id']?.toString() ?? '',
+          },
+        )
+        .toList();
+
+    // إذا لم تكن هناك فئات، نستخدم قائمة فارغة
+    if (banners.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       children: banners.map((banner) {
@@ -512,15 +453,17 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
           imageUrl: imageUrl,
           title: title,
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CategoryProductsScreenShein(
-                  categoryId: id,
-                  categoryName: title,
+            if (id.isNotEmpty) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CategoryProductsScreenShein(
+                    categoryId: id,
+                    categoryName: title,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           },
         );
       }).toList(),

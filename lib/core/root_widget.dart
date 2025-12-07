@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 import '../features/auth/presentation/screens/auth_screen.dart';
-import '../core/supabase_client.dart';
 import '../core/app_config.dart';
 import '../core/theme/theme_provider.dart';
 import '../core/firebase_service.dart';
+import '../core/session/store_session.dart';
 import '../shared/widgets/mbuy_loader.dart';
-import '../features/customer/presentation/screens/customer_shell.dart';
-import '../features/merchant/presentation/screens/merchant_home_screen.dart';
 import 'services/api_service.dart';
+import '../features/auth/data/auth_repository.dart';
+import 'role_based_root.dart';
 
 class RootWidget extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -20,8 +20,9 @@ class RootWidget extends StatefulWidget {
 }
 
 class _RootWidgetState extends State<RootWidget> {
-  User? _user;
-  String? _userRole; // 'customer' أو 'merchant'
+  Map<String, dynamic>? _user; // User data from MBUY Auth
+  Map<String, dynamic>? _userProfile; // User profile from user_profiles table
+  String? _userRole; // 'customer' أو 'merchant' أو 'admin'
   bool _isLoading = true;
   bool _isGuestMode = false; // وضع الضيف
   late AppModeProvider _appModeProvider;
@@ -31,19 +32,6 @@ class _RootWidgetState extends State<RootWidget> {
     super.initState();
     _appModeProvider = AppModeProvider();
     _checkAuthState();
-
-    // الاستماع لتغييرات حالة Auth
-    supabaseClient.auth.onAuthStateChange.listen((data) {
-      final AuthChangeEvent event = data.event;
-      debugPrint('🔐 Auth State Changed: ${event.name}');
-      if (event == AuthChangeEvent.signedIn ||
-          event == AuthChangeEvent.signedOut ||
-          event == AuthChangeEvent.tokenRefreshed ||
-          event == AuthChangeEvent.initialSession) {
-        debugPrint('🔄 إعادة فحص حالة المصادقة...');
-        _checkAuthState();
-      }
-    });
 
     // الاستماع لتغييرات AppMode
     _appModeProvider.addListener(_onAppModeChanged);
@@ -67,96 +55,128 @@ class _RootWidgetState extends State<RootWidget> {
       _isLoading = true;
     });
 
-    // جلب المستخدم الحالي من الجلسة المحفوظة
-    final session = supabaseClient.auth.currentSession;
-    final user = session?.user;
+    // جلب المستخدم الحالي من MBUY Auth فقط
+    // No Supabase Auth - only check for token in secure storage
+    try {
+      debugPrint('🔍 [RootWidget] Checking auth state...');
 
-    debugPrint(
-      '🔍 فحص حالة المصادقة: user=${user?.email}, session=${session != null}',
-    );
-    debugPrint('🔍 Session expires at: ${session?.expiresAt}');
-    debugPrint('🔍 User ID: ${user?.id}');
-    debugPrint('🔍 Email confirmed: ${user?.emailConfirmedAt != null}');
+      final isLoggedIn = await AuthRepository.isLoggedIn();
 
-    // التحقق من انتهاء الجلسة
-    if (session != null && session.expiresAt != null) {
-      final expiresAt = DateTime.fromMillisecondsSinceEpoch(
-        session.expiresAt! * 1000,
-      );
-      final now = DateTime.now();
-      if (expiresAt.isBefore(now)) {
-        debugPrint('⚠️ الجلسة منتهية - محاولة تحديث...');
-        try {
-          await supabaseClient.auth.refreshSession();
-          debugPrint('✅ تم تحديث الجلسة بنجاح');
-        } catch (e) {
-          debugPrint('❌ فشل تحديث الجلسة: $e');
-        }
+      if (!isLoggedIn) {
+        debugPrint(
+          '🔍 [RootWidget] No token found in secure storage - User not logged in',
+        );
+        setState(() {
+          _user = null;
+          _userRole = null;
+          _isLoading = false;
+        });
+        return;
       }
-    }
 
-    if (user != null) {
-      // تعيين User ID في Analytics
-      await FirebaseService.setUserId(user.id);
+      debugPrint('🔍 [RootWidget] Token found, verifying with /auth/me...');
 
-      // جلب role من user_profiles
+      // Verify token by calling /auth/me and get user data
       try {
-        final response = await supabaseClient
-            .from('user_profiles')
-            .select('role, display_name')
-            .eq('id', user.id)
-            .maybeSingle();
+        final userData = await AuthRepository.verifyAndLoadUser();
+        final userId = userData['id'] as String?;
+        final userEmail = userData['email'] as String?;
 
-        if (response != null) {
-          final role = response['role'] as String? ?? 'customer';
+        debugPrint('✅ [RootWidget] Token verified successfully');
+        debugPrint('🔍 [RootWidget] User ID: $userId, Email: $userEmail');
 
-          debugPrint('✅ تم جلب role: $role');
-          debugPrint('✅ User ID: ${user.id}');
-          debugPrint('✅ Display Name: ${response['display_name']}');
+        if (userId != null) {
+          // تعيين User ID في Analytics
+          await FirebaseService.setUserId(userId);
 
-          setState(() {
-            _user = user;
-            _userRole = role;
-            // تحديد AppMode بناءً على role
-            if (role == 'merchant') {
-              debugPrint('🛒 تم تفعيل وضع التاجر');
-              _appModeProvider.setMerchantMode();
-            } else {
-              debugPrint('🛍️ تم تفعيل وضع العميل');
-              _appModeProvider.setCustomerMode();
-            }
-          });
-        } else {
-          // إذا لم يوجد سجل في user_profiles، أنشئه عبر Worker API
+          // جلب role من user_profiles عبر Worker API
           try {
-            await ApiService.post(
-              '/secure/auth/initialize-user',
-              data: {
-                'role': 'customer',
-                'display_name': user.email?.split('@')[0] ?? 'مستخدم',
-              },
-            );
-            debugPrint('✅ تم إنشاء user_profile + wallet عبر Worker API');
-          } catch (e) {
-            debugPrint('⚠️ فشل إنشاء user_profile/wallet: $e');
-          }
+            final profileResponse = await ApiService.get('/secure/users/me');
 
+            if (profileResponse['ok'] == true &&
+                profileResponse['data'] != null) {
+              final profile = profileResponse['data'] as Map<String, dynamic>;
+              final role = profile['role'] as String? ?? 'customer';
+              final displayName = profile['display_name'] as String?;
+
+              debugPrint('✅ تم جلب role: $role');
+              debugPrint('✅ User ID: $userId');
+              debugPrint('✅ Display Name: $displayName');
+
+              // تحديد AppMode بناءً على role قبل setState
+              if (role == 'merchant' || role == 'admin') {
+                debugPrint('🛒 تم تفعيل وضع التاجر/الأدمن');
+                _appModeProvider.setMerchantMode();
+                // جلب store_id للتاجر مباشرة بعد تسجيل الدخول (admin لا يحتاج store)
+                if (role == 'merchant') {
+                  _loadMerchantStoreId();
+                }
+              } else {
+                debugPrint('🛍️ تم تفعيل وضع العميل');
+                _appModeProvider.setCustomerMode();
+              }
+
+              setState(() {
+                _user = userData;
+                _userProfile = profile;
+                _userRole = role;
+              });
+            } else {
+              // إذا لم يوجد سجل في user_profiles، أنشئه عبر Worker API
+              try {
+                final email = await AuthRepository.getUserEmail();
+
+                await ApiService.post(
+                  '/secure/auth/initialize-user',
+                  data: {
+                    'role': 'customer',
+                    'display_name': email?.split('@')[0] ?? 'مستخدم',
+                  },
+                );
+                debugPrint('✅ تم إنشاء user_profile + wallet عبر Worker API');
+              } catch (e) {
+                debugPrint('⚠️ فشل إنشاء user_profile/wallet: $e');
+              }
+
+              setState(() {
+                _user = userData;
+                _userProfile = null; // لم يتم إنشاء profile بعد
+                _userRole = 'customer';
+                _appModeProvider.setCustomerMode();
+              });
+            }
+          } catch (e) {
+            debugPrint('⚠️ خطأ في جلب بيانات المستخدم: $e');
+            // في حالة الخطأ، افترض customer
+            setState(() {
+              _user = userData;
+              _userProfile = null;
+              _userRole = 'customer';
+              _appModeProvider.setCustomerMode();
+            });
+          }
+        } else {
+          debugPrint('⚠️ [RootWidget] User ID is null after verification');
           setState(() {
-            _user = user;
-            _userRole = 'customer';
-            _appModeProvider.setCustomerMode();
+            _user = null;
+            _userRole = null;
           });
         }
       } catch (e) {
-        debugPrint('⚠️ خطأ في جلب بيانات المستخدم: $e');
-        // في حالة الخطأ، افترض customer
+        // Token verification failed - clear token and show login screen
+        debugPrint('⚠️ [RootWidget] Token verification failed: $e');
+        debugPrint('⚠️ [RootWidget] Clearing token and showing login screen');
+
+        // Token already cleared in verifyAndLoadUser, but ensure it's cleared
+        await AuthRepository.logout();
+
         setState(() {
-          _user = user;
-          _userRole = 'customer';
-          _appModeProvider.setCustomerMode();
+          _user = null;
+          _userRole = null;
         });
       }
-    } else {
+    } catch (e) {
+      debugPrint('⚠️ [RootWidget] Error checking auth state: $e');
       setState(() {
         _user = null;
         _userRole = null;
@@ -166,6 +186,83 @@ class _RootWidgetState extends State<RootWidget> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  /// جلب store_id للتاجر بعد تسجيل الدخول
+  Future<void> _loadMerchantStoreId() async {
+    try {
+      final storeSession = context.read<StoreSession>();
+
+      // جلب معلومات المستخدم الحالي من MBUY Auth
+      final userId = await AuthRepository.getUserId();
+      final userEmail = await AuthRepository.getUserEmail();
+
+      debugPrint('🔍 [StoreSession] بدء جلب معلومات المتجر...');
+      debugPrint('🔍 [StoreSession] User ID من Flutter: $userId');
+      debugPrint('🔍 [StoreSession] User Email: ${userEmail ?? "N/A"}');
+      debugPrint(
+        '🔍 [StoreSession] Timestamp: ${DateTime.now().toIso8601String()}',
+      );
+
+      // إذا كان store_id محفوظاً بالفعل، لا حاجة لإعادة الجلب
+      if (storeSession.hasStore) {
+        debugPrint(
+          '✅ [StoreSession] Store ID موجود بالفعل: ${storeSession.storeId}',
+        );
+        return;
+      }
+
+      debugPrint('🔄 [StoreSession] جاري جلب معلومات المتجر عبر Worker API...');
+
+      // جلب المتجر عبر Worker API
+      final result = await ApiService.get('/secure/merchant/store');
+
+      debugPrint(
+        '📥 [StoreSession] استجابة API: ok=${result['ok']}, hasData=${result['data'] != null}, error=${result['error']}',
+      );
+
+      if (result['ok'] == true && result['data'] != null) {
+        final store = result['data'] as Map<String, dynamic>;
+        final storeId = store['id'] as String?;
+        final ownerId = store['owner_id'] as String?;
+        final storeName = store['name'] as String?;
+
+        debugPrint(
+          '📦 [StoreSession] بيانات المتجر: storeId=$storeId, storeName=$storeName, ownerId=$ownerId, userId=$userId, userIdMatches=${ownerId == userId}',
+        );
+
+        if (storeId != null && storeId.isNotEmpty) {
+          storeSession.setStoreId(storeId);
+          debugPrint(
+            '✅ [StoreSession] تم حفظ Store ID بعد تسجيل الدخول: $storeId',
+          );
+          debugPrint('✅ [StoreSession] Store Name: ${storeName ?? "N/A"}');
+          debugPrint('✅ [StoreSession] Owner ID من DB: $ownerId');
+          debugPrint('✅ [StoreSession] User ID من Flutter: $userId');
+          if (ownerId != null && userId != null) {
+            debugPrint(
+              '${ownerId == userId ? "✅" : "⚠️"} [StoreSession] تطابق User ID: ${ownerId == userId}',
+            );
+          }
+        } else {
+          debugPrint('⚠️ [StoreSession] المتجر موجود لكن بدون ID');
+          storeSession.clear();
+        }
+      } else {
+        // إذا كانت الاستجابة ok لكن data = null، يعني لم يتم العثور على متجر
+        // Edge Function ستحاول إنشاء متجر تلقائياً إذا كان المستخدم تاجر
+        debugPrint('⚠️ [StoreSession] لم يتم العثور على متجر لهذا الحساب');
+        debugPrint('⚠️ [StoreSession] Response: $result');
+        debugPrint(
+          'ℹ️ [StoreSession] إذا كان المستخدم تاجر، سيتم إنشاء متجر تلقائياً في المرة القادمة',
+        );
+        storeSession.clear();
+      }
+    } catch (e, stackTrace) {
+      debugPrint('❌ [StoreSession] خطأ في جلب Store ID بعد تسجيل الدخول: $e');
+      debugPrint('❌ [StoreSession] Stack trace: $stackTrace');
+      // في حالة الخطأ، لا ننظف الـ session الموجود
+    }
   }
 
   @override
@@ -202,6 +299,10 @@ class _RootWidgetState extends State<RootWidget> {
                   ),
                   child: TextButton.icon(
                     onPressed: () {
+                      // Skip auth - enter guest mode without any Supabase Auth
+                      debugPrint(
+                        '⏭️ [RootWidget] Skipping auth - entering guest mode',
+                      );
                       setState(() {
                         _isGuestMode = true;
                         _appModeProvider.setCustomerMode();
@@ -228,16 +329,13 @@ class _RootWidgetState extends State<RootWidget> {
       );
     }
 
-    // إذا المستخدم مسجل أو في وضع الضيف → عرض الشاشة المناسبة بناءً على AppMode
-    // يمكن للتاجر التبديل إلى وضع العميل (كمشاهد)
-    if (_appModeProvider.mode == AppMode.merchant && _user != null) {
-      return MerchantHomeScreen(appModeProvider: _appModeProvider);
-    } else {
-      return CustomerShell(
-        appModeProvider: _appModeProvider,
-        userRole: _userRole,
-        themeProvider: widget.themeProvider,
-      );
-    }
+    // إذا المستخدم مسجل أو في وضع الضيف → عرض الشاشة المناسبة بناءً على role
+    // استخدام RoleBasedRoot للتعامل مع جميع الحالات
+    return RoleBasedRoot(
+      userProfile: _userProfile,
+      role: _userRole,
+      themeProvider: widget.themeProvider,
+      appModeProvider: _appModeProvider,
+    );
   }
 }

@@ -20,13 +20,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      iconUrl: json['icon_url'] as String?,
-      displayOrder: json['display_order'] as int,
-      isActive: json['is_active'] as bool,
-      productsCount: json['products_count'] as int?,
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString(),
+      iconUrl: json['icon_url']?.toString(),
+      displayOrder: (json['display_order'] as num?)?.toInt() ?? 0,
+      isActive: json['is_active'] as bool? ?? true,
+      productsCount: (json['products_count'] as num?)?.toInt(),
     );
   }
 

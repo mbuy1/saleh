@@ -36,25 +36,27 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      price: (json['price'] as num).toDouble(),
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       discountPrice: json['discount_price'] != null
           ? (json['discount_price'] as num).toDouble()
           : null,
-      imageUrl: json['image_url'] as String?,
-      storeId: json['store_id'] as String,
-      storeName: json['store_name'] as String?,
-      categoryId: json['category_id'] as String?,
-      categoryName: json['category_name'] as String?,
-      stockQuantity: json['stock_quantity'] as int,
-      isActive: json['is_active'] as bool,
+      imageUrl: json['image_url']?.toString(),
+      storeId: json['store_id']?.toString() ?? '',
+      storeName: json['store_name']?.toString(),
+      categoryId: json['category_id']?.toString(),
+      categoryName: json['category_name']?.toString(),
+      stockQuantity: (json['stock_quantity'] as num?)?.toInt() ?? 0,
+      isActive: json['is_active'] as bool? ?? true,
       rating: json['rating'] != null
           ? (json['rating'] as num).toDouble()
           : null,
-      reviewsCount: json['reviews_count'] as int?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      reviewsCount: (json['reviews_count'] as num?)?.toInt(),
+      createdAt: DateTime.parse(
+        json['created_at']?.toString() ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 
