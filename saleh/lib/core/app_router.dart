@@ -51,11 +51,18 @@ class AppRouter {
   static const String merchantTransactions = '/merchant/transactions';
   static const String merchantProductVariants = '/merchant/products/variants';
   static const String merchantBulkOperations = '/merchant/products/bulk';
+  static const String merchantAITools = '/merchant/ai-tools';
+  static const String merchantMbuyTools = '/merchant/mbuy-tools';
+  static const String merchantMbuyStudio = '/merchant/mbuy-studio';
 
   // Additional Customer Routes
   static const String cart = '/cart';
   static const String map = '/map';
   static const String categoryProducts = '/category-products';
+  static const String shippingSelection = '/shipping-selection';
+  static const String paymentSelection = '/payment-selection';
+  static const String packages = '/packages';
+  static const String search = '/search';
 
   // Auth Routes
   static const String authLogin = '/auth/login';

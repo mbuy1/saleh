@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'category_products_screen.dart';
 
@@ -26,17 +26,43 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     });
 
     try {
-      final response = await supabaseClient
-          .from('categories')
-          .select()
-          .eq('is_active', true)
-          .isFilter('parent_id', null) // فقط الفئات الرئيسية
-          .order('display_order', ascending: true);
+      // استخدام Worker API لجلب الفئات
+      final response = await ApiService.get(
+        '/public/categories',
+        requireAuth: false,
+      );
 
-      setState(() {
-        _categories = List<Map<String, dynamic>>.from(response);
-        _isLoading = false;
-      });
+      if (response['ok'] == true && response['data'] != null) {
+        // تصفية الفئات الرئيسية فقط (parent_id = null)
+        final allCategories = List<Map<String, dynamic>>.from(response['data']);
+        final mainCategories = allCategories
+            .where((cat) => cat['parent_id'] == null && (cat['is_active'] == true))
+            .toList();
+        
+        // ترتيب حسب display_order
+        mainCategories.sort((a, b) {
+          final orderA = a['display_order'] as int? ?? 0;
+          final orderB = b['display_order'] as int? ?? 0;
+          return orderA.compareTo(orderB);
+        });
+
+        setState(() {
+          _categories = mainCategories;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في جلب الفئات: ${response['message'] ?? 'خطأ غير معروف'}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;

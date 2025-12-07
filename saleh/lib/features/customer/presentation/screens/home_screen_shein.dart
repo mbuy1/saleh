@@ -22,23 +22,84 @@ class HomeScreenShein extends StatefulWidget {
 }
 
 class _HomeScreenSheinState extends State<HomeScreenShein> {
-  int _selectedCategoryIndex = 1; // "نساء" هو الافتراضي
+  int _selectedCategoryIndex = 0; // "كل" هو الافتراضي
   List<Product> _featuredProducts = [];
   bool _isLoadingProducts = false;
-
-  final List<String> _categories = [
-    'كل',
-    'نساء',
-    'المنزل + الحيوانات الأليفة',
-    'رجال',
-    'أحذية',
-    'منتج',
-  ];
+  List<Map<String, dynamic>> _productCategories = [];
+  bool _isLoadingCategories = false;
 
   @override
   void initState() {
     super.initState();
+    _loadProductCategories();
     _loadFeaturedProducts();
+  }
+
+  Future<void> _loadProductCategories() async {
+    setState(() {
+      _isLoadingCategories = true;
+    });
+
+    try {
+      final response = await ApiService.get('/public/categories', requireAuth: false);
+
+      if (response['ok'] == true && response['data'] != null) {
+        final allCategories = List<Map<String, dynamic>>.from(response['data']);
+        
+        // تصفية الفئات الرئيسية فقط (parent_id == null) وفعالة
+        final mainCategories = allCategories
+            .where((cat) => cat['parent_id'] == null && (cat['is_active'] == true))
+            .toList();
+        
+        // ترتيب حسب display_order
+        mainCategories.sort((a, b) {
+          final orderA = a['display_order'] as int? ?? 0;
+          final orderB = b['display_order'] as int? ?? 0;
+          return orderA.compareTo(orderB);
+        });
+
+        // إضافة "كل" في البداية
+        final categoriesList = [
+          {'id': null, 'name': 'كل', 'display_order': -1}
+        ];
+        categoriesList.addAll(mainCategories);
+
+        if (mounted) {
+          setState(() {
+            _productCategories = categoriesList;
+            _isLoadingCategories = false;
+          });
+        }
+      } else {
+        // Fallback إلى فئات افتراضية
+        if (mounted) {
+          setState(() {
+            _productCategories = [
+              {'id': null, 'name': 'كل'},
+              {'id': '1', 'name': 'نساء'},
+              {'id': '2', 'name': 'رجال'},
+              {'id': '3', 'name': 'أحذية'},
+              {'id': '4', 'name': 'إلكترونيات'},
+            ];
+            _isLoadingCategories = false;
+          });
+        }
+      }
+    } catch (e) {
+      // Fallback إلى فئات افتراضية
+      if (mounted) {
+        setState(() {
+          _productCategories = [
+            {'id': null, 'name': 'كل'},
+            {'id': '1', 'name': 'نساء'},
+            {'id': '2', 'name': 'رجال'},
+            {'id': '3', 'name': 'أحذية'},
+            {'id': '4', 'name': 'إلكترونيات'},
+          ];
+          _isLoadingCategories = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadFeaturedProducts() async {
@@ -101,98 +162,72 @@ class _HomeScreenSheinState extends State<HomeScreenShein> {
         ),
         child: CustomScrollView(
           slivers: [
+            // Padding في الأعلى لتجنب التداخل مع شريط البحث Sticky (72 = ارتفاع شريط البحث)
+            SliverToBoxAdapter(
+              child: SizedBox(height: MediaQuery.of(context).padding.top + 72),
+            ),
             // بانر ممتد لأعلى الشاشة
             SliverToBoxAdapter(
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Column(
-                    children: [
-                      // شريط البحث مع mBuy والإشعارات
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            // اسم mBuy على اليمين
-                            Text(
-                              'mBuy',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  children: [
+                    // اسم mBuy (بدون شريط البحث - موجود في StickySearchBar)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Text(
+                            'mBuy',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const Spacer(),
+                          // أيقونة الإشعارات
+                          Stack(
+                            children: [
+                              Icon(
+                                Icons.notifications_none,
+                                size: 28,
                                 color: Colors.white,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            // شريط البحث في المنتصف
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.search,
-                                    color: Colors.white,
-                                    size: 20,
+                              Positioned(
+                                right: 4,
+                                top: 0,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        hintText: 'البحث عن المنتجات...',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.7,
-                                          ),
-                                          fontSize: 14,
-                                        ),
-                                        border: InputBorder.none,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            // أيقونة الإشعارات على اليسار
-                            Stack(
-                              children: [
-                                Icon(
-                                  Icons.notifications_none,
-                                  size: 28,
-                                  color: Colors.white,
-                                ),
-                                Positioned(
-                                  right: 4,
-                                  top: 0,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ),
-                      // شريط الفئات ملتصق مباشرة
-                      SheinCategoryBar(
-                        categories: _categories,
-                        initialIndex: _selectedCategoryIndex,
-                        onCategoryChanged: (index) {
-                          setState(() {
-                            _selectedCategoryIndex = index;
-                          });
-                          _loadFeaturedProducts();
-                        },
-                        onMenuTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    // شريط الفئات ملتصق مباشرة (فئات المنتجات)
+                    _isLoadingCategories
+                        ? const SizedBox(height: 48)
+                        : SheinCategoryBar(
+                            categories: _productCategories.map((cat) => cat['name'] as String).toList(),
+                            initialIndex: _selectedCategoryIndex,
+                            onCategoryChanged: (index) {
+                              setState(() {
+                                _selectedCategoryIndex = index;
+                              });
+                              _loadFeaturedProducts();
+                            },
+                            onMenuTap: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                          ),
+                  ],
                 ),
               ),
             ),

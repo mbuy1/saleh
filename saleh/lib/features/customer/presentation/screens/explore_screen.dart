@@ -11,7 +11,8 @@ class ExploreScreen extends StatefulWidget {
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen> {
+class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final PageController _pageController = PageController();
   final bool _showBanner = true;
 
@@ -44,24 +45,211 @@ class _ExploreScreenState extends State<ExploreScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        itemCount: 11, // 1 banner + 10 videos
-        itemBuilder: (context, index) {
-          // أول عنصر هو البانر
-          if (index == 0 && _showBanner) {
-            return _buildBannerItem();
-          }
-
-          // باقي العناصر هي الفيديوهات
-          final videoIndex = _showBanner ? index - 1 : index;
-          return _buildVideoItem(videoIndex);
-        },
+      body: Column(
+        children: [
+          // TabBar في الأعلى
+          Container(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 72),
+            color: Colors.black,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorColor: Colors.white,
+              indicatorWeight: 3,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white60,
+              labelStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Cairo',
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Cairo',
+              ),
+              tabs: const [
+                Tab(text: 'أتابعه'),
+                Tab(text: 'الأفضل'),
+                Tab(text: 'الصور'),
+                Tab(text: 'الفيديو'),
+                Tab(text: 'المتاجر'),
+              ],
+            ),
+          ),
+          // TabBarView
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildFollowingTab(), // أتابعه
+                _buildBestTab(), // الأفضل
+                _buildPhotosTab(), // الصور
+                _buildVideosTab(), // الفيديو
+                _buildStoresTab(), // المتاجر
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  // تبويب "أتابعه"
+  Widget _buildFollowingTab() {
+    return PageView.builder(
+      controller: PageController(),
+      scrollDirection: Axis.vertical,
+      itemCount: 11,
+      itemBuilder: (context, index) {
+        if (index == 0 && _showBanner) {
+          return _buildBannerItem();
+        }
+        final videoIndex = _showBanner ? index - 1 : index;
+        return _buildVideoItem(videoIndex);
+      },
+    );
+  }
+
+  // تبويب "الأفضل"
+  Widget _buildBestTab() {
+    return PageView.builder(
+      controller: PageController(),
+      scrollDirection: Axis.vertical,
+      itemCount: 11,
+      itemBuilder: (context, index) {
+        if (index == 0 && _showBanner) {
+          return _buildBannerItem();
+        }
+        final videoIndex = _showBanner ? index - 1 : index;
+        return _buildVideoItem(videoIndex);
+      },
+    );
+  }
+
+  // تبويب "الصور"
+  Widget _buildPhotosTab() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: 20,
+      itemBuilder: (context, index) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.image_outlined,
+              color: Colors.white.withValues(alpha: 0.5),
+              size: 48,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // تبويب "الفيديو" (التصميم الحالي)
+  Widget _buildVideosTab() {
+    return PageView.builder(
+      controller: _pageController,
+      scrollDirection: Axis.vertical,
+      itemCount: 11,
+      itemBuilder: (context, index) {
+        if (index == 0 && _showBanner) {
+          return _buildBannerItem();
+        }
+        final videoIndex = _showBanner ? index - 1 : index;
+        return _buildVideoItem(videoIndex);
+      },
+    );
+  }
+
+  // تبويب "المتاجر"
+  Widget _buildStoresTab() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 10,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.store,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'اسم المتجر ${index + 1}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'وصف المتجر',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white.withValues(alpha: 0.5),
+                size: 20,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -70,8 +258,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
       color: Colors.black,
       child: Column(
         children: [
-          // Safe Area للحفاظ على المسافات
-          SizedBox(height: MediaQuery.of(context).padding.top + 16),
+          // لا حاجة لـ padding هنا - TabBar موجود في الأعلى
+          const SizedBox(height: 16),
 
           // Hero Banner
           HeroBannerCarousel(

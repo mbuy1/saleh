@@ -308,6 +308,15 @@ class ApiService {
       );
     }
     
+    // Handle PROFILE_NOT_FOUND
+    if (errorCode == 'PROFILE_NOT_FOUND') {
+      throw AppException(
+        errorCode: AppErrorCode.notFound,
+        message: errorMessage ?? 'الملف الشخصي غير موجود. يرجى إكمال إعداد الملف الشخصي.',
+        details: data,
+      );
+    }
+    
     // Handle STORE_NOT_FOUND specifically
     if (errorCode == 'STORE_NOT_FOUND') {
       throw AppException(
@@ -331,6 +340,24 @@ class ApiService {
       throw AppException(
         errorCode: AppErrorCode.productNotFound,
         message: errorMessage ?? 'المنتج غير موجود',
+        details: data,
+      );
+    }
+    
+    // Handle MISSING_ENV
+    if (errorCode == 'MISSING_ENV') {
+      throw AppException(
+        errorCode: AppErrorCode.serverError,
+        message: errorMessage ?? 'خطأ في إعدادات الخادم. يرجى التواصل مع الدعم.',
+        details: data,
+      );
+    }
+    
+    // Handle RLS_ERROR
+    if (errorCode == 'RLS_ERROR') {
+      throw AppException(
+        errorCode: AppErrorCode.forbidden,
+        message: errorMessage ?? 'تم رفض الوصول. يرجى التواصل مع الدعم.',
         details: data,
       );
     }

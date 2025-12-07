@@ -7,7 +7,6 @@ import '../../../../core/widgets/widgets.dart';
 import '../../../../core/services/order_service.dart';
 import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
-import '../../../../shared/widgets/profile_button.dart';
 import '../../../../shared_widgets/cards/protection_banner.dart';
 import '../../../../shared/widgets/circle_item.dart';
 
@@ -291,36 +290,58 @@ class _CartScreenState extends State<CartScreen> {
 
     return MbuyScaffold(
       backgroundColor: MbuyColors.background,
-      appBar: MbuyAppBar(
-        title: 'عربة التسوق ${itemCount > 0 ? "($itemCount)" : ""}',
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: ProfileButton(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.favorite_border,
-              color: MbuyColors.textSecondary,
-              size: 24,
+      // لا يوجد AppBar - شريط البحث Sticky موجود في customer_shell
+      body: Stack(
+        children: [
+          // Padding في الأعلى لتجنب التداخل مع شريط البحث Sticky
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 72),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    // زر العودة
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward, color: MbuyColors.textPrimary),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 8),
+                    // العنوان
+                    Expanded(
+                      child: Text(
+                        'عربة التسوق ${itemCount > 0 ? "($itemCount)" : ""}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: MbuyColors.textPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(width: 48), // مساحة للتوازن
+                  ],
+                ),
+              ),
             ),
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('قريباً: المفضلة')));
-            },
+          ),
+          // المحتوى
+          Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 72 + 60),
+            child: _isLoading
+                ? _buildSkeletonLoader()
+                : widget.userRole == 'merchant'
+                ? _buildMerchantView()
+                : _cartItems.isEmpty
+                ? _buildEmptyCart()
+                : _buildCartContent(),
           ),
         ],
       ),
-      body: _isLoading
-          ? _buildSkeletonLoader()
-          : widget.userRole == 'merchant'
-          ? _buildMerchantView()
-          : _cartItems.isEmpty
-          ? _buildEmptyCart()
-          : _buildCartContent(),
     );
   }
 

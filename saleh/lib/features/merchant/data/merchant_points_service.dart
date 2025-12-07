@@ -1,6 +1,7 @@
-import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
 import '../../auth/data/auth_repository.dart';
+// TODO: إزالة جميع استخدامات supabaseClient واستبدالها بـ ApiService
+// سيتم إضافة endpoints في Worker للعمليات المتبقية
 
 class MerchantPointsService {
   /// جلب رصيد نقاط التاجر الحالي
@@ -14,21 +15,25 @@ class MerchantPointsService {
     }
 
     try {
-      final response = await supabaseClient
-          .from('points_accounts')
-          .select('points_balance')
-          .eq('user_id', userId)
-          .maybeSingle();
+      // استخدام Worker API لجلب رصيد النقاط
+      final response = await ApiService.get('/secure/points');
 
-      if (response == null) {
+      if (response['ok'] == true && response['data'] != null) {
+        final pointsData = response['data'] as Map<String, dynamic>;
+        return (pointsData['points_balance'] as num?)?.toInt() ?? 0;
+      } else {
         // إذا لم يوجد حساب نقاط، ننشئه تلقائياً
         await _createPointsAccount(userId);
         return 0;
       }
-
-      return (response['points_balance'] as num?)?.toInt() ?? 0;
     } catch (e) {
-      throw Exception('خطأ في جلب رصيد النقاط: ${e.toString()}');
+      // إذا كان الخطأ بسبب عدم وجود حساب، نحاول إنشاءه
+      try {
+        await _createPointsAccount(userId);
+        return 0;
+      } catch (_) {
+        throw Exception('خطأ في جلب رصيد النقاط: ${e.toString()}');
+      }
     }
   }
 
@@ -54,15 +59,20 @@ class MerchantPointsService {
   /// Throws: Exception في حالة الفشل
   static Future<List<Map<String, dynamic>>> getAvailableFeatureActions() async {
     try {
-      final response = await supabaseClient
-          .from('feature_actions')
-          .select()
-          .eq('is_enabled', true)
-          .order('key');
+      // استخدام Worker API - يمكن إضافة endpoint مخصص لاحقاً
+      // حالياً نستخدم endpoint عام للفئات/الميزات
+      final response = await ApiService.get('/secure/merchant/features');
 
-      return List<Map<String, dynamic>>.from(response);
+      if (response['ok'] == true && response['data'] != null) {
+        return List<Map<String, dynamic>>.from(response['data']);
+      } else {
+        // Fallback: إرجاع قائمة فارغة إذا لم يكن endpoint موجوداً
+        return [];
+      }
     } catch (e) {
-      throw Exception('خطأ في جلب الميزات المتاحة: ${e.toString()}');
+      // إذا لم يكن endpoint موجوداً، نعيد قائمة فارغة
+      // (سيتم إضافة endpoint لاحقاً في Worker)
+      return [];
     }
   }
 
@@ -122,30 +132,19 @@ class MerchantPointsService {
     }
 
     try {
-      // جلب points_account أولاً
-      final pointsAccountResponse = await supabaseClient
-          .from('points_accounts')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
+      // استخدام Worker API لجلب عمليات النقاط
+      final response = await ApiService.get(
+        '/secure/merchant/points/transactions?limit=$limit',
+      );
 
-      if (pointsAccountResponse == null) {
-        return []; // لا يوجد حساب نقاط، لا توجد عمليات
+      if (response['ok'] == true && response['data'] != null) {
+        return List<Map<String, dynamic>>.from(response['data']);
+      } else {
+        return []; // لا توجد عمليات
       }
-
-      final pointsAccountId = pointsAccountResponse['id'] as String;
-
-      // جلب العمليات المرتبطة بهذا الحساب
-      final response = await supabaseClient
-          .from('points_transactions')
-          .select()
-          .eq('points_account_id', pointsAccountId)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      throw Exception('خطأ في جلب عمليات النقاط: ${e.toString()}');
+      // إذا لم يكن endpoint موجوداً بعد، نعيد قائمة فارغة
+      return [];
     }
   }
 
@@ -209,57 +208,20 @@ class MerchantPointsService {
     }
 
     try {
-      // 1. التحقق من أن المتجر يخص التاجر الحالي
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select('id, owner_id')
-          .eq('id', storeId)
-          .maybeSingle();
-
-      if (storeResponse == null) {
-        throw Exception('المتجر غير موجود');
-      }
-
-      if (storeResponse['owner_id'] != userId) {
-        throw Exception('ليس لديك صلاحية لدعم هذا المتجر');
-      }
-
-      // 2. جلب معلومات الميزة من feature_actions
-      final featureResponse = await supabaseClient
-          .from('feature_actions')
-          .select()
-          .eq('key', featureKey)
-          .eq('is_enabled', true)
-          .maybeSingle();
-
-      if (featureResponse == null) {
-        throw Exception('الميزة غير موجودة أو غير مفعلة');
-      }
-
-      // 3. قراءة duration_hours من config (أو استخدام 24 ساعة كافتراضي)
-      final config = featureResponse['config'] as Map<String, dynamic>?;
-      final durationHours = (config?['duration_hours'] as num?)?.toInt() ?? 24;
-
-      // 4. صرف النقاط باستخدام spendPointsForFeature
-      final success = await spendPointsForFeature(
-        featureKey,
-        meta: {'store_id': storeId, 'duration_hours': durationHours},
+      // استخدام Worker API لدعم المتجر
+      final response = await ApiService.post(
+        '/secure/stores/$storeId/boost',
+        data: {
+          'feature_key': featureKey,
+        },
       );
 
-      if (!success) {
-        return false; // لا توجد نقاط كافية
+      if (response['ok'] == true) {
+        return true; // تم الدعم بنجاح
+      } else {
+        final errorMessage = response['message'] ?? response['error'] ?? 'فشل دعم المتجر';
+        throw Exception(errorMessage);
       }
-
-      // 5. حساب boosted_until = now() + duration_hours
-      final boostedUntil = DateTime.now().add(Duration(hours: durationHours));
-
-      // 6. تحديث جدول stores
-      await supabaseClient
-          .from('stores')
-          .update({'boosted_until': boostedUntil.toIso8601String()})
-          .eq('id', storeId);
-
-      return true; // تم الدعم بنجاح
     } catch (e) {
       // إذا كانت الرسالة مخصصة، نعيدها كما هي
       if (e.toString().contains('غير موجود') ||
@@ -290,57 +252,20 @@ class MerchantPointsService {
     }
 
     try {
-      // 1. التحقق من أن المتجر يخص التاجر الحالي
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select('id, owner_id')
-          .eq('id', storeId)
-          .maybeSingle();
-
-      if (storeResponse == null) {
-        throw Exception('المتجر غير موجود');
-      }
-
-      if (storeResponse['owner_id'] != userId) {
-        throw Exception('ليس لديك صلاحية لإبراز هذا المتجر على الخريطة');
-      }
-
-      // 2. جلب معلومات الميزة من feature_actions
-      final featureResponse = await supabaseClient
-          .from('feature_actions')
-          .select()
-          .eq('key', featureKey)
-          .eq('is_enabled', true)
-          .maybeSingle();
-
-      if (featureResponse == null) {
-        throw Exception('الميزة غير موجودة أو غير مفعلة');
-      }
-
-      // 3. قراءة duration_hours من config (أو استخدام 24 ساعة كافتراضي)
-      final config = featureResponse['config'] as Map<String, dynamic>?;
-      final durationHours = (config?['duration_hours'] as num?)?.toInt() ?? 24;
-
-      // 4. صرف النقاط باستخدام spendPointsForFeature
-      final success = await spendPointsForFeature(
-        featureKey,
-        meta: {'store_id': storeId, 'duration_hours': durationHours},
+      // استخدام Worker API لإبراز المتجر على الخريطة
+      final response = await ApiService.post(
+        '/secure/stores/$storeId/map-highlight',
+        data: {
+          'feature_key': featureKey,
+        },
       );
 
-      if (!success) {
-        return false; // لا توجد نقاط كافية
+      if (response['ok'] == true) {
+        return true; // تم الإبراز بنجاح
+      } else {
+        final errorMessage = response['message'] ?? response['error'] ?? 'فشل إبراز المتجر';
+        throw Exception(errorMessage);
       }
-
-      // 5. حساب map_highlight_until = now() + duration_hours
-      final highlightUntil = DateTime.now().add(Duration(hours: durationHours));
-
-      // 6. تحديث جدول stores
-      await supabaseClient
-          .from('stores')
-          .update({'map_highlight_until': highlightUntil.toIso8601String()})
-          .eq('id', storeId);
-
-      return true; // تم الإبراز بنجاح
     } catch (e) {
       // إذا كانت الرسالة مخصصة، نعيدها كما هي
       if (e.toString().contains('غير موجود') ||

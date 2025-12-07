@@ -33,37 +33,83 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
 
     try {
       final userId = await AuthRepository.getUserId();
-      if (userId == null) return;
+      if (userId == null) {
+        debugPrint('⚠️ [MerchantProfileTab] User ID is null - cannot load profile');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      debugPrint('🔍 [MerchantProfileTab] Loading user profile...');
+      debugPrint('🔍 [MerchantProfileTab] User ID: $userId');
+      debugPrint('🔍 [MerchantProfileTab] Endpoint: GET /secure/users/me');
 
       final response = await ApiService.get('/secure/users/me');
+      
+      debugPrint('📥 [MerchantProfileTab] Response received');
+      debugPrint('📥 [MerchantProfileTab] Response ok: ${response['ok']}');
+      debugPrint('📥 [MerchantProfileTab] Response has data: ${response['data'] != null}');
+      debugPrint('📥 [MerchantProfileTab] Response code: ${response['code']}');
+      debugPrint('📥 [MerchantProfileTab] Response message: ${response['message']}');
+      debugPrint('📥 [MerchantProfileTab] Response error: ${response['error']}');
       
       if (response['ok'] == true && response['data'] != null) {
         setState(() {
           _userProfile = response['data'] as Map<String, dynamic>;
           _isLoading = false;
         });
+        debugPrint('✅ [MerchantProfileTab] Profile loaded successfully');
       } else {
         setState(() {
           _isLoading = false;
         });
+        
+        // Extract error message from response
+        final errorMessage = response['message'] ?? 
+                            response['error'] ?? 
+                            'خطأ غير معروف';
+        final errorCode = response['code'] ?? 'UNKNOWN_ERROR';
+        
+        debugPrint('❌ [MerchantProfileTab] Failed to load profile');
+        debugPrint('❌ [MerchantProfileTab] Error code: $errorCode');
+        debugPrint('❌ [MerchantProfileTab] Error message: $errorMessage');
+        debugPrint('❌ [MerchantProfileTab] Full response: $response');
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ في جلب البيانات: ${response['message'] ?? 'خطأ غير معروف'}'),
+              content: Text('خطأ في جلب البيانات: $errorMessage'),
               backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
             ),
           );
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() {
         _isLoading = false;
       });
+      
+      debugPrint('❌ [MerchantProfileTab] Exception occurred');
+      debugPrint('❌ [MerchantProfileTab] Error type: ${e.runtimeType}');
+      debugPrint('❌ [MerchantProfileTab] Error message: ${e.toString()}');
+      debugPrint('❌ [MerchantProfileTab] Stack trace: $stackTrace');
+      
+      // Try to extract error message from exception
+      String errorMessage = 'خطأ غير معروف';
+      if (e is Map<String, dynamic>) {
+        errorMessage = e['message'] ?? e['error'] ?? e.toString();
+      } else {
+        errorMessage = e.toString();
+      }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في جلب البيانات: ${e.toString()}'),
+            content: Text('خطأ في جلب البيانات: $errorMessage'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
           ),
         );
       }

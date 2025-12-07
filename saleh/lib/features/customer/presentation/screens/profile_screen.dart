@@ -16,6 +16,9 @@ import 'coupons_screen.dart';
 import 'customer_orders_screen.dart';
 import 'settings_screen.dart';
 import 'help_support_screen.dart';
+import 'customer_dashboard_screen.dart';
+import '../../../../core/permissions_helper.dart';
+import '../../../admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../core/data/dummy_data.dart';
@@ -30,11 +33,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _userProfile;
   bool _isLoading = true;
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _loadUserProfile();
+    _checkAdminStatus();
+  }
+
+  Future<void> _checkAdminStatus() async {
+    final isAdmin = await PermissionsHelper.isAdmin();
+    if (mounted) {
+      setState(() {
+        _isAdmin = isAdmin;
+      });
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -45,37 +59,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       // Get user ID from MBUY Auth
       final userId = await AuthRepository.getUserId();
-      if (userId == null) return;
+      if (userId == null) {
+        debugPrint('⚠️ [ProfileScreen] User ID is null - cannot load profile');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      debugPrint('🔍 [ProfileScreen] Loading user profile...');
+      debugPrint('🔍 [ProfileScreen] User ID: $userId');
+      debugPrint('🔍 [ProfileScreen] Endpoint: GET /secure/users/me');
 
       final response = await ApiService.get('/secure/users/me');
+      
+      debugPrint('📥 [ProfileScreen] Response received');
+      debugPrint('📥 [ProfileScreen] Response ok: ${response['ok']}');
+      debugPrint('📥 [ProfileScreen] Response has data: ${response['data'] != null}');
+      debugPrint('📥 [ProfileScreen] Response code: ${response['code']}');
+      debugPrint('📥 [ProfileScreen] Response message: ${response['message']}');
+      debugPrint('📥 [ProfileScreen] Response error: ${response['error']}');
       
       if (response['ok'] == true && response['data'] != null) {
         setState(() {
           _userProfile = response['data'] as Map<String, dynamic>;
           _isLoading = false;
         });
+        debugPrint('✅ [ProfileScreen] Profile loaded successfully');
       } else {
         setState(() {
           _isLoading = false;
         });
+        
+        // Extract error message from response
+        final errorMessage = response['message'] ?? 
+                            response['error'] ?? 
+                            'خطأ غير معروف';
+        final errorCode = response['code'] ?? 'UNKNOWN_ERROR';
+        
+        debugPrint('❌ [ProfileScreen] Failed to load profile');
+        debugPrint('❌ [ProfileScreen] Error code: $errorCode');
+        debugPrint('❌ [ProfileScreen] Error message: $errorMessage');
+        debugPrint('❌ [ProfileScreen] Full response: $response');
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('خطأ في جلب البيانات: ${response['message'] ?? 'خطأ غير معروف'}'),
+              content: Text('خطأ في جلب البيانات: $errorMessage'),
               backgroundColor: MbuyColors.alertRed,
+              duration: const Duration(seconds: 4),
             ),
           );
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() {
         _isLoading = false;
       });
+      
+      debugPrint('❌ [ProfileScreen] Exception occurred');
+      debugPrint('❌ [ProfileScreen] Error type: ${e.runtimeType}');
+      debugPrint('❌ [ProfileScreen] Error message: ${e.toString()}');
+      debugPrint('❌ [ProfileScreen] Stack trace: $stackTrace');
+      
+      // Try to extract error message from exception
+      String errorMessage = 'خطأ غير معروف';
+      if (e is Map<String, dynamic>) {
+        errorMessage = e['message'] ?? e['error'] ?? e.toString();
+      } else {
+        errorMessage = e.toString();
+      }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في جلب البيانات: ${e.toString()}'),
+            content: Text('خطأ في جلب البيانات: $errorMessage'),
             backgroundColor: MbuyColors.alertRed,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -149,6 +209,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? _buildSkeletonLoader()
           : CustomScrollView(
               slivers: [
+                // Padding في الأعلى لتجنب التداخل مع شريط البحث Sticky
+                SliverToBoxAdapter(
+                  child: SizedBox(height: MediaQuery.of(context).padding.top + 72),
+                ),
                 // 1. Header
                 SliverAppBar(
                   expandedHeight: 120,
@@ -372,6 +436,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             'الدفع',
                             () {},
                           ),
+                          _buildFeatureItem(
+                            Icons.dashboard_outlined,
+                            'لوحة التحكم',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CustomerDashboardScreen(),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -379,6 +455,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
 
                 const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                // Admin Dashboard (if admin)
+                if (_isAdmin)
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AdminDashboardScreen(),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.red.shade400, Colors.red.shade600],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.red.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.admin_panel_settings,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'لوحة تحكم الأدمن',
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'إدارة النظام بالكامل',
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 14,
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                if (_isAdmin) const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
                 // 3. Orders Section
                 SliverToBoxAdapter(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/app_config.dart';
+import '../../../../core/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'merchant_store_setup_screen.dart';
 import 'merchant_promotions_screen.dart';
@@ -212,6 +213,17 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                   ),
                   onTap: () {
                     _showSnackBar('سيتم إضافة الشحن قريباً');
+                  },
+                ),
+                _buildMenuCard(
+                  icon: Icons.smart_toy_outlined,
+                  title: 'أدوات الذكاء الاصطناعي',
+                  subtitle: 'توليد وصف، ردود، اقتراحات',
+                  gradient: LinearGradient(
+                    colors: [Colors.purple.shade400, Colors.purple.shade600],
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRouter.merchantAITools);
                   },
                 ),
                 _buildMenuCard(
@@ -535,7 +547,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                   colors: [Colors.blue.shade400, Colors.blue.shade600],
                 ),
                 onTap: () {
-                  _showSnackBar('سيتم إضافة mbuy tools قريباً');
+                  Navigator.pushNamed(context, AppRouter.merchantMbuyTools);
                 },
               ),
             ),
@@ -566,7 +578,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
             colors: [Colors.orange.shade400, Colors.orange.shade600],
           ),
           onTap: () {
-            _showSnackBar('سيتم إضافة mbuy studio قريباً');
+            Navigator.pushNamed(context, AppRouter.merchantMbuyStudio);
           },
         ),
       ],

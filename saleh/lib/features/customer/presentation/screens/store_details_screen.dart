@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../core/firebase_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'product_details_screen.dart';
@@ -46,26 +46,50 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
     });
 
     try {
-      // جلب تفاصيل المتجر
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select()
-          .eq('id', widget.storeId)
-          .single();
+      // جلب تفاصيل المتجر عبر Worker API
+      final storeResponse = await ApiService.get(
+        '/public/stores/${widget.storeId}',
+        requireAuth: false,
+      );
 
-      // جلب منتجات المتجر
-      final productsResponse = await supabaseClient
-          .from('products')
-          .select()
-          .eq('store_id', widget.storeId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false);
+      // جلب منتجات المتجر عبر Worker API
+      final productsResponse = await ApiService.get(
+        '/public/products?store_id=${widget.storeId}&status=active',
+        requireAuth: false,
+      );
 
-      setState(() {
-        _store = storeResponse;
-        _products = List<Map<String, dynamic>>.from(productsResponse);
-        _isLoading = false;
-      });
+      if (storeResponse['ok'] == true && storeResponse['data'] != null) {
+        final store = storeResponse['data'] as Map<String, dynamic>;
+        
+        List<Map<String, dynamic>> products = [];
+        if (productsResponse['ok'] == true && productsResponse['data'] != null) {
+          products = List<Map<String, dynamic>>.from(productsResponse['data']);
+          // ترتيب حسب created_at
+          products.sort((a, b) {
+            final dateA = a['created_at'] as String? ?? '';
+            final dateB = b['created_at'] as String? ?? '';
+            return dateB.compareTo(dateA); // ترتيب تنازلي
+          });
+        }
+
+        setState(() {
+          _store = store;
+          _products = products;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في جلب البيانات: ${storeResponse['message'] ?? 'خطأ غير معروف'}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;

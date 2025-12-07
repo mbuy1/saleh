@@ -1,0 +1,14 @@
+{
+  "name": "mbuy-merchant-web-store",
+  "version": "1.0.0",
+  "description": "Merchant Web Store - Cloudflare Pages",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev",
+    "deploy": "wrangler pages deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
+

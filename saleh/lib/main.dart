@@ -41,6 +41,7 @@ import 'features/customer/presentation/screens/customer_orders_screen.dart';
 import 'features/customer/presentation/screens/customer_order_details_screen.dart';
 import 'features/customer/presentation/screens/category_products_screen.dart';
 import 'features/customer/presentation/screens/map_screen.dart';
+import 'features/customer/presentation/screens/packages_screen.dart';
 
 // Merchant Screens
 import 'features/merchant/presentation/screens/merchant_dashboard_screen.dart';
@@ -67,6 +68,7 @@ import 'features/merchant/presentation/screens/merchant_transactions_screen.dart
 import 'features/merchant/presentation/screens/merchant_order_details_screen.dart';
 import 'features/merchant/presentation/screens/product_variants_screen.dart';
 import 'features/merchant/presentation/screens/bulk_operations_screen.dart';
+import 'features/merchant/presentation/screens/ai_tools_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -182,6 +184,8 @@ Route<dynamic>? _generateRoute(
       return MaterialPageRoute(builder: (_) => const CartScreen());
     case '/map':
       return MaterialPageRoute(builder: (_) => const MapScreen());
+    case AppRouter.packages:
+      return MaterialPageRoute(builder: (_) => const PackagesScreen());
 
     // Customer Routes with Arguments
     case AppRouter.productDetails:
@@ -266,6 +270,10 @@ Route<dynamic>? _generateRoute(
     case AppRouter.merchantPaymentMethods:
       return MaterialPageRoute(
         builder: (_) => const MerchantPaymentMethodsScreen(),
+      );
+    case AppRouter.merchantAITools:
+      return MaterialPageRoute(
+        builder: (_) => const AIToolsScreen(),
       );
     case AppRouter.merchantTransactions:
       return MaterialPageRoute(

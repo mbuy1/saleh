@@ -19,7 +19,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _isSignUp = false; // true = تسجيل جديد، false = تسجيل دخول
   bool _isLoading = false;
-  String _selectedRole = 'customer'; // 'customer' أو 'merchant'
+  String? _selectedRole; // null = لم يتم الاختيار بعد، 'customer' أو 'merchant'
 
   @override
   void dispose() {
@@ -47,7 +47,7 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
           displayName: _displayNameController.text.trim(),
-          role: _selectedRole,
+          role: _selectedRole ?? 'customer',
           storeName: _selectedRole == 'merchant'
               ? _storeNameController.text.trim()
               : null,
@@ -173,6 +173,76 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // إذا لم يتم اختيار نوع الحساب بعد، اعرض شاشة الاختيار
+    if (_selectedRole == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 40),
+                // عنوان الشاشة
+                const Text(
+                  'اختر نوع الحساب',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'اختر نوع الحساب للبدء',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 60),
+
+                // خياران كبيران: Merchant و Customer
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildRoleCard(
+                        icon: Icons.store,
+                        title: 'بائع',
+                        subtitle: 'تاجر',
+                        color: Colors.green,
+                        onTap: () {
+                          setState(() {
+                            _selectedRole = 'merchant';
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildRoleCard(
+                        icon: Icons.shopping_bag,
+                        title: 'عميل',
+                        subtitle: 'زبون',
+                        color: Colors.blue,
+                        onTap: () {
+                          setState(() {
+                            _selectedRole = 'customer';
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // بعد اختيار نوع الحساب، اعرض نموذج تسجيل الدخول/التسجيل
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -183,7 +253,26 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 20),
+
+                // زر العودة لاختيار نوع الحساب
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      setState(() {
+                        _selectedRole = null;
+                        _emailController.clear();
+                        _passwordController.clear();
+                        _displayNameController.clear();
+                        _storeNameController.clear();
+                        _cityController.clear();
+                        _isSignUp = false;
+                      });
+                    },
+                  ),
+                ),
 
                 // عنوان الشاشة
                 Text(
@@ -198,7 +287,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 8),
                 Text(
                   _isSignUp
-                      ? 'أنشئ حسابك للبدء في استخدام التطبيق'
+                      ? 'أنشئ حسابك كـ ${_selectedRole == 'merchant' ? 'تاجر' : 'عميل'} للبدء في استخدام التطبيق'
                       : 'مرحباً بعودتك! سجل دخولك للمتابعة',
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
@@ -223,116 +312,57 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // اختيار نوع الحساب
+                  // عرض نوع الحساب المختار (غير قابل للتعديل)
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
+                      color: _selectedRole == 'merchant'
+                          ? Colors.green.shade50
+                          : Colors.blue.shade50,
+                      border: Border.all(
+                        color: _selectedRole == 'merchant'
+                            ? Colors.green
+                            : Colors.blue,
+                        width: 2,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        const Text(
-                          'نوع الحساب',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Icon(
+                          _selectedRole == 'merchant'
+                              ? Icons.store
+                              : Icons.shopping_bag,
+                          color: _selectedRole == 'merchant'
+                              ? Colors.green
+                              : Colors.blue,
+                          size: 32,
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () =>
-                                    setState(() => _selectedRole = 'customer'),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: _selectedRole == 'customer'
-                                        ? Colors.blue.shade50
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: _selectedRole == 'customer'
-                                          ? Colors.blue
-                                          : Colors.grey.shade300,
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.shopping_bag,
-                                        color: _selectedRole == 'customer'
-                                            ? Colors.blue
-                                            : Colors.grey,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'عميل',
-                                        style: TextStyle(
-                                          fontWeight:
-                                              _selectedRole == 'customer'
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
-                                          color: _selectedRole == 'customer'
-                                              ? Colors.blue
-                                              : Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'نوع الحساب',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () =>
-                                    setState(() => _selectedRole = 'merchant'),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: _selectedRole == 'merchant'
-                                        ? Colors.green.shade50
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: _selectedRole == 'merchant'
-                                          ? Colors.green
-                                          : Colors.grey.shade300,
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.store,
-                                        color: _selectedRole == 'merchant'
-                                            ? Colors.green
-                                            : Colors.grey,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'تاجر',
-                                        style: TextStyle(
-                                          fontWeight:
-                                              _selectedRole == 'merchant'
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
-                                          color: _selectedRole == 'merchant'
-                                              ? Colors.green
-                                              : Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _selectedRole == 'merchant' ? 'تاجر' : 'عميل',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: _selectedRole == 'merchant'
+                                      ? Colors.green
+                                      : Colors.blue,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -470,6 +500,63 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 20),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          height: 200,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            border: Border.all(color: color, width: 2),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 64),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),

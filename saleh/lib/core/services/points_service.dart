@@ -43,4 +43,70 @@ class PointsService {
     final balance = await getBalance();
     return balance >= requiredPoints;
   }
+
+  /// Use points in an order
+  /// 
+  /// Parameters:
+  /// - pointsToUse: عدد النقاط المراد استخدامها
+  /// - orderId: معرف الطلب (اختياري)
+  /// 
+  /// Returns: Map with points usage confirmation
+  static Future<Map<String, dynamic>> usePoints({
+    required int pointsToUse,
+    String? orderId,
+  }) async {
+    try {
+      debugPrint('[PointsService] Using $pointsToUse points');
+      
+      final response = await ApiService.post(
+        '/secure/points/use',
+        data: {
+          'points': pointsToUse,
+          if (orderId != null) 'order_id': orderId,
+        },
+      );
+
+      if (response['ok'] == true) {
+        return {
+          'points_used': response['data']?['points_used'],
+          'discount_amount': response['data']?['discount_amount'],
+          'remaining_balance': response['data']?['remaining_balance'],
+        };
+      } else {
+        throw Exception(response['message'] ?? 'فشل استخدام النقاط');
+      }
+    } catch (e) {
+      debugPrint('[PointsService] Error using points: $e');
+      rethrow;
+    }
+  }
+
+  /// Get points transactions history
+  /// 
+  /// Parameters:
+  /// - limit: عدد المعاملات (افتراضي: 50)
+  /// 
+  /// Returns: List of points transactions
+  static Future<List<Map<String, dynamic>>> getTransactions({
+    int limit = 50,
+  }) async {
+    try {
+      debugPrint('[PointsService] Fetching points transactions');
+      
+      final response = await ApiService.get(
+        '/secure/points/transactions?limit=$limit',
+      );
+
+      if (response['ok'] == true) {
+        return List<Map<String, dynamic>>.from(
+          response['data']?['transactions'] ?? [],
+        );
+      } else {
+        throw Exception(response['message'] ?? 'فشل جلب معاملات النقاط');
+      }
+    } catch (e) {
+      debugPrint('[PointsService] Error fetching transactions: $e');
+      rethrow;
+    }
+  }
 }
