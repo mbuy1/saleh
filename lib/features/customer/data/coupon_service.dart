@@ -1,4 +1,4 @@
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 
 class CouponService {
   /// التحقق من صحة كوبون
@@ -20,62 +20,22 @@ class CouponService {
     }
 
     try {
-      // جلب الكوبون من قاعدة البيانات
-      final response = await supabaseClient
-          .from('coupons')
-          .select()
-          .eq('code', code.toUpperCase().trim())
-          .maybeSingle();
+      // استخدام Worker API للتحقق من الكوبون
+      final response = await ApiService.post(
+        '/secure/coupons/validate',
+        data: {
+          'code': code.toUpperCase().trim(),
+          'store_id': storeId,
+          'total_amount': orderAmount,
+        },
+      );
 
-      if (response == null) {
-        throw Exception('كود الكوبون غير صحيح');
+      if (response['ok'] == true) {
+        return response['coupon'] as Map<String, dynamic>;
+      } else {
+        final errorMessage = response['error'] ?? response['message'] ?? 'كود الكوبون غير صحيح';
+        throw Exception(errorMessage);
       }
-
-      final coupon = response;
-
-      // التحقق من is_active
-      final isActive = coupon['is_active'] as bool? ?? false;
-      if (!isActive) {
-        throw Exception('هذا الكوبون غير نشط');
-      }
-
-      // التحقق من التاريخ (starts_at)
-      final startsAt = coupon['starts_at'] as String?;
-      if (startsAt != null) {
-        final startDate = DateTime.parse(startsAt);
-        if (DateTime.now().isBefore(startDate)) {
-          throw Exception('هذا الكوبون لم يبدأ بعد');
-        }
-      }
-
-      // التحقق من التاريخ (expires_at)
-      final expiresAt = coupon['expires_at'] as String?;
-      if (expiresAt != null) {
-        final expireDate = DateTime.parse(expiresAt);
-        if (DateTime.now().isAfter(expireDate)) {
-          throw Exception('هذا الكوبون منتهي الصلاحية');
-        }
-      }
-
-      // التحقق من store_id (إذا تم تمريره)
-      if (storeId != null) {
-        final couponStoreId = coupon['store_id'] as String?;
-        if (couponStoreId != null && couponStoreId != storeId) {
-          throw Exception('هذا الكوبون غير صالح لهذا المتجر');
-        }
-      }
-
-      // التحقق من min_order_amount (إذا تم تمريره)
-      if (orderAmount != null) {
-        final minOrderAmount = coupon['min_order_amount'] as num?;
-        if (minOrderAmount != null && orderAmount < minOrderAmount) {
-          throw Exception(
-              'الحد الأدنى للطلب هو ${minOrderAmount.toStringAsFixed(2)} ر.س');
-        }
-      }
-
-      // الكوبون صالح
-      return coupon;
     } catch (e) {
       // إذا كانت الرسالة مخصصة، نعيدها كما هي
       if (e.toString().contains('كود') ||
@@ -83,7 +43,10 @@ class CouponService {
           e.toString().contains('لم يبدأ') ||
           e.toString().contains('منتهي') ||
           e.toString().contains('غير صالح') ||
-          e.toString().contains('الحد الأدنى')) {
+          e.toString().contains('الحد الأدنى') ||
+          e.toString().contains('Invalid') ||
+          e.toString().contains('expired') ||
+          e.toString().contains('Minimum')) {
         rethrow;
       }
       throw Exception('خطأ في التحقق من الكوبون: ${e.toString()}');
@@ -99,17 +62,9 @@ class CouponService {
   /// Throws: Exception إذا لم يوجد الكوبون
   static Future<Map<String, dynamic>> getCouponByCode(String code) async {
     try {
-      final response = await supabaseClient
-          .from('coupons')
-          .select()
-          .eq('code', code.toUpperCase().trim())
-          .maybeSingle();
-
-      if (response == null) {
-        throw Exception('كود الكوبون غير موجود');
-      }
-
-      return response;
+      // استخدام Worker API - يمكن إضافة endpoint مخصص لاحقاً
+      // حالياً نستخدم validateCoupon بدون storeId و orderAmount
+      return await validateCoupon(code);
     } catch (e) {
       throw Exception('خطأ في جلب الكوبون: ${e.toString()}');
     }

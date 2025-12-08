@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../supabase_client.dart';
 import '../errors/app_error_codes.dart';
 import 'logger_service.dart';
+import 'secure_storage_service.dart';
 
 /// MBUY API Service
 /// Handles all API calls to Cloudflare Worker (API Gateway)
@@ -18,11 +18,15 @@ class ApiService {
   static const Duration retryDelay = Duration(seconds: 2);
   static const List<int> retryableStatusCodes = [408, 429, 500, 502, 503, 504];
 
-  /// Get JWT token from current session
+  /// Get JWT token from Secure Storage (MBUY Custom Auth only)
+  /// No Supabase Auth fallback
   static Future<String?> _getJwtToken() async {
     try {
-      final session = supabaseClient.auth.currentSession;
-      return session?.accessToken;
+      final mbuyToken = await SecureStorageService.getToken();
+      if (mbuyToken != null && mbuyToken.isNotEmpty) {
+        return mbuyToken;
+      }
+      return null;
     } catch (e) {
       logger.error('Error getting JWT', error: e);
       return null;
@@ -35,20 +39,23 @@ class ApiService {
     String endpoint, {
     Map<String, dynamic>? body,
     bool enableRetry = true,
+    bool requireAuth = true, // Default to requiring auth
   }) async {
-    final jwt = await _getJwtToken();
-    if (jwt == null) {
-      throw AppException(
-        errorCode: AppErrorCode.unauthorized,
-        message: 'يجب تسجيل الدخول أولاً',
-      );
-    }
-
     final url = Uri.parse('$baseUrl$endpoint');
-    final headers = {
-      'Authorization': 'Bearer $jwt',
-      'Content-Type': 'application/json',
-    };
+    final headers = <String, String>{'Content-Type': 'application/json'};
+
+    // إذا كان المسار يبدأ بـ /secure، يجب إضافة Authorization header
+    final isSecureEndpoint = endpoint.startsWith('/secure');
+    if (requireAuth || isSecureEndpoint) {
+      final jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        throw AppException(
+          errorCode: AppErrorCode.unauthorized,
+          message: 'يجب تسجيل الدخول أولاً (JWT مفقود أو فارغ)',
+        );
+      }
+      headers['Authorization'] = 'Bearer $jwt';
+    }
 
     int attempt = 0;
     while (true) {
@@ -144,12 +151,14 @@ class ApiService {
   static Future<Map<String, dynamic>> get(
     String endpoint, {
     bool enableRetry = true,
+    bool requireAuth = true,
   }) async {
     try {
       final response = await _makeAuthRequest(
         'GET',
         endpoint,
         enableRetry: enableRetry,
+        requireAuth: requireAuth,
       );
 
       final data = json.decode(response.body) as Map<String, dynamic>;
@@ -178,16 +187,32 @@ class ApiService {
     String endpoint, {
     Map<String, dynamic>? data,
     bool enableRetry = true,
+    bool requireAuth = true,
   }) async {
     try {
+      logger.debug(
+        'POST $endpoint',
+        tag: 'API',
+        data: data != null ? 'Body: ${json.encode(data)}' : 'No body',
+      );
+
       final response = await _makeAuthRequest(
         'POST',
         endpoint,
         body: data,
         enableRetry: enableRetry,
+        requireAuth: requireAuth,
       );
 
       final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      logger.debug(
+        'POST $endpoint → ${response.statusCode}',
+        tag: 'API',
+        data: responseData.toString().length > 200
+            ? '${responseData.toString().substring(0, 200)}...'
+            : responseData.toString(),
+      );
 
       // Handle error responses
       if (response.statusCode >= 400) {
@@ -213,6 +238,7 @@ class ApiService {
     String endpoint, {
     Map<String, dynamic>? data,
     bool enableRetry = true,
+    bool requireAuth = true,
   }) async {
     try {
       final response = await _makeAuthRequest(
@@ -220,6 +246,7 @@ class ApiService {
         endpoint,
         body: data,
         enableRetry: enableRetry,
+        requireAuth: requireAuth,
       );
 
       final responseData = json.decode(response.body) as Map<String, dynamic>;
@@ -245,6 +272,128 @@ class ApiService {
 
   /// Handle error responses from API
   static void _handleErrorResponse(int statusCode, Map<String, dynamic> data) {
+    // Check for specific error codes from API
+    // Handle both String and int error codes
+    final errorCodeValue = data['code'];
+    final errorCode = errorCodeValue is String
+        ? errorCodeValue
+        : (errorCodeValue is int ? errorCodeValue.toString() : null);
+
+    // Get error message from API response (prioritize message over error)
+    final errorMessage =
+        data['message']?.toString() ?? data['error']?.toString();
+
+    // Handle specific error codes from Worker API
+    if (errorCode == 'INVALID_CREDENTIALS') {
+      throw AppException(
+        errorCode: AppErrorCode.validationError,
+        message: errorMessage ?? 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+        details: data,
+      );
+    }
+
+    if (errorCode == 'ACCOUNT_DISABLED') {
+      throw AppException(
+        errorCode: AppErrorCode.forbidden,
+        message: errorMessage ?? 'تم تعطيل حسابك. يرجى التواصل مع الدعم',
+        details: data,
+      );
+    }
+
+    if (errorCode == 'EMAIL_EXISTS') {
+      throw AppException(
+        errorCode: AppErrorCode.validationError,
+        message: errorMessage ?? 'البريد الإلكتروني مسجل مسبقاً',
+        details: data,
+      );
+    }
+
+    // Handle PROFILE_NOT_FOUND
+    if (errorCode == 'PROFILE_NOT_FOUND') {
+      throw AppException(
+        errorCode: AppErrorCode.notFound,
+        message:
+            errorMessage ??
+            'الملف الشخصي غير موجود. يرجى إكمال إعداد الملف الشخصي.',
+        details: data,
+      );
+    }
+
+    // Handle STORE_NOT_FOUND specifically
+    if (errorCode == 'STORE_NOT_FOUND') {
+      throw AppException(
+        errorCode: AppErrorCode.storeNotFound,
+        message:
+            errorMessage ??
+            'لم يتم العثور على متجر لهذا الحساب، يرجى إنشاء متجر من إعداد المتجر.',
+        details: data,
+      );
+    }
+
+    // Handle ORDER_NOT_FOUND
+    if (errorCode == 'ORDER_NOT_FOUND') {
+      throw AppException(
+        errorCode: AppErrorCode.orderNotFound,
+        message: errorMessage ?? 'الطلب غير موجود',
+        details: data,
+      );
+    }
+
+    // Handle PRODUCT_NOT_FOUND
+    if (errorCode == 'PRODUCT_NOT_FOUND') {
+      throw AppException(
+        errorCode: AppErrorCode.productNotFound,
+        message: errorMessage ?? 'المنتج غير موجود',
+        details: data,
+      );
+    }
+
+    // Handle MISSING_ENV
+    if (errorCode == 'MISSING_ENV') {
+      throw AppException(
+        errorCode: AppErrorCode.serverError,
+        message:
+            errorMessage ?? 'خطأ في إعدادات الخادم. يرجى التواصل مع الدعم.',
+        details: data,
+      );
+    }
+
+    // Handle RLS_ERROR
+    if (errorCode == 'RLS_ERROR') {
+      throw AppException(
+        errorCode: AppErrorCode.forbidden,
+        message: errorMessage ?? 'تم رفض الوصول. يرجى التواصل مع الدعم.',
+        details: data,
+      );
+    }
+
+    // Handle BAD_REQUEST
+    if (errorCode == 'BAD_REQUEST') {
+      throw AppException(
+        errorCode: AppErrorCode.validationError,
+        message: errorMessage ?? 'بيانات غير صحيحة',
+        details: data,
+      );
+    }
+
+    // Handle FORBIDDEN
+    if (errorCode == 'FORBIDDEN' || errorCode == 'UNAUTHORIZED') {
+      throw AppException(
+        errorCode: AppErrorCode.forbidden,
+        message: errorMessage ?? 'ليس لديك صلاحية الوصول',
+        details: data,
+      );
+    }
+
+    // Handle INTERNAL_ERROR
+    if (errorCode == 'INTERNAL_ERROR' || errorCode == 'SERVER_ERROR') {
+      throw AppException(
+        errorCode: AppErrorCode.serverError,
+        message: errorMessage ?? 'خطأ في الخادم',
+        details: data,
+      );
+    }
+
     // Try to parse error from response
     if (data.containsKey('error_code')) {
       throw AppException.fromResponse(data);
@@ -255,23 +404,27 @@ class ApiService {
       case 400:
         throw AppException(
           errorCode: AppErrorCode.validationError,
-          message: data['error']?.toString() ?? 'بيانات غير صحيحة',
+          message: errorMessage ?? 'بيانات غير صحيحة',
           details: data['details'],
         );
       case 401:
+        // For 401, use the message from API if available, otherwise generic message
         throw AppException(
           errorCode: AppErrorCode.unauthorized,
-          message: 'يجب تسجيل الدخول',
+          message: errorMessage ?? 'يجب تسجيل الدخول',
+          details: data,
         );
       case 403:
         throw AppException(
           errorCode: AppErrorCode.forbidden,
-          message: 'ليس لديك صلاحية الوصول',
+          message: errorMessage ?? 'ليس لديك صلاحية الوصول',
+          details: data,
         );
       case 404:
         throw AppException(
           errorCode: AppErrorCode.notFound,
-          message: data['error']?.toString() ?? 'العنصر غير موجود',
+          message: errorMessage ?? 'العنصر غير موجود',
+          details: data,
         );
       case 429:
         throw AppException(
@@ -280,14 +433,21 @@ class ApiService {
           details: data,
         );
       default:
-        throw AppException.server(data['error']?.toString());
+        throw AppException.server(errorMessage ?? 'خطأ في الخادم');
     }
   }
 
   /// DELETE request
-  static Future<Map<String, dynamic>> delete(String endpoint) async {
+  static Future<Map<String, dynamic>> delete(
+    String endpoint, {
+    bool requireAuth = true,
+  }) async {
     try {
-      final response = await _makeAuthRequest('DELETE', endpoint);
+      final response = await _makeAuthRequest(
+        'DELETE',
+        endpoint,
+        requireAuth: requireAuth,
+      );
       return json.decode(response.body);
     } catch (e) {
       debugPrint('❌ DELETE Error: $e');

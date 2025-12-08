@@ -11,7 +11,9 @@ class AppRouter {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String favorites = '/favorites';
+  static const String wishlist = '/wishlist';
   static const String browseHistory = '/browse-history';
+  static const String recentlyViewed = '/recently-viewed';
   static const String coupons = '/coupons';
   static const String orders = '/orders';
   static const String wallet = '/wallet';
@@ -47,11 +49,20 @@ class AppRouter {
   static const String merchantInvoices = '/merchant/invoices';
   static const String merchantPaymentMethods = '/merchant/payment-methods';
   static const String merchantTransactions = '/merchant/transactions';
+  static const String merchantProductVariants = '/merchant/products/variants';
+  static const String merchantBulkOperations = '/merchant/products/bulk';
+  static const String merchantAITools = '/merchant/ai-tools';
+  static const String merchantMbuyTools = '/merchant/mbuy-tools';
+  static const String merchantMbuyStudio = '/merchant/mbuy-studio';
 
   // Additional Customer Routes
   static const String cart = '/cart';
   static const String map = '/map';
   static const String categoryProducts = '/category-products';
+  static const String shippingSelection = '/shipping-selection';
+  static const String paymentSelection = '/payment-selection';
+  static const String packages = '/packages';
+  static const String search = '/search';
 
   // Auth Routes
   static const String authLogin = '/auth/login';

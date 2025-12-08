@@ -1,41 +1,16 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+// Supabase client is intentionally disabled in the Flutter client.
+// Architecture: Flutter -> Worker (API Gateway) -> Supabase
+// The Flutter application must NOT initialize or use supabaseClient directly.
+// Any prior usage of supabaseClient must be replaced with ApiService calls.
 
-/// تهيئة Supabase
-///
-/// يجب استدعاء هذه الدالة في main() قبل runApp()
-///
-/// المفاتيح المطلوبة في ملف .env:
-/// - SUPABASE_URL: رابط مشروع Supabase
-/// - SUPABASE_ANON_KEY: المفتاح العام (anon key) من Supabase
+/// initSupabase is a no-op on purpose. Do not initialize Supabase in the client.
 Future<void> initSupabase() async {
-  final supabaseUrl = dotenv.env['SUPABASE_URL'];
-  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
-
-  if (supabaseUrl == null || supabaseUrl.isEmpty) {
-    throw Exception('SUPABASE_URL غير موجود في ملف .env');
-  }
-
-  if (supabaseAnonKey == null || supabaseAnonKey.isEmpty) {
-    throw Exception('SUPABASE_ANON_KEY غير موجود في ملف .env');
-  }
-
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-    authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce,
-    ),
-  );
-
-  debugPrint('✅ Supabase initialized with PKCE auth flow');
+  // Intentionally left blank. Using Supabase directly from Flutter is prohibited
+  // to avoid leaking secrets or bypassing the Worker API. Use ApiService instead.
+  return;
 }
 
-/// Getter للوصول إلى Supabase client في بقية المشروع
-///
-/// مثال الاستخدام:
-/// ```dart
-/// final response = supabaseClient.from('table_name').select();
-/// ```
-SupabaseClient get supabaseClient => Supabase.instance.client;
+/// Accessing supabaseClient directly will throw — replace with ApiService.
+Never get supabaseClient => throw UnsupportedError(
+  'Do not use supabaseClient in Flutter. Use ApiService instead.',
+);

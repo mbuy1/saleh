@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../auth/data/auth_service.dart';
+import '../../../auth/data/auth_repository.dart';
 import '../screens/merchant_store_setup_screen.dart';
 import '../screens/merchant_points_screen.dart';
 
@@ -31,28 +32,84 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
+        debugPrint('⚠️ [MerchantProfileTab] User ID is null - cannot load profile');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
 
-      final response = await supabaseClient
-          .from('user_profiles')
-          .select()
-          .eq('id', user.id)
-          .maybeSingle();
+      debugPrint('🔍 [MerchantProfileTab] Loading user profile...');
+      debugPrint('🔍 [MerchantProfileTab] User ID: $userId');
+      debugPrint('🔍 [MerchantProfileTab] Endpoint: GET /secure/users/me');
 
+      final response = await ApiService.get('/secure/users/me');
+      
+      debugPrint('📥 [MerchantProfileTab] Response received');
+      debugPrint('📥 [MerchantProfileTab] Response ok: ${response['ok']}');
+      debugPrint('📥 [MerchantProfileTab] Response has data: ${response['data'] != null}');
+      debugPrint('📥 [MerchantProfileTab] Response code: ${response['code']}');
+      debugPrint('📥 [MerchantProfileTab] Response message: ${response['message']}');
+      debugPrint('📥 [MerchantProfileTab] Response error: ${response['error']}');
+      
+      if (response['ok'] == true && response['data'] != null) {
+        setState(() {
+          _userProfile = response['data'] as Map<String, dynamic>;
+          _isLoading = false;
+        });
+        debugPrint('✅ [MerchantProfileTab] Profile loaded successfully');
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Extract error message from response
+        final errorMessage = response['message'] ?? 
+                            response['error'] ?? 
+                            'خطأ غير معروف';
+        final errorCode = response['code'] ?? 'UNKNOWN_ERROR';
+        
+        debugPrint('❌ [MerchantProfileTab] Failed to load profile');
+        debugPrint('❌ [MerchantProfileTab] Error code: $errorCode');
+        debugPrint('❌ [MerchantProfileTab] Error message: $errorMessage');
+        debugPrint('❌ [MerchantProfileTab] Full response: $response');
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في جلب البيانات: $errorMessage'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    } catch (e, stackTrace) {
       setState(() {
-        _userProfile = response;
         _isLoading = false;
       });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      
+      debugPrint('❌ [MerchantProfileTab] Exception occurred');
+      debugPrint('❌ [MerchantProfileTab] Error type: ${e.runtimeType}');
+      debugPrint('❌ [MerchantProfileTab] Error message: ${e.toString()}');
+      debugPrint('❌ [MerchantProfileTab] Stack trace: $stackTrace');
+      
+      // Try to extract error message from exception
+      String errorMessage = 'خطأ غير معروف';
+      if (e is Map<String, dynamic>) {
+        errorMessage = e['message'] ?? e['error'] ?? e.toString();
+      } else {
+        errorMessage = e.toString();
+      }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في جلب البيانات: ${e.toString()}'),
+            content: Text('خطأ في جلب البيانات: $errorMessage'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -82,6 +139,14 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
     if (confirmed == true) {
       try {
         await AuthService.signOut();
+        
+        // إعادة توجيه المستخدم إلى شاشة تسجيل الدخول
+        if (mounted) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/',
+            (route) => false,
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -97,8 +162,6 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
 
   @override
   Widget build(BuildContext context) {
-    final user = supabaseClient.auth.currentUser;
-
     return Scaffold(
       backgroundColor: MbuyColors.background,
       appBar: AppBar(
@@ -144,13 +207,18 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
                   const SizedBox(height: 8),
 
                   // البريد الإلكتروني
-                  Text(
-                    user?.email ?? '',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: MbuyColors.textSecondary,
-                      fontFamily: 'Arabic',
-                    ),
+                  FutureBuilder<String?>(
+                    future: AuthRepository.getUserEmail(),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: MbuyColors.textSecondary,
+                          fontFamily: 'Arabic',
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 8),
 

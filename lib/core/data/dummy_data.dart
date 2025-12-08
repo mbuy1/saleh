@@ -55,7 +55,7 @@ class DummyData {
   // البيانات الوهمية - Stores
   static List<Store> get stores => [
     const Store(
-      id: '1',
+      id: '11111111-1111-1111-1111-111111111111',
       name: 'متجر الإلكترونيات',
       description: 'أحدث الأجهزة الإلكترونية',
       rating: 4.5,
@@ -67,7 +67,7 @@ class DummyData {
       city: 'الرياض',
     ),
     const Store(
-      id: '2',
+      id: '22222222-2222-2222-2222-222222222222',
       name: 'متجر الأزياء',
       description: 'أفضل الملابس العصرية',
       rating: 4.8,
@@ -83,23 +83,23 @@ class DummyData {
   // البيانات الوهمية - Products
   static List<Product> get products => [
     const Product(
-      id: '1',
+      id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
       name: 'آيفون 15 برو',
       description: 'أحدث هاتف من آبل',
       price: 4999.00,
       categoryId: '11',
-      storeId: '1',
+      storeId: '11111111-1111-1111-1111-111111111111',
       rating: 4.7,
       reviewCount: 150,
       stockCount: 25,
     ),
     const Product(
-      id: '2',
+      id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
       name: 'سامسونج S24',
       description: 'أحدث هاتف من سامسونج',
       price: 3999.00,
       categoryId: '11',
-      storeId: '1',
+      storeId: '11111111-1111-1111-1111-111111111111',
       rating: 4.6,
       reviewCount: 120,
       stockCount: 30,
@@ -117,7 +117,7 @@ class DummyData {
       dislikes: 20,
       comments: 250,
       caption: 'مراجعة شاملة لأحدث هاتف من آبل',
-      productId: '1',
+      productId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
       productPrice: 4999.00,
     ),
     const VideoItem(
@@ -129,7 +129,7 @@ class DummyData {
       dislikes: 15,
       comments: 300,
       caption: 'مقارنة تفصيلية بين الهاتفين',
-      productId: '2',
+      productId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
       productPrice: 3999.00,
     ),
   ];

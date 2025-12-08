@@ -1,7 +1,7 @@
-import '../../../../core/supabase_client.dart';
 import '../../../../core/permissions_helper.dart';
 import '../../../../core/services/api_service.dart';
 import 'services/cart_service.dart';
+import '../../auth/data/auth_repository.dart';
 
 class OrderService {
   /// تحويل السلة إلى طلب
@@ -15,8 +15,8 @@ class OrderService {
   /// Returns: ID الطلب الجديد
   /// Throws: Exception إذا كان المستخدم ليس customer
   static Future<String> createOrderFromCart() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       throw Exception('المستخدم غير مسجل');
     }
 
@@ -32,13 +32,14 @@ class OrderService {
       throw Exception('السلة فارغة');
     }
 
-    // جلب السلة النشطة
-    final cart = await supabaseClient
-        .from('carts')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+    // جلب السلة النشطة عبر Worker API
+    final cartResponse = await ApiService.get('/secure/carts/active');
+    
+    if (cartResponse['ok'] != true || cartResponse['data'] == null) {
+      throw Exception('لا توجد سلة نشطة');
+    }
 
+    final cart = cartResponse['data'] as Map<String, dynamic>;
     final cartId = cart['id'] as String;
 
     // حساب المجموع الكلي باستخدام calculateTotal
@@ -70,8 +71,8 @@ class OrderService {
   ///
   /// Returns: List of orders
   static Future<List<Map<String, dynamic>>> getCustomerOrders() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       return [];
     }
 

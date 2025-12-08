@@ -1,4 +1,5 @@
-import '../core/supabase_client.dart';
+import '../features/auth/data/auth_repository.dart';
+import '../core/services/api_service.dart';
 
 /// نموذج الصلاحيات (Permissions Model) للتطبيق
 ///
@@ -8,23 +9,26 @@ import '../core/supabase_client.dart';
 ///   عند الانتقال لواجهة العميل يكون في "Viewer Mode" فقط (تصفح بدون شراء)
 /// - customer: العميل - يتصفح ويشتري ويعلق ويقيّم
 class PermissionsHelper {
-  /// جلب role المستخدم الحالي من user_profiles
+  /// جلب role المستخدم الحالي من Worker API
   ///
   /// Returns: 'admin', 'merchant', 'customer', أو null إذا لم يكن مسجل
   static Future<String?> getCurrentUserRole() async {
-    final user = supabaseClient.auth.currentUser;
-    if (user == null) {
+    final userId = await AuthRepository.getUserId();
+    if (userId == null) {
       return null;
     }
 
     try {
-      final response = await supabaseClient
-          .from('user_profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-      return response?['role'] as String?;
+      // استخدام Worker API بدلاً من Supabase مباشرة
+      final response = await ApiService.get('/secure/users/me');
+      
+      if (response['ok'] == true && response['data'] != null) {
+        // Worker يعيد profile مباشرة في data
+        final userProfile = response['data'];
+        return userProfile['role'] as String?;
+      }
+      
+      return null;
     } catch (e) {
       return null;
     }

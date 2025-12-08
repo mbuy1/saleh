@@ -29,45 +29,74 @@ class MerchantAdminShell extends StatefulWidget {
 class _MerchantAdminShellState extends State<MerchantAdminShell> {
   bool _showDashboard = true; // true = Dashboard, false = Customer view
 
+  Future<bool> _onWillPop() async {
+    // If dashboard shown, confirm exit; otherwise switch back to dashboard
+    if (!_showDashboard) {
+      setState(() => _showDashboard = true);
+      return false;
+    }
+
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('تأكيد الخروج'),
+          content: const Text('هل تريد الخروج من التطبيق؟'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('لا'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('نعم'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldExit ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _showDashboard
-              ? 'لوحة التحكم'
-              : 'تطبيق Mbuy',
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _onWillPop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_showDashboard ? 'لوحة التحكم' : 'تطبيق Mbuy'),
+          centerTitle: true,
+          actions: [
+            // زر التبديل بين Dashboard و Customer view
+            IconButton(
+              icon: Icon(
+                _showDashboard
+                    ? Icons.shopping_bag_outlined
+                    : Icons.dashboard_outlined,
+              ),
+              tooltip: _showDashboard ? 'عرض التطبيق' : 'عرض لوحة التحكم',
+              onPressed: () {
+                setState(() {
+                  _showDashboard = !_showDashboard;
+                });
+              },
+            ),
+          ],
         ),
-        centerTitle: true,
-        actions: [
-          // زر التبديل بين Dashboard و Customer view
-          IconButton(
-            icon: Icon(
-              _showDashboard
-                  ? Icons.shopping_bag_outlined
-                  : Icons.dashboard_outlined,
-            ),
-            tooltip: _showDashboard
-                ? 'عرض التطبيق'
-                : 'عرض لوحة التحكم',
-            onPressed: () {
-              setState(() {
-                _showDashboard = !_showDashboard;
-              });
-            },
-          ),
-        ],
+        body: _showDashboard
+            ? MerchantDashboardScreen(appModeProvider: widget.appModeProvider)
+            : CustomerShell(
+                appModeProvider: widget.appModeProvider,
+                userRole: widget.role,
+                themeProvider: widget.themeProvider,
+              ),
       ),
-      body: _showDashboard
-          ? MerchantDashboardScreen(
-              appModeProvider: widget.appModeProvider,
-            )
-          : CustomerShell(
-              appModeProvider: widget.appModeProvider,
-              userRole: widget.role,
-              themeProvider: widget.themeProvider,
-            ),
     );
   }
 }
-

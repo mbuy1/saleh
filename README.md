@@ -1,8 +1,14 @@
-# 🛒 Mbuy - منصة تسوق وإدارة متاجر
+# 📱 MBUY Flutter Application
+
+<div dir="rtl">
+
+## 📋 نظرة عامة
 
 تطبيق Flutter متكامل يجمع بين تجربة التسوق للعملاء وإدارة المتاجر للتجار في منصة واحدة.
 
-## ✨ الميزات الرئيسية
+---
+
+## ✨ الميزات
 
 ### للعملاء 👥
 - 🛍️ التسوق من متاجر متعددة
@@ -19,92 +25,93 @@
 - 💳 محفظة التاجر
 - ⭐ نظام نقاط مع ميزات مدفوعة
 - 🚀 دعم المتجر (Boost)
-- 📍 إبراز المتجر على الخريطة
 
-## 🛠️ التقنيات المستخدمة
+---
 
-- **Flutter** 3.10+ - إطار العمل الأساسي
-- **Supabase** - قاعدة البيانات والمصادقة (Backend: [mbuy-backend](https://github.com/mbuy1/mbuy-backend))
-- **Cloudflare Worker** - API Gateway (Worker: [mbuy-worker](https://github.com/mbuy1/mbuy-worker))
-- **Cloudflare R2** - تخزين وإدارة الصور
+## 🚀 البدء السريع
 
-📖 **معلومات إضافية:** راجع [BACKEND-REPOS.md](BACKEND-REPOS.md) لمعرفة هيكل البنية التحتية
+### المتطلبات
 
-## 📱 البدء السريع
-
-### المتطلبات الأساسية
 ```bash
 flutter --version  # يجب أن يكون 3.10 أو أحدث
 ```
 
 ### التثبيت
 
-1. **استنساخ المشروع:**
 ```bash
-git clone https://github.com/mbuy1/saleh.git
+# استنساخ المشروع
+git clone <repository-url>
 cd saleh
-```
 
-2. **تثبيت Dependencies:**
-```bash
+# تثبيت Dependencies
 flutter pub get
-```
 
-3. **إعداد المتغيرات البيئية:**
-```bash
-# انسخ الملف المثال
-cp .env.example .env
-
-# املأ القيم الحقيقية في .env
-```
-
-4. **تشغيل التطبيق:**
-```bash
+# تشغيل التطبيق
 flutter run
 ```
 
-## 🔐 الإعداد الأمني
+---
 
-### الحصول على المفاتيح:
+## 🔐 الإعداد
 
-#### Supabase
-1. اذهب إلى [Supabase Dashboard](https://app.supabase.com)
-2. أنشئ مشروع جديد أو اختر موجود
-3. Settings > API
-4. انسخ `URL` و `anon key`
+### Environment Variables
 
-#### Cloudflare Images
-1. اذهب إلى [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. Images > Create Token
-3. انسخ `Account ID` و `API Token`
+إنشاء ملف `.env` في `saleh/`:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+WORKER_URL=https://your-worker.workers.dev
+```
 
 ⚠️ **مهم:** لا تشارك ملف `.env` أو ترفعه إلى Git!
 
-📖 راجع [SECURITY_CHECKLIST.md](SECURITY_CHECKLIST.md) للتفاصيل
+---
 
 ## 📂 هيكل المشروع
 
 ```
 lib/
 ├── core/              # الوظائف الأساسية
+│   ├── services/     # API Service, Auth Repository
 │   ├── theme/        # نظام التصميم
-│   ├── services/     # الخدمات المشتركة
-│   └── ...
+│   └── root_widget.dart
+│
 ├── features/          # الميزات حسب النطاق
 │   ├── auth/         # المصادقة
 │   ├── customer/     # ميزات العميل
 │   └── merchant/     # ميزات التاجر
+│
 └── shared/           # Widgets مشتركة
 ```
 
+---
+
 ## 🎨 التصميم
 
-التطبيق يستخدم هوية بصرية موحدة:
 - 🎨 ألوان: جراديانت أزرق → موف
 - ☀️ Light Theme أنيق ونظيف
 - 🔤 دعم كامل للعربية (RTL)
 
-راجع [MBUY_UI_DESIGN.md](MBUY_UI_DESIGN.md) للتفاصيل
+---
+
+## 🔄 التدفقات الرئيسية
+
+### تسجيل الدخول
+
+```
+User Input → AuthRepository.login() → Worker API
+→ Save token → Verify → Navigate to Home
+```
+
+### إضافة منتج
+
+```
+Merchant Input → ApiService.post('/secure/products')
+→ Worker verifies JWT → Creates product → Updates UI
+```
+
+---
 
 ## 🧪 الاختبار
 
@@ -112,40 +119,31 @@ lib/
 # تحليل الكود
 flutter analyze
 
-# تشغيل الاختبارات (قريباً)
+# تشغيل الاختبارات
 flutter test
 ```
 
+---
+
 ## 📚 التوثيق
 
-- [تحليل المشروع](PROJECT_ANALYSIS.md)
-- [ملخص التنفيذ](IMPLEMENTATION_SUMMARY.md)
-- [دليل التصميم](MBUY_UI_DESIGN.md)
-- [تقرير الفحص الأمني](SECURITY_AUDIT_REPORT.md)
-
-## 🤝 المساهمة
-
-المشروع قيد التطوير النشط. لا تتردد في فتح Issues أو Pull Requests.
-
-## 📄 الترخيص
-
-هذا المشروع خاص ولا يُسمح باستخدامه دون إذن.
-
-## 📞 الدعم
-
-للاستفسارات والدعم، يرجى فتح Issue في GitHub.
+- [API Documentation](./MBUY_API_DOCUMENTATION.md)
+- [Architecture](../docs/ARCHITECTURE.md)
+- [Development Guide](../docs/DEVELOPMENT.md)
 
 ---
 
-## 🗂️ Backend Repositories
+## 🐛 Troubleshooting
 
-Backend code has been moved to separate repositories for better organization:
-
-- **Backend (Supabase):** [github.com/mbuy1/mbuy-backend](https://github.com/mbuy1/mbuy-backend)
-- **Worker (Cloudflare):** [github.com/mbuy1/mbuy-worker](https://github.com/mbuy1/mbuy-worker)
-
-📄 See [BACKEND-REPOS.md](BACKEND-REPOS.md) for full migration details and local development setup.
+راجع [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) للمشاكل الشائعة.
 
 ---
 
-**آخر تحديث:** يناير 2025
+## 🔗 Related Projects
+
+- **Backend:** [mbuy-backend](../mbuy-backend/)
+- **Worker:** [mbuy-worker](../mbuy-worker/)
+
+---
+
+</div>

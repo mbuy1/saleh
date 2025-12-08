@@ -1,21 +1,29 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/supabase_client.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/session/store_session.dart';
 import '../../../../core/services/api_service.dart';
+import '../../../../core/errors/app_error_codes.dart';
+import '../../../../core/services/secure_storage_service.dart';
 import '../../../customer/presentation/screens/product_details_screen.dart';
+import '../../../../core/app_router.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
   const MerchantProductsScreen({super.key});
 
   @override
-  State<MerchantProductsScreen> createState() => _MerchantProductsScreenState();
+  State<MerchantProductsScreen> createState() => MerchantProductsScreenState();
 }
 
-class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
+class MerchantProductsScreenState extends State<MerchantProductsScreen> {
   List<Map<String, dynamic>> _products = [];
   bool _isLoading = true;
   bool _isCreating = false;
+  bool _isUpdating = false;
+  bool _isDeleting = false;
   bool _isUploadingImage = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -25,11 +33,23 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
   final _stockController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   File? _selectedImageFile;
+  String? _currentImageUrl; // URL الصورة الحالية عند التعديل
+
+  // للبحث والفلترة
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _statusFilter = 'all'; // all, active, inactive, out_of_stock
+  Timer? _searchDebounce; // لـ Debounce البحث
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
+  }
+
+  /// Public API for parent widgets (e.g., dashboard) to open the Add Product dialog
+  Future<void> openAddProductDialog() async {
+    await _showAddProductDialog();
   }
 
   @override
@@ -38,7 +58,70 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     _descriptionController.dispose();
     _priceController.dispose();
     _stockController.dispose();
+    _searchController.dispose();
+    _searchDebounce?.cancel();
     super.dispose();
+  }
+
+  /// الحصول على المنتجات المفلترة
+  List<Map<String, dynamic>> get _filteredProducts {
+    var filtered = _products;
+
+    // فلترة حسب البحث
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((product) {
+        final name = (product['name'] ?? '').toString().toLowerCase();
+        final description = (product['description'] ?? '')
+            .toString()
+            .toLowerCase();
+        return name.contains(_searchQuery) ||
+            description.contains(_searchQuery);
+      }).toList();
+    }
+
+    // فلترة حسب الحالة
+    if (_statusFilter != 'all') {
+      filtered = filtered.where((product) {
+        final isActive =
+            product['is_active'] != false &&
+            (product['status'] == 'active' || product['status'] == null);
+        final stock = product['stock'] ?? product['stock_quantity'] ?? 0;
+        final isOutOfStock = stock == 0;
+
+        switch (_statusFilter) {
+          case 'active':
+            return isActive && !isOutOfStock;
+          case 'inactive':
+            return !isActive;
+          case 'out_of_stock':
+            return isOutOfStock;
+          default:
+            return true;
+        }
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  /// بناء Filter Chip
+  Widget _buildFilterChip(String value, String label, Color color) {
+    final isSelected = _statusFilter == value;
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        setState(() {
+          _statusFilter = value;
+        });
+      },
+      selectedColor: color.withValues(alpha: 0.2),
+      checkmarkColor: color,
+      labelStyle: TextStyle(
+        color: isSelected ? color : Colors.grey[700],
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+    );
   }
 
   Future<void> _loadProducts() async {
@@ -47,8 +130,34 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) return;
+
+      // Make sure the token is present. There is a small timing window where
+      // the token was just saved by the login flow and this screen started
+      // before it became available via secure storage. Retry briefly instead
+      // of immediately failing with a session-expired flow.
+      String? token = await SecureStorageService.getToken();
+      int tokenRetries = 0;
+      while ((token == null || token.isEmpty) && tokenRetries < 3) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        tokenRetries += 1;
+        token = await SecureStorageService.getToken();
+      }
+
+      // If still no token, we don't treat this as an expired session — most
+      // likely user isn't actually logged in. Avoid showing a "session
+      // expired" message right away; just return with an empty list and
+      // allow the higher-level UI to handle routing/login flows.
+      if (token == null || token.isEmpty) {
+        debugPrint(
+          '[MerchantProducts] No JWT token found after retries, aborting load',
+        );
+        setState(() {
+          _products = [];
+        });
+        return;
+      }
 
       // جلب المنتجات عبر Worker API
       final result = await ApiService.get('/secure/merchant/products');
@@ -71,22 +180,86 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           _products = products;
         });
       } else {
-        // فقط عرض الخطأ في حالة الأخطاء الحقيقية (ليس NOT_FOUND)
-        final errorCode = result['error_code'];
+        // فقط عرض الخطأ في حالة الأخطاء الحقيقية (ليس NOT_FOUND).
+        // Special-case the backend's NO_ACTIVE_STORE (the merchant has no
+        // active store yet) and show a clear message rather than a generic
+        // session-expired or server error.
+        final errorCode = (result['error_code'] ?? result['code'])?.toString();
         if (errorCode != null && errorCode != 'NOT_FOUND') {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(result['error'] ?? 'خطأ في جلب المنتجات'),
-                backgroundColor: Colors.orange,
-              ),
-            );
+          if (errorCode == 'NO_ACTIVE_STORE' ||
+              errorCode == 'NO_STORE_FOR_MERCHANT') {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'لم يتم العثور على متجر نشط لهذا الحساب. يرجى إنشاء متجر من إعداد المتجر أولاً.',
+                  ),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result['error'] ?? 'خطأ في جلب المنتجات'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
           }
         }
         // في حالة NOT_FOUND، نترك القائمة فارغة بدون عرض رسالة خطأ
         setState(() {
           _products = [];
         });
+      }
+    } on AppException catch (e) {
+      debugPrint(
+        '❌ AppException while loading products: ${e.technicalMessage}',
+      );
+      if (mounted) {
+        // If the API signalled that the merchant has no active store, show
+        // that message (don't treat this as a session expiration).
+        final details = e.details;
+        final detailsErrorCode = (details is Map)
+            ? (details['error_code'] ?? details['code'])?.toString()
+            : null;
+        if (e.errorCode == AppErrorCode.storeNotFound ||
+            detailsErrorCode == 'NO_ACTIVE_STORE' ||
+            detailsErrorCode == 'NO_STORE_FOR_MERCHANT') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'لم يتم العثور على متجر نشط لهذا الحساب. يرجى إنشاء متجر من إعداد المتجر أولاً.',
+                ),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
+        // If the error is due to unauthorized / token expired — show clear message and suggest re-login
+        else if (e.errorCode == AppErrorCode.unauthorized ||
+            e.errorCode == AppErrorCode.tokenExpired) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'انتهت صلاحية الجلسة أو لم يتم تسجيل الدخول. يرجى إعادة تسجيل الدخول.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          // Clear stored token so next flows will go to login, then navigate safely
+          await SecureStorageService.deleteToken();
+          if (mounted) {
+            Navigator.pushNamed(context, AppRouter.authLogin);
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.userMessage), backgroundColor: Colors.red),
+          );
+        }
       }
     } catch (e) {
       // فقط عرض الأخطاء الحقيقية (مشاكل الاتصال، إلخ)
@@ -108,11 +281,28 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     }
   }
 
-  Future<void> _showAddProductDialog() async {
-    _nameController.clear();
-    _descriptionController.clear();
-    _priceController.clear();
-    _stockController.clear();
+  Future<void> _showAddProductDialog({Map<String, dynamic>? product}) async {
+    final isEditing = product != null;
+
+    // تعبئة الحقول إذا كان تعديل
+    if (isEditing) {
+      _nameController.text = product['name'] ?? '';
+      _descriptionController.text = product['description'] ?? '';
+      _priceController.text = (product['price'] ?? 0).toString();
+      _stockController.text =
+          (product['stock'] ?? product['stock_quantity'] ?? 0).toString();
+      _currentImageUrl =
+          product['main_image_url'] ??
+          product['image_url'] ??
+          product['images']?[0];
+    } else {
+      _nameController.clear();
+      _descriptionController.clear();
+      _priceController.clear();
+      _stockController.clear();
+      _currentImageUrl = null;
+    }
+
     setState(() {
       _selectedImageFile = null;
     });
@@ -121,7 +311,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إضافة منتج جديد'),
+          title: Text(isEditing ? 'تعديل المنتج' : 'إضافة منتج جديد'),
           content: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -137,6 +327,12 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'الرجاء إدخال اسم المنتج';
+                      }
+                      if (value.trim().length < 3) {
+                        return 'اسم المنتج يجب أن يكون 3 أحرف على الأقل';
+                      }
+                      if (value.trim().length > 200) {
+                        return 'اسم المنتج يجب ألا يزيد عن 200 حرف';
                       }
                       return null;
                     },
@@ -163,8 +359,15 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return 'الرجاء إدخال السعر';
                       }
-                      if (double.tryParse(value) == null) {
+                      final price = double.tryParse(value);
+                      if (price == null) {
                         return 'السعر يجب أن يكون رقماً';
+                      }
+                      if (price < 0.01) {
+                        return 'السعر يجب أن يكون 0.01 ر.س على الأقل';
+                      }
+                      if (price > 999999) {
+                        return 'السعر يجب ألا يزيد عن 999,999 ر.س';
                       }
                       return null;
                     },
@@ -181,8 +384,15 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return 'الرجاء إدخال الكمية';
                       }
-                      if (int.tryParse(value) == null) {
+                      final stock = int.tryParse(value);
+                      if (stock == null) {
                         return 'الكمية يجب أن تكون رقماً';
+                      }
+                      if (stock < 0) {
+                        return 'الكمية يجب أن تكون 0 أو أكثر';
+                      }
+                      if (stock > 999999) {
+                        return 'الكمية يجب ألا تزيد عن 999,999';
                       }
                       return null;
                     },
@@ -200,16 +410,18 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
               child: const Text('إلغاء'),
             ),
             ElevatedButton(
-              onPressed: (_isCreating || _isUploadingImage)
+              onPressed: ((_isCreating || _isUpdating) || _isUploadingImage)
                   ? null
-                  : _createProduct,
-              child: (_isCreating || _isUploadingImage)
+                  : (isEditing
+                        ? () => _updateProduct(product['id'])
+                        : _createProduct),
+              child: ((_isCreating || _isUpdating) || _isUploadingImage)
                   ? const SizedBox(
                       height: 16,
                       width: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('إضافة'),
+                  : Text(isEditing ? 'حفظ التعديلات' : 'إضافة'),
             ),
           ],
         ),
@@ -226,19 +438,14 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       _isCreating = true;
     });
 
+    // Read StoreSession early (before any await) to avoid using BuildContext
+    // across async gaps which causes use_build_context_synchronously warnings.
+    final storeSession = context.read<StoreSession>();
+
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('المستخدم غير مسجل');
-      }
-
-      // جلب المتجر عبر Worker API
-      final storeResult = await ApiService.get('/secure/merchant/store');
-
-      if (storeResult['ok'] != true || storeResult['data'] == null) {
-        throw Exception(
-          'لم يتم العثور على متجر. يرجى إنشاء متجر أولاً من قائمة "إعداد المتجر"',
-        );
       }
 
       // رفع الصورة إذا تم اختيارها
@@ -248,9 +455,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           _isUploadingImage = true;
         });
         try {
-          // استخدام ApiService الذي يستخدم Cloudflare Worker
           imageUrl = await ApiService.uploadImage(_selectedImageFile!.path);
-
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -270,7 +475,6 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
               ),
             );
           }
-          // لا نتابع إنشاء المنتج إذا فشل رفع الصورة
           setState(() {
             _isUploadingImage = false;
             _isCreating = false;
@@ -283,8 +487,39 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         }
       }
 
-      // إنشاء منتج جديد
-      final productData = {
+      // الحصول على storeId من Provider (value read earlier)
+      String? storeId = storeSession.storeId;
+      if (storeId == null || storeId.isEmpty) {
+        final storeResult = await ApiService.get('/secure/merchant/store');
+        if (storeResult['ok'] == true && storeResult['data'] != null) {
+          storeId =
+              (storeResult['data'] as Map<String, dynamic>)['id'] as String?;
+          if (storeId != null && storeId.isNotEmpty) {
+            storeSession.setStoreId(storeId);
+            debugPrint(
+              '✅ [MerchantProducts] Fetched/store_id saved to StoreSession: $storeId',
+            );
+          }
+        }
+      }
+      if (storeId == null || storeId.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'لم يتم العثور على متجر لهذا الحساب. يرجى إنشاء متجر أولاً.',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        setState(() {
+          _isCreating = false;
+        });
+        return;
+      }
+
+      final productData = <String, dynamic>{
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'price': double.parse(_priceController.text),
@@ -292,8 +527,6 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         'status': 'active',
         'is_active': true,
       };
-
-      // إضافة URL الصورة إذا كان موجوداً
       if (imageUrl != null && imageUrl.isNotEmpty) {
         productData['main_image_url'] = imageUrl;
         productData['images'] = [imageUrl];
@@ -301,36 +534,220 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
       } else {
         debugPrint('⚠️ لا توجد صورة لحفظها');
       }
+      productData.remove('id');
+      productData.remove('product_id');
+      productData.remove('user_id');
+      productData.remove('owner_id');
+      productData['store_id'] = storeId;
+      debugPrint('[MBUY] Sending create product request: $productData');
 
-      debugPrint('📦 بيانات المنتج: $productData');
+      try {
+        final result = await ApiService.post(
+          '/secure/products',
+          data: productData,
+        );
+        debugPrint(
+          '[MBUY] API Response: ${result['ok']} - ${result.toString()}',
+        );
+        if (result['ok'] == true) {
+          if (mounted) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'تم إضافة المنتج بنجاح!${imageUrl != null ? '\nالصورة: $imageUrl' : ''}',
+                ),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            await _loadProducts();
+          }
+        } else {
+          final errorCode = result['error_code'] ?? result['code'];
+          final errorMessage =
+              result['message'] ?? result['error'] ?? 'فشل إضافة المنتج';
+          final detail = result['detail'] ?? '';
+          debugPrint(
+            '[MBUY] API Error - code: $errorCode, message: $errorMessage, detail: $detail',
+          );
+          String userFriendlyMessage;
+          switch (errorCode) {
+            case 'NO_USER_PROFILE':
+              userFriendlyMessage =
+                  'لا يوجد ملف مستخدم لهذا الحساب. يرجى التحقق من إعدادات الحساب.';
+              break;
+            case 'NOT_MERCHANT':
+              userFriendlyMessage =
+                  'هذا الحساب غير مسجل كتاجر. يرجى التحقق من صلاحيات الحساب.';
+              break;
+            case 'NO_ACTIVE_STORE':
+              userFriendlyMessage =
+                  'لا يوجد متجر نشط لهذا الحساب. يرجى إنشاء متجر من إعداد المتجر أولاً.';
+              break;
+            case 'INSERT_FAILED':
+              userFriendlyMessage =
+                  'فشل إضافة المنتج في قاعدة البيانات. يرجى المحاولة مرة أخرى.';
+              break;
+            case 'FORBIDDEN':
+              userFriendlyMessage =
+                  'ليس لديك صلاحية لإضافة منتجات. يرجى التحقق من صلاحيات الحساب.';
+              break;
+            case 'BAD_REQUEST':
+              userFriendlyMessage =
+                  'البيانات المرسلة غير صحيحة. يرجى التحقق من جميع الحقول المطلوبة.';
+              break;
+            case 'UNAUTHORIZED':
+              userFriendlyMessage =
+                  'انتهت صلاحية الجلسة أو لم يتم تسجيل الدخول. يرجى إعادة تسجيل الدخول.';
+              break;
+            default:
+              userFriendlyMessage =
+                  'حدث خطأ غير متوقع أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.';
+              debugPrint('[MBUY] Unknown error code: $errorCode');
+              break;
+          }
+          throw Exception(userFriendlyMessage);
+        }
+      } on SocketException {
+        debugPrint('[MBUY] Network error: SocketException');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تأكد من اتصال الإنترنت وحاول مرة أخرى'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint('[MBUY] Error creating product: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في إضافة المنتج: ${e.toString()}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
+    }
+  }
 
-      // استخدام Worker API لإنشاء المنتج
-      final result = await ApiService.post(
-        '/secure/products',
-        data: productData,
+  /// تعديل منتج موجود
+  Future<void> _updateProduct(String productId) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isUpdating = true;
+    });
+
+    try {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
+        throw Exception('المستخدم غير مسجل');
+      }
+
+      // رفع الصورة إذا تم اختيار صورة جديدة
+      String? imageUrl = _currentImageUrl;
+      if (_selectedImageFile != null) {
+        setState(() {
+          _isUploadingImage = true;
+        });
+        try {
+          imageUrl = await ApiService.uploadImage(_selectedImageFile!.path);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم رفع الصورة بنجاح'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 1),
+              ),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('خطأ في رفع الصورة: ${e.toString()}'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+          setState(() {
+            _isUploadingImage = false;
+            _isUpdating = false;
+          });
+          return;
+        } finally {
+          setState(() {
+            _isUploadingImage = false;
+          });
+        }
+      }
+
+      // إعداد بيانات التعديل
+      final updateData = <String, dynamic>{
+        'name': _nameController.text.trim(),
+        'description': _descriptionController.text.trim(),
+        'price': double.parse(_priceController.text),
+        'stock': int.parse(_stockController.text),
+      };
+
+      // إضافة الصورة إذا كانت موجودة
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        updateData['main_image_url'] = imageUrl;
+        if (updateData['images'] == null) {
+          updateData['images'] = [imageUrl];
+        }
+      }
+
+      // إزالة الحقول التي لا يجب إرسالها
+      updateData.remove('id');
+      updateData.remove('product_id');
+      updateData.remove('store_id');
+      updateData.remove('created_at');
+      updateData.remove('updated_at');
+
+      debugPrint('📦 بيانات التعديل: $updateData');
+
+      // استخدام Worker API لتعديل المنتج
+      final result = await ApiService.put(
+        '/secure/products/$productId',
+        data: updateData,
       );
 
-      debugPrint('✅ تم إنشاء المنتج: $result');
-
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'تم إضافة المنتج بنجاح!${imageUrl != null ? '\nالصورة: $imageUrl' : ''}',
+      if (result['ok'] == true) {
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم تعديل المنتج بنجاح!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
             ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        // إعادة تحميل القائمة
-        await _loadProducts();
+          );
+          // إعادة تحميل القائمة
+          await _loadProducts();
+        }
+      } else {
+        throw Exception(result['error'] ?? 'فشل تعديل المنتج');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في إضافة المنتج: ${e.toString()}'),
+            content: Text('خطأ في تعديل المنتج: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -338,7 +755,75 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     } finally {
       if (mounted) {
         setState(() {
-          _isCreating = false;
+          _isUpdating = false;
+        });
+      }
+    }
+  }
+
+  /// حذف منتج
+  Future<void> _deleteProduct(String productId, String productName) async {
+    // تأكيد قبل الحذف
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تأكيد الحذف'),
+        content: Text(
+          'هل أنت متأكد من حذف المنتج "$productName"؟\n\nهذه العملية لا يمكن التراجع عنها.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) {
+      return;
+    }
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final result = await ApiService.delete('/secure/products/$productId');
+
+      if (result['ok'] == true || result['message'] != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم حذف المنتج بنجاح!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          // إعادة تحميل القائمة
+          await _loadProducts();
+        }
+      } else {
+        throw Exception(result['error'] ?? 'فشل حذف المنتج');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في حذف المنتج: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
         });
       }
     }
@@ -356,6 +841,16 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          // Bulk Operations Button
+          IconButton(
+            icon: const Icon(Icons.batch_prediction),
+            tooltip: 'العمليات المجمعة',
+            onPressed: () {
+              Navigator.pushNamed(context, AppRouter.merchantBulkOperations);
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -385,14 +880,116 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             )
           : Column(
               children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: _products.length,
-                    itemBuilder: (context, index) {
-                      return _buildProductCard(_products[index]);
-                    },
+                // شريط البحث والفلترة
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'ابحث عن منتج...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {
+                                      _searchQuery = '';
+                                    });
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        onChanged: (value) {
+                          // Debounce للبحث - انتظر 300ms قبل التحديث
+                          _searchDebounce?.cancel();
+                          _searchDebounce = Timer(
+                            const Duration(milliseconds: 300),
+                            () {
+                              if (mounted) {
+                                setState(() {
+                                  _searchQuery = value.toLowerCase();
+                                });
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      // فلتر الحالة
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip('all', 'الكل', Colors.blue),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('active', 'نشط', Colors.green),
+                            const SizedBox(width: 8),
+                            _buildFilterChip(
+                              'inactive',
+                              'غير نشط',
+                              Colors.grey,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildFilterChip(
+                              'out_of_stock',
+                              'نفد',
+                              Colors.orange,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                // قائمة المنتجات
+                Expanded(
+                  child: _filteredProducts.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.search_off,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'لا توجد منتجات تطابق البحث',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                    _statusFilter = 'all';
+                                  });
+                                },
+                                child: const Text('إعادة تعيين الفلاتر'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          itemCount: _filteredProducts.length,
+                          itemBuilder: (context, index) {
+                            return _buildProductCard(_filteredProducts[index]);
+                          },
+                        ),
                 ),
               ],
             ),
@@ -404,9 +1001,17 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
   }
 
   Widget _buildProductCard(Map<String, dynamic> product) {
+    final isActive =
+        product['is_active'] != false &&
+        (product['status'] == 'active' || product['status'] == null);
+    final stock = product['stock'] ?? product['stock_quantity'] ?? 0;
+    final isOutOfStock = stock == 0;
+
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: ListTile(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
         onTap: () {
           Navigator.push(
             context,
@@ -416,24 +1021,147 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             ),
           );
         },
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // صورة المنتج
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isOutOfStock ? Colors.red : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: _buildProductImage(product),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // معلومات المنتج
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            product['name'] ?? 'بدون اسم',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // Status badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? (isOutOfStock ? Colors.orange : Colors.green)
+                                : Colors.grey,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isActive
+                                ? (isOutOfStock ? 'نفد' : 'نشط')
+                                : 'غير نشط',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${product['price'] ?? 0} ر.س',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 16,
+                          color: isOutOfStock ? Colors.red : Colors.grey[600],
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'الكمية: $stock',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isOutOfStock ? Colors.red : Colors.grey[600],
+                            fontWeight: isOutOfStock
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // أزرار الإجراءات
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Variants Button
+                  IconButton(
+                    icon: const Icon(Icons.style, color: Colors.purple),
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRouter.merchantProductVariants,
+                        arguments: {
+                          'productId': product['id'],
+                          'productName': product['name'] ?? 'المنتج',
+                        },
+                      );
+                    },
+                    tooltip: 'Variants',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+                    onPressed: () {
+                      _showAddProductDialog(product: product);
+                    },
+                    tooltip: 'تعديل',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: _isDeleting
+                        ? null
+                        : () {
+                            _deleteProduct(
+                              product['id'],
+                              product['name'] ?? 'المنتج',
+                            );
+                          },
+                    tooltip: 'حذف',
+                  ),
+                ],
+              ),
+            ],
           ),
-          child: _buildProductImage(product),
-        ),
-        title: Text(product['name'] ?? 'بدون اسم'),
-        subtitle: Text(
-          '${product['price'] ?? 0} ر.س - الكمية: ${product['stock'] ?? 0}',
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
-          onPressed: () {
-            // TODO: إضافة منطق حذف المنتج
-          },
         ),
       ),
     );
@@ -449,7 +1177,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        // عرض الصورة المختارة
+        // عرض الصورة المختارة أو الحالية
         if (_selectedImageFile != null)
           Container(
             width: double.infinity,
@@ -462,6 +1190,64 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.file(_selectedImageFile!, fit: BoxFit.cover),
+            ),
+          )
+        else if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty)
+          Container(
+            width: double.infinity,
+            height: 150,
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, style: BorderStyle.solid),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[200],
+            ),
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    _currentImageUrl!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 150,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _currentImageUrl = null;
+                        });
+                        setDialogState(() {
+                          _currentImageUrl = null;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           )
         else
@@ -557,6 +1343,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('تم اختيار الصورة بنجاح'),
+              // image picked — no product/session mutation here
               backgroundColor: Colors.green,
               duration: Duration(seconds: 1),
             ),

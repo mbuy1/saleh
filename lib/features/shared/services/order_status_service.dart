@@ -1,6 +1,6 @@
-import '../../../core/supabase_client.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/logger_service.dart';
+import '../../auth/data/auth_repository.dart';
 
 /// Order Status Types
 enum OrderStatus {
@@ -70,31 +70,26 @@ class OrderStatusService {
         tag: 'OrderStatus',
       );
 
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('User not authenticated');
       }
 
-      // Insert new status history entry
-      await supabaseClient
-          .from('order_status_history')
-          .insert({
-            'order_id': orderId,
-            'status': newStatus.value,
-            'notes': notes,
-            'changed_by': user.id,
-          })
-          .select()
-          .single();
+      // Call Worker API to update order status and create history entry
+      final response = await ApiService.put(
+        '/secure/orders/$orderId/status',
+        data: {
+          'status': newStatus.value,
+          'notes': notes,
+        },
+      );
 
-      // Update order status
-      await supabaseClient
-          .from('orders')
-          .update({'status': newStatus.value})
-          .eq('id', orderId);
-
-      logger.info('Order status updated successfully', tag: 'OrderStatus');
-      return true;
+      if (response['ok'] == true) {
+        logger.info('Order status updated successfully', tag: 'OrderStatus');
+        return true;
+      } else {
+        throw Exception(response['message'] ?? response['error'] ?? 'Failed to update order status');
+      }
     } catch (e, stackTrace) {
       logger.error(
         'Failed to update order status',
@@ -111,15 +106,18 @@ class OrderStatusService {
     String orderId,
   ) async {
     try {
-      final response =
-          await supabaseClient
-                  .from('order_status_history')
-                  .select()
-                  .eq('order_id', orderId)
-                  .order('created_at', ascending: false)
-              as List;
+      final response = await ApiService.get('/secure/orders/$orderId/status-history');
 
-      return response.map((json) => OrderStatusHistory.fromJson(json)).toList();
+      if (response['ok'] == true && response['data'] != null) {
+        final historyList = response['data'] as List;
+        return historyList.map((json) => OrderStatusHistory.fromJson(json)).toList();
+      } else {
+        logger.warning(
+          'Failed to fetch order status history: ${response['message'] ?? response['error']}',
+          tag: 'OrderStatus',
+        );
+        return [];
+      }
     } catch (e, stackTrace) {
       logger.error(
         'Failed to fetch order status history',
@@ -134,13 +132,18 @@ class OrderStatusService {
   /// Get current order status
   static Future<OrderStatus?> getCurrentOrderStatus(String orderId) async {
     try {
-      final response = await supabaseClient
-          .from('orders')
-          .select('status')
-          .eq('id', orderId)
-          .single();
+      final response = await ApiService.get('/secure/orders/$orderId/status');
 
-      return OrderStatus.fromString(response['status'] as String);
+      if (response['ok'] == true && response['data'] != null) {
+        final data = response['data'] as Map<String, dynamic>;
+        return OrderStatus.fromString(data['status'] as String);
+      } else {
+        logger.warning(
+          'Failed to fetch current order status: ${response['message'] ?? response['error']}',
+          tag: 'OrderStatus',
+        );
+        return null;
+      }
     } catch (e) {
       logger.error(
         'Failed to fetch current order status',

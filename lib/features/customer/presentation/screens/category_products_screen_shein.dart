@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../shared/widgets/shein/shein_top_bar.dart';
 import '../../../../shared/widgets/product_card_compact.dart';
 import '../../../../core/data/models.dart';
@@ -16,10 +16,12 @@ class CategoryProductsScreenShein extends StatefulWidget {
   });
 
   @override
-  State<CategoryProductsScreenShein> createState() => _CategoryProductsScreenSheinState();
+  State<CategoryProductsScreenShein> createState() =>
+      _CategoryProductsScreenSheinState();
 }
 
-class _CategoryProductsScreenSheinState extends State<CategoryProductsScreenShein> {
+class _CategoryProductsScreenSheinState
+    extends State<CategoryProductsScreenShein> {
   List<Map<String, dynamic>> _products = [];
   bool _isLoading = true;
 
@@ -35,17 +37,22 @@ class _CategoryProductsScreenSheinState extends State<CategoryProductsScreenShei
     });
 
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select()
-          .eq('category_id', widget.categoryId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false);
+      // Use Worker API for public products
+      final resp = await ApiService.get(
+        '/public/products?category_id=${Uri.encodeQueryComponent(widget.categoryId)}&limit=100',
+        requireAuth: false,
+      );
 
-      setState(() {
-        _products = List<Map<String, dynamic>>.from(response);
-        _isLoading = false;
-      });
+      if (resp['ok'] == true && resp['data'] != null) {
+        setState(() {
+          _products = List<Map<String, dynamic>>.from(resp['data']);
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -135,4 +142,3 @@ class _CategoryProductsScreenSheinState extends State<CategoryProductsScreenShei
     );
   }
 }
-

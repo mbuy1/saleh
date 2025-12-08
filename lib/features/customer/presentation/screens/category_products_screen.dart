@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../shared/widgets/skeleton/skeleton_loader.dart';
 import 'product_details_screen.dart';
 
@@ -33,17 +33,38 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
     });
 
     try {
-      final response = await supabaseClient
-          .from('products')
-          .select()
-          .eq('category_id', widget.categoryId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false);
+      // استخدام Worker API لجلب المنتجات حسب الفئة
+      final response = await ApiService.get(
+        '/public/products?category_id=${widget.categoryId}&status=active',
+        requireAuth: false,
+      );
 
-      setState(() {
-        _products = List<Map<String, dynamic>>.from(response);
-        _isLoading = false;
-      });
+      if (response['ok'] == true && response['data'] != null) {
+        final products = List<Map<String, dynamic>>.from(response['data']);
+        // ترتيب حسب created_at
+        products.sort((a, b) {
+          final dateA = a['created_at'] as String? ?? '';
+          final dateB = b['created_at'] as String? ?? '';
+          return dateB.compareTo(dateA); // ترتيب تنازلي
+        });
+
+        setState(() {
+          _products = products;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في جلب المنتجات: ${response['message'] ?? 'خطأ غير معروف'}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;

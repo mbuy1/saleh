@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../core/services/order_service.dart';
 
 class MerchantOrderDetailsScreen extends StatefulWidget {
@@ -61,14 +61,15 @@ class _MerchantOrderDetailsScreenState
       Map<String, dynamic>? customerInfo;
       if (customerId != null) {
         try {
-          final customerResponse = await supabaseClient
-              .from('user_profiles')
-              .select('display_name')
-              .eq('id', customerId)
-              .maybeSingle();
-          customerInfo = customerResponse;
+          final resp = await ApiService.get(
+            '/secure/users/$customerId',
+            requireAuth: false,
+          );
+          if (resp['ok'] == true && resp['data'] != null) {
+            customerInfo = Map<String, dynamic>.from(resp['data']);
+          }
         } catch (e) {
-          // تجاهل الخطأ
+          // ignore
         }
       }
 

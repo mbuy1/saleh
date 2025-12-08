@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../shared/widgets/sticky_search_bar.dart';
 import 'explore_screen.dart';
 import 'stores_screen.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'map_screen.dart';
+import 'profile_screen.dart';
 
 class CustomerShell extends StatefulWidget {
   final AppModeProvider appModeProvider;
@@ -26,10 +28,6 @@ class CustomerShell extends StatefulWidget {
 
 class _CustomerShellState extends State<CustomerShell> {
   int _currentIndex = 2; // Home هي الصفحة الرئيسية (index 2)
-  Offset _fabPosition = const Offset(
-    20,
-    100,
-  ); // Initial position for draggable button
 
   // Screens
   late List<Widget> _screens;
@@ -55,32 +53,31 @@ class _CustomerShellState extends State<CustomerShell> {
       // لا يوجد AppBar - كل صفحة تدير الـ header الخاص بها
       body: Stack(
         children: [
+          // الصفحات
           IndexedStack(index: _currentIndex, children: _screens),
-
-          // Draggable Dashboard Button (only if merchant access)
-          if (widget.appModeProvider.hasMerchantAccess())
-            Positioned(
-              left: _fabPosition.dx,
-              top: _fabPosition.dy,
-              child: Draggable(
-                feedback: Material(
-                  color: Colors.transparent,
-                  child: _buildDashboardButton(isDragging: true),
-                ),
-                childWhenDragging: Container(),
-                onDragEnd: (details) {
-                  setState(() {
-                    // Keep button within screen bounds
-                    final screenSize = MediaQuery.of(context).size;
-                    _fabPosition = Offset(
-                      details.offset.dx.clamp(0, screenSize.width - 60),
-                      details.offset.dy.clamp(0, screenSize.height - 200),
-                    );
-                  });
-                },
-                child: _buildDashboardButton(),
-              ),
+          
+          // شريط البحث Sticky - يظهر في جميع الصفحات
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: StickySearchBar(
+              hintText: 'البحث عن المنتجات...',
+              appModeProvider: widget.appModeProvider,
+              onTap: () {
+                // TODO: الانتقال إلى صفحة البحث
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => SearchScreen()));
+              },
+              onProfileTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
+          ),
         ],
       ),
 
@@ -165,38 +162,6 @@ class _CustomerShellState extends State<CustomerShell> {
         child: Icon(activeIcon, size: 24),
       ),
       label: label,
-    );
-  }
-
-  Widget _buildDashboardButton({bool isDragging = false}) {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF00D9B3), Color(0xFF00A896)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00D9B3).withValues(alpha: 0.4),
-            blurRadius: isDragging ? 20 : 12,
-            offset: Offset(0, isDragging ? 8 : 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            widget.appModeProvider.setMerchantMode();
-          },
-          customBorder: const CircleBorder(),
-          child: const Icon(Icons.storefront, color: Colors.white, size: 26),
-        ),
-      ),
     );
   }
 }

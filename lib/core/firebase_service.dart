@@ -2,9 +2,9 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'supabase_client.dart';
 import 'services/preferences_service.dart';
 import 'services/api_service.dart';
+import '../features/auth/data/auth_repository.dart';
 
 /// خدمة Firebase المركزية
 /// تدير Analytics و FCM (Push Notifications)
@@ -369,8 +369,8 @@ class FirebaseService {
       await PreferencesService.saveFCMToken(token);
 
       // حفظ في Supabase عبر Worker API (إذا كان المستخدم مسجل دخول)
-      final user = supabaseClient.auth.currentUser;
-      if (user != null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId != null) {
         try {
           // استخدام Worker API بدلاً من الاتصال المباشر
           final response = await ApiService.post(

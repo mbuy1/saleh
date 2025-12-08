@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/supabase_client.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/services/order_service.dart';
+import '../../../../core/session/store_session.dart';
 import 'merchant_order_details_screen.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantOrdersScreen extends StatefulWidget {
   const MerchantOrdersScreen({super.key});
@@ -27,21 +29,18 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      final userId = await AuthRepository.getUserId();
+      if (userId == null || !mounted) return;
 
-      // جلب المتجر
-      final storeResponse = await supabaseClient
-          .from('stores')
-          .select('id')
-          .eq('owner_id', user.id)
-          .maybeSingle();
+      // جلب store_id من StoreSession Provider
+      final storeSession = context.read<StoreSession>();
+      final storeId = storeSession.storeId;
 
-      if (storeResponse == null) {
+      if (storeId == null || storeId.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('يجب إنشاء متجر أولاً'),
+              content: Text('لم يتم العثور على متجر لهذا الحساب. يرجى إنشاء متجر أولاً'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -49,7 +48,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
         return;
       }
 
-      _storeId = storeResponse['id'] as String;
+      _storeId = storeId;
 
       // جلب طلبات المتجر
       final orders = await OrderService.getStoreOrders(_storeId!);

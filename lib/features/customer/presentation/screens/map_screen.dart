@@ -433,6 +433,13 @@ class _MapScreenState extends State<MapScreen> {
       useSafeArea: false,
       body: Stack(
         children: [
+          // Padding في الأعلى لتجنب التداخل مع شريط البحث Sticky
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(height: MediaQuery.of(context).padding.top + 72),
+          ),
           FlutterMap(
             mapController: _mapController,
             options: const MapOptions(
@@ -503,50 +510,46 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
 
-          // Header - Google Maps Style Search & Categories
+          // Header - Categories only (شريط البحث موجود في StickySearchBar)
           Positioned(
-            top: 0,
+            top: MediaQuery.of(context).padding.top + 72 + 8,
             left: 0,
             right: 0,
             child: SafeArea(
+              bottom: false,
               child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // شريط البحث مع أيقونة الحساب الشخصي
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.filter_list, color: Colors.grey[600], size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'فئات المتاجر',
+                          style: GoogleFonts.cairo(
+                            color: Colors.grey[700],
+                            fontSize: 14,
                           ),
-                        ],
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, color: Colors.grey),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'ابحث عن متجر أو مكان',
-                              style: GoogleFonts.cairo(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

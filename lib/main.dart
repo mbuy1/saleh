@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'core/session/store_session.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'core/supabase_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/cloudflare_images_service.dart';
@@ -20,6 +21,8 @@ import 'features/customer/presentation/screens/categories_screen.dart';
 import 'features/customer/presentation/screens/profile_screen.dart';
 import 'features/customer/presentation/screens/settings_screen.dart';
 import 'features/customer/presentation/screens/favorites_screen.dart';
+import 'features/customer/presentation/screens/wishlist_screen.dart';
+import 'features/customer/presentation/screens/recently_viewed_screen.dart';
 import 'features/customer/presentation/screens/browse_history_screen.dart';
 import 'features/customer/presentation/screens/coupons_screen.dart';
 import 'features/customer/presentation/screens/customer_wallet_screen.dart';
@@ -37,6 +40,7 @@ import 'features/customer/presentation/screens/customer_orders_screen.dart';
 import 'features/customer/presentation/screens/customer_order_details_screen.dart';
 import 'features/customer/presentation/screens/category_products_screen.dart';
 import 'features/customer/presentation/screens/map_screen.dart';
+import 'features/customer/presentation/screens/packages_screen.dart';
 
 // Merchant Screens
 import 'features/merchant/presentation/screens/merchant_dashboard_screen.dart';
@@ -61,6 +65,9 @@ import 'features/merchant/presentation/screens/merchant_invoices_screen.dart';
 import 'features/merchant/presentation/screens/merchant_payment_methods_screen.dart';
 import 'features/merchant/presentation/screens/merchant_transactions_screen.dart';
 import 'features/merchant/presentation/screens/merchant_order_details_screen.dart';
+import 'features/merchant/presentation/screens/product_variants_screen.dart';
+import 'features/merchant/presentation/screens/bulk_operations_screen.dart';
+import 'features/merchant/presentation/screens/ai_tools_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,15 +94,11 @@ Future<void> main() async {
     debugPrint('⚠️ خطأ في تهيئة Firebase: $e');
   }
 
-  // تهيئة Supabase مع حفظ الجلسة
-  try {
-    await initSupabase();
-    debugPrint('✅ تم تهيئة Supabase بنجاح');
-  } catch (e) {
-    // إذا فشل تهيئة Supabase، نتابع بدونها (للتطوير فقط)
-    // في الإنتاج يجب إيقاف التطبيق إذا فشل Supabase
-    debugPrint('⚠️ خطأ في تهيئة Supabase: $e');
-  }
+  // Supabase client is NOT initialized in Flutter anymore.
+  // Architecture: Flutter -> Worker (API Gateway) -> Supabase
+  debugPrint(
+    'ℹ️ Skipping Supabase initialization in Flutter (Worker-only access)',
+  );
 
   // تهيئة Cloudflare Images عبر Worker API
   try {
@@ -145,6 +148,10 @@ Route<dynamic>? _generateRoute(
       );
     case AppRouter.favorites:
       return MaterialPageRoute(builder: (_) => const FavoritesScreen());
+    case AppRouter.wishlist:
+      return MaterialPageRoute(builder: (_) => const WishlistScreen());
+    case AppRouter.recentlyViewed:
+      return MaterialPageRoute(builder: (_) => const RecentlyViewedScreen());
     case AppRouter.browseHistory:
       return MaterialPageRoute(builder: (_) => const BrowseHistoryScreen());
     case AppRouter.coupons:
@@ -171,6 +178,8 @@ Route<dynamic>? _generateRoute(
       return MaterialPageRoute(builder: (_) => const CartScreen());
     case '/map':
       return MaterialPageRoute(builder: (_) => const MapScreen());
+    case AppRouter.packages:
+      return MaterialPageRoute(builder: (_) => const PackagesScreen());
 
     // Customer Routes with Arguments
     case AppRouter.productDetails:
@@ -256,10 +265,22 @@ Route<dynamic>? _generateRoute(
       return MaterialPageRoute(
         builder: (_) => const MerchantPaymentMethodsScreen(),
       );
+    case AppRouter.merchantAITools:
+      return MaterialPageRoute(builder: (_) => const AIToolsScreen());
     case AppRouter.merchantTransactions:
       return MaterialPageRoute(
         builder: (_) => const MerchantTransactionsScreen(),
       );
+    case AppRouter.merchantProductVariants:
+      final args = settings.arguments as Map<String, dynamic>?;
+      return MaterialPageRoute(
+        builder: (_) => ProductVariantsScreen(
+          productId: args?['productId'] ?? '',
+          productName: args?['productName'],
+        ),
+      );
+    case AppRouter.merchantBulkOperations:
+      return MaterialPageRoute(builder: (_) => const BulkOperationsScreen());
 
     // Merchant Routes with Arguments
     case '/merchant-order-details':
@@ -288,38 +309,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: themeProvider,
-      builder: (context, _) {
-        return MaterialApp(
-          title: 'Mbuy',
-          debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<StoreSession>(create: (_) => StoreSession()),
+      ],
+      child: ListenableBuilder(
+        listenable: themeProvider,
+        builder: (context, _) {
+          return MaterialApp(
+            title: 'Mbuy',
+            debugShowCheckedModeBanner: false,
 
-          // Theme Configuration
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: themeProvider.themeMode,
+            // Theme Configuration
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
 
-          // تفعيل RTL للعربية
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('ar', 'SA'), // العربية
-            Locale('en', 'US'), // الإنجليزية
-          ],
-          locale: const Locale('ar', 'SA'),
+            // تفعيل RTL للعربية
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('ar', 'SA'), // العربية
+              Locale('en', 'US'), // الإنجليزية
+            ],
+            locale: const Locale('ar', 'SA'),
 
-          // إعداد المسارات (Routes)
-          onGenerateRoute: (settings) =>
-              _generateRoute(settings, themeProvider, appModeProvider),
-          initialRoute: '/splash', // بدء التطبيق بـ Splash Screen
-          // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
-          home: app.RootWidget(themeProvider: themeProvider),
-        );
-      },
+            // إعداد المسارات (Routes)
+            onGenerateRoute: (settings) =>
+                _generateRoute(settings, themeProvider, appModeProvider),
+            initialRoute: '/splash', // بدء التطبيق بـ Splash Screen
+            // استخدام RootWidget الذي يفحص حالة المستخدم ويعرض الشاشة المناسبة
+            home: app.RootWidget(themeProvider: themeProvider),
+          );
+        },
+      ),
     );
   }
 }

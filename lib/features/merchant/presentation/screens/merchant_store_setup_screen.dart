@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/supabase_client.dart';
 import '../../../../core/services/media_service.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/session/store_session.dart';
 import '../../data/merchant_points_service.dart';
+import '../../../auth/data/auth_repository.dart';
 
 class MerchantStoreSetupScreen extends StatefulWidget {
   const MerchantStoreSetupScreen({super.key});
@@ -49,17 +52,13 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) return;
+      // جلب المتجر عبر Worker API بدلاً من Supabase مباشرة
+      final result = await ApiService.get('/secure/merchant/store');
 
-      // جلب المتجر المرتبط بهذا التاجر
-      final response = await supabaseClient
-          .from('stores')
-          .select()
-          .eq('owner_id', user.id)
-          .maybeSingle();
-
-      if (response != null) {
+      if (result['ok'] == true && result['data'] != null) {
+        final response = result['data'] as Map<String, dynamic>;
+        final storeId = response['id'] as String?;
+        
         setState(() {
           _store = response;
           _nameController.text = _store!['name'] ?? '';
@@ -67,6 +66,12 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           _descriptionController.text = _store!['description'] ?? '';
           _logoUrl = _store!['logo_url'] as String?;
         });
+        
+        // حفظ store_id في StoreSession
+        if (storeId != null && storeId.isNotEmpty && mounted) {
+          context.read<StoreSession>().setStoreId(storeId);
+          debugPrint('✅ تم حفظ Store ID في StoreSession: $storeId');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -96,8 +101,8 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     });
 
     try {
-      final user = supabaseClient.auth.currentUser;
-      if (user == null) {
+      final userId = await AuthRepository.getUserId();
+      if (userId == null) {
         throw Exception('المستخدم غير مسجل');
       }
 
@@ -132,33 +137,47 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         }
       }
 
-      // إنشاء متجر جديد
-      final response = await supabaseClient
-          .from('stores')
-          .insert({
-            'owner_id': user.id,
-            'name': _nameController.text.trim(),
-            'city': _cityController.text.trim(),
-            'description': _descriptionController.text.trim(),
-            'slug': slug,
-            'visibility': 'public', // افتراضي: عام
-            'status': 'active', // افتراضي: نشط
-            if (logoUrl != null) 'logo_url': logoUrl,
-          })
-          .select()
-          .single();
+      // إنشاء متجر جديد عبر Worker API (لا نرسل owner_id - يتم جلبها من JWT في Backend)
+      final result = await ApiService.post(
+        '/secure/merchant/store',
+        data: {
+          'name': _nameController.text.trim(),
+          'city': _cityController.text.trim(),
+          'description': _descriptionController.text.trim(),
+          'slug': slug,
+          'visibility': 'public', // افتراضي: عام
+          'status': 'active', // افتراضي: نشط
+          // لا نرسل owner_id - يتم جلبها من JWT في Backend
+          if (logoUrl != null) 'logo_url': logoUrl,
+        },
+      );
 
-      setState(() {
-        _store = response;
-      });
+      if (result['ok'] == true && result['data'] != null) {
+        final response = result['data'] as Map<String, dynamic>;
+        final storeId = response['id'] as String?;
+        
+        setState(() {
+          _store = response;
+        });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم إنشاء المتجر بنجاح!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        // حفظ store_id في StoreSession بعد إنشاء المتجر
+        if (storeId != null && storeId.isNotEmpty && mounted) {
+          context.read<StoreSession>().setStoreId(storeId);
+          debugPrint('✅ تم حفظ Store ID في StoreSession بعد الإنشاء: $storeId');
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إنشاء المتجر بنجاح!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        // Handle API error response
+        final errorMessage = result['message'] ?? result['error'] ?? 'فشل إنشاء المتجر';
+        throw Exception(errorMessage);
       }
     } catch (e) {
       if (mounted) {
@@ -179,11 +198,21 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
   }
 
   Future<void> _boostStore() async {
-    if (_store == null) {
+    // جلب store_id من StoreSession Provider
+    final storeSession = context.read<StoreSession>();
+    final storeId = storeSession.storeId;
+
+    if (storeId == null || storeId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('لم يتم العثور على متجر لهذا الحساب'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
       return;
     }
-
-    final storeId = _store!['id'] as String;
 
     // تأكيد الدعم
     final confirmed = await showDialog<bool>(
@@ -255,11 +284,21 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
   }
 
   Future<void> _highlightStoreOnMap() async {
-    if (_store == null) {
+    // جلب store_id من StoreSession Provider
+    final storeSession = context.read<StoreSession>();
+    final storeId = storeSession.storeId;
+
+    if (storeId == null || storeId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('لم يتم العثور على متجر لهذا الحساب'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
       return;
     }
-
-    final storeId = _store!['id'] as String;
 
     // تأكيد الإبراز
     final confirmed = await showDialog<bool>(

@@ -8,6 +8,7 @@ import '../core/session/store_session.dart';
 import '../shared/widgets/mbuy_loader.dart';
 import 'services/api_service.dart';
 import '../features/auth/data/auth_repository.dart';
+import '../core/services/secure_storage_service.dart';
 import 'role_based_root.dart';
 
 class RootWidget extends StatefulWidget {
@@ -103,15 +104,27 @@ class _RootWidgetState extends State<RootWidget> {
               debugPrint('✅ User ID: $userId');
               debugPrint('✅ Display Name: $displayName');
 
-              // تحديد AppMode بناءً على role قبل setState
+              // قراءة login_as من SecureStorage
+              final loginAs = await SecureStorageService.getString('login_as');
+              debugPrint('🔍 [RootWidget] login_as from storage: $loginAs');
+
+              // تحديد AppMode بناءً على role و login_as
               if (role == 'merchant' || role == 'admin') {
-                debugPrint('🛒 تم تفعيل وضع التاجر/الأدمن');
-                _appModeProvider.setMerchantMode();
-                // جلب store_id للتاجر مباشرة بعد تسجيل الدخول (admin لا يحتاج store)
-                if (role == 'merchant') {
-                  _loadMerchantStoreId();
+                if (loginAs == 'merchant') {
+                  // تاجر/أدمن دخل كتاجر → لوحة التحكم
+                  debugPrint('🛒 تم تفعيل وضع التاجر/الأدمن (لوحة التحكم)');
+                  _appModeProvider.setMerchantMode();
+                  // جلب store_id للتاجر مباشرة بعد تسجيل الدخول (admin لا يحتاج store)
+                  if (role == 'merchant') {
+                    _loadMerchantStoreId();
+                  }
+                } else {
+                  // تاجر/أدمن دخل كعميل → واجهة العميل
+                  debugPrint('🛍️ تم تفعيل وضع العميل (تاجر/أدمن يتجرب كعميل)');
+                  _appModeProvider.setCustomerMode();
                 }
               } else {
+                // عميل → واجهة العميل دائماً
                 debugPrint('🛍️ تم تفعيل وضع العميل');
                 _appModeProvider.setCustomerMode();
               }
