@@ -68,7 +68,9 @@ class _AuthScreenState extends State<AuthScreen> {
           if (mounted && isLoggedIn) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم التسجيل بنجاح! جاري تحميل التطبيق...'),
+                content: Text(
+                  'تم إنشاء حسابك بنجاح! تم إنشاء متجرك الأول تلقائياً.',
+                ),
                 backgroundColor: Colors.green,
               ),
             );
@@ -135,9 +137,10 @@ class _AuthScreenState extends State<AuthScreen> {
             if (mounted) {
               // If user logged in as merchant, open merchant dashboard directly
               if ((_selectedRole ?? 'customer') == 'merchant') {
-                Navigator.of(
-                  context,
-                ).pushReplacementNamed(AppRouter.merchantDashboard);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRouter.merchantDashboard,
+                  (route) => false, // Remove all previous routes
+                );
               } else {
                 Navigator.of(context).pushReplacementNamed('/');
               }

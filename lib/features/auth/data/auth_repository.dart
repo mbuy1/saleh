@@ -45,12 +45,26 @@ class AuthRepository {
         await SecureStorageService.saveUserId(user['id'] as String);
         await SecureStorageService.saveUserEmail(user['email'] as String);
 
+        // Save refresh token if available
+        final refreshToken = response['refresh_token'] as String?;
+        if (refreshToken != null) {
+          await SecureStorageService.saveRefreshToken(refreshToken);
+          debugPrint('[AuthRepository] ✅ Refresh token saved');
+        }
+
         // Save role if profile exists
         if (profile != null && profile['role'] != null) {
           await SecureStorageService.saveString(
             'user_role',
             profile['role'] as String,
           );
+        }
+
+        // Save store info if exists (for merchants)
+        final store = response['store'] as Map<String, dynamic>?;
+        if (store != null && store['id'] != null) {
+          await SecureStorageService.saveStoreId(store['id'] as String);
+          debugPrint('[AuthRepository] ✅ Store ID saved: ${store['id']}');
         }
 
         debugPrint('[AuthRepository] ✅ Registration successful');
@@ -113,6 +127,13 @@ class AuthRepository {
         await SecureStorageService.saveUserId(user['id'] as String);
         await SecureStorageService.saveUserEmail(user['email'] as String);
 
+        // Save refresh token if available
+        final refreshToken = response['refresh_token'] as String?;
+        if (refreshToken != null) {
+          await SecureStorageService.saveRefreshToken(refreshToken);
+          debugPrint('[AuthRepository] ✅ Refresh token saved');
+        }
+
         // Save role and login_as if profile exists
         if (profile != null && profile['role'] != null) {
           await SecureStorageService.saveString(
@@ -124,13 +145,11 @@ class AuthRepository {
           await SecureStorageService.saveString('login_as', loginAs);
         }
 
-        debugPrint(
-          '[AuthRepository] ✅ Login successful - Token saved to secure storage',
-        );
-        debugPrint('[AuthRepository] ✅ User ID: ${user['id']}');
-        debugPrint('[AuthRepository] ✅ User Email: ${user['email']}');
-        if (profile != null) {
-          debugPrint('[AuthRepository] ✅ User Role: ${profile['role']}');
+        // Save store info if exists (for merchants)
+        final store = response['store'] as Map<String, dynamic>?;
+        if (store != null && store['id'] != null) {
+          await SecureStorageService.saveStoreId(store['id'] as String);
+          debugPrint('[AuthRepository] ✅ Store ID saved: ${store['id']}');
         }
 
         return response;

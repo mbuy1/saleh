@@ -119,6 +119,45 @@ class AppException implements Exception {
     return AppException.unknown(message: errorMessage, error: error);
   }
 
+  /// إنشاء استثناء من استجابة API
+  factory AppException.fromResponse(Map<String, dynamic> response) {
+    final errorCode = response['error_code'] as String?;
+    final message = response['message'] ?? response['error'] ?? 'خطأ غير معروف';
+
+    switch (errorCode) {
+      case 'VALIDATION_ERROR':
+        return AppException(
+          type: AppExceptionType.validation,
+          message: message,
+          code: errorCode,
+        );
+      case 'UNAUTHORIZED':
+        return AppException(
+          type: AppExceptionType.unauthorized,
+          message: message,
+          code: errorCode,
+        );
+      case 'NOT_FOUND':
+        return AppException(
+          type: AppExceptionType.notFound,
+          message: message,
+          code: errorCode,
+        );
+      case 'RATE_LIMIT_EXCEEDED':
+        return AppException(
+          type: AppExceptionType.server,
+          message: 'تم تجاوز عدد الطلبات المسموحة',
+          code: errorCode,
+        );
+      default:
+        return AppException(
+          type: AppExceptionType.server,
+          message: message,
+          code: errorCode ?? 'SERVER_ERROR',
+        );
+    }
+  }
+
   /// رسالة مناسبة للمستخدم
   String get userMessage {
     switch (type) {

@@ -90,7 +90,7 @@ class _MerchantAdminShellState extends State<MerchantAdminShell> {
           ],
         ),
         body: _showDashboard
-            ? MerchantDashboardScreen(appModeProvider: widget.appModeProvider)
+            ? const MerchantDashboardScreen()
             : CustomerShell(
                 appModeProvider: widget.appModeProvider,
                 userRole: widget.role,

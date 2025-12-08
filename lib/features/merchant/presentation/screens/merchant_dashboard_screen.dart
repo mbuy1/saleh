@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/app_config.dart';
+import '../../../auth/data/auth_repository.dart';
 import 'merchant_products_screen.dart';
 import 'merchant_orders_screen.dart';
 import 'merchant_store_setup_screen.dart';
 import '../widgets/merchant_bottom_bar.dart';
 import '../widgets/merchant_profile_tab.dart';
 
-// Simple, focused merchant dashboard that provides tab navigation only.
+// لوحة تحكم التاجر المعاد بناؤها بشكل نظيف ومنظم
 class MerchantDashboardScreen extends StatefulWidget {
-  final AppModeProvider appModeProvider;
-
-  const MerchantDashboardScreen({super.key, required this.appModeProvider});
+  const MerchantDashboardScreen({super.key});
 
   @override
   State<MerchantDashboardScreen> createState() =>
@@ -19,44 +16,108 @@ class MerchantDashboardScreen extends StatefulWidget {
 }
 
 class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
-  int _currentIndex = 0;
-  final GlobalKey<MerchantProductsScreenState> _productsKey =
-      GlobalKey<MerchantProductsScreenState>();
+  int _selectedIndex = 0;
 
-  List<Widget> get _merchantTabs => [
-    MerchantProductsScreen(key: _productsKey),
-    MerchantOrdersScreen(),
-    MerchantStoreSetupScreen(),
-    MerchantProfileTab(appModeProvider: widget.appModeProvider),
-  ];
+  // قائمة التبويبات
+  late final List<Widget> _tabs;
 
-  void _onTabTapped(int index) => setState(() => _currentIndex = index);
+  @override
+  void initState() {
+    super.initState();
+    _initializeTabs();
+    _showWelcomeMessage();
+  }
+
+  void _showWelcomeMessage() {
+    // عرض رسالة ترحيب للتاجر الجديد
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'مرحباً بك في لوحة تحكم التاجر! ابدأ بإضافة منتجاتك الأولى.',
+            ),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+  }
+
+  void _initializeTabs() {
+    _tabs = [
+      const MerchantProductsScreen(), // المنتجات
+      const MerchantOrdersScreen(), // الطلبات
+      const MerchantStoreSetupScreen(), // المتجر
+      const MerchantProfileTab(), // الملف
+    ];
+  }
+
+  void _onTabTapped(int index) {
+    if (index >= 0 && index < _tabs.length) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    // عرض حوار تأكيد الخروج
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تأكيد الخروج'),
+        content: const Text('هل تريد تسجيل الخروج من لوحة التحكم؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('خروج'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      // تسجيل الخروج وإعادة التوجيه للشاشة الرئيسية
+      await AuthRepository.logout();
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      }
+    }
+
+    return result ?? false; // لا تسمح بالرجوع التلقائي
+  }
+
+  void _onPopInvokedWithResult(bool didPop, dynamic result) {
+    if (!didPop) {
+      _onWillPop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
-      body: _merchantTabs[_currentIndex],
-      bottomNavigationBar: MerchantBottomBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        onAddTap: () {
-          // If currently on products tab, trigger the add dialog inside the products screen
-          if (_currentIndex == 0) {
-            _productsKey.currentState?.openAddProductDialog();
-            return;
-          }
-
-          // Default: when not on products tab, navigate to products tab first
-          setState(() {
-            _currentIndex = 0;
-          });
-          // call the dialog after a short delay so the widget is mounted
-          Future.delayed(const Duration(milliseconds: 150), () {
-            _productsKey.currentState?.openAddProductDialog();
-          });
-        },
-        onStoreTap: null,
+    return PopScope(
+      onPopInvokedWithResult: _onPopInvokedWithResult,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('لوحة التحكم'),
+          centerTitle: true,
+          elevation: 0,
+        ),
+        body: _tabs[_selectedIndex],
+        bottomNavigationBar: MerchantBottomBar(
+          currentIndex: _selectedIndex,
+          onTap: _onTabTapped,
+          onAddTap: () {
+            // منطق إضافة منتج جديد - يمكن إضافته لاحقاً
+            debugPrint('إضافة منتج جديد');
+          },
+        ),
       ),
     );
   }

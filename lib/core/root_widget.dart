@@ -67,13 +67,23 @@ class _RootWidgetState extends State<RootWidget> {
         debugPrint(
           '🔍 [RootWidget] No token found in secure storage - User not logged in',
         );
-        setState(() {
-          _user = null;
-          _userRole = null;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _user = null;
+            _userRole = null;
+            _isLoading = false;
+          });
+        }
         return;
       }
+
+      // Debug: Show loaded token
+      final loadedToken = await SecureStorageService.getToken();
+      final loadedStoreId = await SecureStorageService.getStoreId();
+      debugPrint(
+        '🔑 [RootWidget] Loaded token: ${loadedToken != null ? "Present (${loadedToken.length} chars)" : "Null"}',
+      );
+      debugPrint('🏪 [RootWidget] Loaded store_id: ${loadedStoreId ?? "Null"}');
 
       debugPrint('🔍 [RootWidget] Token found, verifying with /auth/me...');
 
@@ -115,8 +125,15 @@ class _RootWidgetState extends State<RootWidget> {
                   debugPrint('🛒 تم تفعيل وضع التاجر/الأدمن (لوحة التحكم)');
                   _appModeProvider.setMerchantMode();
                   // جلب store_id للتاجر مباشرة بعد تسجيل الدخول (admin لا يحتاج store)
-                  if (role == 'merchant') {
-                    _loadMerchantStoreId();
+                  await _loadMerchantStoreId();
+                  // Also try to load store_id from SecureStorage immediately
+                  final storedStoreId = await SecureStorageService.getStoreId();
+                  if (storedStoreId != null && mounted) {
+                    final storeSession = context.read<StoreSession>();
+                    storeSession.setStoreId(storedStoreId);
+                    debugPrint(
+                      '✅ [RootWidget] Store ID loaded from SecureStorage: $storedStoreId',
+                    );
                   }
                 } else {
                   // تاجر/أدمن دخل كعميل → واجهة العميل
@@ -129,11 +146,13 @@ class _RootWidgetState extends State<RootWidget> {
                 _appModeProvider.setCustomerMode();
               }
 
-              setState(() {
-                _user = userData;
-                _userProfile = profile;
-                _userRole = role;
-              });
+              if (mounted) {
+                setState(() {
+                  _user = userData;
+                  _userProfile = profile;
+                  _userRole = role;
+                });
+              }
             } else {
               // إذا لم يوجد سجل في user_profiles، أنشئه عبر Worker API
               try {
@@ -151,29 +170,35 @@ class _RootWidgetState extends State<RootWidget> {
                 debugPrint('⚠️ فشل إنشاء user_profile/wallet: $e');
               }
 
-              setState(() {
-                _user = userData;
-                _userProfile = null; // لم يتم إنشاء profile بعد
-                _userRole = 'customer';
-                _appModeProvider.setCustomerMode();
-              });
+              if (mounted) {
+                setState(() {
+                  _user = userData;
+                  _userProfile = null; // لم يتم إنشاء profile بعد
+                  _userRole = 'customer';
+                  _appModeProvider.setCustomerMode();
+                });
+              }
             }
           } catch (e) {
             debugPrint('⚠️ خطأ في جلب بيانات المستخدم: $e');
             // في حالة الخطأ، افترض customer
-            setState(() {
-              _user = userData;
-              _userProfile = null;
-              _userRole = 'customer';
-              _appModeProvider.setCustomerMode();
-            });
+            if (mounted) {
+              setState(() {
+                _user = userData;
+                _userProfile = null;
+                _userRole = 'customer';
+                _appModeProvider.setCustomerMode();
+              });
+            }
           }
         } else {
           debugPrint('⚠️ [RootWidget] User ID is null after verification');
-          setState(() {
-            _user = null;
-            _userRole = null;
-          });
+          if (mounted) {
+            setState(() {
+              _user = null;
+              _userRole = null;
+            });
+          }
         }
       } catch (e) {
         // Token verification failed - clear token and show login screen
@@ -183,22 +208,28 @@ class _RootWidgetState extends State<RootWidget> {
         // Token already cleared in verifyAndLoadUser, but ensure it's cleared
         await AuthRepository.logout();
 
+        if (mounted) {
+          setState(() {
+            _user = null;
+            _userRole = null;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [RootWidget] Error checking auth state: $e');
+      if (mounted) {
         setState(() {
           _user = null;
           _userRole = null;
         });
       }
-    } catch (e) {
-      debugPrint('⚠️ [RootWidget] Error checking auth state: $e');
-      setState(() {
-        _user = null;
-        _userRole = null;
-      });
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   /// جلب store_id للتاجر بعد تسجيل الدخول
@@ -246,6 +277,8 @@ class _RootWidgetState extends State<RootWidget> {
 
         if (storeId != null && storeId.isNotEmpty) {
           storeSession.setStoreId(storeId);
+          // Also save to SecureStorage for persistence
+          await SecureStorageService.saveStoreId(storeId);
           debugPrint(
             '✅ [StoreSession] تم حفظ Store ID بعد تسجيل الدخول: $storeId',
           );
@@ -260,6 +293,7 @@ class _RootWidgetState extends State<RootWidget> {
         } else {
           debugPrint('⚠️ [StoreSession] المتجر موجود لكن بدون ID');
           storeSession.clear();
+          await SecureStorageService.deleteStoreId();
         }
       } else {
         // إذا كانت الاستجابة ok لكن data = null، يعني لم يتم العثور على متجر
@@ -294,10 +328,10 @@ class _RootWidgetState extends State<RootWidget> {
           children: [
             const AuthScreen(),
             // زر تخطي عائم في أعلى اليمين
-            SafeArea(
-              child: Positioned(
-                top: 8,
-                right: 8,
+            Positioned(
+              top: 8,
+              right: 8,
+              child: SafeArea(
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.9),

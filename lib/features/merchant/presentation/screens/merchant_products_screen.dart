@@ -25,6 +25,7 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
   bool _isUpdating = false;
   bool _isDeleting = false;
   bool _isUploadingImage = false;
+  bool _showCreateStoreButton = false; // لعرض زر إنشاء المتجر
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -229,31 +230,47 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
             detailsErrorCode == 'NO_ACTIVE_STORE' ||
             detailsErrorCode == 'NO_STORE_FOR_MERCHANT') {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'لم يتم العثور على متجر نشط لهذا الحساب. يرجى إنشاء متجر من إعداد المتجر أولاً.',
-                ),
-                backgroundColor: Colors.orange,
-              ),
-            );
+            setState(() {
+              _showCreateStoreButton = true;
+              _isLoading = false;
+            });
           }
         }
         // If the error is due to unauthorized / token expired — show clear message and suggest re-login
         else if (e.errorCode == AppErrorCode.unauthorized ||
             e.errorCode == AppErrorCode.tokenExpired) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'انتهت صلاحية الجلسة أو لم يتم تسجيل الدخول. يرجى إعادة تسجيل الدخول.',
-              ),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          // Clear stored token so next flows will go to login, then navigate safely
-          await SecureStorageService.deleteToken();
           if (mounted) {
-            Navigator.pushNamed(context, AppRouter.authLogin);
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('انتهت صلاحية الجلسة'),
+                content: const Text(
+                  'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('إلغاء'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                      }
+                      await SecureStorageService.deleteToken();
+                      if (mounted) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRouter.authLogin,
+                          (route) => false,
+                        );
+                      }
+                    },
+                    child: const Text('تسجيل الدخول'),
+                  ),
+                ],
+              ),
+            );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -534,11 +551,11 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
       } else {
         debugPrint('⚠️ لا توجد صورة لحفظها');
       }
+      // Remove store_id - Edge Function will derive it from JWT
       productData.remove('id');
       productData.remove('product_id');
       productData.remove('user_id');
       productData.remove('owner_id');
-      productData['store_id'] = storeId;
       debugPrint('[MBUY] Sending create product request: $productData');
 
       try {
@@ -579,11 +596,11 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
               break;
             case 'NOT_MERCHANT':
               userFriendlyMessage =
-                  'هذا الحساب غير مسجل كتاجر. يرجى التحقق من صلاحيات الحساب.';
+                  'هذا الحساب ليس حساب تاجر. استخدم تسجيل الدخول كعميل.';
               break;
             case 'NO_ACTIVE_STORE':
               userFriendlyMessage =
-                  'لا يوجد متجر نشط لهذا الحساب. يرجى إنشاء متجر من إعداد المتجر أولاً.';
+                  'لا يوجد متجر نشط لحسابك. الرجاء إنشاء متجر جديد.';
               break;
             case 'INSERT_FAILED':
               userFriendlyMessage =
@@ -599,7 +616,7 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
               break;
             case 'UNAUTHORIZED':
               userFriendlyMessage =
-                  'انتهت صلاحية الجلسة أو لم يتم تسجيل الدخول. يرجى إعادة تسجيل الدخول.';
+                  'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.';
               break;
             default:
               userFriendlyMessage =
@@ -852,7 +869,52 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: _showCreateStoreButton
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.store_outlined,
+                    size: 64,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'لم يتم العثور على متجر نشط',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'يجب إنشاء متجر أولاً قبل إضافة المنتجات',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // انتقل إلى تبويب المتجر (index 2)
+                      Navigator.of(context).pushReplacementNamed(
+                        AppRouter.merchantDashboard,
+                        arguments: {'initialIndex': 2},
+                      );
+                    },
+                    icon: const Icon(Icons.store),
+                    label: const Text('إنشاء متجر الآن'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _products.isEmpty
           ? Center(
@@ -866,8 +928,9 @@ class MerchantProductsScreenState extends State<MerchantProductsScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'لا توجد منتجات',
+                    'لا توجد منتجات. اضغط على زر + لإضافة أول منتج لمتجرك.',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(

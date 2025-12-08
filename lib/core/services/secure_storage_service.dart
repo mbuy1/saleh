@@ -12,8 +12,10 @@ class SecureStorageService {
   // Keys
   static const String _keyJwtToken =
       'auth_token'; // Changed to auth_token as requested
+  static const String _keyRefreshToken = 'refresh_token';
   static const String _keyUserId = 'mbuy_user_id';
   static const String _keyUserEmail = 'mbuy_user_email';
+  static const String _keyStoreId = 'store_id';
 
   /// Save JWT token
   static Future<void> saveToken(String token) async {
@@ -28,6 +30,36 @@ class SecureStorageService {
   /// Delete JWT token
   static Future<void> deleteToken() async {
     await _storage.delete(key: _keyJwtToken);
+  }
+
+  /// Save refresh token
+  static Future<void> saveRefreshToken(String refreshToken) async {
+    await _storage.write(key: _keyRefreshToken, value: refreshToken);
+  }
+
+  /// Get refresh token
+  static Future<String?> getRefreshToken() async {
+    return await _storage.read(key: _keyRefreshToken);
+  }
+
+  /// Delete refresh token
+  static Future<void> deleteRefreshToken() async {
+    await _storage.delete(key: _keyRefreshToken);
+  }
+
+  /// Save store ID
+  static Future<void> saveStoreId(String storeId) async {
+    await _storage.write(key: _keyStoreId, value: storeId);
+  }
+
+  /// Get store ID
+  static Future<String?> getStoreId() async {
+    return await _storage.read(key: _keyStoreId);
+  }
+
+  /// Delete store ID
+  static Future<void> deleteStoreId() async {
+    await _storage.delete(key: _keyStoreId);
   }
 
   /// Save user ID

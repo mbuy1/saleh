@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/services/order_service.dart';
 import '../../../../core/session/store_session.dart';
+import '../../../../core/app_router.dart';
 import 'merchant_order_details_screen.dart';
 import '../../../auth/data/auth_repository.dart';
 
@@ -38,10 +39,24 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
 
       if (storeId == null || storeId.isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لم يتم العثور على متجر لهذا الحساب. يرجى إنشاء متجر أولاً'),
-              backgroundColor: Colors.orange,
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('لا يوجد متجر'),
+              content: const Text('لا يوجد متجر مرتبط بحسابك.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('إلغاء'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, AppRouter.merchantStoreSetup);
+                  },
+                  child: const Text('إنشاء متجر'),
+                ),
+              ],
             ),
           );
         }
@@ -129,8 +144,9 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'لا توجد طلبات',
+                    'لا توجد طلبات حتى الآن. شارك رابط متجرك مع عملائك لبدء استقبال الطلبات.',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

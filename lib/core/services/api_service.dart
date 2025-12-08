@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../errors/app_error_codes.dart';
+import '../exceptions/app_exception.dart';
 import 'logger_service.dart';
 import 'secure_storage_service.dart';
+import '../../features/auth/data/auth_repository.dart';
 
 /// MBUY API Service
 /// Handles all API calls to Cloudflare Worker (API Gateway)
@@ -26,9 +27,60 @@ class ApiService {
       if (mbuyToken != null && mbuyToken.isNotEmpty) {
         return mbuyToken;
       }
+
+      // إذا كان JWT مفقود، انتظر قليلاً وأعد المحاولة مرة واحدة
+      await Future.delayed(const Duration(milliseconds: 500));
+      final retryToken = await SecureStorageService.getToken();
+      if (retryToken != null && retryToken.isNotEmpty) {
+        return retryToken;
+      }
+
       return null;
     } catch (e) {
       logger.error('Error getting JWT', error: e);
+      return null;
+    }
+  }
+
+  /// Refresh JWT token using refresh token
+  static Future<String?> _refreshToken() async {
+    try {
+      final refreshToken = await SecureStorageService.getRefreshToken();
+      if (refreshToken == null) {
+        logger.warning('No refresh token available', tag: 'API');
+        return null;
+      }
+
+      logger.debug('Attempting token refresh', tag: 'API');
+
+      final response = await _makeAuthRequest(
+        'POST',
+        '/auth/refresh',
+        body: {'refresh_token': refreshToken},
+        enableRetry: false,
+        requireAuth: false, // Refresh endpoint doesn't need auth
+      );
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && data['ok'] == true) {
+        final newToken = data['token'] as String?;
+        final newRefreshToken = data['refresh_token'] as String?;
+
+        if (newToken != null) {
+          await SecureStorageService.saveToken(newToken);
+          if (newRefreshToken != null) {
+            await SecureStorageService.saveRefreshToken(newRefreshToken);
+          }
+          logger.debug('Token refreshed successfully', tag: 'API');
+          return newToken;
+        }
+      }
+
+      logger.warning('Token refresh failed', tag: 'API', data: data);
+      return null;
+    } catch (e) {
+      logger.error('Token refresh error', error: e, tag: 'API');
       return null;
     }
   }
@@ -41,19 +93,29 @@ class ApiService {
     bool enableRetry = true,
     bool requireAuth = true, // Default to requiring auth
   }) async {
+    // إذا كان المسار يبدأ بـ /secure، يجب إضافة Authorization header
+    final isSecureEndpoint = endpoint.startsWith('/secure');
+
+    String? jwt;
+    if (requireAuth || isSecureEndpoint) {
+      jwt = await _getJwtToken();
+      if (jwt == null || jwt.isEmpty) {
+        // لا نرمي خطأ فوراً، بل نعيد تحميل البيانات من SecureStorage
+        await Future.delayed(const Duration(seconds: 1));
+        jwt = await _getJwtToken();
+
+        if (jwt == null || jwt.isEmpty) {
+          throw AppException.unauthorized(
+            message: 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.',
+          );
+        }
+      }
+    }
+
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = <String, String>{'Content-Type': 'application/json'};
 
-    // إذا كان المسار يبدأ بـ /secure، يجب إضافة Authorization header
-    final isSecureEndpoint = endpoint.startsWith('/secure');
-    if (requireAuth || isSecureEndpoint) {
-      final jwt = await _getJwtToken();
-      if (jwt == null || jwt.isEmpty) {
-        throw AppException(
-          errorCode: AppErrorCode.unauthorized,
-          message: 'يجب تسجيل الدخول أولاً (JWT مفقود أو فارغ)',
-        );
-      }
+    if (jwt != null) {
       headers['Authorization'] = 'Bearer $jwt';
     }
 
@@ -97,6 +159,20 @@ class ApiService {
         if (response.statusCode < 500 ||
             !enableRetry ||
             attempt >= maxRetries) {
+          // Check for 401 Unauthorized - attempt token refresh once
+          if (response.statusCode == 401 &&
+              (requireAuth || isSecureEndpoint) &&
+              attempt == 1) {
+            logger.debug('Received 401, attempting token refresh', tag: 'API');
+            final newToken = await _refreshToken();
+            if (newToken != null) {
+              // Retry the request with new token
+              headers['Authorization'] = 'Bearer $newToken';
+              attempt--; // Don't count this as a retry attempt
+              continue;
+            }
+          }
+
           logger.debug(
             '$method $endpoint → ${response.statusCode}',
             tag: 'API',
@@ -121,7 +197,7 @@ class ApiService {
       } on SocketException catch (e) {
         if (!enableRetry || attempt >= maxRetries) {
           logger.error('Network error', error: e, tag: 'API');
-          throw AppException.network('تحقق من اتصالك بالإنترنت');
+          throw AppException.network(message: 'تحقق من اتصالك بالإنترنت');
         }
 
         logger.warning('Network error, retrying...', tag: 'API');
@@ -129,16 +205,13 @@ class ApiService {
       } on TimeoutException catch (e) {
         if (!enableRetry || attempt >= maxRetries) {
           logger.error('Request timeout', error: e, tag: 'API');
-          throw AppException(
-            errorCode: AppErrorCode.timeout,
-            message: 'انتهت مهلة الطلب',
-          );
+          throw AppException.timeout(message: 'انتهت مهلة الطلب');
         }
         logger.warning('Request timeout, retrying...', tag: 'API');
         await Future.delayed(retryDelay * attempt);
       } on http.ClientException catch (e) {
         logger.error('HTTP client error', error: e, tag: 'API');
-        throw AppException.network(e.message);
+        throw AppException.network(message: e.message);
       }
     }
   }
@@ -178,7 +251,7 @@ class ApiService {
         stackTrace: stackTrace,
         tag: 'API',
       );
-      throw AppException.server(e.toString());
+      throw AppException.server(message: e.toString());
     }
   }
 
@@ -190,12 +263,6 @@ class ApiService {
     bool requireAuth = true,
   }) async {
     try {
-      logger.debug(
-        'POST $endpoint',
-        tag: 'API',
-        data: data != null ? 'Body: ${json.encode(data)}' : 'No body',
-      );
-
       final response = await _makeAuthRequest(
         'POST',
         endpoint,
@@ -205,14 +272,6 @@ class ApiService {
       );
 
       final responseData = json.decode(response.body) as Map<String, dynamic>;
-
-      logger.debug(
-        'POST $endpoint → ${response.statusCode}',
-        tag: 'API',
-        data: responseData.toString().length > 200
-            ? '${responseData.toString().substring(0, 200)}...'
-            : responseData.toString(),
-      );
 
       // Handle error responses
       if (response.statusCode >= 400) {
@@ -229,7 +288,7 @@ class ApiService {
         stackTrace: stackTrace,
         tag: 'API',
       );
-      throw AppException.server(e.toString());
+      throw AppException.server(message: e.toString());
     }
   }
 
@@ -266,188 +325,71 @@ class ApiService {
         stackTrace: stackTrace,
         tag: 'API',
       );
-      throw AppException.server(e.toString());
+      throw AppException.server(message: e.toString());
     }
   }
 
   /// Handle error responses from API
   static void _handleErrorResponse(int statusCode, Map<String, dynamic> data) {
-    // Check for specific error codes from API
-    // Handle both String and int error codes
-    final errorCodeValue = data['code'];
-    final errorCode = errorCodeValue is String
-        ? errorCodeValue
-        : (errorCodeValue is int ? errorCodeValue.toString() : null);
-
-    // Get error message from API response (prioritize message over error)
-    final errorMessage =
-        data['message']?.toString() ?? data['error']?.toString();
-
-    // Handle specific error codes from Worker API
-    if (errorCode == 'INVALID_CREDENTIALS') {
-      throw AppException(
-        errorCode: AppErrorCode.validationError,
-        message: errorMessage ?? 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-        details: data,
-      );
-    }
-
-    if (errorCode == 'ACCOUNT_DISABLED') {
-      throw AppException(
-        errorCode: AppErrorCode.forbidden,
-        message: errorMessage ?? 'تم تعطيل حسابك. يرجى التواصل مع الدعم',
-        details: data,
-      );
-    }
-
-    if (errorCode == 'EMAIL_EXISTS') {
-      throw AppException(
-        errorCode: AppErrorCode.validationError,
-        message: errorMessage ?? 'البريد الإلكتروني مسجل مسبقاً',
-        details: data,
-      );
-    }
-
-    // Handle PROFILE_NOT_FOUND
-    if (errorCode == 'PROFILE_NOT_FOUND') {
-      throw AppException(
-        errorCode: AppErrorCode.notFound,
-        message:
-            errorMessage ??
-            'الملف الشخصي غير موجود. يرجى إكمال إعداد الملف الشخصي.',
-        details: data,
-      );
-    }
-
-    // Handle STORE_NOT_FOUND specifically
-    if (errorCode == 'STORE_NOT_FOUND') {
-      throw AppException(
-        errorCode: AppErrorCode.storeNotFound,
-        message:
-            errorMessage ??
-            'لم يتم العثور على متجر لهذا الحساب، يرجى إنشاء متجر من إعداد المتجر.',
-        details: data,
-      );
-    }
-
-    // Handle ORDER_NOT_FOUND
-    if (errorCode == 'ORDER_NOT_FOUND') {
-      throw AppException(
-        errorCode: AppErrorCode.orderNotFound,
-        message: errorMessage ?? 'الطلب غير موجود',
-        details: data,
-      );
-    }
-
-    // Handle PRODUCT_NOT_FOUND
-    if (errorCode == 'PRODUCT_NOT_FOUND') {
-      throw AppException(
-        errorCode: AppErrorCode.productNotFound,
-        message: errorMessage ?? 'المنتج غير موجود',
-        details: data,
-      );
-    }
-
-    // Handle MISSING_ENV
-    if (errorCode == 'MISSING_ENV') {
-      throw AppException(
-        errorCode: AppErrorCode.serverError,
-        message:
-            errorMessage ?? 'خطأ في إعدادات الخادم. يرجى التواصل مع الدعم.',
-        details: data,
-      );
-    }
-
-    // Handle RLS_ERROR
-    if (errorCode == 'RLS_ERROR') {
-      throw AppException(
-        errorCode: AppErrorCode.forbidden,
-        message: errorMessage ?? 'تم رفض الوصول. يرجى التواصل مع الدعم.',
-        details: data,
-      );
-    }
-
-    // Handle BAD_REQUEST
-    if (errorCode == 'BAD_REQUEST') {
-      throw AppException(
-        errorCode: AppErrorCode.validationError,
-        message: errorMessage ?? 'بيانات غير صحيحة',
-        details: data,
-      );
-    }
-
-    // Handle FORBIDDEN
-    if (errorCode == 'FORBIDDEN' || errorCode == 'UNAUTHORIZED') {
-      throw AppException(
-        errorCode: AppErrorCode.forbidden,
-        message: errorMessage ?? 'ليس لديك صلاحية الوصول',
-        details: data,
-      );
-    }
-
-    // Handle INTERNAL_ERROR
-    if (errorCode == 'INTERNAL_ERROR' || errorCode == 'SERVER_ERROR') {
-      throw AppException(
-        errorCode: AppErrorCode.serverError,
-        message: errorMessage ?? 'خطأ في الخادم',
-        details: data,
-      );
-    }
-
     // Try to parse error from response
     if (data.containsKey('error_code')) {
-      throw AppException.fromResponse(data);
+      final appException = AppException.fromResponse(data);
+
+      // If unauthorized, logout immediately
+      if (appException.type == AppExceptionType.unauthorized) {
+        _performLogoutOnUnauthorized();
+      }
+
+      throw appException;
     }
 
     // Fallback based on status code
     switch (statusCode) {
       case 400:
-        throw AppException(
-          errorCode: AppErrorCode.validationError,
-          message: errorMessage ?? 'بيانات غير صحيحة',
-          details: data['details'],
+        throw AppException.validation(
+          message: data['error']?.toString() ?? 'بيانات غير صحيحة',
         );
       case 401:
-        // For 401, use the message from API if available, otherwise generic message
-        throw AppException(
-          errorCode: AppErrorCode.unauthorized,
-          message: errorMessage ?? 'يجب تسجيل الدخول',
-          details: data,
+        _performLogoutOnUnauthorized();
+        throw AppException.unauthorized(
+          message: 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.',
         );
       case 403:
-        throw AppException(
-          errorCode: AppErrorCode.forbidden,
-          message: errorMessage ?? 'ليس لديك صلاحية الوصول',
-          details: data,
-        );
+        throw AppException.unauthorized(message: 'ليس لديك صلاحية الوصول');
       case 404:
-        throw AppException(
-          errorCode: AppErrorCode.notFound,
-          message: errorMessage ?? 'العنصر غير موجود',
-          details: data,
+        throw AppException.notFound(
+          message: data['error']?.toString() ?? 'العنصر غير موجود',
         );
       case 429:
-        throw AppException(
-          errorCode: AppErrorCode.rateLimitExceeded,
+        throw AppException.server(
           message: 'تم تجاوز عدد الطلبات المسموحة',
-          details: data,
+          code: 'RATE_LIMIT_EXCEEDED',
         );
       default:
-        throw AppException.server(errorMessage ?? 'خطأ في الخادم');
+        throw AppException.server(
+          message: data['error']?.toString(),
+          code: 'SERVER_ERROR',
+        );
+    }
+  }
+
+  /// Perform logout when receiving unauthorized error
+  static Future<void> _performLogoutOnUnauthorized() async {
+    try {
+      logger.warning(
+        'Received 401 Unauthorized - performing automatic logout',
+        tag: 'API',
+      );
+      await AuthRepository.logout();
+    } catch (e) {
+      logger.error('Error during automatic logout', error: e, tag: 'API');
     }
   }
 
   /// DELETE request
-  static Future<Map<String, dynamic>> delete(
-    String endpoint, {
-    bool requireAuth = true,
-  }) async {
+  static Future<Map<String, dynamic>> delete(String endpoint) async {
     try {
-      final response = await _makeAuthRequest(
-        'DELETE',
-        endpoint,
-        requireAuth: requireAuth,
-      );
+      final response = await _makeAuthRequest('DELETE', endpoint);
       return json.decode(response.body);
     } catch (e) {
       debugPrint('❌ DELETE Error: $e');

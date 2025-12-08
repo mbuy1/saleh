@@ -103,6 +103,6 @@ class _MerchantHomeScreenState extends State<MerchantHomeScreen> {
   @override
   Widget build(BuildContext context) {
     // الصفحة الرئيسية للتاجر هي لوحة التحكم مباشرة
-    return MerchantDashboardScreen(appModeProvider: widget.appModeProvider);
+    return const MerchantDashboardScreen();
   }
 }

@@ -42,7 +42,7 @@ class MerchantBottomBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(0, Icons.home_filled, 'الرئيسية'),
+                  _buildNavItem(0, Icons.inventory_2_outlined, 'المنتجات'),
                   _buildNavItem(1, Icons.shopping_bag_outlined, 'الطلبات'),
 
                   // Premium Floating FAB - 38px with elevation 14
@@ -77,8 +77,8 @@ class MerchantBottomBar extends StatelessWidget {
                     ),
                   ),
 
-                  _buildNavItem(2, Icons.chat_bubble_outline, 'المحادثات'),
-                  _buildNavItem(3, Icons.store, 'المتجر'),
+                  _buildNavItem(2, Icons.store_outlined, 'المتجر'),
+                  _buildNavItem(3, Icons.person_outline, 'الملف'),
                 ],
               ),
             ),
@@ -89,18 +89,16 @@ class MerchantBottomBar extends StatelessWidget {
   }
 
   Widget _buildNavItem(int index, IconData icon, String label) {
-    // Adjust index for items after the center button
-    final actualIndex = index > 1 ? index + 1 : index;
-    final isSelected = currentIndex == actualIndex;
+    final isSelected = currentIndex == index;
 
-    // Special handling for store icon (index 3)
-    if (index == 3 && icon == Icons.store) {
+    // Special handling for store icon (index 2)
+    if (index == 2 && icon == Icons.store_outlined) {
       return GestureDetector(
         onTap: () {
           if (onStoreTap != null) {
             onStoreTap!();
           } else {
-            onTap(actualIndex);
+            onTap(index);
           }
         },
         behavior: HitTestBehavior.opaque,
@@ -141,7 +139,7 @@ class MerchantBottomBar extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () => onTap(actualIndex),
+      onTap: () => onTap(index),
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

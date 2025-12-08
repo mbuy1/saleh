@@ -58,7 +58,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       if (result['ok'] == true && result['data'] != null) {
         final response = result['data'] as Map<String, dynamic>;
         final storeId = response['id'] as String?;
-        
+
         setState(() {
           _store = response;
           _nameController.text = _store!['name'] ?? '';
@@ -66,7 +66,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
           _descriptionController.text = _store!['description'] ?? '';
           _logoUrl = _store!['logo_url'] as String?;
         });
-        
+
         // حفظ store_id في StoreSession
         if (storeId != null && storeId.isNotEmpty && mounted) {
           context.read<StoreSession>().setStoreId(storeId);
@@ -76,8 +76,10 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في جلب بيانات المتجر: ${e.toString()}'),
+          const SnackBar(
+            content: Text(
+              'خطأ في جلب بيانات المتجر. تحقق من اتصال الإنترنت وحاول مرة أخرى.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -124,8 +126,10 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('خطأ في رفع الصورة: ${e.toString()}'),
+              const SnackBar(
+                content: Text(
+                  'فشل رفع الصورة. تحقق من حجم الملف وحاول مرة أخرى.',
+                ),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -155,7 +159,7 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
       if (result['ok'] == true && result['data'] != null) {
         final response = result['data'] as Map<String, dynamic>;
         final storeId = response['id'] as String?;
-        
+
         setState(() {
           _store = response;
         });
@@ -176,14 +180,15 @@ class _MerchantStoreSetupScreenState extends State<MerchantStoreSetupScreen> {
         }
       } else {
         // Handle API error response
-        final errorMessage = result['message'] ?? result['error'] ?? 'فشل إنشاء المتجر';
+        final errorMessage =
+            result['message'] ?? result['error'] ?? 'فشل إنشاء المتجر';
         throw Exception(errorMessage);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في إنشاء المتجر: ${e.toString()}'),
+          const SnackBar(
+            content: Text('فشل إنشاء المتجر. تحقق من البيانات وحاول مرة أخرى.'),
             backgroundColor: Colors.red,
           ),
         );

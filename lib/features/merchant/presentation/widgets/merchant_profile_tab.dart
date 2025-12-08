@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../auth/data/auth_service.dart';
@@ -8,9 +7,7 @@ import '../screens/merchant_store_setup_screen.dart';
 import '../screens/merchant_points_screen.dart';
 
 class MerchantProfileTab extends StatefulWidget {
-  final AppModeProvider appModeProvider;
-
-  const MerchantProfileTab({super.key, required this.appModeProvider});
+  const MerchantProfileTab({super.key});
 
   @override
   State<MerchantProfileTab> createState() => _MerchantProfileTabState();
@@ -34,7 +31,9 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
     try {
       final userId = await AuthRepository.getUserId();
       if (userId == null) {
-        debugPrint('⚠️ [MerchantProfileTab] User ID is null - cannot load profile');
+        debugPrint(
+          '⚠️ [MerchantProfileTab] User ID is null - cannot load profile',
+        );
         setState(() {
           _isLoading = false;
         });
@@ -46,14 +45,20 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
       debugPrint('🔍 [MerchantProfileTab] Endpoint: GET /secure/users/me');
 
       final response = await ApiService.get('/secure/users/me');
-      
+
       debugPrint('📥 [MerchantProfileTab] Response received');
       debugPrint('📥 [MerchantProfileTab] Response ok: ${response['ok']}');
-      debugPrint('📥 [MerchantProfileTab] Response has data: ${response['data'] != null}');
+      debugPrint(
+        '📥 [MerchantProfileTab] Response has data: ${response['data'] != null}',
+      );
       debugPrint('📥 [MerchantProfileTab] Response code: ${response['code']}');
-      debugPrint('📥 [MerchantProfileTab] Response message: ${response['message']}');
-      debugPrint('📥 [MerchantProfileTab] Response error: ${response['error']}');
-      
+      debugPrint(
+        '📥 [MerchantProfileTab] Response message: ${response['message']}',
+      );
+      debugPrint(
+        '📥 [MerchantProfileTab] Response error: ${response['error']}',
+      );
+
       if (response['ok'] == true && response['data'] != null) {
         setState(() {
           _userProfile = response['data'] as Map<String, dynamic>;
@@ -64,18 +69,17 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
         setState(() {
           _isLoading = false;
         });
-        
+
         // Extract error message from response
-        final errorMessage = response['message'] ?? 
-                            response['error'] ?? 
-                            'خطأ غير معروف';
+        final errorMessage =
+            response['message'] ?? response['error'] ?? 'خطأ غير معروف';
         final errorCode = response['code'] ?? 'UNKNOWN_ERROR';
-        
+
         debugPrint('❌ [MerchantProfileTab] Failed to load profile');
         debugPrint('❌ [MerchantProfileTab] Error code: $errorCode');
         debugPrint('❌ [MerchantProfileTab] Error message: $errorMessage');
         debugPrint('❌ [MerchantProfileTab] Full response: $response');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -90,12 +94,12 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
       setState(() {
         _isLoading = false;
       });
-      
+
       debugPrint('❌ [MerchantProfileTab] Exception occurred');
       debugPrint('❌ [MerchantProfileTab] Error type: ${e.runtimeType}');
       debugPrint('❌ [MerchantProfileTab] Error message: ${e.toString()}');
       debugPrint('❌ [MerchantProfileTab] Stack trace: $stackTrace');
-      
+
       // Try to extract error message from exception
       String errorMessage = 'خطأ غير معروف';
       if (e is Map<String, dynamic>) {
@@ -103,7 +107,7 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
       } else {
         errorMessage = e.toString();
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -139,13 +143,10 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
     if (confirmed == true) {
       try {
         await AuthService.signOut();
-        
+
         // إعادة توجيه المستخدم إلى شاشة تسجيل الدخول
         if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/',
-            (route) => false,
-          );
+          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
         }
       } catch (e) {
         if (mounted) {
@@ -249,47 +250,6 @@ class _MerchantProfileTabState extends State<MerchantProfileTab> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // زر التبديل لوضع العميل
-                  Card(
-                    color: MbuyColors.surfaceLight,
-                    child: ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: MbuyColors.primaryBlue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag,
-                          color: MbuyColors.primaryBlue,
-                        ),
-                      ),
-                      title: const Text(
-                        'التبديل لوضع العميل',
-                        style: TextStyle(
-                          color: MbuyColors.textPrimary,
-                          fontFamily: 'Arabic',
-                        ),
-                      ),
-                      subtitle: const Text(
-                        'اعرض التطبيق كعميل',
-                        style: TextStyle(
-                          color: MbuyColors.textSecondary,
-                          fontFamily: 'Arabic',
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: MbuyColors.textSecondary,
-                      ),
-                      onTap: () {
-                        widget.appModeProvider.setCustomerMode();
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
 
                   // إدارة المتجر والنقاط
                   Card(

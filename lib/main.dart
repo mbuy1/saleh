@@ -213,10 +213,7 @@ Route<dynamic>? _generateRoute(
 
     // Merchant Routes
     case AppRouter.merchantDashboard:
-      return MaterialPageRoute(
-        builder: (_) =>
-            MerchantDashboardScreen(appModeProvider: appModeProvider),
-      );
+      return MaterialPageRoute(builder: (_) => const MerchantDashboardScreen());
     case AppRouter.merchantProducts:
       return MaterialPageRoute(builder: (_) => const MerchantProductsScreen());
     case AppRouter.merchantOrders:
