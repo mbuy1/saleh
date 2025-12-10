@@ -1,1231 +1,232 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../exceptions/app_exception.dart';
-import 'logger_service.dart';
-import 'secure_storage_service.dart';
-import '../../features/auth/data/auth_repository.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../app_config.dart';
 
-/// MBUY API Service
-/// Handles all API calls to Cloudflare Worker (API Gateway)
+/// API Service - Handles all HTTP communication with Cloudflare Worker
+///
+/// This service:
+/// - Manages all HTTP requests (GET, POST, PUT, DELETE)
+/// - Handles authentication via Bearer tokens
+/// - Automatic retry logic for failed requests
+/// - Token refresh on 401 responses
 class ApiService {
-  static const String baseUrl =
-      'https://misty-mode-b68b.baharista1.workers.dev';
+  final String baseUrl;
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   // Retry configuration
   static const int maxRetries = 3;
   static const Duration retryDelay = Duration(seconds: 2);
-  static const List<int> retryableStatusCodes = [408, 429, 500, 502, 503, 504];
 
-  /// Get JWT token from Secure Storage (MBUY Custom Auth only)
-  /// No Supabase Auth fallback
-  static Future<String?> _getJwtToken() async {
-    try {
-      final mbuyToken = await SecureStorageService.getToken();
-      if (mbuyToken != null && mbuyToken.isNotEmpty) {
-        return mbuyToken;
-      }
+  ApiService({String? baseUrl}) : baseUrl = baseUrl ?? AppConfig.apiBaseUrl;
 
-      // إذا كان JWT مفقود، انتظر قليلاً وأعد المحاولة مرة واحدة
-      await Future.delayed(const Duration(milliseconds: 500));
-      final retryToken = await SecureStorageService.getToken();
-      if (retryToken != null && retryToken.isNotEmpty) {
-        return retryToken;
-      }
-
-      return null;
-    } catch (e) {
-      logger.error('Error getting JWT', error: e);
-      return null;
-    }
-  }
-
-  /// Refresh JWT token using refresh token
-  static Future<String?> _refreshToken() async {
-    try {
-      final refreshToken = await SecureStorageService.getRefreshToken();
-      if (refreshToken == null) {
-        logger.warning('No refresh token available', tag: 'API');
-        return null;
-      }
-
-      logger.debug('Attempting token refresh', tag: 'API');
-
-      final response = await _makeAuthRequest(
-        'POST',
-        '/auth/refresh',
-        body: {'refresh_token': refreshToken},
-        enableRetry: false,
-        requireAuth: false, // Refresh endpoint doesn't need auth
-      );
-
-      final data = json.decode(response.body) as Map<String, dynamic>;
-
-      if (response.statusCode == 200 && data['ok'] == true) {
-        final newToken = data['token'] as String?;
-        final newRefreshToken = data['refresh_token'] as String?;
-
-        if (newToken != null) {
-          await SecureStorageService.saveToken(newToken);
-          if (newRefreshToken != null) {
-            await SecureStorageService.saveRefreshToken(newRefreshToken);
-          }
-          logger.debug('Token refreshed successfully', tag: 'API');
-          return newToken;
-        }
-      }
-
-      logger.warning('Token refresh failed', tag: 'API', data: data);
-      return null;
-    } catch (e) {
-      logger.error('Token refresh error', error: e, tag: 'API');
-      return null;
-    }
-  }
-
-  /// Helper: Make authenticated request with retry logic
-  static Future<http.Response> _makeAuthRequest(
-    String method,
-    String endpoint, {
-    Map<String, dynamic>? body,
-    bool enableRetry = true,
-    bool requireAuth = true, // Default to requiring auth
-  }) async {
-    // إذا كان المسار يبدأ بـ /secure، يجب إضافة Authorization header
-    final isSecureEndpoint = endpoint.startsWith('/secure');
-
-    String? jwt;
-    if (requireAuth || isSecureEndpoint) {
-      jwt = await _getJwtToken();
-      if (jwt == null || jwt.isEmpty) {
-        // لا نرمي خطأ فوراً، بل نعيد تحميل البيانات من SecureStorage
-        await Future.delayed(const Duration(seconds: 1));
-        jwt = await _getJwtToken();
-
-        if (jwt == null || jwt.isEmpty) {
-          throw AppException.unauthorized(
-            message: 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.',
-          );
-        }
-      }
-    }
-
-    final url = Uri.parse('$baseUrl$endpoint');
-    final headers = <String, String>{'Content-Type': 'application/json'};
-
-    if (jwt != null) {
-      headers['Authorization'] = 'Bearer $jwt';
-    }
-
-    int attempt = 0;
-    while (true) {
-      attempt++;
-
-      try {
-        logger.debug(
-          '$method $endpoint (attempt $attempt/$maxRetries)',
-          tag: 'API',
-        );
-
-        final http.Response response;
-        switch (method.toUpperCase()) {
-          case 'GET':
-            response = await http
-                .get(url, headers: headers)
-                .timeout(const Duration(seconds: 30));
-            break;
-          case 'POST':
-            response = await http
-                .post(url, headers: headers, body: json.encode(body))
-                .timeout(const Duration(seconds: 30));
-            break;
-          case 'PUT':
-            response = await http
-                .put(url, headers: headers, body: json.encode(body))
-                .timeout(const Duration(seconds: 30));
-            break;
-          case 'DELETE':
-            response = await http
-                .delete(url, headers: headers)
-                .timeout(const Duration(seconds: 30));
-            break;
-          default:
-            throw Exception('Unsupported method: $method');
-        }
-
-        // Success or non-retryable error
-        if (response.statusCode < 500 ||
-            !enableRetry ||
-            attempt >= maxRetries) {
-          // Check for 401 Unauthorized - attempt token refresh once
-          if (response.statusCode == 401 &&
-              (requireAuth || isSecureEndpoint) &&
-              attempt == 1) {
-            logger.debug('Received 401, attempting token refresh', tag: 'API');
-            final newToken = await _refreshToken();
-            if (newToken != null) {
-              // Retry the request with new token
-              headers['Authorization'] = 'Bearer $newToken';
-              attempt--; // Don't count this as a retry attempt
-              continue;
-            }
-          }
-
-          logger.debug(
-            '$method $endpoint → ${response.statusCode}',
-            tag: 'API',
-            data: response.body.length > 200
-                ? '${response.body.substring(0, 200)}...'
-                : response.body,
-          );
-          return response;
-        }
-
-        // Retryable error
-        if (retryableStatusCodes.contains(response.statusCode)) {
-          logger.warning(
-            'Retryable error ${response.statusCode}, retrying in ${retryDelay.inSeconds}s...',
-            tag: 'API',
-          );
-          await Future.delayed(retryDelay * attempt);
-          continue;
-        }
-
-        return response;
-      } on SocketException catch (e) {
-        if (!enableRetry || attempt >= maxRetries) {
-          logger.error('Network error', error: e, tag: 'API');
-          throw AppException.network(message: 'تحقق من اتصالك بالإنترنت');
-        }
-
-        logger.warning('Network error, retrying...', tag: 'API');
-        await Future.delayed(retryDelay * attempt);
-      } on TimeoutException catch (e) {
-        if (!enableRetry || attempt >= maxRetries) {
-          logger.error('Request timeout', error: e, tag: 'API');
-          throw AppException.timeout(message: 'انتهت مهلة الطلب');
-        }
-        logger.warning('Request timeout, retrying...', tag: 'API');
-        await Future.delayed(retryDelay * attempt);
-      } on http.ClientException catch (e) {
-        logger.error('HTTP client error', error: e, tag: 'API');
-        throw AppException.network(message: e.message);
-      }
-    }
-  }
-
-  // ============================================================================
-  // PUBLIC API METHODS
-  // ============================================================================
+  // ==========================================================================
+  // Public HTTP Methods
+  // ==========================================================================
 
   /// GET request
-  static Future<Map<String, dynamic>> get(
-    String endpoint, {
-    bool enableRetry = true,
-    bool requireAuth = true,
+  Future<http.Response> get(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? queryParams,
   }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        endpoint,
-        enableRetry: enableRetry,
-        requireAuth: requireAuth,
-      );
+    final uri = _buildUri(path, queryParams);
+    final mergedHeaders = await _withAuthHeaders(headers);
 
-      final data = json.decode(response.body) as Map<String, dynamic>;
-
-      // Handle error responses
-      if (response.statusCode >= 400) {
-        _handleErrorResponse(response.statusCode, data);
-      }
-
-      return data;
-    } on AppException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logger.error(
-        'GET request failed',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'API',
-      );
-      throw AppException.server(message: e.toString());
-    }
+    return _makeRequest(() async {
+      return await http.get(uri, headers: mergedHeaders);
+    });
   }
 
   /// POST request
-  static Future<Map<String, dynamic>> post(
-    String endpoint, {
-    Map<String, dynamic>? data,
-    bool enableRetry = true,
-    bool requireAuth = true,
+  Future<http.Response> post(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
   }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        endpoint,
-        body: data,
-        enableRetry: enableRetry,
-        requireAuth: requireAuth,
+    final uri = _buildUri(path, null);
+    final mergedHeaders = await _withAuthHeaders(headers);
+    mergedHeaders['Content-Type'] = 'application/json';
+
+    return _makeRequest(() async {
+      return await http.post(
+        uri,
+        headers: mergedHeaders,
+        body: body != null ? jsonEncode(body) : null,
       );
-
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
-
-      // Handle error responses
-      if (response.statusCode >= 400) {
-        _handleErrorResponse(response.statusCode, responseData);
-      }
-
-      return responseData;
-    } on AppException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logger.error(
-        'POST request failed',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'API',
-      );
-      throw AppException.server(message: e.toString());
-    }
+    });
   }
 
   /// PUT request
-  static Future<Map<String, dynamic>> put(
-    String endpoint, {
-    Map<String, dynamic>? data,
-    bool enableRetry = true,
-    bool requireAuth = true,
+  Future<http.Response> put(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
   }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'PUT',
-        endpoint,
-        body: data,
-        enableRetry: enableRetry,
-        requireAuth: requireAuth,
+    final uri = _buildUri(path, null);
+    final mergedHeaders = await _withAuthHeaders(headers);
+    mergedHeaders['Content-Type'] = 'application/json';
+
+    return _makeRequest(() async {
+      return await http.put(
+        uri,
+        headers: mergedHeaders,
+        body: body != null ? jsonEncode(body) : null,
       );
-
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
-
-      // Handle error responses
-      if (response.statusCode >= 400) {
-        _handleErrorResponse(response.statusCode, responseData);
-      }
-
-      return responseData;
-    } on AppException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logger.error(
-        'PUT request failed',
-        error: e,
-        stackTrace: stackTrace,
-        tag: 'API',
-      );
-      throw AppException.server(message: e.toString());
-    }
-  }
-
-  /// Handle error responses from API
-  static void _handleErrorResponse(int statusCode, Map<String, dynamic> data) {
-    // Try to parse error from response
-    if (data.containsKey('error_code')) {
-      final appException = AppException.fromResponse(data);
-
-      // If unauthorized, logout immediately
-      if (appException.type == AppExceptionType.unauthorized) {
-        _performLogoutOnUnauthorized();
-      }
-
-      throw appException;
-    }
-
-    // Fallback based on status code
-    switch (statusCode) {
-      case 400:
-        throw AppException.validation(
-          message: data['error']?.toString() ?? 'بيانات غير صحيحة',
-        );
-      case 401:
-        _performLogoutOnUnauthorized();
-        throw AppException.unauthorized(
-          message: 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.',
-        );
-      case 403:
-        throw AppException.unauthorized(message: 'ليس لديك صلاحية الوصول');
-      case 404:
-        throw AppException.notFound(
-          message: data['error']?.toString() ?? 'العنصر غير موجود',
-        );
-      case 429:
-        throw AppException.server(
-          message: 'تم تجاوز عدد الطلبات المسموحة',
-          code: 'RATE_LIMIT_EXCEEDED',
-        );
-      default:
-        throw AppException.server(
-          message: data['error']?.toString(),
-          code: 'SERVER_ERROR',
-        );
-    }
-  }
-
-  /// Perform logout when receiving unauthorized error
-  static Future<void> _performLogoutOnUnauthorized() async {
-    try {
-      logger.warning(
-        'Received 401 Unauthorized - performing automatic logout',
-        tag: 'API',
-      );
-      await AuthRepository.logout();
-    } catch (e) {
-      logger.error('Error during automatic logout', error: e, tag: 'API');
-    }
+    });
   }
 
   /// DELETE request
-  static Future<Map<String, dynamic>> delete(String endpoint) async {
-    try {
-      final response = await _makeAuthRequest('DELETE', endpoint);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ DELETE Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
+  Future<http.Response> delete(
+    String path, {
+    Map<String, String>? headers,
+  }) async {
+    final uri = _buildUri(path, null);
+    final mergedHeaders = await _withAuthHeaders(headers);
+
+    return _makeRequest(() async {
+      return await http.delete(uri, headers: mergedHeaders);
+    });
   }
 
-  // ============================================================================
-  // MEDIA UPLOADS
-  // ============================================================================
+  // ==========================================================================
+  // Helper Methods
+  // ==========================================================================
 
-  /// Get upload URL for image
-  static Future<Map<String, dynamic>> getImageUploadUrl(String filename) async {
+  /// Build URI with query parameters
+  Uri _buildUri(String path, Map<String, String>? queryParams) {
+    final fullPath = path.startsWith('/') ? path : '/$path';
+    final url = '$baseUrl$fullPath';
+
+    if (queryParams != null && queryParams.isNotEmpty) {
+      return Uri.parse(url).replace(queryParameters: queryParams);
+    }
+
+    return Uri.parse(url);
+  }
+
+  /// Add authentication headers
+  Future<Map<String, String>> _withAuthHeaders(
+    Map<String, String>? headers,
+  ) async {
+    final Map<String, String> result = {};
+
+    if (headers != null) {
+      result.addAll(headers);
+    }
+
+    // Add Authorization header if token exists
+    final token = await _secureStorage.read(key: AppConfig.accessTokenKey);
+    if (token != null && token.isNotEmpty) {
+      result['Authorization'] = 'Bearer $token';
+    }
+
+    return result;
+  }
+
+  /// Make HTTP request with retry logic
+  Future<http.Response> _makeRequest(
+    Future<http.Response> Function() requestFunction,
+  ) async {
+    int attempts = 0;
+
+    while (attempts < maxRetries) {
+      attempts++;
+
+      try {
+        final response = await requestFunction().timeout(
+          const Duration(seconds: 30),
+        );
+
+        // Handle 401 Unauthorized - attempt token refresh
+        if (response.statusCode == 401 && attempts == 1) {
+          final refreshed = await _refreshToken();
+          if (refreshed) {
+            // Retry request with new token
+            continue;
+          }
+        }
+
+        return response;
+      } on SocketException catch (_) {
+        if (attempts >= maxRetries) {
+          rethrow;
+        }
+        await Future.delayed(retryDelay * attempts);
+      } on HttpException catch (_) {
+        if (attempts >= maxRetries) {
+          rethrow;
+        }
+        await Future.delayed(retryDelay * attempts);
+      } catch (e) {
+        rethrow;
+      }
+    }
+
+    throw Exception('Max retries exceeded');
+  }
+
+  /// Refresh authentication token
+  Future<bool> _refreshToken() async {
     try {
-      debugPrint('📡 طلب URL الرفع من Cloudflare Worker...');
+      final refreshToken = await _secureStorage.read(
+        key: AppConfig.refreshTokenKey,
+      );
+
+      if (refreshToken == null) {
+        return false;
+      }
+
       final response = await http.post(
-        Uri.parse('$baseUrl/media/image'),
+        Uri.parse('$baseUrl${AppConfig.refreshEndpoint}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'filename': filename}),
+        body: jsonEncode({'refresh_token': refreshToken}),
       );
-
-      debugPrint('📥 استجابة Worker: ${response.statusCode}');
-      debugPrint('📥 محتوى الاستجابة: ${response.body}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        debugPrint('✅ تم الحصول على URL الرفع بنجاح');
-        return data;
-      } else {
-        final errorBody = response.body;
-        debugPrint('❌ فشل الحصول على URL الرفع: $errorBody');
-        throw Exception(
-          'فشل الحصول على URL الرفع (${response.statusCode}): $errorBody',
-        );
-      }
-    } catch (e) {
-      debugPrint('❌ خطأ في طلب URL الرفع: $e');
-      if (e is Exception) {
-        rethrow;
-      }
-      throw Exception('خطأ في طلب URL الرفع: ${e.toString()}');
-    }
-  }
+        final data = jsonDecode(response.body);
 
-  /// Get upload URL for video
-  static Future<Map<String, dynamic>> getVideoUploadUrl(String filename) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/media/video'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'filename': filename}),
-    );
+        if (data['ok'] == true && data['token'] != null) {
+          await _secureStorage.write(
+            key: AppConfig.accessTokenKey,
+            value: data['token'],
+          );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to get video upload URL: ${response.body}');
-    }
-  }
+          if (data['refresh_token'] != null) {
+            await _secureStorage.write(
+              key: AppConfig.refreshTokenKey,
+              value: data['refresh_token'],
+            );
+          }
 
-  /// Upload image file to Cloudflare Images
-  static Future<String> uploadImage(String filePath) async {
-    try {
-      // 1. Get upload URL from Cloudflare Worker
-      debugPrint('📤 طلب URL لرفع الصورة...');
-      final uploadData = await getImageUploadUrl(filePath.split('/').last);
-
-      if (uploadData['ok'] != true) {
-        throw Exception(
-          'فشل الحصول على URL الرفع: ${uploadData['error'] ?? 'خطأ غير معروف'}',
-        );
+          return true;
+        }
       }
 
-      final uploadUrl = uploadData['uploadURL'] as String?;
-      final viewUrl = uploadData['viewURL'] as String?;
-
-      if (uploadUrl == null || viewUrl == null) {
-        throw Exception('لم يتم الحصول على URL الرفع من Cloudflare Worker');
-      }
-
-      debugPrint('✅ تم الحصول على URL الرفع: $uploadUrl');
-
-      // 2. Upload file to Cloudflare Images
-      debugPrint('📤 جاري رفع الصورة إلى Cloudflare Images...');
-      final file = await http.MultipartFile.fromPath('file', filePath);
-      final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
-      request.files.add(file);
-
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      debugPrint('📥 استجابة رفع الصورة: ${response.statusCode}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('✅ تم رفع الصورة بنجاح: $viewUrl');
-        return viewUrl;
-      } else {
-        final errorBody = response.body;
-        debugPrint('❌ فشل رفع الصورة: $errorBody');
-        throw Exception('فشل رفع الصورة (${response.statusCode}): $errorBody');
-      }
-    } catch (e) {
-      debugPrint('❌ خطأ في رفع الصورة: $e');
-      if (e is Exception) {
-        rethrow;
-      }
-      throw Exception('خطأ في رفع الصورة: ${e.toString()}');
-    }
-  }
-
-  // ============================================================================
-  // WALLET OPERATIONS
-  // ============================================================================
-
-  /// Get user wallet balance
-  static Future<Map<String, dynamic>?> getWallet() async {
-    final response = await _makeAuthRequest('GET', '/secure/wallet');
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['data'];
-    } else {
-      throw Exception('Failed to get wallet: ${response.body}');
-    }
-  }
-
-  /// Add funds to wallet
-  static Future<Map<String, dynamic>> addWalletFunds({
-    required double amount,
-    required String paymentMethod,
-    required String paymentReference,
-  }) async {
-    final response = await _makeAuthRequest(
-      'POST',
-      '/secure/wallet/add',
-      body: {
-        'amount': amount,
-        'payment_method': paymentMethod,
-        'payment_reference': paymentReference,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to add wallet funds: ${response.body}');
-    }
-  }
-
-  // ============================================================================
-  // POINTS OPERATIONS
-  // ============================================================================
-
-  /// Get user points balance
-  static Future<Map<String, dynamic>?> getPoints() async {
-    final response = await _makeAuthRequest('GET', '/secure/points');
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['data'];
-    } else {
-      throw Exception('Failed to get points: ${response.body}');
-    }
-  }
-
-  /// Add or deduct points (admin only via server)
-  static Future<Map<String, dynamic>> addPoints({
-    required int points,
-    required String reason,
-  }) async {
-    final response = await _makeAuthRequest(
-      'POST',
-      '/secure/points/add',
-      body: {'points': points, 'reason': reason},
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to add points: ${response.body}');
-    }
-  }
-
-  // ============================================================================
-  // ORDER OPERATIONS
-  // ============================================================================
-
-  /// Create new order
-  static Future<Map<String, dynamic>> createOrder({
-    required List<Map<String, dynamic>> products,
-    required String deliveryAddress,
-    required String paymentMethod,
-    int? pointsToUse,
-    String? couponCode,
-  }) async {
-    final response = await _makeAuthRequest(
-      'POST',
-      '/secure/orders/create',
-      body: {
-        'products': products,
-        'delivery_address': deliveryAddress,
-        'payment_method': paymentMethod,
-        if (pointsToUse != null) 'points_to_use': pointsToUse,
-        if (couponCode != null) 'coupon_code': couponCode,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to create order: ${response.body}');
-    }
-  }
-
-  // ============================================================================
-  // MERCHANT REGISTRATION
-  // ============================================================================
-
-  /// Register as merchant
-  static Future<Map<String, dynamic>> registerMerchant({
-    required String userId,
-    required String storeName,
-    required String city,
-    required String district,
-    required String address,
-  }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/public/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'user_id': userId,
-        'store_name': storeName,
-        'city': city,
-        'district': district,
-        'address': address,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to register merchant: ${response.body}');
-    }
-  }
-
-  // ============================================================================
-  // PRODUCTS OPERATIONS (PUBLIC)
-  // ============================================================================
-
-  /// Get products with optional filters (public - no auth required)
-  static Future<Map<String, dynamic>> getProducts({
-    int? limit,
-    int? offset,
-    String? categoryId,
-    String? storeId,
-    String? status,
-    String? sortBy,
-    bool? descending,
-  }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (offset != null) queryParams['offset'] = offset.toString();
-      if (categoryId != null) queryParams['category_id'] = categoryId;
-      if (storeId != null) queryParams['store_id'] = storeId;
-      if (status != null) queryParams['status'] = status;
-      if (sortBy != null) queryParams['sort_by'] = sortBy;
-      if (descending != null) queryParams['desc'] = descending.toString();
-
-      final uri = Uri.parse(
-        '$baseUrl/public/products',
-      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
-
-      final response = await http.get(uri);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getProducts Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get featured products (with discounts)
-  static Future<Map<String, dynamic>> getFeaturedProducts({
-    int limit = 10,
-  }) async {
-    return getProducts(limit: limit, sortBy: 'discount', descending: true);
-  }
-
-  /// Get new arrivals
-  static Future<Map<String, dynamic>> getNewArrivals({int limit = 10}) async {
-    return getProducts(limit: limit, sortBy: 'created_at', descending: true);
-  }
-
-  /// Get best sellers
-  static Future<Map<String, dynamic>> getBestSellers({int limit = 10}) async {
-    return getProducts(limit: limit, sortBy: 'sales_count', descending: true);
-  }
-
-  /// Get product by ID (public)
-  static Future<Map<String, dynamic>> getProductById(String productId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/public/products/$productId'),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getProductById Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // STORES OPERATIONS (PUBLIC)
-  // ============================================================================
-
-  /// Get all stores (public - no auth required)
-  static Future<Map<String, dynamic>> getStores({
-    int? limit,
-    int? offset,
-    String? city,
-    bool? isVerified,
-    bool? isBoosted,
-    String? sortBy,
-    bool? descending,
-  }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (offset != null) queryParams['offset'] = offset.toString();
-      if (city != null) queryParams['city'] = city;
-      if (isVerified != null) {
-        queryParams['is_verified'] = isVerified.toString();
-      }
-      if (isBoosted != null) queryParams['is_boosted'] = isBoosted.toString();
-      if (sortBy != null) queryParams['sort_by'] = sortBy;
-      if (descending != null) queryParams['desc'] = descending.toString();
-
-      final uri = Uri.parse(
-        '$baseUrl/public/stores',
-      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
-
-      final response = await http.get(uri);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getStores Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get store by ID (public)
-  static Future<Map<String, dynamic>> getStoreById(String storeId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/public/stores/$storeId'),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getStoreById Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get store products (public)
-  static Future<Map<String, dynamic>> getStoreProducts(
-    String storeId, {
-    int? limit,
-    int? offset,
-  }) async {
-    return getProducts(storeId: storeId, limit: limit, offset: offset);
-  }
-
-  // ============================================================================
-  // CATEGORIES OPERATIONS (PUBLIC)
-  // ============================================================================
-
-  /// Get all categories (public)
-  static Future<Map<String, dynamic>> getCategories() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/public/categories'));
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getCategories Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get category products (public)
-  static Future<Map<String, dynamic>> getCategoryProducts(
-    String categoryId, {
-    int? limit,
-    int? offset,
-  }) async {
-    return getProducts(categoryId: categoryId, limit: limit, offset: offset);
-  }
-
-  // ============================================================================
-  // HEALTH CHECK
-  // ============================================================================
-
-  /// Check API health
-  static Future<bool> checkHealth() async {
-    try {
-      final response = await http.get(Uri.parse(baseUrl));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['ok'] == true;
-      }
       return false;
     } catch (e) {
-      debugPrint('Health check failed: $e');
       return false;
     }
   }
 
-  // ============================================================================
-  // MERCHANT ANALYTICS
-  // ============================================================================
+  // ==========================================================================
+  // Utility Methods
+  // ==========================================================================
 
-  /// Get product analytics for merchant
-  static Future<Map<String, dynamic>> getProductAnalytics({
-    String period = '30d',
-  }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/analytics/products?period=$period',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getProductAnalytics Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
+  /// Parse JSON response
+  Map<String, dynamic> parseResponse(http.Response response) {
+    return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
-  /// Get order analytics for merchant
-  static Future<Map<String, dynamic>> getOrderAnalytics({
-    String period = '30d',
-  }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/analytics/orders?period=$period',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getOrderAnalytics Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get customer analytics for merchant
-  static Future<Map<String, dynamic>> getCustomerAnalytics({
-    String period = '30d',
-  }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/analytics/customers?period=$period',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getCustomerAnalytics Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get revenue analytics for merchant
-  static Future<Map<String, dynamic>> getRevenueAnalytics({
-    String period = '30d',
-  }) async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/analytics/revenue?period=$period',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getRevenueAnalytics Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // MERCHANT REVIEWS
-  // ============================================================================
-
-  /// Get merchant reviews
-  static Future<Map<String, dynamic>> getMerchantReviews({
-    int? limit,
-    int? offset,
-    int? rating,
-    bool? hasReply,
-  }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (offset != null) queryParams['offset'] = offset.toString();
-      if (rating != null) queryParams['rating'] = rating.toString();
-      if (hasReply != null) queryParams['has_reply'] = hasReply.toString();
-
-      final uri = Uri.parse(
-        '$baseUrl/secure/merchant/reviews',
-      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
-
-      final response = await _makeAuthRequest(
-        'GET',
-        uri.path + (uri.query.isNotEmpty ? '?${uri.query}' : ''),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getMerchantReviews Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Reply to a review
-  static Future<Map<String, dynamic>> replyToReview(
-    String reviewId,
-    String reply,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/merchant/reviews/$reviewId/reply',
-        body: {'reply': reply},
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ replyToReview Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // MERCHANT COUPONS
-  // ============================================================================
-
-  /// Get merchant coupons
-  static Future<Map<String, dynamic>> getMerchantCoupons() async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/coupons',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getMerchantCoupons Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Create a new coupon
-  static Future<Map<String, dynamic>> createCoupon(
-    Map<String, dynamic> couponData,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/merchant/coupons',
-        body: couponData,
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ createCoupon Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Update a coupon
-  static Future<Map<String, dynamic>> updateCoupon(
-    String couponId,
-    Map<String, dynamic> couponData,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'PUT',
-        '/secure/merchant/coupons/$couponId',
-        body: couponData,
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ updateCoupon Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Delete a coupon
-  static Future<Map<String, dynamic>> deleteCoupon(String couponId) async {
-    try {
-      final response = await _makeAuthRequest(
-        'DELETE',
-        '/secure/merchant/coupons/$couponId',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ deleteCoupon Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Apply coupon code
-  static Future<Map<String, dynamic>> applyCoupon(
-    String couponCode,
-    double orderTotal,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/public/coupons/apply'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'code': couponCode, 'order_total': orderTotal}),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ applyCoupon Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // MERCHANT BANNERS
-  // ============================================================================
-
-  /// Get merchant banners
-  static Future<Map<String, dynamic>> getMerchantBanners() async {
-    try {
-      final response = await _makeAuthRequest(
-        'GET',
-        '/secure/merchant/banners',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getMerchantBanners Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Create a new banner
-  static Future<Map<String, dynamic>> createBanner(
-    Map<String, dynamic> bannerData,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/merchant/banners',
-        body: bannerData,
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ createBanner Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Update a banner
-  static Future<Map<String, dynamic>> updateBanner(
-    String bannerId,
-    Map<String, dynamic> bannerData,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'PUT',
-        '/secure/merchant/banners/$bannerId',
-        body: bannerData,
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ updateBanner Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Delete a banner
-  static Future<Map<String, dynamic>> deleteBanner(String bannerId) async {
-    try {
-      final response = await _makeAuthRequest(
-        'DELETE',
-        '/secure/merchant/banners/$bannerId',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ deleteBanner Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Reorder banners
-  static Future<Map<String, dynamic>> reorderBanners(
-    List<String> bannerIds,
-  ) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/merchant/banners/reorder',
-        body: {'order': bannerIds},
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ reorderBanners Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get public banners
-  static Future<Map<String, dynamic>> getPublicBanners({
-    String? storeId,
-  }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (storeId != null) queryParams['store_id'] = storeId;
-
-      final uri = Uri.parse(
-        '$baseUrl/public/banners',
-      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
-
-      final response = await http.get(uri);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getPublicBanners Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // MERCHANT VIDEOS
-  // ============================================================================
-
-  /// Get merchant videos
-  static Future<Map<String, dynamic>> getMerchantVideos() async {
-    try {
-      final response = await _makeAuthRequest('GET', '/secure/merchant/videos');
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getMerchantVideos Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Delete a video
-  static Future<Map<String, dynamic>> deleteVideo(String videoId) async {
-    try {
-      final response = await _makeAuthRequest(
-        'DELETE',
-        '/secure/merchant/videos/$videoId',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ deleteVideo Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Get public videos (feed)
-  static Future<Map<String, dynamic>> getPublicVideos({
-    int? limit,
-    int? offset,
-    String? storeId,
-    String? productId,
-  }) async {
-    try {
-      final queryParams = <String, String>{};
-      if (limit != null) queryParams['limit'] = limit.toString();
-      if (offset != null) queryParams['offset'] = offset.toString();
-      if (storeId != null) queryParams['store_id'] = storeId;
-      if (productId != null) queryParams['product_id'] = productId;
-
-      final uri = Uri.parse(
-        '$baseUrl/public/videos',
-      ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
-
-      final response = await http.get(uri);
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ getPublicVideos Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Like a video
-  static Future<Map<String, dynamic>> likeVideo(String videoId) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/videos/$videoId/like',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ likeVideo Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Share a video
-  static Future<Map<String, dynamic>> shareVideo(String videoId) async {
-    try {
-      final response = await _makeAuthRequest(
-        'POST',
-        '/secure/videos/$videoId/share',
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ shareVideo Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  /// Record video view
-  static Future<Map<String, dynamic>> recordVideoView(String videoId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/public/videos/$videoId/view'),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ recordVideoView Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
-  }
-
-  // ============================================================================
-  // GLOBAL SEARCH
-  // ============================================================================
-
-  /// Global search across products, stores, and videos
-  static Future<Map<String, dynamic>> globalSearch(
-    String query, {
-    int limit = 20,
-  }) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '$baseUrl/public/search?q=${Uri.encodeComponent(query)}&limit=$limit',
-        ),
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      debugPrint('❌ globalSearch Error: $e');
-      return {'ok': false, 'error': e.toString()};
-    }
+  /// Check if response is successful
+  bool isSuccessful(http.Response response) {
+    return response.statusCode >= 200 && response.statusCode < 300;
   }
 }
+
+/// Riverpod Provider للوصول لـ ApiService
+final apiServiceProvider = Provider<ApiService>((ref) {
+  return ApiService();
+});
