@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'home_tab.dart';
-import 'products_tab.dart';
-import 'orders_tab.dart';
-import 'account_tab.dart';
+import '../../../community/presentation/screens/community_screen.dart';
+import '../../../conversations/presentation/screens/conversations_screen.dart';
+import '../../../store/presentation/screens/store_screen.dart';
+import '../../../products/presentation/screens/add_product_screen.dart';
 
 /// شاشة لوحة التحكم الرئيسية مع NavigationBar
-/// تحتوي على 4 تبويبات: الرئيسية، المنتجات، الطلبات، الحساب
+/// تحتوي على 5 تبويبات: الرئيسية، المجتمع، إضافة منتج، المحادثات، المتجر
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -19,28 +20,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // قائمة الصفحات الرئيسية
   final List<Widget> _pages = const [
     HomeTab(),
-    ProductsTab(),
-    OrdersTab(),
-    AccountTab(),
+    CommunityScreen(),
+    SizedBox(), // Placeholder for Add Product (handled by FAB)
+    ConversationsScreen(),
+    StoreScreen(),
   ];
+
+  void _onItemTapped(int index) {
+    if (index == 2) {
+      // عند الضغط على زر الإضافة (المنتصف)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AddProductScreen()),
+      );
+    } else {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // إزالة زر العودة من الشاشات الرئيسية
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(_getTitle()),
-        centerTitle: true,
-      ),
+      // إزالة AppBar لأنه موجود داخل كل Tab
       body: IndexedStack(index: _currentIndex, children: _pages),
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onDestinationSelected: _onItemTapped,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -48,37 +56,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'الرئيسية',
           ),
           NavigationDestination(
-            icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2),
-            label: 'المنتجات',
+            icon: Icon(Icons.people_outline),
+            selectedIcon: Icon(Icons.people),
+            label: 'المجتمع',
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'الطلبات',
+            icon: Icon(
+              Icons.add_circle_outline,
+              size: 32,
+            ), // أيقونة أكبر للإضافة
+            selectedIcon: Icon(Icons.add_circle, size: 32),
+            label: 'إضافة',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'الحساب',
+            icon: Icon(Icons.chat_bubble_outline),
+            selectedIcon: Icon(Icons.chat_bubble),
+            label: 'المحادثات',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.storefront_outlined),
+            selectedIcon: Icon(Icons.storefront),
+            label: 'المتجر',
           ),
         ],
       ),
     );
-  }
-
-  String _getTitle() {
-    switch (_currentIndex) {
-      case 0:
-        return 'الرئيسية';
-      case 1:
-        return 'المنتجات';
-      case 2:
-        return 'الطلبات';
-      case 3:
-        return 'الحساب';
-      default:
-        return 'MBUY';
-    }
   }
 }

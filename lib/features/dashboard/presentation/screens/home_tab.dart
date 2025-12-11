@@ -1,214 +1,286 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../auth/data/auth_controller.dart';
+import 'mbuy_studio_screen.dart';
+import 'mbuy_tools_screen.dart';
+import 'merchant_services_screen.dart';
+import 'placeholder_screen.dart';
 
-/// شاشة الرئيسية - Home Tab
-/// تعرض ملخص سريع للمعلومات الأساسية والإحصائيات
-class HomeTab extends ConsumerWidget {
+class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // رسالة ترحيب
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.waving_hand, color: Colors.amber, size: 28),
-                      const SizedBox(width: 8),
-                      Text(
-                        'مرحباً بك',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  if (authState.userRole != null)
-                    Text(
-                      'الدور: ${authState.userRole}',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                    ),
-                ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.notifications_outlined),
+          onPressed: () {},
+        ),
+        title: const Text(
+          'MBUY',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+              child: Text(
+                'متجر السعادة',
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
           ),
-          const SizedBox(height: 20),
-
-          // عنوان الإحصائيات
-          Text(
-            'الإحصائيات السريعة',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-
-          // بطاقات الإحصائيات
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  title: 'المنتجات',
-                  value: '0',
-                  icon: Icons.inventory_2,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatCard(
-                  title: 'الطلبات',
-                  value: '0',
-                  icon: Icons.receipt_long,
-                  color: Colors.orange,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  title: 'المبيعات',
-                  value: '0 ر.س',
-                  icon: Icons.monetization_on,
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatCard(
-                  title: 'العملاء',
-                  value: '0',
-                  icon: Icons.people,
-                  color: Colors.purple,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // روابط سريعة
-          Text(
-            'روابط سريعة',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          _QuickLinkCard(
-            title: 'إضافة منتج جديد',
-            icon: Icons.add_box,
-            color: Colors.blue,
-            onTap: () {
-              // سيتم الربط لاحقاً
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('قريباً: إضافة منتج')),
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          _QuickLinkCard(
-            title: 'عرض الطلبات الجديدة',
-            icon: Icons.notification_important,
-            color: Colors.orange,
-            onTap: () {
-              // سيتم الربط لاحقاً
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('قريباً: الطلبات الجديدة')),
-              );
-            },
-          ),
         ],
       ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // (ب) شريط الأيقونات الأربعة
+            _buildTopIconsGrid(context),
+
+            const SizedBox(height: 24),
+
+            // (ج) أربعة مربعات كبيرة للرصد السريع
+            _buildStatisticsGrid(context),
+
+            const SizedBox(height: 24),
+
+            // (د) ثلاثة تبويبات/بطاقات رئيسية
+            _buildMainCards(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopIconsGrid(BuildContext context) {
+    final items = [
+      {
+        'icon': Icons.lightbulb_outline,
+        'label': 'رؤيتنا وأفكارنا',
+        'screen': 'VisionAndIdeasScreen',
+      },
+      {
+        'icon': Icons.campaign_outlined,
+        'label': 'التسويق',
+        'screen': 'MarketingScreen',
+      },
+      {
+        'icon': Icons.local_offer_outlined,
+        'label': 'الترويج',
+        'screen': 'PromotionScreen',
+      },
+      {
+        'icon': Icons.bar_chart,
+        'label': 'التحليلات',
+        'screen': 'AnalyticsReportsScreen',
+      },
+    ];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: items.map((item) {
+        return Expanded(
+          child: Column(
+            children: [
+              IconButton.filledTonal(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          PlaceholderScreen(title: item['label'] as String),
+                    ),
+                  );
+                },
+                icon: Icon(item['icon'] as IconData),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item['label'] as String,
+                style: const TextStyle(fontSize: 11),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildStatisticsGrid(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.5,
+      children: const [
+        _StatCard(title: 'الرصيد', value: '0.00', unit: 'ر.س'),
+        _StatCard(title: 'النقاط', value: '150', unit: 'نقطة'),
+        _StatCard(title: 'الطلبات', value: '12', unit: 'طلب'),
+        _StatCard(title: 'العملاء', value: '45', unit: 'عميل'),
+      ],
+    );
+  }
+
+  Widget _buildMainCards(BuildContext context) {
+    return Column(
+      children: [
+        _MainFeatureCard(
+          title: 'MBUY Studio',
+          description: 'توليد الصور والفيديو والمحتوى بالذكاء الاصطناعي',
+          icon: Icons.movie_filter,
+          color: Colors.purple.shade50,
+          iconColor: Colors.purple,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MbuyStudioScreen()),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _MainFeatureCard(
+          title: 'MBUY Tools',
+          description: 'أدوات الذكاء الاصطناعي، التحليلات، والأتمتة',
+          icon: Icons.smart_toy,
+          color: Colors.blue.shade50,
+          iconColor: Colors.blue,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MbuyToolsScreen()),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _MainFeatureCard(
+          title: 'خدمات التاجر',
+          description: 'الموردين، الدروب شوبينغ، المصورين، والمزيد',
+          icon: Icons.storefront,
+          color: Colors.orange.shade50,
+          iconColor: Colors.orange,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MerchantServicesScreen()),
+          ),
+        ),
+      ],
     );
   }
 }
 
-/// بطاقة إحصائية صغيرة
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;
-  final IconData icon;
-  final Color color;
+  final String unit;
 
   const _StatCard({
     required this.title,
     required this.value,
-    required this.icon,
-    required this.color,
+    required this.unit,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-            ),
-          ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                unit,
+                style: TextStyle(color: Colors.grey[400], fontSize: 10),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// بطاقة رابط سريع
-class _QuickLinkCard extends StatelessWidget {
+class _MainFeatureCard extends StatelessWidget {
   final String title;
+  final String description;
   final IconData icon;
   final Color color;
+  final Color iconColor;
   final VoidCallback onTap;
 
-  const _QuickLinkCard({
+  const _MainFeatureCard({
     required this.title,
+    required this.description,
     required this.icon,
     required this.color,
+    required this.iconColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withAlpha(51), // 0.2 * 255 = 51
-          child: Icon(icon, color: color),
-        ),
-        title: Text(title),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      elevation: 0,
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 32, color: iconColor),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            ],
+          ),
+        ),
       ),
     );
   }
