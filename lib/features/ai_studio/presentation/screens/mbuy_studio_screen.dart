@@ -1,216 +1,104 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../ai_studio/data/mbuy_studio_service.dart';
+import '../../data/mbuy_studio_service.dart';
 
-class MbuyToolsScreen extends ConsumerStatefulWidget {
-  const MbuyToolsScreen({super.key});
+class MbuyStudioScreen extends ConsumerStatefulWidget {
+  const MbuyStudioScreen({super.key});
 
   @override
-  ConsumerState<MbuyToolsScreen> createState() => _MbuyToolsScreenState();
+  ConsumerState<MbuyStudioScreen> createState() => _MbuyStudioScreenState();
 }
 
-class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
+class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   final TextEditingController _promptController = TextEditingController();
   bool _isGenerating = false;
   String _statusMessage = '';
   String? _generatedImageUrl;
 
   final Map<String, List<Map<String, dynamic>>> _sections = {
-    'التحليلات و التقارير': [
+    'توليد صور': [
       {
-        'title': 'تحليلات لحظية',
-        'icon': Icons.analytics,
-        'taskType': 'analytics_realtime',
+        'title': 'صور منتجات',
+        'icon': Icons.image,
+        'taskType': 'image_product',
+        'badge': 'AI',
       },
       {
-        'title': 'تفاعل العملاء',
-        'icon': Icons.people,
-        'taskType': 'analytics_customer_interaction',
+        'title': 'خلفيات',
+        'icon': Icons.wallpaper,
+        'taskType': 'image_background',
+        'badge': 'AI',
       },
       {
-        'title': 'تحليل الشراء',
-        'icon': Icons.shopping_cart,
-        'taskType': 'analytics_purchase_analysis',
+        'title': 'شعارات',
+        'icon': Icons.branding_watermark,
+        'taskType': 'image_logo',
+        'badge': 'AI',
       },
       {
-        'title': 'تحليل الأرباح',
-        'icon': Icons.attach_money,
-        'taskType': 'analytics_profit_analysis',
+        'title': 'إعلانات',
+        'icon': Icons.ad_units,
+        'taskType': 'image_ad',
+        'badge': 'AI',
       },
       {
-        'title': 'تحليل المصروفات',
-        'icon': Icons.money_off,
-        'taskType': 'analytics_expenses_analysis',
+        'title': 'تحسين صور',
+        'icon': Icons.auto_fix_high,
+        'taskType': 'image_enhance',
+        'badge': 'AI',
       },
       {
-        'title': 'رحلة العميل',
-        'icon': Icons.timeline,
-        'taskType': 'analytics_customer_journey',
-      },
-      {
-        'title': 'تقارير يومية',
-        'icon': Icons.today,
-        'taskType': 'analytics_daily_reports',
-      },
-      {
-        'title': 'أداء المتجر',
-        'icon': Icons.store,
-        'taskType': 'analytics_store_performance',
-      },
-      {
-        'title': 'تحليل الحملات',
-        'icon': Icons.campaign,
-        'taskType': 'analytics_campaign_analysis',
-      },
-      {
-        'title': 'تقارير المبيعات',
-        'icon': Icons.bar_chart,
-        'taskType': 'analytics_sales_reports',
-      },
-      {
-        'title': 'ملخصات AI',
-        'icon': Icons.summarize,
-        'taskType': 'analytics_ai_summaries',
+        'title': 'إزالة خلفية',
+        'icon': Icons.layers_clear,
+        'taskType': 'image_remove_bg',
         'badge': 'AI',
       },
     ],
-    'توليد / تحليل نصوص': [
+    'توليد فيديو': [
       {
-        'title': 'وصف منتجات',
-        'icon': Icons.description,
-        'taskType': 'text_product_desc',
+        'title': 'فيديو ترويجي',
+        'icon': Icons.video_library,
+        'taskType': 'video_promo',
         'badge': 'AI',
       },
       {
-        'title': 'تحسين SEO',
-        'icon': Icons.search,
-        'taskType': 'text_seo',
+        'title': 'ريلز / تيك توك',
+        'icon': Icons.movie_creation,
+        'taskType': 'video_reels',
         'badge': 'AI',
       },
       {
-        'title': 'كلمات مفتاحية',
-        'icon': Icons.vpn_key,
-        'taskType': 'text_keywords',
+        'title': 'شرح منتج',
+        'icon': Icons.featured_video,
+        'taskType': 'video_explainer',
         'badge': 'AI',
       },
       {
-        'title': 'خطة تسويقية',
-        'icon': Icons.lightbulb,
-        'taskType': 'text_marketing_plan',
-        'badge': 'AI',
-      },
-      {
-        'title': 'خطة محتوى',
-        'icon': Icons.calendar_today,
-        'taskType': 'text_content_plan',
-        'badge': 'AI',
-      },
-      {
-        'title': 'اقتراحات ذكية',
-        'icon': Icons.auto_awesome,
-        'taskType': 'text_suggestions',
-        'badge': 'AI',
-      },
-      {
-        'title': 'اقتراحات تسعير',
-        'icon': Icons.price_change,
-        'taskType': 'text_pricing',
-        'badge': 'AI',
-      },
-      {
-        'title': 'اقتراحات حملات',
-        'icon': Icons.campaign_outlined,
-        'taskType': 'text_campaigns',
-        'badge': 'AI',
-      },
-      {
-        'title': 'تحويل PDF',
-        'icon': Icons.picture_as_pdf,
-        'taskType': 'text_pdf_convert',
-      },
-      {
-        'title': 'دمج ملفات',
-        'icon': Icons.merge_type,
-        'taskType': 'text_merge_files',
-      },
-      {
-        'title': 'جدول بيانات',
-        'icon': Icons.table_chart,
-        'taskType': 'text_spreadsheet',
-        'badge': 'AI',
-      },
-      {
-        'title': 'يوميات',
-        'icon': Icons.book,
-        'taskType': 'text_diary',
-        'badge': 'AI',
-      },
-      {
-        'title': 'ملاحظات',
-        'icon': Icons.note,
-        'taskType': 'text_notes',
+        'title': 'قصص (Stories)',
+        'icon': Icons.history_edu,
+        'taskType': 'video_stories',
         'badge': 'AI',
       },
     ],
-    'المساعد الذكي': [
+    'توليد 3D': [
       {
-        'title': 'مساعد شخصي',
-        'icon': Icons.person,
-        'taskType': 'assistant_personal',
+        'title': 'نموذج 3D',
+        'icon': Icons.view_in_ar,
+        'taskType': '3d_model',
         'badge': 'AI',
       },
       {
-        'title': 'مساعد تسويقي',
-        'icon': Icons.campaign,
-        'taskType': 'assistant_marketing',
+        'title': 'عرض 360',
+        'icon': Icons.threesixty,
+        'taskType': '3d_360',
         'badge': 'AI',
       },
       {
-        'title': 'مدير حساب',
-        'icon': Icons.manage_accounts,
-        'taskType': 'assistant_account_manager',
+        'title': 'تغليف منتج',
+        'icon': Icons.inventory_2,
+        'taskType': '3d_packaging',
         'badge': 'AI',
-      },
-      {
-        'title': 'بوت محادثة',
-        'icon': Icons.chat,
-        'taskType': 'assistant_chat_bot',
-        'badge': 'AI',
-      },
-    ],
-    'الأساسية': [
-      {'title': 'تخصيص CSS/JS', 'icon': Icons.code, 'taskType': 'basic_css_js'},
-      {
-        'title': 'عملات متعددة',
-        'icon': Icons.currency_exchange,
-        'taskType': 'basic_multi_currency',
-      },
-      {
-        'title': 'محادثة موحدة',
-        'icon': Icons.chat_bubble,
-        'taskType': 'basic_unified_chat',
-      },
-      {
-        'title': 'سلة متروكة',
-        'icon': Icons.shopping_basket,
-        'taskType': 'basic_abandoned_cart',
-      },
-      {
-        'title': 'تخصيص الدفع',
-        'icon': Icons.payment,
-        'taskType': 'basic_payment',
-      },
-      {
-        'title': 'تخصيص الشحن',
-        'icon': Icons.local_shipping,
-        'taskType': 'basic_shipping',
-      },
-      {
-        'title': 'تخصيص العملاء',
-        'icon': Icons.people_outline,
-        'taskType': 'basic_customers',
       },
     ],
   };
@@ -229,7 +117,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'أدوات MBuy',
+          'MBUY Studio',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -276,7 +164,11 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
       height: 150,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF2D2B4E),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
       child: Stack(
         children: [
@@ -287,7 +179,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'أدوات MBuy الذكية',
+                  'استوديو الإبداع',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -296,7 +188,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'كل ما تحتاجه لإدارة وتنمية متجرك في مكان واحد',
+                  'صمم صور وفيديوهات احترافية لمتجرك باستخدام الذكاء الاصطناعي',
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -324,7 +216,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         return InkWell(
           onTap: () {
             if (item.containsKey('taskType')) {
-              _handleTask(item['taskType']);
+              _showGenerateDialog(taskType: item['taskType']);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('قريباً: ${item['title']}')),
@@ -393,69 +285,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
     );
   }
 
-  void _handleTask(String taskType) {
-    if (taskType.startsWith('analytics_')) {
-      _showAnalyticsDialog(taskType);
-    } else if (taskType.startsWith('text_') ||
-        taskType.startsWith('assistant_')) {
-      _showGenerateDialog(taskType: taskType);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('سيتم تفعيل هذه الأداة قريباً')),
-      );
-    }
-  }
-
-  Future<void> _showAnalyticsDialog(String taskType) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('جاري جلب البيانات...'),
-        content: const SizedBox(
-          height: 100,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
-    );
-
-    try {
-      final service = ref.read(mbuyStudioServiceProvider);
-      final type = taskType.replaceFirst('analytics_', '');
-      final result = await service.getAnalytics(type);
-
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(taskType.replaceAll('_', ' ').toUpperCase()),
-          content: SingleChildScrollView(
-            child: Text(
-              const JsonEncoder.withIndent('  ').convert(result['data']),
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('موافق'),
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
-    }
-  }
-
-  void _showGenerateDialog({String taskType = 'ai_image'}) {
+  void _showGenerateDialog({String taskType = 'image_product'}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -473,14 +303,14 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'توليد محتوى بالذكاء الاصطناعي',
+              'توليد محتوى إبداعي',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _promptController,
               decoration: const InputDecoration(
-                hintText: 'اكتب وصف المحتوى هنا...',
+                hintText: 'اكتب وصف الصورة أو الفيديو...',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -491,8 +321,15 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
               const SizedBox(height: 8),
               Text(_statusMessage),
             ] else if (_generatedImageUrl != null) ...[
-              // For text results, we might not have an image URL, so handle that
-              const SizedBox(),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  _generatedImageUrl!,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(height: 8),
               Text(_statusMessage, style: const TextStyle(color: Colors.green)),
             ] else ...[
@@ -501,11 +338,11 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
                 child: ElevatedButton(
                   onPressed: () => _startCloudflareGeneration(taskType),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: const Color(0xFF6A11CB),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text('توليد'),
+                  child: const Text('توليد الآن'),
                 ),
               ),
             ],
@@ -521,7 +358,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
 
     setState(() {
       _isGenerating = true;
-      _statusMessage = 'جاري البدء...';
+      _statusMessage = 'جاري الإبداع...';
       _generatedImageUrl = null;
     });
 
@@ -535,13 +372,8 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
       setState(() {
         _isGenerating = false;
         _statusMessage = 'تم الانتهاء!';
-        if (result['result'] != null) {
-          if (result['result']['image'] != null) {
-            _generatedImageUrl = result['result']['image'];
-          } else if (result['result']['text'] != null) {
-            _statusMessage =
-                'تم توليد النص بنجاح: ${result['result']['text'].toString().substring(0, 50)}...';
-          }
+        if (result['result'] != null && result['result']['image'] != null) {
+          _generatedImageUrl = result['result']['image'];
         }
       });
     } catch (e) {

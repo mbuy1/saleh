@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'home_tab.dart';
-import '../../../community/presentation/screens/community_screen.dart';
+import 'orders_tab.dart';
+import 'products_tab.dart';
+import 'account_tab.dart';
 import '../../../conversations/presentation/screens/conversations_screen.dart';
-import '../../../store/presentation/screens/store_screen.dart';
-import '../../../products/presentation/screens/add_product_screen.dart';
 
 /// شاشة لوحة التحكم الرئيسية مع NavigationBar
-/// تحتوي على 5 تبويبات: الرئيسية، المجتمع، إضافة منتج، المحادثات، المتجر
+/// تحتوي على 5 تبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، ملفي
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -20,24 +20,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // قائمة الصفحات الرئيسية
   final List<Widget> _pages = const [
     HomeTab(),
-    CommunityScreen(),
-    SizedBox(), // Placeholder for Add Product (handled by FAB)
+    OrdersTab(),
+    ProductsTab(),
     ConversationsScreen(),
-    StoreScreen(),
+    AccountTab(),
   ];
 
   void _onItemTapped(int index) {
-    if (index == 2) {
-      // عند الضغط على زر الإضافة (المنتصف)
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const AddProductScreen()),
-      );
-    } else {
-      setState(() {
-        _currentIndex = index;
-      });
-    }
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -56,17 +48,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'الرئيسية',
           ),
           NavigationDestination(
-            icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people),
-            label: 'المجتمع',
+            icon: Icon(Icons.shopping_bag_outlined),
+            selectedIcon: Icon(Icons.shopping_bag),
+            label: 'الطلبات',
           ),
           NavigationDestination(
-            icon: Icon(
-              Icons.add_circle_outline,
-              size: 32,
-            ), // أيقونة أكبر للإضافة
-            selectedIcon: Icon(Icons.add_circle, size: 32),
-            label: 'إضافة',
+            icon: Icon(Icons.inventory_2_outlined),
+            selectedIcon: Icon(Icons.inventory_2),
+            label: 'المنتجات',
           ),
           NavigationDestination(
             icon: Icon(Icons.chat_bubble_outline),
@@ -74,9 +63,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'المحادثات',
           ),
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
-            selectedIcon: Icon(Icons.storefront),
-            label: 'المتجر',
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'ملفي',
           ),
         ],
       ),

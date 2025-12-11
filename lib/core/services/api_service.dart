@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -179,14 +180,14 @@ class ApiService {
   /// Refresh authentication token using Supabase refresh endpoint
   Future<bool> _refreshToken() async {
     try {
-      print('[ApiService] Attempting to refresh token');
+      debugPrint('[ApiService] Attempting to refresh token');
 
       final refreshToken = await _secureStorage.read(
         key: AppConfig.refreshTokenKey,
       );
 
       if (refreshToken == null || refreshToken.isEmpty) {
-        print('[ApiService] No refresh token found');
+        debugPrint('[ApiService] No refresh token found');
         // ✅ Clear all tokens when no refresh token exists
         await _clearAllTokens();
         return false;
@@ -206,7 +207,7 @@ class ApiService {
 
         // Worker returns: { success: true, access_token: "...", refresh_token: "...", expires_in: 3600 }
         if (data['access_token'] != null) {
-          print('[ApiService] Token refresh successful');
+          debugPrint('[ApiService] Token refresh successful');
 
           // Save new access token
           await _secureStorage.write(
@@ -227,12 +228,12 @@ class ApiService {
       }
 
       // ✅ Refresh failed - clear all tokens to force re-login
-      print('[ApiService] Token refresh failed: ${response.statusCode}');
-      print('[ApiService] Clearing all tokens - user needs to re-login');
+      debugPrint('[ApiService] Token refresh failed: ${response.statusCode}');
+      debugPrint('[ApiService] Clearing all tokens - user needs to re-login');
       await _clearAllTokens();
       return false;
     } catch (e) {
-      print('[ApiService] Token refresh error: $e');
+      debugPrint('[ApiService] Token refresh error: $e');
       // ✅ On any error, clear tokens to ensure clean state
       await _clearAllTokens();
       return false;
@@ -248,9 +249,9 @@ class ApiService {
       await _secureStorage.delete(key: 'user_id');
       await _secureStorage.delete(key: 'user_role');
       await _secureStorage.delete(key: 'user_email');
-      print('[ApiService] All tokens cleared successfully');
+      debugPrint('[ApiService] All tokens cleared successfully');
     } catch (e) {
-      print('[ApiService] Error clearing tokens: $e');
+      debugPrint('[ApiService] Error clearing tokens: $e');
     }
   }
 

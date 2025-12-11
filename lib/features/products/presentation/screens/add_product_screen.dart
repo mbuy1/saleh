@@ -84,6 +84,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         _selectedImages.addAll(images.take(remaining));
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('فشل اختيار الصور: $e')));
@@ -105,6 +106,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         setState(() => _selectedVideo = video);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('فشل اختيار الفيديو: $e')));
@@ -393,7 +395,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
             // التصنيف
             DropdownButtonFormField<String>(
-              value: _selectedCategoryId,
+              initialValue: _selectedCategoryId,
               decoration: const InputDecoration(
                 labelText: 'التصنيف *',
                 hintText: 'اختر التصنيف',
@@ -528,7 +530,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                   ),
                               ],
                             );
-                          }).toList(),
+                          }),
                           if (_selectedImages.length < 4)
                             GestureDetector(
                               onTap: _pickImages,

@@ -13,8 +13,8 @@ class MerchantServicesScreen extends StatelessWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         children: const [
+          _ServiceCard(icon: Icons.store, label: 'متجر دروب شوبينغ'),
           _ServiceCard(icon: Icons.local_shipping, label: 'الموردين'),
-          _ServiceCard(icon: Icons.shopping_bag, label: 'دروب شوبينغ'),
           _ServiceCard(icon: Icons.camera_alt, label: 'المصورين'),
           _ServiceCard(icon: Icons.brush, label: 'المصممين'),
           _ServiceCard(icon: Icons.star, label: 'المؤثرين'),
