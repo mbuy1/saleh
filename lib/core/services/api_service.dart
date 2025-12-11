@@ -26,6 +26,14 @@ class ApiService {
   // Public HTTP Methods
   // ==========================================================================
 
+  /// Check if user has valid authentication tokens
+  Future<bool> hasValidTokens() async {
+    final accessToken = await _secureStorage.read(
+      key: AppConfig.accessTokenKey,
+    );
+    return accessToken != null && accessToken.isNotEmpty;
+  }
+
   /// GET request
   Future<http.Response> get(
     String path, {
@@ -168,32 +176,45 @@ class ApiService {
     throw Exception('Max retries exceeded');
   }
 
-  /// Refresh authentication token
+  /// Refresh authentication token using Supabase refresh endpoint
   Future<bool> _refreshToken() async {
     try {
+      print('[ApiService] Attempting to refresh token');
+
       final refreshToken = await _secureStorage.read(
         key: AppConfig.refreshTokenKey,
       );
 
-      if (refreshToken == null) {
+      if (refreshToken == null || refreshToken.isEmpty) {
+        print('[ApiService] No refresh token found');
+        // ✅ Clear all tokens when no refresh token exists
+        await _clearAllTokens();
         return false;
       }
 
-      final response = await http.post(
-        Uri.parse('$baseUrl${AppConfig.refreshEndpoint}'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'refresh_token': refreshToken}),
-      );
+      // Call Worker /auth/supabase/refresh endpoint
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/supabase/refresh'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'refresh_token': refreshToken}),
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        if (data['ok'] == true && data['token'] != null) {
+        // Worker returns: { success: true, access_token: "...", refresh_token: "...", expires_in: 3600 }
+        if (data['access_token'] != null) {
+          print('[ApiService] Token refresh successful');
+
+          // Save new access token
           await _secureStorage.write(
             key: AppConfig.accessTokenKey,
-            value: data['token'],
+            value: data['access_token'],
           );
 
+          // Save new refresh token if provided
           if (data['refresh_token'] != null) {
             await _secureStorage.write(
               key: AppConfig.refreshTokenKey,
@@ -205,9 +226,31 @@ class ApiService {
         }
       }
 
+      // ✅ Refresh failed - clear all tokens to force re-login
+      print('[ApiService] Token refresh failed: ${response.statusCode}');
+      print('[ApiService] Clearing all tokens - user needs to re-login');
+      await _clearAllTokens();
       return false;
     } catch (e) {
+      print('[ApiService] Token refresh error: $e');
+      // ✅ On any error, clear tokens to ensure clean state
+      await _clearAllTokens();
       return false;
+    }
+  }
+
+  /// Clear all authentication tokens from secure storage
+  /// Called when refresh fails or user logs out
+  Future<void> _clearAllTokens() async {
+    try {
+      await _secureStorage.delete(key: AppConfig.accessTokenKey);
+      await _secureStorage.delete(key: AppConfig.refreshTokenKey);
+      await _secureStorage.delete(key: 'user_id');
+      await _secureStorage.delete(key: 'user_role');
+      await _secureStorage.delete(key: 'user_email');
+      print('[ApiService] All tokens cleared successfully');
+    } catch (e) {
+      print('[ApiService] Error clearing tokens: $e');
     }
   }
 

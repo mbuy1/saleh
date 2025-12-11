@@ -65,6 +65,7 @@ class ProductsController extends StateNotifier<ProductsState> {
     String? description,
     String? imageUrl,
     String? categoryId,
+    List<Map<String, dynamic>>? media,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -76,6 +77,7 @@ class ProductsController extends StateNotifier<ProductsState> {
         description: description,
         imageUrl: imageUrl,
         categoryId: categoryId,
+        media: media,
       );
 
       // إضافة المنتج الجديد للقائمة

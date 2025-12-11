@@ -62,6 +62,39 @@ class ProductsRepository {
     }
   }
 
+  /// طلب روابط رفع الوسائط من Worker
+  /// المسار: POST /secure/media/upload-urls
+  Future<List<Map<String, dynamic>>> getUploadUrls({
+    required List<Map<String, String>> files,
+  }) async {
+    try {
+      final token = await _tokenStorage.getAccessToken();
+      if (token == null) {
+        throw Exception('لا يوجد رمز وصول - يجب تسجيل الدخول');
+      }
+
+      final body = {'files': files};
+
+      final response = await _apiService.post(
+        '/secure/media/upload-urls',
+        body: body,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = jsonDecode(response.body);
+        if (data['ok'] == true && data['uploadUrls'] != null) {
+          return List<Map<String, dynamic>>.from(data['uploadUrls']);
+        }
+      }
+
+      throw Exception('فشل الحصول على روابط الرفع');
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('خطأ في طلب روابط الرفع: $e');
+    }
+  }
+
   /// إضافة منتج جديد
   /// المسار: POST /secure/products
   /// Worker يستدعي Edge Function: product_create
@@ -72,6 +105,7 @@ class ProductsRepository {
     String? description,
     String? imageUrl,
     String? categoryId,
+    List<Map<String, dynamic>>? media,
   }) async {
     try {
       final token = await _tokenStorage.getAccessToken();
@@ -85,10 +119,10 @@ class ProductsRepository {
         'stock': stock,
         if (description != null && description.isNotEmpty)
           'description': description,
-        if (imageUrl != null && imageUrl.isNotEmpty)
-          'main_image_url': imageUrl, // Worker expects main_image_url
+        if (imageUrl != null && imageUrl.isNotEmpty) 'image_url': imageUrl,
         if (categoryId != null && categoryId.isNotEmpty)
           'category_id': categoryId,
+        if (media != null && media.isNotEmpty) 'media': media,
         'is_active': true,
       };
 

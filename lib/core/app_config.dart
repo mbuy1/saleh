@@ -30,10 +30,11 @@ class AppConfig {
   // API Endpoints
   // ============================================================================
 
-  // Auth
-  static const String loginEndpoint = '/auth/login';
-  static const String refreshEndpoint = '/auth/refresh';
-  static const String logoutEndpoint = '/auth/logout';
+  // Auth - Supabase endpoints
+  static const String loginEndpoint = '/auth/supabase/login';
+  static const String registerEndpoint = '/auth/supabase/register';
+  static const String refreshEndpoint = '/auth/supabase/refresh';
+  static const String logoutEndpoint = '/auth/supabase/logout';
 
   // Merchant
   static const String merchantStoreEndpoint = '/secure/merchant/store';

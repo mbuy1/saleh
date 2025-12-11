@@ -85,15 +85,23 @@ class AuthController extends StateNotifier<AuthState> {
       );
 
       // استخراج معلومات المستخدم
-      final profile = result['profile'] as Map<String, dynamic>;
       final user = result['user'] as Map<String, dynamic>;
+
+      // Profile قد يكون null
+      final profile = result['profile'] != null
+          ? result['profile'] as Map<String, dynamic>
+          : null;
+
+      // Role من user له الأولوية، ثم profile
+      final userRole =
+          user['role'] as String? ?? profile?['role'] as String? ?? 'customer';
 
       // تحديث الحالة - نجح تسجيل الدخول
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: true,
         errorMessage: null,
-        userRole: profile['role'] as String?,
+        userRole: userRole,
         userId: user['id'] as String?,
       );
     } on Exception catch (e) {

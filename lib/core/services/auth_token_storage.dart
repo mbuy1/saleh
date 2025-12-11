@@ -2,9 +2,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// خدمة تخزين آمنة للتوكنات باستخدام FlutterSecureStorage
-/// تحفظ access_token في مخزن آمن ومشفر على الجهاز
+/// تحفظ access_token و refresh_token في مخزن آمن ومشفر على الجهاز
 class AuthTokenStorage {
   static const _accessTokenKey = 'access_token';
+  static const _refreshTokenKey = 'refresh_token';
   static const _userIdKey = 'user_id';
   static const _userRoleKey = 'user_role';
   static const _userEmailKey = 'user_email';
@@ -35,6 +36,16 @@ class AuthTokenStorage {
     return await _storage.read(key: _accessTokenKey);
   }
 
+  /// استرجاع refresh token
+  Future<String?> getRefreshToken() async {
+    return await _storage.read(key: _refreshTokenKey);
+  }
+
+  /// حفظ refresh token
+  Future<void> saveRefreshToken(String refreshToken) async {
+    await _storage.write(key: _refreshTokenKey, value: refreshToken);
+  }
+
   /// استرجاع معرف المستخدم
   Future<String?> getUserId() async {
     return await _storage.read(key: _userIdKey);
@@ -60,6 +71,7 @@ class AuthTokenStorage {
   Future<void> clear() async {
     await Future.wait([
       _storage.delete(key: _accessTokenKey),
+      _storage.delete(key: _refreshTokenKey),
       _storage.delete(key: _userIdKey),
       _storage.delete(key: _userRoleKey),
       _storage.delete(key: _userEmailKey),

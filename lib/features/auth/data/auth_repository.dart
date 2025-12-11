@@ -7,47 +7,47 @@ import '../../../core/services/auth_token_storage.dart';
 ///
 /// المسؤوليات:
 /// - تسجيل الدخول/الخروج
-/// - إدارة التوكنات
+/// - إدارة التوكنات (Supabase JWT)
 /// - حفظ جلسة المستخدم
 ///
 /// يتواصل مع Worker على:
-/// POST /auth/login
+/// POST /auth/supabase/login
 ///
 /// مثال Request:
 /// {
 ///   "email": "user@example.com",
-///   "password": "password123",
-///   "login_as": "merchant" // اختياري: customer أو merchant
+///   "password": "password123"
 /// }
 ///
-/// مثال Response (نجاح):
+/// مثال Response (نجاح) - Supabase Auth Format:
 /// {
-///   "ok": true,
+///   "session": {
+///     "access_token": "eyJhbGciOiJIUzI1NiIs...",
+///     "refresh_token": "...",
+///     "expires_in": 3600,
+///     "token_type": "bearer"
+///   },
 ///   "user": {
-///     "id": "uuid",
+///     "id": "auth-user-uuid",
 ///     "email": "user@example.com",
-///     "full_name": "User Name",
-///     "phone": "+966...",
-///     "is_active": true,
-///     "created_at": "2025-01-01T00:00:00Z"
+///     "user_metadata": {
+///       "full_name": "User Name",
+///       "role": "merchant"
+///     }
 ///   },
 ///   "profile": {
-///     "id": "uuid",
-///     "mbuy_user_id": "uuid",
+///     "id": "profile-uuid",
+///     "auth_user_id": "auth-user-uuid",
 ///     "role": "merchant",
 ///     "display_name": "Display Name",
 ///     "email": "user@example.com",
-///     "phone": "+966...",
 ///     "avatar_url": null
-///   },
-///   "token": "eyJhbGciOiJIUzI1NiIs..."
+///   }
 /// }
 ///
 /// مثال Response (فشل):
 /// {
-///   "ok": false,
-///   "code": "INVALID_CREDENTIALS",
-///   "error": "Invalid credentials",
+///   "error": "INVALID_CREDENTIALS",
 ///   "message": "Invalid email or password"
 /// }
 class AuthRepository {
@@ -64,11 +64,11 @@ class AuthRepository {
   // تسجيل الدخول
   // ==========================================================================
 
-  /// تسجيل الدخول باستخدام email وpassword
+  /// تسجيل الدخول باستخدام email وpassword (Supabase Auth)
   ///
   /// [identifier] يمكن أن يكون email
   /// [password] كلمة المرور
-  /// [loginAs] اختياري: "merchant" أو "customer" (افتراضي: أي دور)
+  /// [loginAs] غير مستخدم (محفوظ للتوافق)
   ///
   /// يرمي [Exception] إذا فشل تسجيل الدخول
   Future<Map<String, dynamic>> signIn({
@@ -77,33 +77,53 @@ class AuthRepository {
     String? loginAs,
   }) async {
     try {
-      // إرسال طلب تسجيل الدخول إلى Worker
+      // إرسال طلب تسجيل الدخول إلى Worker (Supabase Auth)
       final response = await _apiService.post(
-        '/auth/login',
-        body: {
-          'email': identifier.trim(),
-          'password': password,
-          if (loginAs != null) 'login_as': loginAs,
-        },
+        '/auth/supabase/login',
+        body: {'email': identifier.trim(), 'password': password},
       );
 
       // التحقق من نجاح الطلب
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        if (data['ok'] == true) {
-          // استخراج البيانات
-          final token = data['token'] as String;
+        // Worker الآن يرجع البيانات مباشرة (CLEAN format)
+        // {
+        //   "success": true,
+        //   "access_token": "...",
+        //   "refresh_token": "...",
+        //   "expires_in": 3600,
+        //   "user": { "id": "...", "email": "...", "role": "..." },
+        //   "profile": { ... }
+        // }
+        if (data['access_token'] != null && data['user'] != null) {
+          final accessToken = data['access_token'] as String;
+          final refreshToken = data['refresh_token'] as String?;
           final user = data['user'] as Map<String, dynamic>;
-          final profile = data['profile'] as Map<String, dynamic>;
+
+          // Profile قد يكون null إذا لم يتم إنشاؤه بعد
+          final profile = data['profile'] != null
+              ? data['profile'] as Map<String, dynamic>
+              : null;
+
+          // استخراج role من user object مباشرة (له الأولوية)
+          final userRole =
+              user['role'] as String? ??
+              profile?['role'] as String? ??
+              'customer';
 
           // حفظ التوكن ومعلومات المستخدم
           await _tokenStorage.saveToken(
-            accessToken: token,
+            accessToken: accessToken,
             userId: user['id'] as String,
-            userRole: profile['role'] as String,
+            userRole: userRole,
             userEmail: user['email'] as String?,
           );
+
+          // حفظ refresh_token إذا موجود
+          if (refreshToken != null) {
+            await _tokenStorage.saveRefreshToken(refreshToken);
+          }
 
           return data;
         }
