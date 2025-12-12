@@ -74,6 +74,7 @@ class ProductsRepository {
       }
 
       final body = {'files': files};
+      
 
       final response = await _apiService.post(
         '/secure/media/upload-urls',
@@ -81,15 +82,22 @@ class ProductsRepository {
         headers: {'Authorization': 'Bearer $token'},
       );
 
+      
+      
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
         if (data['ok'] == true && data['uploadUrls'] != null) {
           return List<Map<String, dynamic>>.from(data['uploadUrls']);
         }
+        throw Exception('Upload URLs response missing data: ${response.body}');
       }
 
-      throw Exception('فشل الحصول على روابط الرفع');
+      throw Exception(
+        'فشل الحصول على روابط الرفع: ${response.statusCode} - ${response.body}',
+      );
     } catch (e) {
+      
       if (e is Exception) rethrow;
       throw Exception('خطأ في طلب روابط الرفع: $e');
     }
@@ -126,11 +134,16 @@ class ProductsRepository {
         'is_active': true,
       };
 
+      
+
       final response = await _apiService.post(
         '/secure/products',
         body: body,
         headers: {'Authorization': 'Bearer $token'},
       );
+
+      
+      
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         try {
@@ -166,6 +179,7 @@ class ProductsRepository {
         }
       }
     } catch (e) {
+      
       if (e.toString().contains('لا يوجد رمز وصول')) {
         rethrow;
       }
@@ -250,3 +264,5 @@ final productsRepositoryProvider = Provider<ProductsRepository>((ref) {
   final tokenStorage = ref.watch(authTokenStorageProvider);
   return ProductsRepository(apiService, tokenStorage);
 });
+
+

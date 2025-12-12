@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import '../../../../shared/widgets/exports.dart';
+import '../../../../core/services/auth_token_storage.dart';
 import '../../data/products_controller.dart';
 import '../../data/categories_repository.dart';
 import '../../data/products_repository.dart';
@@ -95,21 +97,73 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   Future<void> _pickVideo() async {
     if (_selectedVideo != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يمكنك اختيار فيديو واحد فقط')),
+        const SnackBar(
+          content: Text('يمكنك اختيار فيديو واحد فقط'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
 
     try {
-      final video = await _picker.pickVideo(source: ImageSource.gallery);
+      final video = await _picker.pickVideo(
+        source: ImageSource.gallery,
+        maxDuration: const Duration(minutes: 5), // حد أقصى 5 دقائق
+      );
+
       if (video != null) {
+        // التحقق من حجم الفيديو (حد أقصى 100 MB)
+        final videoFile = File(video.path);
+        final videoSize = await videoFile.length();
+        final videoSizeMB = videoSize / (1024 * 1024);
+
+        if (videoSizeMB > 100) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'حجم الفيديو كبير جداً (${videoSizeMB.toStringAsFixed(1)} MB). الحد الأقصى 100 MB',
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+
         setState(() => _selectedVideo = video);
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'تم اختيار الفيديو (${videoSizeMB.toStringAsFixed(1)} MB)',
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('فشل اختيار الفيديو: $e')));
+      String errorMessage = 'فشل اختيار الفيديو';
+
+      if (e.toString().contains('permission')) {
+        errorMessage =
+            'لا توجد صلاحية للوصول إلى المعرض. يرجى السماح بالوصول من إعدادات التطبيق';
+      } else if (e.toString().contains('cancelled')) {
+        errorMessage = 'تم إلغاء اختيار الفيديو';
+      } else {
+        errorMessage = 'خطأ في اختيار الفيديو: $e';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
@@ -173,13 +227,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('فشل الحصول على روابط الرفع: $e'),
-                backgroundColor: Colors.red,
+                content: Text(
+                  'فشل الحصول على روابط الرفع: $e\nسيتم إضافة المنتج بدون صور',
+                ),
+                backgroundColor: Colors.orange,
                 duration: const Duration(seconds: 5),
               ),
             );
           }
-          return;
+          // متابعة بدون صور بدلاً من إيقاف العملية
+          uploadUrls = [];
         }
 
         // 2. رفع الملفات
@@ -187,16 +244,34 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         int uploadedCount = 0;
 
         for (var i = 0; i < _selectedImages.length; i++) {
+          if (i >= uploadUrls.length) break; // تحقق من وجود upload URL
+
           final image = _selectedImages[i];
           final uploadData = uploadUrls[i];
 
           try {
-            // رفع الصورة
+            // قراءة بيانات الصورة
             final imageBytes = await image.readAsBytes();
+
+            // تحديد Content-Type حسب نوع الملف
+            String contentType = 'image/jpeg';
+            if (image.path.endsWith('.png')) {
+              contentType = 'image/png';
+            } else if (image.path.endsWith('.webp')) {
+              contentType = 'image/webp';
+            } else if (image.path.endsWith('.gif')) {
+              contentType = 'image/gif';
+            }
+
+            // رفع الصورة مباشرة إلى Worker endpoint (R2)
             final uploadResponse = await http.post(
               Uri.parse(uploadData['uploadUrl']),
+              headers: {
+                'Content-Type': contentType,
+                'Authorization':
+                    'Bearer ${await ref.read(authTokenStorageProvider).getAccessToken()}',
+              },
               body: imageBytes,
-              headers: {'Content-Type': 'image/jpeg'},
             );
 
             if (uploadResponse.statusCode >= 200 &&
@@ -239,13 +314,13 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('فشل رفع جميع الصور. الرجاء المحاولة مرة أخرى'),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 5),
+                content: Text('فشل رفع الصور. سيتم إضافة المنتج بدون صور'),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
               ),
             );
           }
-          return;
+          // متابعة بدلاً من إيقاف العملية
         }
 
         // رفع الفيديو إذا وجد
@@ -254,12 +329,57 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           final videoUploadData = uploadUrls[_selectedImages.length];
 
           try {
+            // عرض رسالة بدء الرفع
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text('جارٍ رفع الفيديو...'),
+                    ],
+                  ),
+                  duration: Duration(seconds: 30),
+                ),
+              );
+            }
+
             final videoBytes = await _selectedVideo!.readAsBytes();
 
+            // تحديد Content-Type حسب نوع الملف
+            String videoContentType = 'video/mp4';
+            final videoPath = _selectedVideo!.path.toLowerCase();
+            if (videoPath.endsWith('.webm')) {
+              videoContentType = 'video/webm';
+            } else if (videoPath.endsWith('.mov')) {
+              videoContentType = 'video/quicktime';
+            } else if (videoPath.endsWith('.avi')) {
+              videoContentType = 'video/x-msvideo';
+            } else if (videoPath.endsWith('.mkv')) {
+              videoContentType = 'video/x-matroska';
+            } else if (videoPath.endsWith('.3gp')) {
+              videoContentType = 'video/3gpp';
+            }
+
+            // رفع الفيديو مباشرة إلى Worker endpoint (R2)
             final videoUploadResponse = await http.post(
               Uri.parse(videoUploadData['uploadUrl']),
+              headers: {
+                'Content-Type': videoContentType,
+                'Authorization':
+                    'Bearer ${await ref.read(authTokenStorageProvider).getAccessToken()}',
+              },
               body: videoBytes,
-              headers: {'Content-Type': 'video/mp4'},
             );
 
             if (videoUploadResponse.statusCode >= 200 &&
@@ -270,26 +390,68 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 'is_main': false,
                 'sort_order': _selectedImages.length,
               });
+
+              // إخفاء رسالة التحميل وعرض رسالة النجاح
+              if (mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white),
+                        SizedBox(width: 12),
+                        Text('تم رفع الفيديو بنجاح'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             } else {
               if (mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'فشل رفع الفيديو: ${videoUploadResponse.statusCode}',
+                      'فشل رفع الفيديو: ${videoUploadResponse.statusCode}\nالرجاء المحاولة مرة أخرى',
                     ),
-                    backgroundColor: Colors.orange,
-                    duration: const Duration(seconds: 3),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 4),
+                    action: SnackBarAction(
+                      label: 'حسناً',
+                      textColor: Colors.white,
+                      onPressed: () {},
+                    ),
                   ),
                 );
               }
             }
           } catch (e) {
             if (mounted) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+              String errorMessage = 'خطأ في رفع الفيديو';
+              if (e.toString().contains('timeout') ||
+                  e.toString().contains('TimeoutException')) {
+                errorMessage =
+                    'انتهت مهلة رفع الفيديو. قد يكون الفيديو كبيراً جداً أو الاتصال بطيء';
+              } else if (e.toString().contains('connection')) {
+                errorMessage = 'خطأ في الاتصال. تحقق من اتصال الإنترنت';
+              } else {
+                errorMessage = 'خطأ في رفع الفيديو: $e';
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('خطأ في رفع الفيديو: $e'),
-                  backgroundColor: Colors.orange,
-                  duration: const Duration(seconds: 3),
+                  content: Text(errorMessage),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 5),
+                  action: SnackBarAction(
+                    label: 'حسناً',
+                    textColor: Colors.white,
+                    onPressed: () {},
+                  ),
                 ),
               );
             }
@@ -299,10 +461,13 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         // تعيين mediaList فقط إذا تم رفع شيء
         if (tempMediaList.isNotEmpty) {
           mediaList = tempMediaList;
+
+          for (var i = 0; i < mediaList.length; i++) {}
         }
       }
 
       // 3. إنشاء المنتج مع الوسائط
+
       final success = await ref
           .read(productsControllerProvider.notifier)
           .addProduct(
@@ -364,114 +529,137 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('إضافة منتج جديد'), centerTitle: true),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // اسم المنتج
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'اسم المنتج *',
-                hintText: 'مثال: هاتف آيفون 15',
-                prefixIcon: Icon(Icons.inventory_2),
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'الرجاء إدخال اسم المنتج';
-                }
-                if (value.trim().length < 3) {
-                  return 'يجب أن يكون الاسم 3 أحرف على الأقل';
-                }
-                return null;
-              },
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 16),
-
-            // التصنيف
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCategoryId,
-              decoration: const InputDecoration(
-                labelText: 'التصنيف *',
-                hintText: 'اختر التصنيف',
-                prefixIcon: Icon(Icons.category),
-                border: OutlineInputBorder(),
-              ),
-              items: _loadingCategories
-                  ? []
-                  : _categories.map((category) {
-                      return DropdownMenuItem<String>(
-                        value: category.id,
-                        child: Text(category.name),
-                      );
-                    }).toList(),
-              onChanged: _loadingCategories
-                  ? null
-                  : (value) {
-                      setState(() {
-                        _selectedCategoryId = value;
-                      });
-                    },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'الرجاء اختيار التصنيف';
-                }
-                return null;
-              },
-            ),
-            if (_loadingCategories)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text(
-                  'جاري تحميل التصنيفات...',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+    return MbuyScaffold(
+      showAppBar: false,
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: AppDimensions.screenPadding,
+            children: [
+              _buildSubPageHeader(context, 'إضافة منتج جديد'),
+              // اسم المنتج
+              MbuyInputField(
+                controller: _nameController,
+                label: 'اسم المنتج *',
+                hint: 'مثال: هاتف آيفون 15',
+                prefixIcon: const Icon(
+                  Icons.inventory_2,
+                  color: AppTheme.textSecondaryColor,
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'الرجاء إدخال اسم المنتج';
+                  }
+                  if (value.trim().length < 3) {
+                    return 'يجب أن يكون الاسم 3 أحرف على الأقل';
+                  }
+                  return null;
+                },
+                textInputAction: TextInputAction.next,
               ),
-            const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
 
-            // قسم الصور
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
+              // التصنيف
+              DropdownButtonFormField<String>(
+                initialValue: _selectedCategoryId,
+                decoration: InputDecoration(
+                  labelText: 'التصنيف *',
+                  hintText: 'اختر التصنيف',
+                  prefixIcon: const Icon(
+                    Icons.category,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  ),
+                ),
+                items: _loadingCategories
+                    ? []
+                    : _categories.map((category) {
+                        return DropdownMenuItem<String>(
+                          value: category.id,
+                          child: Text(category.name),
+                        );
+                      }).toList(),
+                onChanged: _loadingCategories
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _selectedCategoryId = value;
+                        });
+                      },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء اختيار التصنيف';
+                  }
+                  return null;
+                },
+              ),
+              if (_loadingCategories)
+                const Padding(
+                  padding: EdgeInsets.only(top: AppDimensions.spacing8),
+                  child: Text(
+                    'جاري تحميل التصنيفات...',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontCaption,
+                      color: AppTheme.textHintColor,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: AppDimensions.spacing16),
+
+              // قسم الصور
+              MbuyCard(
+                padding: const EdgeInsets.all(AppDimensions.spacing12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.photo_library, size: 20),
-                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.photo_library,
+                          size: AppDimensions.iconS,
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                        const SizedBox(width: AppDimensions.spacing8),
                         const Text(
                           'صور المنتج *',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontBody,
+                            color: AppTheme.textPrimaryColor,
                           ),
                         ),
                         const Spacer(),
                         Text(
                           '${_selectedImages.length}/4',
-                          style: TextStyle(color: Colors.grey[600]),
+                          style: const TextStyle(
+                            color: AppTheme.textSecondaryColor,
+                            fontSize: AppDimensions.fontBody2,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     if (_selectedImages.isEmpty)
                       Center(
                         child: TextButton.icon(
                           onPressed: _pickImages,
-                          icon: const Icon(Icons.add_photo_alternate),
-                          label: const Text('اختر صور (حتى 4 صور)'),
+                          icon: const Icon(
+                            Icons.add_photo_alternate,
+                            color: AppTheme.accentColor,
+                          ),
+                          label: const Text(
+                            'اختر صور (حتى 4 صور)',
+                            style: TextStyle(color: AppTheme.accentColor),
+                          ),
                         ),
                       )
                     else
                       Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: AppDimensions.spacing8,
+                        runSpacing: AppDimensions.spacing8,
                         children: [
                           ..._selectedImages.asMap().entries.map((entry) {
                             final index = entry.key;
@@ -479,7 +667,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             return Stack(
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusM,
+                                  ),
                                   child: Image.file(
                                     File(image.path),
                                     width: 80,
@@ -494,13 +684,13 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                     onTap: () => _removeImage(index),
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
+                                      decoration: const BoxDecoration(
+                                        color: AppTheme.errorColor,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.close,
-                                        size: 16,
+                                        size: AppDimensions.iconXS,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -512,18 +702,20 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                     left: 4,
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
+                                        horizontal: AppDimensions.spacing6,
+                                        vertical: AppDimensions.spacing2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        borderRadius: BorderRadius.circular(4),
+                                        color: AppTheme.accentColor,
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimensions.radiusXS,
+                                        ),
                                       ),
                                       child: const Text(
                                         'رئيسية',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 10,
+                                          fontSize: AppDimensions.fontCaption,
                                         ),
                                       ),
                                     ),
@@ -538,12 +730,16 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: AppTheme.dividerColor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusM,
+                                  ),
                                 ),
                                 child: const Icon(
                                   Icons.add,
-                                  color: Colors.grey,
+                                  color: AppTheme.textHintColor,
                                 ),
                               ),
                             ),
@@ -552,36 +748,45 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
 
-            // قسم الفيديو
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
+              // قسم الفيديو
+              MbuyCard(
+                padding: const EdgeInsets.all(AppDimensions.spacing12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.videocam, size: 20),
-                        const SizedBox(width: 8),
-                        const Text(
+                        Icon(
+                          Icons.videocam,
+                          size: AppDimensions.iconS,
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                        SizedBox(width: AppDimensions.spacing8),
+                        Text(
                           'فيديو المنتج (اختياري)',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontBody,
+                            color: AppTheme.textPrimaryColor,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     if (_selectedVideo == null)
                       Center(
                         child: TextButton.icon(
                           onPressed: _pickVideo,
-                          icon: const Icon(Icons.video_library),
-                          label: const Text('اختر فيديو'),
+                          icon: const Icon(
+                            Icons.video_library,
+                            color: AppTheme.accentColor,
+                          ),
+                          label: const Text(
+                            'اختر فيديو',
+                            style: TextStyle(color: AppTheme.accentColor),
+                          ),
                         ),
                       )
                     else
@@ -589,130 +794,164 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         children: [
                           const Icon(
                             Icons.videocam,
-                            size: 40,
-                            color: Colors.blue,
+                            size: AppDimensions.iconL,
+                            color: AppTheme.accentColor,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacing12),
                           Expanded(
                             child: Text(
                               _selectedVideo!.name,
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(
+                                fontSize: AppDimensions.fontBody2,
+                                color: AppTheme.textPrimaryColor,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           IconButton(
                             onPressed: _removeVideo,
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: AppTheme.errorColor,
+                            ),
                           ),
                         ],
                       ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
 
-            // الوصف
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'الوصف',
-                hintText: 'وصف تفصيلي للمنتج',
-                prefixIcon: Icon(Icons.description),
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 16),
-
-            // السعر
-            TextFormField(
-              controller: _priceController,
-              decoration: const InputDecoration(
-                labelText: 'السعر (ر.س) *',
-                hintText: '0.00',
-                prefixIcon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'الرجاء إدخال السعر';
-                }
-                final price = double.tryParse(value);
-                if (price == null || price <= 0) {
-                  return 'يجب أن يكون السعر أكبر من 0';
-                }
-                return null;
-              },
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 16),
-
-            // المخزون
-            TextFormField(
-              controller: _stockController,
-              decoration: const InputDecoration(
-                labelText: 'المخزون *',
-                hintText: '0',
-                prefixIcon: Icon(Icons.inventory),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'الرجاء إدخال كمية المخزون';
-                }
-                final stock = int.tryParse(value);
-                if (stock == null || stock < 0) {
-                  return 'يجب أن يكون المخزون 0 أو أكبر';
-                }
-                return null;
-              },
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 24),
-
-            // أزرار الإجراءات
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _isSubmitting ? null : () => context.pop(),
-                    child: const Text('إلغاء'),
-                  ),
+              // الوصف
+              MbuyInputField(
+                controller: _descriptionController,
+                label: 'الوصف',
+                hint: 'وصف تفصيلي للمنتج',
+                prefixIcon: const Icon(
+                  Icons.description,
+                  color: AppTheme.textSecondaryColor,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 2,
-                  child: FilledButton.icon(
-                    onPressed: _isSubmitting ? null : _submitForm,
-                    icon: _isSubmitting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.add),
-                    label: Text(
-                      _isSubmitting ? 'جاري الإضافة...' : 'إضافة المنتج',
+                maxLines: 3,
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: AppDimensions.spacing16),
+
+              // السعر
+              MbuyInputField(
+                controller: _priceController,
+                label: 'السعر (ر.س) *',
+                hint: '0.00',
+                prefixIcon: const Icon(
+                  Icons.monetization_on,
+                  color: AppTheme.textSecondaryColor,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'الرجاء إدخال السعر';
+                  }
+                  final price = double.tryParse(value);
+                  if (price == null || price <= 0) {
+                    return 'يجب أن يكون السعر أكبر من 0';
+                  }
+                  return null;
+                },
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: AppDimensions.spacing16),
+
+              // المخزون
+              MbuyInputField(
+                controller: _stockController,
+                label: 'المخزون *',
+                hint: '0',
+                prefixIcon: const Icon(
+                  Icons.inventory,
+                  color: AppTheme.textSecondaryColor,
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'الرجاء إدخال كمية المخزون';
+                  }
+                  final stock = int.tryParse(value);
+                  if (stock == null || stock < 0) {
+                    return 'يجب أن يكون المخزون 0 أو أكبر';
+                  }
+                  return null;
+                },
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: AppDimensions.spacing24),
+
+              // أزرار الإجراءات
+              Row(
+                children: [
+                  Expanded(
+                    child: MbuyButton(
+                      label: 'إلغاء',
+                      onPressed: _isSubmitting ? null : () => context.pop(),
+                      type: MbuyButtonType.secondary,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: AppDimensions.spacing16),
+                  Expanded(
+                    flex: 2,
+                    child: MbuyButton(
+                      label: _isSubmitting ? 'جاري الإضافة...' : 'إضافة المنتج',
+                      onPressed: _isSubmitting ? null : _submitForm,
+                      isLoading: _isSubmitting,
+                      icon: Icons.add,
+                      type: MbuyButtonType.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSubPageHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: AppDimensions.iconS,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+        ],
       ),
     );
   }

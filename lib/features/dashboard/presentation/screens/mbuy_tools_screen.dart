@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../shared/widgets/exports.dart';
 import '../../../ai_studio/data/mbuy_studio_service.dart';
 
 class MbuyToolsScreen extends ConsumerStatefulWidget {
@@ -223,44 +224,28 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'أدوات MBuy',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+    return MbuyScaffold(
+      showAppBar: false,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildSubPageHeader(context, 'أدوات MBuy'),
             _buildBanner(),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacing20),
             ..._sections.entries.map((entry) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      entry.key,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacing16,
                     ),
+                    child: MbuySectionTitle(title: entry.key),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppDimensions.spacing10),
                   _buildSectionGrid(entry.value),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppDimensions.spacing20),
                 ],
               );
             }),
@@ -272,32 +257,35 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
 
   Widget _buildBanner() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: AppDimensions.screenPadding,
       height: 150,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF2D2B4E),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        gradient: AppTheme.primaryGradient,
       ),
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.spacing20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
+              children: const [
+                Text(
                   'أدوات MBuy الذكية',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: AppDimensions.fontH2,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: AppDimensions.spacing8),
+                Text(
                   'كل ما تحتاجه لإدارة وتنمية متجرك في مكان واحد',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: AppDimensions.fontBody2,
+                  ),
                 ),
               ],
             ),
@@ -309,13 +297,13 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
 
   Widget _buildSectionGrid(List<Map<String, dynamic>> items) {
     return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisSpacing: AppDimensions.spacing12,
+        mainAxisSpacing: AppDimensions.spacing12,
         childAspectRatio: 1.6,
       ),
       itemCount: items.length,
@@ -326,37 +314,33 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
             if (item.containsKey('taskType')) {
               _handleTask(item['taskType']);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('قريباً: ${item['title']}')),
+              MbuySnackBar.show(
+                context,
+                message: 'قريباً: ${item['title']}',
+                type: MbuySnackBarType.info,
               );
             }
           },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+          child: MbuyCard(
+            padding: const EdgeInsets.all(AppDimensions.spacing12),
             child: Stack(
               children: [
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(item['icon'], size: 32, color: Colors.black87),
-                      const SizedBox(height: 8),
+                      Icon(
+                        item['icon'],
+                        size: AppDimensions.iconL,
+                        color: AppTheme.textPrimaryColor,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing8),
                       Text(
                         item['title'],
                         style: const TextStyle(
-                          color: Colors.black87,
+                          color: AppTheme.textPrimaryColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: AppDimensions.fontBody2,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -365,24 +349,11 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
                 ),
                 if (item.containsKey('badge'))
                   Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        item['badge'] as String,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                      ),
+                    top: 0,
+                    left: 0,
+                    child: MbuyBadge(
+                      label: item['badge'] as String,
+                      backgroundColor: AppTheme.warningColor,
                     ),
                   ),
               ],
@@ -550,5 +521,41 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         _statusMessage = 'حدث خطأ: $e';
       });
     }
+  }
+
+  Widget _buildSubPageHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: AppDimensions.iconS,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+        ],
+      ),
+    );
   }
 }

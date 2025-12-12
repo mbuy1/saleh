@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../data/auth_controller.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 
@@ -32,22 +34,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // استدعاء login من AuthController
     await ref
         .read(authControllerProvider.notifier)
         .login(
           identifier: _emailController.text.trim(),
           password: _passwordController.text,
-          loginAs: 'merchant', // افتراضياً نسجل دخول كتاجر
+          loginAs: 'merchant',
         );
 
-    // الاستماع لحالة المصادقة
     final authState = ref.read(authControllerProvider);
 
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // نجح تسجيل الدخول - التحقق من وجود متجر
       final storeController = ref.read(
         merchantStoreControllerProvider.notifier,
       );
@@ -58,35 +57,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final hasStore = ref.read(hasMerchantStoreProvider);
 
       if (hasStore) {
-        // لدى التاجر متجر - الانتقال للوحة التحكم
         context.go('/dashboard');
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('مرحباً بعودتك!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: const Text('مرحباً بعودتك!'),
+            backgroundColor: AppTheme.successColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: AppDimensions.borderRadiusS,
+            ),
           ),
         );
       } else {
-        // التاجر ليس لديه متجر - الانتقال لشاشة إنشاء متجر
         context.go('/create-store');
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('يرجى إنشاء متجرك للمتابعة'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: const Text('يرجى إنشاء متجرك للمتابعة'),
+            backgroundColor: AppTheme.warningColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: AppDimensions.borderRadiusS,
+            ),
           ),
         );
       }
     } else if (authState.errorMessage != null) {
-      // فشل تسجيل الدخول - عرض رسالة الخطأ
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authState.errorMessage!),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
+          backgroundColor: AppTheme.errorColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppDimensions.borderRadiusS,
+          ),
         ),
       );
     }
@@ -94,52 +97,65 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // الاستماع لحالة المصادقة من Riverpod
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimensions.screenPadding,
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo/Title
-                  const Icon(Icons.store, size: 80, color: Color(0xFFE53935)),
-                  const SizedBox(height: 16),
+                  // Logo
+                  Container(
+                    width: AppDimensions.avatarProfile,
+                    height: AppDimensions.avatarProfile,
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.store,
+                      size: AppDimensions.iconDisplay,
+                      color: AppTheme.accentColor,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing16),
+
+                  // Title
                   Text(
                     'MBUY Merchant',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: const Color(0xFFE53935),
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
+
                   Text(
                     'تسجيل دخول التاجر',
                     textAlign: TextAlign.center,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontTitle,
+                      color: AppTheme.textSecondaryColor,
+                    ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: AppDimensions.spacing48),
 
                   // Email Field
-                  TextFormField(
+                  _buildTextField(
                     controller: _emailController,
+                    label: 'البريد الإلكتروني',
+                    hint: 'example@domain.com',
+                    icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
-                    textDirection: TextDirection.ltr,
-                    decoration: const InputDecoration(
-                      labelText: 'البريد الإلكتروني',
-                      hintText: 'example@domain.com',
-                      prefixIcon: Icon(Icons.email),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'الرجاء إدخال البريد الإلكتروني';
@@ -150,28 +166,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
 
                   // Password Field
-                  TextFormField(
+                  _buildTextField(
                     controller: _passwordController,
+                    label: 'كلمة المرور',
+                    hint: '••••••••',
+                    icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
-                    textDirection: TextDirection.ltr,
-                    decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: AppTheme.textSecondaryColor,
+                        size: AppDimensions.iconS,
                       ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -183,42 +199,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacing32),
 
-                  // عرض رسالة خطأ إن وجدت
+                  // Error Message
                   if (authState.errorMessage != null) ...[
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red[300]!),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.error_outline, color: Colors.red[700]),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              authState.errorMessage!,
-                              style: TextStyle(color: Colors.red[700]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    _buildErrorMessage(authState.errorMessage!),
+                    const SizedBox(height: AppDimensions.spacing16),
                   ],
 
                   // Login Button
                   SizedBox(
-                    height: 50,
+                    height: AppDimensions.buttonHeightXL,
                     child: ElevatedButton(
                       onPressed: isLoading ? null : _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.accentColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppDimensions.borderRadiusM,
+                        ),
+                        elevation: 0,
+                        disabledBackgroundColor: AppTheme.accentColor
+                            .withValues(alpha: 0.6),
+                      ),
                       child: isLoading
                           ? const SizedBox(
-                              height: 20,
-                              width: 20,
+                              height: AppDimensions.iconS,
+                              width: AppDimensions.iconS,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -229,49 +236,169 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           : const Text(
                               'تسجيل الدخول',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: AppDimensions.fontTitle,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacing24),
 
-                  // Demo credentials hint
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'للتجربة:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[900],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'البريد: baharista1@gmail.com',
-                          style: TextStyle(color: Colors.blue[800]),
-                        ),
-                        Text(
-                          'كلمة المرور: أي شيء (6 أحرف أو أكثر)',
-                          style: TextStyle(color: Colors.blue[800]),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Demo Info
+                  _buildDemoInfo(),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textDirection: TextDirection.ltr,
+      obscureText: obscureText,
+      style: const TextStyle(
+        fontSize: AppDimensions.fontBody,
+        color: AppTheme.textPrimaryColor,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        hintStyle: TextStyle(
+          color: AppTheme.textHintColor,
+          fontSize: AppDimensions.fontBody,
+        ),
+        labelStyle: TextStyle(
+          color: AppTheme.textSecondaryColor,
+          fontSize: AppDimensions.fontBody,
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: AppTheme.textSecondaryColor,
+          size: AppDimensions.iconS,
+        ),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: AppTheme.surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing16,
+          vertical: AppDimensions.spacing14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+          borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+          borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+          borderSide: const BorderSide(color: AppTheme.accentColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+          borderSide: const BorderSide(color: AppTheme.errorColor),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: AppDimensions.borderRadiusM,
+          borderSide: const BorderSide(color: AppTheme.errorColor, width: 2),
+        ),
+      ),
+      validator: validator,
+    );
+  }
+
+  Widget _buildErrorMessage(String message) {
+    return Container(
+      padding: AppDimensions.screenPadding,
+      decoration: BoxDecoration(
+        color: AppTheme.errorColor.withValues(alpha: 0.1),
+        borderRadius: AppDimensions.borderRadiusM,
+        border: Border.all(color: AppTheme.errorColor.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: AppTheme.errorColor,
+            size: AppDimensions.iconM,
+          ),
+          const SizedBox(width: AppDimensions.spacing12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppTheme.errorColor,
+                fontSize: AppDimensions.fontBody,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDemoInfo() {
+    return Container(
+      padding: AppDimensions.screenPadding,
+      decoration: BoxDecoration(
+        color: AppTheme.infoColor.withValues(alpha: 0.08),
+        borderRadius: AppDimensions.borderRadiusM,
+        border: Border.all(color: AppTheme.infoColor.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'للتجربة:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.infoColor,
+                  fontSize: AppDimensions.fontBody,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacing8),
+              Icon(
+                Icons.info_outline,
+                color: AppTheme.infoColor,
+                size: AppDimensions.iconS,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacing8),
+          Text(
+            'البريد: baharista1@gmail.com',
+            style: TextStyle(
+              color: AppTheme.infoColor.withValues(alpha: 0.8),
+              fontSize: AppDimensions.fontBody2,
+            ),
+            textDirection: TextDirection.ltr,
+          ),
+          Text(
+            'كلمة المرور: أي شيء (6 أحرف أو أكثر)',
+            style: TextStyle(
+              color: AppTheme.infoColor.withValues(alpha: 0.8),
+              fontSize: AppDimensions.fontBody2,
+            ),
+          ),
+        ],
       ),
     );
   }

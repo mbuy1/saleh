@@ -45,5 +45,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- صلاحيات الوصول للصور والفيديوهات -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>نحتاج الوصول إلى معرض الصور لاختيار صور المنتجات</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>نحتاج الوصول إلى معرض الصور لحفظ الصور</string>
+	<key>NSCameraUsageDescription</key>
+	<string>نحتاج الوصول للكاميرا لالتقاط صور المنتجات</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>نحتاج الوصول للميكروفون لتسجيل الفيديوهات</string>
+	<!-- صلاحيات الموقع (اختيارية) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>نحتاج موقعك لعرض المتاجر القريبة منك</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>نحتاج موقعك لعرض المتاجر القريبة منك</string>
 </dict>
 </plist>

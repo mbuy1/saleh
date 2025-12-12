@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
+import '../../../../shared/widgets/exports.dart';
 import '../../data/products_controller.dart';
 import '../../domain/models/product.dart';
 
@@ -19,6 +21,10 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   bool _isEditing = false;
   bool _isSubmitting = false;
+  int _currentImageIndex = 0;
+  final PageController _pageController = PageController();
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
 
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
@@ -46,7 +52,34 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     _priceController.dispose();
     _stockController.dispose();
     _imageUrlController.dispose();
+    _pageController.dispose();
+    _videoController?.dispose();
     super.dispose();
+  }
+
+  void _initializeVideo(String videoUrl) {
+    debugPrint('🎥 [VIDEO] Initializing video: $videoUrl');
+
+    if (_videoController != null) {
+      debugPrint('🎥 [VIDEO] Video already initialized');
+      return;
+    }
+
+    try {
+      _videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
+        ..initialize()
+            .then((_) {
+              debugPrint('🎥 [VIDEO] Video initialized successfully');
+              if (mounted) {
+                setState(() => _isVideoInitialized = true);
+              }
+            })
+            .catchError((error) {
+              debugPrint('❌ [VIDEO] Error initializing: $error');
+            });
+    } catch (e) {
+      debugPrint('❌ [VIDEO] Exception: $e');
+    }
   }
 
   void _initializeControllers(Product product) {
@@ -168,6 +201,12 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final productsState = ref.watch(productsControllerProvider);
+
+    debugPrint('📦 [ProductDetails] Looking for product: ${widget.productId}');
+    debugPrint(
+      '📦 [ProductDetails] Total products in state: ${productsState.products.length}',
+    );
+
     final product = productsState.products.firstWhere(
       (p) => p.id == widget.productId,
       orElse: () => Product(
@@ -179,156 +218,319 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       ),
     );
 
+    debugPrint('📦 [ProductDetails] Found product: ${product.name}');
+    debugPrint('📦 [ProductDetails] imageUrl: ${product.imageUrl}');
+    debugPrint('📦 [ProductDetails] media count: ${product.media.length}');
+    debugPrint('📦 [ProductDetails] imageUrls: ${product.imageUrls}');
+    debugPrint('📦 [ProductDetails] videoUrl: ${product.videoUrl}');
+
     if (product.name == 'غير موجود') {
-      return Scaffold(
-        appBar: AppBar(title: const Text('المنتج غير موجود')),
-        body: const Center(child: Text('لم يتم العثور على المنتج')),
+      return MbuyScaffold(
+        showAppBar: false,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildSubPageHeader(context, 'المنتج غير موجود'),
+              const Expanded(
+                child: MbuyEmptyState(
+                  icon: Icons.error_outline,
+                  title: 'المنتج غير موجود',
+                  subtitle: 'لم يتم العثور على المنتج',
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
     _initializeControllers(product);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'تعديل المنتج' : 'تفاصيل المنتج'),
-        centerTitle: true,
-        actions: [
-          if (!_isEditing)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => setState(() => _isEditing = true),
-              tooltip: 'تعديل',
+    return MbuyScaffold(
+      showAppBar: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildSubPageHeaderWithActions(
+              context,
+              _isEditing ? 'تعديل المنتج' : 'تفاصيل المنتج',
+              _isEditing,
             ),
-          if (!_isEditing)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _deleteProduct,
-              tooltip: 'حذف',
+            Expanded(
+              child: _isEditing
+                  ? _buildEditForm(product)
+                  : _buildDetailsView(product),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubPageHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: AppDimensions.iconS,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubPageHeaderWithActions(
+    BuildContext context,
+    String title,
+    bool isEditing,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: AppDimensions.iconS,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          if (!isEditing) ...[
+            GestureDetector(
+              onTap: () => setState(() => _isEditing = true),
+              child: Container(
+                padding: const EdgeInsets.all(AppDimensions.spacing8),
+                decoration: BoxDecoration(
+                  color: AppTheme.infoColor.withValues(alpha: 0.1),
+                  borderRadius: AppDimensions.borderRadiusS,
+                ),
+                child: Icon(
+                  Icons.edit,
+                  size: AppDimensions.iconS,
+                  color: AppTheme.infoColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacing8),
+            GestureDetector(
+              onTap: _deleteProduct,
+              child: Container(
+                padding: const EdgeInsets.all(AppDimensions.spacing8),
+                decoration: BoxDecoration(
+                  color: AppTheme.errorColor.withValues(alpha: 0.1),
+                  borderRadius: AppDimensions.borderRadiusS,
+                ),
+                child: Icon(
+                  Icons.delete,
+                  size: AppDimensions.iconS,
+                  color: AppTheme.errorColor,
+                ),
+              ),
+            ),
+          ] else
+            const SizedBox(
+              width: AppDimensions.iconM + AppDimensions.spacing16,
             ),
         ],
       ),
-      body: _isEditing ? _buildEditForm(product) : _buildDetailsView(product),
     );
   }
 
   Widget _buildDetailsView(Product product) {
+    // تهيئة الفيديو إذا وجد
+    if (product.videoUrl != null && product.videoUrl!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeVideo(product.videoUrl!);
+      });
+    }
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.screenPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // صورة المنتج
-          if (product.imageUrl != null)
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  product.imageUrl!,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 200,
-                      color: Colors.grey[200],
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          const SizedBox(height: 24),
+          // معرض الصور والفيديو
+          _buildMediaGallery(product),
+          const SizedBox(height: AppDimensions.spacing24),
 
           // اسم المنتج
           Text(
             product.name,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: AppDimensions.fontH2,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimaryColor,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // السعر والمخزون
           Row(
             children: [
               Expanded(
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        const Icon(Icons.monetization_on, color: Colors.green),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${product.price.toStringAsFixed(2)} ر.س',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                child: MbuyCard(
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.monetization_on,
+                        color: AppTheme.successColor,
+                        size: AppDimensions.iconL,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing8),
+                      Text(
+                        '${product.price.toStringAsFixed(2)} ر.س',
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontH3,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimaryColor,
                         ),
-                        const Text('السعر'),
-                      ],
-                    ),
+                      ),
+                      const Text(
+                        'السعر',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontBody2,
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.inventory,
-                          color: product.stock > 0 ? Colors.blue : Colors.red,
+                child: MbuyCard(
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.inventory,
+                        color: product.stock > 0
+                            ? AppTheme.infoColor
+                            : AppTheme.errorColor,
+                        size: AppDimensions.iconL,
+                      ),
+                      const SizedBox(height: AppDimensions.spacing8),
+                      Text(
+                        product.stock.toString(),
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontH3,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimaryColor,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          product.stock.toString(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      const Text(
+                        'المخزون',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontBody2,
+                          color: AppTheme.textSecondaryColor,
                         ),
-                        const Text('المخزون'),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // الحالة
-          Card(
-            child: ListTile(
-              leading: Icon(
-                product.isActive ? Icons.check_circle : Icons.visibility_off,
-                color: product.isActive ? Colors.green : Colors.grey,
-              ),
-              title: Text(product.isActive ? 'نشط' : 'غير نشط'),
-              subtitle: const Text('حالة المنتج'),
+          MbuyCard(
+            padding: const EdgeInsets.all(AppDimensions.spacing12),
+            child: Row(
+              children: [
+                Icon(
+                  product.isActive ? Icons.check_circle : Icons.visibility_off,
+                  color: product.isActive
+                      ? AppTheme.successColor
+                      : AppTheme.textHintColor,
+                  size: AppDimensions.iconM,
+                ),
+                const SizedBox(width: AppDimensions.spacing12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.isActive ? 'نشط' : 'غير نشط',
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontBody,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimaryColor,
+                        ),
+                      ),
+                      const Text(
+                        'حالة المنتج',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontCaption,
+                          color: AppTheme.textSecondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // الوصف
           if (product.description != null && product.description!.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الوصف', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 8),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(product.description!),
+                const MbuySectionTitle(title: 'الوصف'),
+                const SizedBox(height: AppDimensions.spacing8),
+                MbuyCard(
+                  padding: const EdgeInsets.all(AppDimensions.spacing16),
+                  child: Text(
+                    product.description!,
+                    style: const TextStyle(
+                      fontSize: AppDimensions.fontBody,
+                      color: AppTheme.textPrimaryColor,
+                    ),
                   ),
                 ),
               ],
@@ -342,15 +544,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.screenPadding,
         children: [
           // اسم المنتج
-          TextFormField(
+          MbuyInputField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'اسم المنتج *',
-              prefixIcon: Icon(Icons.inventory_2),
-              border: OutlineInputBorder(),
+            label: 'اسم المنتج *',
+            prefixIcon: const Icon(
+              Icons.inventory_2,
+              color: AppTheme.textSecondaryColor,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -363,28 +565,28 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             },
             textInputAction: TextInputAction.next,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // الوصف
-          TextFormField(
+          MbuyInputField(
             controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'الوصف',
-              prefixIcon: Icon(Icons.description),
-              border: OutlineInputBorder(),
+            label: 'الوصف',
+            prefixIcon: const Icon(
+              Icons.description,
+              color: AppTheme.textSecondaryColor,
             ),
             maxLines: 3,
             textInputAction: TextInputAction.next,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // السعر
-          TextFormField(
+          MbuyInputField(
             controller: _priceController,
-            decoration: const InputDecoration(
-              labelText: 'السعر (ر.س) *',
-              prefixIcon: Icon(Icons.monetization_on),
-              border: OutlineInputBorder(),
+            label: 'السعر (ر.س) *',
+            prefixIcon: const Icon(
+              Icons.monetization_on,
+              color: AppTheme.textSecondaryColor,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
@@ -402,15 +604,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             },
             textInputAction: TextInputAction.next,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // المخزون
-          TextFormField(
+          MbuyInputField(
             controller: _stockController,
-            decoration: const InputDecoration(
-              labelText: 'المخزون *',
-              prefixIcon: Icon(Icons.inventory),
-              border: OutlineInputBorder(),
+            label: 'المخزون *',
+            prefixIcon: const Icon(
+              Icons.inventory,
+              color: AppTheme.textSecondaryColor,
             ),
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -426,58 +628,272 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             },
             textInputAction: TextInputAction.next,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // رابط الصورة
-          TextFormField(
+          MbuyInputField(
             controller: _imageUrlController,
-            decoration: const InputDecoration(
-              labelText: 'رابط الصورة',
-              prefixIcon: Icon(Icons.image),
-              border: OutlineInputBorder(),
+            label: 'رابط الصورة',
+            prefixIcon: const Icon(
+              Icons.image,
+              color: AppTheme.textSecondaryColor,
             ),
             keyboardType: TextInputType.url,
             textInputAction: TextInputAction.done,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacing24),
 
           // أزرار الإجراءات
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: MbuyButton(
+                  label: 'إلغاء',
                   onPressed: _isSubmitting
                       ? null
                       : () {
                           setState(() => _isEditing = false);
                           _initializeControllers(product);
                         },
-                  child: const Text('إلغاء'),
+                  type: MbuyButtonType.secondary,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing16),
               Expanded(
                 flex: 2,
-                child: FilledButton.icon(
+                child: MbuyButton(
+                  label: _isSubmitting ? 'جاري الحفظ...' : 'حفظ التعديلات',
                   onPressed: _isSubmitting ? null : _updateProduct,
-                  icon: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.save),
-                  label: Text(
-                    _isSubmitting ? 'جاري الحفظ...' : 'حفظ التعديلات',
-                  ),
+                  isLoading: _isSubmitting,
+                  icon: Icons.save,
+                  type: MbuyButtonType.primary,
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// معرض الصور والفيديو
+  Widget _buildMediaGallery(Product product) {
+    final allImages = product.imageUrls;
+    final videoUrl = product.videoUrl;
+    final hasVideo = videoUrl != null && videoUrl.isNotEmpty;
+    final totalItems = allImages.length + (hasVideo ? 1 : 0);
+
+    // Debug logging
+    debugPrint('🖼️ [MediaGallery] Product: ${product.name}');
+    debugPrint('🖼️ [MediaGallery] imageUrl: ${product.imageUrl}');
+    debugPrint('🖼️ [MediaGallery] media count: ${product.media.length}');
+    debugPrint('🖼️ [MediaGallery] allImages: $allImages');
+    debugPrint('🖼️ [MediaGallery] videoUrl: $videoUrl');
+    debugPrint('🖼️ [MediaGallery] hasVideo: $hasVideo');
+    debugPrint('🖼️ [MediaGallery] totalItems: $totalItems');
+
+    if (totalItems == 0) {
+      // لا توجد وسائط - عرض placeholder
+      return Container(
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        child: const Icon(
+          Icons.image_not_supported,
+          size: AppDimensions.iconDisplay,
+          color: AppTheme.textHintColor,
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // معرض الصور القابل للتمرير
+        SizedBox(
+          height: 250,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: totalItems,
+            onPageChanged: (index) {
+              setState(() => _currentImageIndex = index);
+            },
+            itemBuilder: (context, index) {
+              // إذا كان الفيديو وهو في النهاية
+              if (hasVideo && index == allImages.length) {
+                return _buildVideoPlayer();
+              }
+              // الصور
+              return GestureDetector(
+                onTap: () => _showFullScreenImage(context, allImages[index]),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  child: Image.network(
+                    allImages[index],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: AppTheme.surfaceColor,
+                        child: const Icon(
+                          Icons.broken_image,
+                          size: AppDimensions.iconDisplay,
+                          color: AppTheme.textHintColor,
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppDimensions.spacing12),
+        // مؤشرات الصور
+        if (totalItems > 1)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(totalItems, (index) {
+              final isVideo = hasVideo && index == allImages.length;
+              return GestureDetector(
+                onTap: () {
+                  _pageController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentImageIndex == index ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentImageIndex == index
+                        ? AppTheme.primaryColor
+                        : AppTheme.textHintColor.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: isVideo && _currentImageIndex == index
+                      ? const Icon(
+                          Icons.play_arrow,
+                          size: 6,
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
+              );
+            }),
+          ),
+        // عداد الصور
+        const SizedBox(height: AppDimensions.spacing8),
+        Text(
+          hasVideo && _currentImageIndex == allImages.length
+              ? 'فيديو'
+              : 'صورة ${_currentImageIndex + 1} من ${allImages.length}${hasVideo ? " + فيديو" : ""}',
+          style: const TextStyle(
+            fontSize: AppDimensions.fontCaption,
+            color: AppTheme.textSecondaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// مشغل الفيديو
+  Widget _buildVideoPlayer() {
+    if (!_isVideoInitialized || _videoController == null) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio,
+            child: VideoPlayer(_videoController!),
+          ),
+          // زر التشغيل/الإيقاف
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if (_videoController!.value.isPlaying) {
+                  _videoController!.pause();
+                } else {
+                  _videoController!.play();
+                }
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.5),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _videoController!.value.isPlaying
+                    ? Icons.pause
+                    : Icons.play_arrow,
+                color: Colors.white,
+                size: 40,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// عرض الصورة بالحجم الكامل
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.broken_image,
+                    color: Colors.white,
+                    size: 100,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

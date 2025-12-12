@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/widgets/exports.dart';
 import '../../data/merchant_store_provider.dart';
 
 /// شاشة إنشاء أو تعديل متجر
@@ -113,26 +114,28 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(merchantStoreLoadingProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditMode ? 'تعديل المتجر' : 'إنشاء متجر جديد'),
-        centerTitle: true,
-      ),
+    return MbuyScaffold(
+      showAppBar: false,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: AppDimensions.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // أيقونة المتجر
-                Icon(
-                  Icons.store,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
+                _buildSubPageHeader(
+                  context,
+                  _isEditMode ? 'تعديل المتجر' : 'إنشاء متجر جديد',
                 ),
-                const SizedBox(height: 16),
+                // أيقونة المتجر
+                MbuyCircleIcon(
+                  icon: Icons.store,
+                  size: 80,
+                  backgroundColor: AppTheme.primaryColor,
+                  iconColor: Colors.white,
+                ),
+                const SizedBox(height: AppDimensions.spacing16),
 
                 // عنوان ترحيبي
                 if (!_isEditMode) ...[
@@ -140,15 +143,17 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     'مرحباً بك!',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimaryColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: AppDimensions.spacing8),
+                  const Text(
                     'قم بإنشاء متجرك الإلكتروني وابدأ في عرض منتجاتك',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    style: TextStyle(
+                      color: AppTheme.textSecondaryColor,
+                      fontSize: AppDimensions.fontBody,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ] else ...[
@@ -156,30 +161,31 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     'تعديل معلومات المتجر',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimaryColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: AppDimensions.spacing8),
+                  const Text(
                     'قم بتحديث معلومات متجرك',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    style: TextStyle(
+                      color: AppTheme.textSecondaryColor,
+                      fontSize: AppDimensions.fontBody,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacing32),
 
                 // حقل اسم المتجر
-                TextFormField(
+                MbuyInputField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'اسم المتجر *',
-                    hintText: 'أدخل اسم متجرك',
-                    prefixIcon: Icon(Icons.storefront),
-                    border: OutlineInputBorder(),
+                  label: 'اسم المتجر *',
+                  hint: 'أدخل اسم متجرك',
+                  prefixIcon: const Icon(
+                    Icons.storefront,
+                    color: AppTheme.textSecondaryColor,
                   ),
-                  textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'يرجى إدخال اسم المتجر';
@@ -189,79 +195,74 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     }
                     return null;
                   },
+                  textInputAction: TextInputAction.next,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
 
                 // حقل المدينة
-                TextFormField(
+                MbuyInputField(
                   controller: _cityController,
-                  decoration: const InputDecoration(
-                    labelText: 'المدينة',
-                    hintText: 'أدخل مدينة المتجر',
-                    prefixIcon: Icon(Icons.location_city),
-                    border: OutlineInputBorder(),
+                  label: 'المدينة',
+                  hint: 'أدخل مدينة المتجر',
+                  prefixIcon: const Icon(
+                    Icons.location_city,
+                    color: AppTheme.textSecondaryColor,
                   ),
                   textInputAction: TextInputAction.next,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
 
                 // حقل الوصف
-                TextFormField(
+                MbuyInputField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'وصف المتجر',
-                    hintText: 'أدخل وصفاً مختصراً لمتجرك',
-                    prefixIcon: Icon(Icons.description),
-                    border: OutlineInputBorder(),
-                    alignLabelWithHint: true,
+                  label: 'وصف المتجر',
+                  hint: 'أدخل وصفاً مختصراً لمتجرك',
+                  prefixIcon: const Icon(
+                    Icons.description,
+                    color: AppTheme.textSecondaryColor,
                   ),
                   maxLines: 4,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _handleSaveStore(),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacing32),
 
                 // زر الحفظ
-                FilledButton(
+                MbuyButton(
+                  label: _isEditMode ? 'حفظ التعديلات' : 'إنشاء المتجر',
                   onPressed: isLoading ? null : _handleSaveStore,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          _isEditMode ? 'حفظ التعديلات' : 'إنشاء المتجر',
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                  isLoading: isLoading,
+                  type: MbuyButtonType.primary,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
 
                 // ملاحظة
                 if (!_isEditMode)
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacing12),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade200),
+                      color: AppTheme.infoColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      border: Border.all(
+                        color: AppTheme.infoColor.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue.shade700),
-                        const SizedBox(width: 12),
-                        Expanded(
+                        Icon(
+                          Icons.info_outline,
+                          color: AppTheme.infoColor,
+                          size: AppDimensions.iconM,
+                        ),
+                        const SizedBox(width: AppDimensions.spacing12),
+                        const Expanded(
                           child: Text(
                             'يمكنك تعديل معلومات المتجر لاحقاً من صفحة الإعدادات',
                             style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.blue.shade900,
+                              fontSize: AppDimensions.fontBody2,
+                              color: AppTheme.infoColor,
                             ),
                           ),
                         ),
@@ -272,6 +273,42 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSubPageHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: AppDimensions.iconS,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+        ],
       ),
     );
   }
