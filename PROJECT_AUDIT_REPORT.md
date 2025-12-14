@@ -1,439 +1,473 @@
-# 🔍 تقرير فحص المشروع الشامل - MBUY
+# 📋 تقرير فحص شامل لمشروع MBUY
 
-**تاريخ الفحص:** 2025-01-07  
-**المفحوص:** MBUY E-Commerce Platform  
-**الإصدار:** 1.0.0
-
----
-
-## 📋 ملخص تنفيذي
-
-تم إجراء فحص شامل لمشروع MBUY الذي يتكون من ثلاثة مكونات رئيسية: Flutter App، Cloudflare Worker، وSupabase Database. الهدف من الفحص هو التحقق من جودة الكود، المعمارية، الأمان، والتوثيق.
-
-### النتيجة الإجمالية: ✅ ممتاز
+**تاريخ الفحص:** 2025-01-12  
+**نطاق الفحص:** مشروع MBUY كامل (Flutter + Worker + Backend)  
+**الحالة:** ✅ فحص مكتمل - تم اكتشاف مشاكل حرجة
 
 ---
 
-## 🎯 المكونات المفحوصة
+## 📊 ملخص تنفيذي
 
-### 1. Flutter App (saleh/)
-### 2. Cloudflare Worker (mbuy-worker/)
-### 3. Supabase Database (mbuy-backend/)
-### 4. التوثيق (docs/)
+### ✅ المكونات المتوافقة مع Golden Plan
 
----
+1. **Worker (mbuy-worker)** - ✅ 100% متوافق
+2. **Flutter App (saleh)** - ⚠️ متوافق جزئياً (مشاكل في الـ Auth Flow)
+3. **Database Schema** - ✅ متوافق (Migrations deployed)
 
-## 📱 1. فحص Flutter App
+### ❌ المكونات غير المتوافقة
 
-### ✅ النتيجة: ممتاز
-
-#### البنية المعمارية:
-```
-lib/
-├── core/                    ✅ منظم جيداً
-│   ├── services/           ✅ ApiService + Auth
-│   ├── theme/              ✅ نظام تصميم موحد
-│   └── root_widget.dart    ✅ نقطة دخول واضحة
-│
-├── features/                ✅ Feature-based organization
-│   ├── auth/               ✅ Auth منفصل
-│   ├── customer/           ✅ Customer features
-│   └── merchant/           ✅ Merchant features
-│
-└── shared/                  ✅ Widgets مشتركة
-```
-
-#### استخدام Supabase:
-- ✅ **لا يوجد استخدام مباشر لـ Supabase Auth** - تم الاستبدال بالكامل
-- ⚠️ **2 ملفات فقط** تستخدم `supabaseClient.from()`:
-  1. `examples/product_image_upload_example.dart` - ملف مثال (مُعلق)
-  2. `core/supabase_client.dart` - helper file للاستخدام القديم
-- ✅ **81 استخدام لـ ApiService** في 24 ملف - ممتاز!
-
-#### استخدام API:
-```
-✅ 81 استخدام لـ ApiService (GET, POST, PUT, DELETE)
-✅ جميع الطلبات المحمية تستخدم JWT
-✅ Error handling موحد
-✅ Response validation
-```
-
-#### الأخطاء (Linter):
-```
-✅ لا توجد أخطاء في Linter
-```
-
-#### التقييم:
-- **المعمارية**: ⭐⭐⭐⭐⭐ (5/5)
-- **جودة الكود**: ⭐⭐⭐⭐⭐ (5/5)
-- **الأمان**: ⭐⭐⭐⭐⭐ (5/5)
-- **الصيانة**: ⭐⭐⭐⭐⭐ (5/5)
+1. **Edge Functions (17 function)** - ❌ تستخدم Foreign Keys خاطئة
+2. **Flutter Auth Flow** - ❌ يستخدم `/auth/login` بدلاً من `/auth/supabase/login`
 
 ---
 
-## ☁️ 2. فحص Cloudflare Worker
+## 🔍 النتائج المفصلة
 
-### ✅ النتيجة: ممتاز
+### 1. ⚠️ Flutter App - مشكلة حرجة في Auth Flow
 
-#### البنية:
-```
-src/
-├── index.ts                 ✅ نقطة الدخول (4110 سطر)
-├── endpoints/
-│   └── auth.ts             ✅ Auth handlers
-├── middleware/
-│   ├── authMiddleware.ts   ✅ JWT verification
-│   └── rateLimiter.ts      ✅ Rate limiting
-├── utils/
-│   ├── supabase.ts         ✅ Supabase client helper
-│   └── auth.ts             ✅ JWT + Password hashing
-└── types.ts                 ✅ TypeScript types
-```
+#### المشكلة:
 
-#### API Endpoints:
-```
-✅ 108+ endpoints في index.ts
-✅ 4 Auth endpoints (register, login, me, logout)
-✅ JWT Middleware على جميع /secure/* routes
-```
+**الموقع:** `saleh/lib/features/auth/data/auth_repository.dart`
 
-#### Middleware:
-```typescript
-// ✅ JWT Verification
-export async function mbuyAuthMiddleware(c, next) {
-  const token = extractTokenFromHeader(authHeader);
-  const payload = await verifyJWT(token, jwtSecret);
-  c.set('userId', payload.sub);
-  await next();
-}
-
-// ✅ Password Hashing
-PBKDF2 + 100,000 rounds + SHA-256
-
-// ✅ JWT Signing
-HS256 + 30 days expiration
-```
-
-#### Supabase Integration:
-```typescript
-// ✅ Service Role Key
-createSupabaseClient(env) {
-  // Uses SUPABASE_SERVICE_ROLE_KEY
-  // Bypasses RLS
-  // Full access to tables
-}
-```
-
-#### التقييم:
-- **المعمارية**: ⭐⭐⭐⭐⭐ (5/5)
-- **جودة الكود**: ⭐⭐⭐⭐⭐ (5/5)
-- **الأمان**: ⭐⭐⭐⭐⭐ (5/5)
-- **الأداء**: ⭐⭐⭐⭐⭐ (5/5)
-
----
-
-## 🗄️ 3. فحص Database
-
-### ✅ النتيجة: ممتاز
-
-#### Migrations:
-```
-✅ 19 migration file في migrations/
-✅ Migration رئيسي: 20250107000001_create_mbuy_auth_tables.sql
-✅ RLS fix: 20251206204801_fix_rls_policies_mbuy_auth.sql
-```
-
-#### Auth Tables:
-```sql
--- ✅ mbuy_users
-CREATE TABLE mbuy_users (
-  id UUID PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  full_name TEXT,
-  phone TEXT,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- ✅ mbuy_sessions
-CREATE TABLE mbuy_sessions (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES mbuy_users(id),
-  token_hash TEXT NOT NULL,
-  expires_at TIMESTAMPTZ,
-  is_active BOOLEAN DEFAULT true
-);
-```
-
-#### RLS Policies:
-```sql
--- ✅ Service Role Access
-CREATE POLICY "Service role can access all mbuy_users"
-  ON mbuy_users
-  FOR ALL
-  USING (true)
-  WITH CHECK (true);
-
--- ✅ RLS Enabled
-ALTER TABLE mbuy_users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE mbuy_sessions ENABLE ROW LEVEL SECURITY;
-```
-
-#### Indexes:
-```sql
-✅ idx_mbuy_users_email
-✅ idx_mbuy_users_is_active
-✅ idx_mbuy_sessions_user_id
-✅ idx_mbuy_sessions_token_hash
-```
-
-#### التقييم:
-- **Schema Design**: ⭐⭐⭐⭐⭐ (5/5)
-- **RLS Policies**: ⭐⭐⭐⭐⭐ (5/5)
-- **Indexes**: ⭐⭐⭐⭐⭐ (5/5)
-- **Migrations**: ⭐⭐⭐⭐⭐ (5/5)
-
----
-
-## 📚 4. فحص التوثيق
-
-### ✅ النتيجة: ممتاز
-
-#### هيكل التوثيق:
-```
-docs/
-├── README.md               ✅ دليل التوثيق الرئيسي
-├── INDEX.md                ✅ فهرس شامل
-├── API.md                  ✅ دليل API كامل
-├── ARCHITECTURE.md         ✅ البنية المعمارية
-├── QUICK_START.md          ✅ البدء السريع
-├── DEVELOPMENT.md          ✅ دليل التطوير
-├── DEPLOYMENT.md           ✅ دليل النشر
-├── TROUBLESHOOTING.md      ✅ حل المشاكل
-├── CODE_STANDARDS.md       ✅ معايير الكود
-├── SECURITY.md             ✅ دليل الأمان
-└── ENVIRONMENT.md          ✅ Environment Variables
-```
-
-#### README Files:
-```
-✅ README.md (رئيسي)
-✅ saleh/README.md (Flutter)
-✅ mbuy-worker/README.md (Worker)
-✅ mbuy-backend/README.md (Database)
-```
-
-#### ملفات التقارير:
-```
-⚠️ 43 ملف REPORT
-⚠️ 22 ملف SUMMARY
-💡 توصية: دمج الملفات المكررة
-```
-
-#### التقييم:
-- **الاكتمال**: ⭐⭐⭐⭐⭐ (5/5)
-- **التنظيم**: ⭐⭐⭐⭐☆ (4/5)
-- **الوضوح**: ⭐⭐⭐⭐⭐ (5/5)
-- **التحديث**: ⭐⭐⭐⭐⭐ (5/5)
-
----
-
-## 🔐 الأمان
-
-### ✅ النتيجة: ممتاز
-
-#### Authentication:
-```
-✅ JWT-based authentication
-✅ Custom auth (mbuy_users)
-✅ Password hashing (PBKDF2, 100k rounds)
-✅ Session tracking
-✅ Token expiration (30 days)
-```
-
-#### Authorization:
-```
-✅ JWT Middleware على /secure/*
-✅ userId extraction من JWT
-✅ Role-based access
-✅ Store ownership verification
-```
-
-#### Data Protection:
-```
-✅ SERVICE_ROLE_KEY في Worker secrets
-✅ Client لا يرسل user_id, store_id
-✅ Body cleaning في Worker
-✅ RLS على Database
-✅ HTTPS only
-```
-
-#### Network Security:
-```
-✅ CORS policies محددة
-✅ Rate limiting
-✅ Input validation
-```
-
-#### التقييم:
-- **Authentication**: ⭐⭐⭐⭐⭐ (5/5)
-- **Authorization**: ⭐⭐⭐⭐⭐ (5/5)
-- **Data Protection**: ⭐⭐⭐⭐⭐ (5/5)
-- **Network Security**: ⭐⭐⭐⭐⭐ (5/5)
-
----
-
-## 📊 الإحصائيات
-
-### Flutter App:
-```
-✅ 0 استخدامات Supabase Auth
-✅ 2 استخدامات Supabase Client (مثال فقط)
-✅ 81 استخدامات ApiService
-✅ 0 أخطاء Linter
-✅ 24 ملف يستخدم ApiService
-```
-
-### Cloudflare Worker:
-```
-✅ 108+ endpoints
-✅ 4 Auth endpoints
-✅ 1 JWT Middleware
-✅ 1 Supabase Client Helper
-✅ TypeScript types موحدة
-```
-
-### Database:
-```
-✅ 19 migrations
-✅ 2 Auth tables (mbuy_users, mbuy_sessions)
-✅ RLS policies محددة
-✅ Indexes محسّنة
-```
-
-### التوثيق:
-```
-✅ 11 ملف في docs/
-✅ 4 README files
-✅ 43 ملف REPORT (للأرشفة)
-✅ 22 ملف SUMMARY (للأرشفة)
-```
-
----
-
-## ✅ نقاط القوة
-
-### 1. المعمارية
-- ✅ API Gateway Pattern محكم
-- ✅ Feature-based organization في Flutter
-- ✅ Separation of concerns واضح
-- ✅ Custom Auth system قوي
-
-### 2. الأمان
-- ✅ JWT-based authentication
-- ✅ Password hashing آمن
-- ✅ Service Role access محمي
-- ✅ RLS policies محكمة
-- ✅ Input validation شامل
-
-### 3. جودة الكود
-- ✅ لا أخطاء Linter
-- ✅ TypeScript types موحدة
-- ✅ Error handling موحد
-- ✅ Code organization ممتاز
-
-### 4. التوثيق
-- ✅ توثيق شامل ومحدث
-- ✅ API documentation كامل
-- ✅ Architecture diagrams
-- ✅ Quick start guides
-
----
-
-## ⚠️ التوصيات
-
-### 1. التوثيق (أولوية منخفضة)
-
-**المشكلة:** ملفات تقارير مكررة (43 REPORT + 22 SUMMARY)
-
-**الحل المقترح:**
-```bash
-# إنشاء مجلد archive
-mkdir -p docs/archive
-
-# نقل الملفات القديمة
-mv *REPORT*.md docs/archive/
-mv *SUMMARY*.md docs/archive/
-
-# الاحتفاظ بالملفات المهمة فقط
-```
-
-**الأولوية:** منخفضة  
-**التأثير:** تنظيمي فقط
-
-### 2. الأمثلة (أولوية منخفضة)
-
-**المشكلة:** `examples/product_image_upload_example.dart` يحتوي على كود معلق
-
-**الحل المقترح:**
 ```dart
-// تحديث المثال ليستخدم ApiService بدلاً من Supabase مباشرة
-// أو حذف الملف إذا لم يعد مستخدماً
+// ❌ يستخدم endpoint خاطئ (Legacy Custom Auth)
+final response = await _apiService.post(
+  '/auth/login',  // ❌ هذا Endpoint مُعطل (Deprecated)
+  body: {
+    'email': identifier.trim(),
+    'password': password,
+  },
+);
 ```
 
-**الأولوية:** منخفضة  
-**التأثير:** تعليمي فقط
+**التأثير:**
+- تسجيل الدخول **لن يعمل** إطلاقاً
+- Worker يُرجع استجابة 410 Gone للـ `/auth/login`
+- Flutter يتوقع response بصيغة Legacy Auth (mbuy_users)
+- Flutter **لا يستخدم** Supabase JWT الصحيح
 
-### 3. Tests (أولوية متوسطة)
+#### الحل المطلوب:
 
-**المشكلة:** لا توجد tests كافية
+```dart
+// ✅ الاستخدام الصحيح (Supabase Auth)
+final response = await _apiService.post(
+  '/auth/supabase/login',  // ✅ Correct endpoint
+  body: {
+    'email': identifier.trim(),
+    'password': password,
+  },
+);
 
-**الحل المقترح:**
+// استخراج JWT الصحيح من Supabase
+final token = data['session']['access_token'];
 ```
-1. Unit tests للـ Worker endpoints
-2. Unit tests للـ Flutter services
-3. Integration tests للـ API flows
-```
 
-**الأولوية:** متوسطة  
-**التأثير:** جودة الكود على المدى الطويل
+#### الملفات المتأثرة:
+
+1. **`lib/features/auth/data/auth_repository.dart`**
+   - `signIn()` - Line 82: يستخدم `/auth/login` ❌
+   - Response Format: يتوقع `{ok, token, user, profile}` ❌
+   - **الصحيح:** `{session: {access_token, refresh_token}, user, profile}` ✅
+
+2. **`lib/core/app_config.dart`**
+   - `loginEndpoint = '/auth/login'` ❌
+   - **الصحيح:** `loginEndpoint = '/auth/supabase/login'` ✅
+
+3. **Comments في `auth_repository.dart`**
+   - التعليقات تشير إلى Legacy Response:
+   ```dart
+   /// "token": "eyJhbGciOiJIUzI1NiIs..."  // ❌ Custom JWT
+   /// "mbuy_user_id": "uuid",              // ❌ Legacy Field
+   ```
+   - **الصحيح:** التعليقات يجب أن تعكس Supabase Auth Response
 
 ---
 
-## 📈 التقييم الإجمالي
+### 2. ❌ Edge Functions - Foreign Keys خاطئة
 
-| المكون | التقييم | الملاحظات |
-|--------|---------|-----------|
-| **Flutter App** | ⭐⭐⭐⭐⭐ (5/5) | معمارية ممتازة، لا أخطاء |
-| **Cloudflare Worker** | ⭐⭐⭐⭐⭐ (5/5) | آمن، سريع، منظم |
-| **Database** | ⭐⭐⭐⭐⭐ (5/5) | Schema محسّن، RLS صحيح |
-| **التوثيق** | ⭐⭐⭐⭐☆ (4/5) | شامل لكن يحتاج تنظيم |
-| **الأمان** | ⭐⭐⭐⭐⭐ (5/5) | ممتاز على جميع الأصعدة |
+#### المشكلة:
 
-### التقييم النهائي: **4.8/5** ⭐⭐⭐⭐⭐
+جميع Edge Functions (17 function) تفترض أن `auth.users.id` يمكن استخدامه مباشرة كـ FK إلى `stores.owner_id`، `wallets.owner_id`، إلخ.
+
+هذا **خاطئ** في Golden Plan Schema:
+
+```
+Golden Plan Identity Chain:
+auth.users.id → user_profiles.auth_user_id (FK)
+              → user_profiles.id (PK)
+              → stores.owner_id (FK)
+```
+
+#### الأمثلة:
+
+**1. merchant_store/index.ts** (6 مواقع):
+```typescript
+// ❌ WRONG
+const { data: store } = await supabase
+  .from('stores')
+  .eq('owner_id', user.id);  // user.id = auth.users.id
+
+// ✅ CORRECT
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .eq('auth_user_id', user.id)
+  .single();
+
+const { data: store } = await supabase
+  .from('stores')
+  .eq('owner_id', profile.id);  // profile.id = user_profiles.id
+```
+
+**2. merchant_products/index.ts**:
+```typescript
+// ❌ Line 22
+.eq('user_id', user.id)
+```
+
+**3. wallet_transactions/index.ts**:
+```typescript
+// ❌ Line 27
+.eq('owner_id', user.id)
+```
+
+**4. points_transactions/index.ts**:
+```typescript
+// ❌ Line 27
+.eq('user_id', user.id)
+```
+
+**5. user_profile/index.ts**:
+```typescript
+// ❌ Line 19 (Ambiguous)
+const targetUserId = user_id || user.id;
+```
+
+#### العواقب:
+
+- Edge Functions ستُرجع **نتائج فارغة** دائماً
+- RLS Policies تتوقع `user_profiles.id`، ليس `auth.users.id`
+- Data Access مكسور لجميع Edge Functions
+
+#### قائمة Edge Functions المتأثرة (11+ مواقع):
+
+| Edge Function | السطر | الخطأ |
+|--------------|-------|-------|
+| merchant_store | 94, 110, 151, 156, 221, 297 | `.eq('owner_id', user.id)` |
+| merchant_products | 22 | `.eq('user_id', user.id)` |
+| wallet_transactions | 27 | `.eq('owner_id', user.id)` |
+| points_transactions | 27 | `.eq('user_id', user.id)` |
+| user_profile | 19 | `user_id \|\| user.id` |
 
 ---
 
-## ✅ الخلاصة
+### 3. ✅ Worker (mbuy-worker) - متوافق بالكامل
 
-مشروع MBUY في حالة **ممتازة** من حيث:
-- ✅ المعمارية والتنظيم
-- ✅ الأمان والحماية
-- ✅ جودة الكود
-- ✅ التوثيق
+#### الحالة: ✅ ممتاز
 
-**التوصيات:**
-1. دمج ملفات التقارير المكررة (اختياري)
-2. تحديث أو حذف ملفات الأمثلة القديمة (اختياري)
-3. إضافة tests شاملة (موصى به)
+**الفحوصات:**
+- ✅ لا توجد references لـ `mbuy_users` أو `mbuy_sessions`
+- ✅ يستخدم `supabaseAuthMiddleware` في 20+ route
+- ✅ ملفات Legacy محذوفة:
+  - `src/endpoints/auth.ts` ❌ محذوف
+  - `src/middleware/authMiddleware.ts` ❌ محذوف
+  - `src/utils/userMapping.ts` ❌ محذوف
+- ✅ يوجد Deprecation Warnings للـ Legacy Endpoints:
+  ```typescript
+  // /auth/login → 410 Gone
+  // /auth/register → 410 Gone
+  ```
 
-**الحالة:** ✅ **جاهز للإنتاج**
+**الـ Endpoints الصحيحة:**
+```typescript
+// ✅ Supabase Auth (Active)
+POST /auth/supabase/register
+POST /auth/supabase/login
+POST /auth/supabase/logout
+POST /auth/supabase/refresh
+
+// ✅ Secure Endpoints (JWT-protected)
+GET /secure/merchant/store
+POST /secure/products
+GET /secure/users/me
+```
 
 ---
 
-**تاريخ الفحص:** 2025-01-07  
-**المفحوص:** MBUY E-Commerce Platform  
-**النتيجة:** ⭐⭐⭐⭐⭐ (4.8/5)
+### 4. ✅ Database Schema - متوافق
 
+#### الحالة: ✅ جيد
+
+**Migrations المطبقة:**
+```
+20251211120000_golden_plan_setup.sql        ✅
+20251211120001_auto_profile_creation.sql    ✅
+20251211120002_manual_sync_functions.sql    ✅
+20251211120003_rls_policies.sql             ✅
+```
+
+**الـ Schema:**
+```sql
+-- ✅ Golden Plan Identity Chain
+auth.users (Supabase Auth)
+  ↓ auth_user_id (FK)
+user_profiles
+  ↓ owner_id (FK)
+stores
+  ↓ store_id (FK)
+products
+```
+
+**RLS Policies:**
+- ✅ `user_profiles`: يستخدم `auth.uid()` للوصول
+- ✅ `stores`: يتحقق من `owner_id = user_profiles.id`
+- ✅ `products`: يتحقق من `store_id → stores.owner_id`
+
+**⚠️ ملاحظة:** Legacy Migrations لا تزال موجودة (تاريخية):
+- `20251206201515_create_mbuy_auth_tables.sql`
+- `20251207074238_link_old_users_to_profiles.sql`
+- `20251207080000_unify_user_profiles_with_mbuy_users.sql`
+
+**التوصية:** أرشفة Legacy Migrations في مجلد `archive/` للاحتفاظ بالسجل التاريخي
+
+---
+
+### 5. ✅ Flutter Dependencies - متوافق
+
+#### الحالة: ✅ ممتاز
+
+**الفحص:** `saleh/pubspec.yaml`
+
+```yaml
+dependencies:
+  # ✅ HTTP فقط - لا يوجد supabase_flutter
+  http: ^1.2.0
+  
+  # ✅ لا يوجد Supabase SDK
+  # supabase_flutter: ❌ غير موجود
+  
+  # ✅ Firebase للتنبيهات فقط
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+```
+
+**التحقق من الكود:**
+```bash
+# بحث عن supabase_flutter
+grep -r "supabase_flutter" saleh/lib/**/*.dart
+# النتيجة: 0 matches ✅
+```
+
+---
+
+## 🐛 الأخطاء الحرجة (يجب إصلاحها)
+
+### ❌ خطأ 1: Flutter Auth Flow مكسور
+
+**الأولوية:** 🔴 حرجة جداً  
+**التأثير:** تسجيل الدخول لا يعمل إطلاقاً
+
+**الإصلاح:**
+1. تحديث `auth_repository.dart`:
+   - تغيير `/auth/login` → `/auth/supabase/login`
+   - تحديث Response Parsing:
+     ```dart
+     final token = data['session']['access_token'];
+     final refreshToken = data['session']['refresh_token'];
+     ```
+
+2. تحديث `app_config.dart`:
+   ```dart
+   static const String loginEndpoint = '/auth/supabase/login';
+   ```
+
+3. تحديث التعليقات في `auth_repository.dart`:
+   - إزالة references لـ `mbuy_user_id`
+   - تحديث Response Examples
+
+---
+
+### ❌ خطأ 2: Edge Functions تستخدم FK خاطئة
+
+**الأولوية:** 🔴 حرجة  
+**التأثير:** جميع Edge Functions ترجع بيانات خاطئة/فارغة
+
+**الإصلاح:** تحديث 17 Edge Function لاستخدام:
+
+```typescript
+// Step 1: Get profile
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .eq('auth_user_id', user.id)
+  .single();
+
+if (!profile) {
+  return new Response(
+    JSON.stringify({ error: 'Profile not found' }), 
+    { status: 404 }
+  );
+}
+
+// Step 2: Use profile.id as FK
+const { data } = await supabase
+  .from('stores')
+  .eq('owner_id', profile.id);
+```
+
+**الملفات المتأثرة:**
+- `merchant_store/index.ts` (6 مواقع)
+- `merchant_products/index.ts` (1 موقع)
+- `wallet_transactions/index.ts` (1 موقع)
+- `points_transactions/index.ts` (1 موقع)
+- `user_profile/index.ts` (1 موقع)
+- ... (والمزيد يحتاج فحص)
+
+---
+
+## ⚠️ التحذيرات (مستحسن إصلاحها)
+
+### ⚠️ تحذير 1: Legacy Migrations موجودة
+
+**التأثير:** لا يؤثر على التشغيل، لكن يسبب فوضى
+
+**التوصية:**
+```bash
+# أرشفة Legacy Migrations
+mkdir mbuy-backend/supabase/migrations/archive
+mv mbuy-backend/supabase/migrations/2025120*.sql archive/
+```
+
+---
+
+### ⚠️ تحذير 2: لا يوجد اختبار للـ Registration Flow
+
+**التأثير:** لا نعرف إذا كانت الـ Trigger تعمل بشكل صحيح
+
+**التوصية:**
+- اختبار Registration Flow end-to-end
+- التحقق من أن `handle_new_auth_user` trigger يعمل
+- فحص الـ Logs في Supabase
+
+---
+
+## 📈 التقييم العام
+
+| المكون | الحالة | النسبة |
+|--------|--------|--------|
+| Worker | ✅ ممتاز | 100% |
+| Flutter Dependencies | ✅ ممتاز | 100% |
+| Database Schema | ✅ ممتاز | 100% |
+| Flutter Auth | ❌ مكسور | 0% |
+| Edge Functions | ❌ مكسور | 0% |
+
+**النسبة الإجمالية:** 60% ✅ / 40% ❌
+
+---
+
+## 📝 خطة العمل المقترحة
+
+### المرحلة 1: إصلاح Flutter Auth (حرجة) 🔴
+
+1. تحديث `auth_repository.dart`:
+   - تغيير endpoint
+   - تحديث Response parsing
+   - تحديث Token storage
+
+2. تحديث `app_config.dart`:
+   - تحديث `loginEndpoint`
+
+3. اختبار Login Flow:
+   - محاولة تسجيل الدخول
+   - التحقق من JWT
+   - التحقق من Navigation
+
+**المدة المقدرة:** 30 دقيقة
+
+---
+
+### المرحلة 2: إصلاح Edge Functions (حرجة) 🔴
+
+**خيار A: تحديث جميع Edge Functions**
+- تحديث 17 function لاستخدام Golden Plan FK
+- المدة: 2-3 ساعات
+- الفائدة: Edge Functions تعمل بشكل صحيح
+
+**خيار B: إيقاف Edge Functions (مستحسن)**
+- إرجاع 410 Gone لجميع Edge Functions
+- توجيه المستخدمين لاستخدام Worker endpoints
+- المدة: 15 دقيقة
+- الفائدة: توحيد API Layer في Worker فقط
+
+**التوصية:** **خيار B** لأن Worker يوفر نفس الوظائف
+
+---
+
+### المرحلة 3: أرشفة Legacy Code (اختياري) ⚪
+
+1. نقل Legacy Migrations إلى `archive/`
+2. إضافة README في `archive/` يشرح التاريخ
+
+**المدة:** 10 دقائق
+
+---
+
+### المرحلة 4: اختبار شامل (مستحسن) 🟡
+
+1. اختبار Registration:
+   ```bash
+   POST /auth/supabase/register
+   # التحقق من إنشاء user_profiles
+   ```
+
+2. اختبار Login:
+   ```bash
+   POST /auth/supabase/login
+   # التحقق من JWT
+   ```
+
+3. اختبار Secure Endpoints:
+   ```bash
+   GET /secure/merchant/store
+   Authorization: Bearer <JWT>
+   ```
+
+**المدة:** 1 ساعة
+
+---
+
+## 🎯 النتيجة النهائية
+
+### ✅ ما يعمل بشكل صحيح:
+
+1. Worker API Layer - ✅ ممتاز
+2. Database Schema - ✅ صحيح
+3. Flutter Dependencies - ✅ متوافق مع Golden Plan
+4. RLS Policies - ✅ صحيحة
+
+### ❌ ما يحتاج إصلاح عاجل:
+
+1. **Flutter Auth Flow** - يستخدم Legacy Endpoint
+2. **Edge Functions** - تستخدم FK خاطئة
+
+### ⚠️ التوصيات:
+
+1. إصلاح Flutter Auth أولاً (أولوية قصوى)
+2. إيقاف Edge Functions أو تحديثها
+3. اختبار Registration Flow
+4. أرشفة Legacy Code
+
+---
+
+## 📞 الخطوات التالية
+
+يرجى الرد بأحد الخيارات التالية:
+
+1. **"نفذ المرحلة 1"** - إصلاح Flutter Auth فوراً
+2. **"نفذ المرحلة 1 + 2"** - إصلاح Flutter + إيقاف Edge Functions
+3. **"نفذ كل شيء"** - إصلاح كامل + أرشفة + اختبار
+4. **"أعطني تفاصيل أكثر عن [موضوع]"** - مزيد من الشرح
+
+---
+
+**تاريخ التقرير:** 2025-01-12  
+**المراجع:** GitHub Copilot  
+**إصدار Golden Plan:** 1.0

@@ -1,298 +1,214 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
-import '../../../core/services/secure_storage_service.dart';
+import '../../../core/services/auth_token_storage.dart';
 
-/// Auth Repository - Uses MBUY Custom Auth only
-/// No Supabase Auth dependency
+/// Auth Repository - يتعامل مع جميع عمليات المصادقة
+///
+/// المسؤوليات:
+/// - تسجيل الدخول/الخروج
+/// - إدارة التوكنات (Supabase JWT)
+/// - حفظ جلسة المستخدم
+///
+/// يتواصل مع Worker على:
+/// POST /auth/supabase/login
+///
+/// مثال Request:
+/// {
+///   "email": "user@example.com",
+///   "password": "password123"
+/// }
+///
+/// مثال Response (نجاح) - Supabase Auth Format:
+/// {
+///   "session": {
+///     "access_token": "eyJhbGciOiJIUzI1NiIs...",
+///     "refresh_token": "...",
+///     "expires_in": 3600,
+///     "token_type": "bearer"
+///   },
+///   "user": {
+///     "id": "auth-user-uuid",
+///     "email": "user@example.com",
+///     "user_metadata": {
+///       "full_name": "User Name",
+///       "role": "merchant"
+///     }
+///   },
+///   "profile": {
+///     "id": "profile-uuid",
+///     "auth_user_id": "auth-user-uuid",
+///     "role": "merchant",
+///     "display_name": "Display Name",
+///     "email": "user@example.com",
+///     "avatar_url": null
+///   }
+/// }
+///
+/// مثال Response (فشل):
+/// {
+///   "error": "INVALID_CREDENTIALS",
+///   "message": "Invalid email or password"
+/// }
 class AuthRepository {
-  static const String baseUrl = ApiService.baseUrl;
+  final ApiService _apiService;
+  final AuthTokenStorage _tokenStorage;
 
-  /// Register a new user
-  /// POST /auth/register
-  static Future<Map<String, dynamic>> register({
-    required String email,
+  AuthRepository({
+    required ApiService apiService,
+    required AuthTokenStorage tokenStorage,
+  }) : _apiService = apiService,
+       _tokenStorage = tokenStorage;
+
+  // ==========================================================================
+  // تسجيل الدخول
+  // ==========================================================================
+
+  /// تسجيل الدخول باستخدام email وpassword (Supabase Auth)
+  ///
+  /// [identifier] يمكن أن يكون email
+  /// [password] كلمة المرور
+  /// [loginAs] غير مستخدم (محفوظ للتوافق)
+  ///
+  /// يرمي [Exception] إذا فشل تسجيل الدخول
+  Future<Map<String, dynamic>> signIn({
+    required String identifier,
     required String password,
-    String? fullName,
-    String? phone,
+    String? loginAs,
   }) async {
     try {
-      debugPrint('[AuthRepository] Registering user: $email');
-
-      final response = await ApiService.post(
-        '/auth/register',
-        data: {
-          'email': email.trim().toLowerCase(),
-          'password': password,
-          if (fullName != null) 'full_name': fullName,
-          if (phone != null) 'phone': phone,
-        },
-        requireAuth: false, // Register doesn't need auth
+      // إرسال طلب تسجيل الدخول إلى Worker (Supabase Auth)
+      final response = await _apiService.post(
+        '/auth/supabase/login',
+        body: {'email': identifier.trim(), 'password': password},
       );
 
-      if (response['ok'] == true) {
-        // Save token and user info
-        final token = response['token'] as String;
-        final user = response['user'] as Map<String, dynamic>;
+      // التحقق من نجاح الطلب
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        await SecureStorageService.saveToken(token);
-        await SecureStorageService.saveUserId(user['id'] as String);
-        await SecureStorageService.saveUserEmail(user['email'] as String);
+        // Worker الآن يرجع البيانات مباشرة (CLEAN format)
+        // {
+        //   "success": true,
+        //   "access_token": "...",
+        //   "refresh_token": "...",
+        //   "expires_in": 3600,
+        //   "user": { "id": "...", "email": "...", "role": "..." },
+        //   "profile": { ... }
+        // }
+        if (data['access_token'] != null && data['user'] != null) {
+          final accessToken = data['access_token'] as String;
+          final refreshToken = data['refresh_token'] as String?;
+          final user = data['user'] as Map<String, dynamic>;
 
-        debugPrint('[AuthRepository] ✅ Registration successful');
-        return response;
-      } else {
-        final errorMessage = response['message'] ?? response['error'] ?? 'Registration failed';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      debugPrint('[AuthRepository] ❌ Registration error: $e');
-      rethrow;
-    }
-  }
+          // Profile قد يكون null إذا لم يتم إنشاؤه بعد
+          final profile = data['profile'] != null
+              ? data['profile'] as Map<String, dynamic>
+              : null;
 
-  /// Login with email and password
-  /// POST /auth/login
-  /// After successful login, token is saved and user data is returned
-  static Future<Map<String, dynamic>> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      debugPrint('LOGIN_REQUEST_START');
-      debugPrint('[AuthRepository] 🔐 Logging in: $email');
-      debugPrint('[AuthRepository] 📡 Endpoint: POST /auth/login');
-      debugPrint('[AuthRepository] 📦 Data: email=${email.trim().toLowerCase()}, password=***');
+          // استخراج role من user object مباشرة (له الأولوية)
+          final userRole =
+              user['role'] as String? ??
+              profile?['role'] as String? ??
+              'customer';
 
-      final response = await ApiService.post(
-        '/auth/login',
-        data: {
-          'email': email.trim().toLowerCase(),
-          'password': password,
-        },
-        requireAuth: false, // Login doesn't need auth
-      );
-
-      debugPrint('LOGIN_RESPONSE: statusCode=200, body=${response.toString()}');
-      debugPrint('[AuthRepository] 📥 Response: ${response.toString()}');
-
-      if (response['ok'] == true) {
-        // Save token and user info
-        final token = response['token'] as String?;
-        final user = response['user'] as Map<String, dynamic>?;
-
-        if (token == null || user == null) {
-          debugPrint('[AuthRepository] ⚠️ Missing token or user in response');
-          throw Exception('استجابة غير صحيحة من الخادم');
-        }
-
-        // Save token to secure storage (using auth_token key)
-        await SecureStorageService.saveToken(token);
-        await SecureStorageService.saveUserId(user['id'] as String);
-        await SecureStorageService.saveUserEmail(user['email'] as String);
-
-        debugPrint('[AuthRepository] ✅ Login successful - Token saved to secure storage');
-        debugPrint('[AuthRepository] ✅ User ID: ${user['id']}');
-        debugPrint('[AuthRepository] ✅ User Email: ${user['email']}');
-        
-        return response;
-      } else {
-        final errorCode = response['code'] ?? response['error_code'];
-        final errorMessage = response['message'] ?? response['error'] ?? 'Login failed';
-
-        debugPrint('[AuthRepository] ❌ Login failed: code=$errorCode, message=$errorMessage');
-
-        // Handle specific error codes
-        if (errorCode == 'INVALID_CREDENTIALS') {
-          throw Exception('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-        } else if (errorCode == 'ACCOUNT_DISABLED') {
-          throw Exception('تم تعطيل حسابك. يرجى التواصل مع الدعم');
-        } else {
-          throw Exception(errorMessage);
-        }
-      }
-    } catch (e) {
-      debugPrint('[AuthRepository] ❌ Login error: $e');
-      debugPrint('[AuthRepository] ❌ Error type: ${e.runtimeType}');
-      if (e is Exception) {
-        debugPrint('[AuthRepository] ❌ Exception message: ${e.toString()}');
-      }
-      rethrow;
-    }
-  }
-
-  /// Verify token and load user data after login
-  /// Calls /auth/me to verify token and get user data
-  /// Returns user data if successful, throws exception if failed
-  static Future<Map<String, dynamic>> verifyAndLoadUser() async {
-    try {
-      debugPrint('[AuthRepository] 🔍 Verifying token and loading user...');
-      
-      final token = await SecureStorageService.getToken();
-      if (token == null) {
-        debugPrint('[AuthRepository] ⚠️ No token found in secure storage');
-        throw Exception('Not authenticated');
-      }
-
-      debugPrint('[AuthRepository] 📡 Calling GET /auth/me with Authorization header');
-      
-      final response = await ApiService.get(
-        '/auth/me',
-        requireAuth: true, // This endpoint requires auth
-      );
-
-      debugPrint('AUTH_ME_RESPONSE: statusCode=200, body=${response.toString()}');
-      debugPrint('[AuthRepository] 📥 /auth/me Response: ${response.toString()}');
-
-      if (response['ok'] == true) {
-        final user = response['user'] as Map<String, dynamic>;
-        debugPrint('[AuthRepository] ✅ User verified and loaded successfully');
-        debugPrint('[AuthRepository] ✅ User ID: ${user['id']}');
-        debugPrint('[AuthRepository] ✅ User Email: ${user['email']}');
-        return user;
-      } else {
-        final errorMessage = response['message'] ?? response['error'] ?? 'Failed to get user';
-        debugPrint('[AuthRepository] ❌ /auth/me failed: $errorMessage');
-        
-        // Clear invalid token
-        await SecureStorageService.clearAll();
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      debugPrint('[AuthRepository] ❌ Verify and load user error: $e');
-      
-      // If error is 401 or 500, clear token
-      if (e.toString().contains('401') || 
-          e.toString().contains('UNAUTHORIZED') ||
-          e.toString().contains('500') ||
-          e.toString().contains('INTERNAL_ERROR')) {
-        debugPrint('[AuthRepository] 🗑️ Clearing invalid token due to error');
-        await SecureStorageService.clearAll();
-      }
-      
-      rethrow;
-    }
-  }
-
-  /// Get current user profile
-  /// GET /auth/me
-  static Future<Map<String, dynamic>> getCurrentUser() async {
-    try {
-      final token = await SecureStorageService.getToken();
-      if (token == null) {
-        throw Exception('Not authenticated');
-      }
-
-      debugPrint('[AuthRepository] 📡 Calling GET /auth/me');
-      
-      final response = await ApiService.get(
-        '/auth/me',
-        requireAuth: true, // This endpoint requires auth
-      );
-
-      debugPrint('AUTH_ME_RESPONSE: statusCode=200, body=${response.toString()}');
-
-      if (response['ok'] == true) {
-        return response['user'] as Map<String, dynamic>;
-      } else {
-        final errorMessage = response['message'] ?? response['error'] ?? 'Failed to get user';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      debugPrint('[AuthRepository] ❌ Get current user error: $e');
-      rethrow;
-    }
-  }
-
-  /// Logout
-  /// POST /auth/logout
-  static Future<void> logout() async {
-    try {
-      final token = await SecureStorageService.getToken();
-      if (token != null) {
-        try {
-          await ApiService.post(
-            '/auth/logout',
-            requireAuth: true,
+          // حفظ التوكن ومعلومات المستخدم
+          await _tokenStorage.saveToken(
+            accessToken: accessToken,
+            userId: user['id'] as String,
+            userRole: userRole,
+            userEmail: user['email'] as String?,
           );
-        } catch (e) {
-          debugPrint('[AuthRepository] ⚠️ Logout API call failed: $e');
-          // Continue with local logout even if API call fails
+
+          // حفظ refresh_token إذا موجود
+          if (refreshToken != null) {
+            await _tokenStorage.saveRefreshToken(refreshToken);
+          }
+
+          return data;
         }
       }
 
-      // Clear local storage
-      await SecureStorageService.clearAll();
-      debugPrint('[AuthRepository] ✅ Logout successful');
-    } catch (e) {
-      debugPrint('[AuthRepository] ❌ Logout error: $e');
-      // Clear local storage even if API call fails
-      await SecureStorageService.clearAll();
-      rethrow;
-    }
-  }
-
-  /// Check if user is logged in
-  static Future<bool> isLoggedIn() async {
-    return await SecureStorageService.isLoggedIn();
-  }
-
-  /// Get stored user ID
-  static Future<String?> getUserId() async {
-    return await SecureStorageService.getUserId();
-  }
-
-  /// Get stored user email
-  static Future<String?> getUserEmail() async {
-    return await SecureStorageService.getUserEmail();
-  }
-
-  /// Get stored JWT token
-  static Future<String?> getToken() async {
-    return await SecureStorageService.getToken();
-  }
-
-  /// Verify token by calling /auth/me
-  /// Returns true if token is valid, false otherwise
-  static Future<bool> verifyToken() async {
-    try {
-      await getCurrentUser();
-      return true;
-    } catch (e) {
-      debugPrint('[AuthRepository] ⚠️ Token verification failed: $e');
-      // Clear invalid token
-      await SecureStorageService.clearAll();
-      return false;
-    }
-  }
-
-  /// Change password
-  /// POST /auth/change-password
-  static Future<void> changePassword({
-    required String currentPassword,
-    required String newPassword,
-  }) async {
-    try {
-      debugPrint('[AuthRepository] Changing password...');
-
-      final response = await ApiService.post(
-        '/auth/change-password',
-        data: {
-          'current_password': currentPassword,
-          'new_password': newPassword,
-        },
-        requireAuth: true,
-      );
-
-      if (response['ok'] == true) {
-        debugPrint('[AuthRepository] ✅ Password changed successfully');
-      } else {
-        final errorMessage = response['message'] ?? response['error'] ?? 'Failed to change password';
-        throw Exception(errorMessage);
+      // معالجة حالة الفشل
+      Map<String, dynamic>? errorData;
+      try {
+        errorData = jsonDecode(response.body) as Map<String, dynamic>?;
+      } catch (_) {
+        errorData = null;
       }
+      throw Exception(
+        errorData?['message'] ?? errorData?['error'] ?? 'فشل تسجيل الدخول',
+      );
     } catch (e) {
-      debugPrint('[AuthRepository] ❌ Change password error: $e');
-      rethrow;
+      // إعادة رمي الخطأ مع رسالة واضحة
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('حدث خطأ أثناء تسجيل الدخول: ${e.toString()}');
     }
+  }
+
+  // ==========================================================================
+  // تسجيل الخروج
+  // ==========================================================================
+
+  /// تسجيل الخروج - حذف جميع البيانات المحفوظة
+  Future<void> signOut() async {
+    try {
+      // محاولة إرسال طلب تسجيل خروج إلى Worker (اختياري)
+      // ملاحظة: Worker الحالي لا يحتوي على endpoint للخروج
+      // يمكن إضافته لاحقاً لإلغاء الجلسة من قاعدة البيانات
+      // await _apiService.post('/auth/logout');
+    } catch (_) {
+      // الاستمرار في تسجيل الخروج حتى لو فشل الطلب
+    } finally {
+      // حذف جميع البيانات المحفوظة محلياً
+      await _tokenStorage.clear();
+    }
+  }
+
+  // ==========================================================================
+  // التحقق من الجلسة
+  // ==========================================================================
+
+  /// التحقق من وجود جلسة صالحة (توكن محفوظ)
+  Future<bool> hasValidSession() async {
+    return await _tokenStorage.hasValidToken();
+  }
+
+  // ==========================================================================
+  // الحصول على معلومات المستخدم
+  // ==========================================================================
+
+  /// الحصول على دور المستخدم الحالي
+  Future<String?> getUserRole() async {
+    return await _tokenStorage.getUserRole();
+  }
+
+  /// الحصول على معرف المستخدم
+  Future<String?> getUserId() async {
+    return await _tokenStorage.getUserId();
+  }
+
+  /// الحصول على إيميل المستخدم
+  Future<String?> getUserEmail() async {
+    return await _tokenStorage.getUserEmail();
   }
 }
 
+// ==========================================================================
+// Riverpod Providers
+// ==========================================================================
+
+/// Provider لـ AuthTokenStorage
+final authTokenStorageProvider = Provider<AuthTokenStorage>((ref) {
+  return AuthTokenStorage();
+});
+
+/// Provider لـ AuthRepository
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final apiService = ApiService();
+  final tokenStorage = ref.watch(authTokenStorageProvider);
+
+  return AuthRepository(apiService: apiService, tokenStorage: tokenStorage);
+});

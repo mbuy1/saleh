@@ -1,0 +1,801 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/skeleton_loading.dart';
+import '../../../merchant/data/merchant_store_provider.dart';
+import '../../../merchant/domain/models/store.dart';
+import '../../../auth/data/auth_controller.dart';
+
+// هذا نص واضح يسمح بالتعديل على التصميم
+
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                                                                           ║
+// ║   الصفحة الرئيسية - التصميم مثبت ومعتمد                                   ║
+// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║                                                                           ║
+// ║   العناصر المثبتة:                                                        ║
+// ║   • بطاقات الإحصائيات (4 بطاقات بدون أيقونات)                             ║
+// ║   • شبكة الأيقونات (6 أيقونات مربعة بدون ظل)                              ║
+// ║   • زر "متجرك على جوك"                                                    ║
+// ║                                                                           ║
+// ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
+// ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+/// الصفحة الرئيسية للتاجر
+/// 🔒 LOCKED DESIGN - تصميم مثبت
+/// Last updated: 2025-12-14
+class HomeTab extends ConsumerStatefulWidget {
+  const HomeTab({super.key});
+
+  @override
+  ConsumerState<HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends ConsumerState<HomeTab> {
+  bool _isLoading = true;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void _openProfileDrawer() {
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // تحميل بيانات المتجر عند فتح الصفحة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    await ref
+        .read(merchantStoreControllerProvider.notifier)
+        .loadMerchantStore();
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final storeState = ref.watch(merchantStoreControllerProvider);
+    final store = storeState.store;
+
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF5F5F5),
+      endDrawer: _buildProfileDrawer(context, ref),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _loadData,
+          color: AppTheme.accentColor,
+          child: _isLoading
+              ? const SkeletonHomeDashboard()
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  child: Column(
+                    children: [
+                      // 1. بار رابط متجري
+                      _buildStoreLinkCard(
+                        context,
+                        storeName: store?.name ?? 'متجري',
+                        isLoading: storeState.isLoading,
+                      ),
+                      const SizedBox(height: 12),
+                      // 2. الإحصائيات الأربعة
+                      _buildStatsGrid(context, store: store),
+                      const SizedBox(height: 12),
+                      // 3. شبكة الأيقونات (4 أيقونات)
+                      _buildIconsGrid(context),
+                      const SizedBox(height: 12),
+                      // 4. زر تجربة العميل (تمت إزالته)
+                      // _buildCustomerModeButton(context),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  /// بار رابط متجري - نُقل من صفحة المتجر
+  Widget _buildStoreLinkCard(
+    BuildContext context, {
+    required String storeName,
+    bool isLoading = false,
+  }) {
+    final storeSlug = storeName.replaceAll(' ', '-');
+    final storeUrl = 'tabayu.com/$storeSlug';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: _openProfileDrawer,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.store,
+                    color: AppTheme.primaryColor,
+                    size: 32,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    isLoading
+                        ? Container(
+                            width: 80,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          )
+                        : Text(
+                            storeName,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                    const SizedBox(height: 4),
+                    // زر عرض متجري (منقول)
+                    InkWell(
+                      onTap: () => context.push('/dashboard/view-store'),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.visibility_outlined,
+                            size: 16,
+                            color: Colors.grey[700],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'عرض متجري',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // زر الإشعارات
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {
+                  context.push('/dashboard/notifications');
+                },
+                color: Colors.grey[700],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // أزرار إدارة المتجر
+          Row(
+            children: [
+              Expanded(
+                child: _buildLinkActionButton(
+                  icon: Icons.settings_outlined,
+                  label: 'إدارة المتجر',
+                  onTap: () => context.push('/dashboard/store-management'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildLinkActionButton(
+                  icon: Icons.storefront_outlined,
+                  label: 'تخصيص المتجر',
+                  onTap: () => context.push('/dashboard/store-on-jock'),
+                ),
+              ),
+              // تم نقل زر عرض متجري للأعلى
+            ],
+          ),
+          const SizedBox(height: 12),
+          // رابط المتجر مع زر نسخ
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.link, size: 16, color: AppTheme.primaryColor),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    storeUrl,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textDirection: TextDirection.ltr,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // زر النسخ
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    Clipboard.setData(ClipboardData(text: storeUrl));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('تم نسخ الرابط'),
+                        backgroundColor: AppTheme.successColor,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'نسخ',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // زر المشاركة
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    SharePlus.instance.share(
+                      ShareParams(
+                        text: 'تفضل بزيارة متجري على: $storeUrl',
+                        subject: 'رابط متجري',
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.share_outlined,
+                      size: 16,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.grey[100],
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            children: [
+              Icon(icon, size: 20, color: Colors.grey[700]),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// شبكة الإحصائيات الأربعة - قابلة للنقر
+  Widget _buildStatsGrid(BuildContext context, {Store? store}) {
+    return Column(
+      children: [
+        // الصف الأول: الرصيد + النقاط
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.account_balance_wallet_outlined,
+                title: 'الرصيد',
+                value: '0.00',
+                suffix: 'ر.س',
+                color: Colors.green,
+                onTap: () => context.push('/dashboard/wallet'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.stars_outlined,
+                title: 'النقاط',
+                value: '0',
+                suffix: 'نقطة',
+                color: Colors.orange,
+                onTap: () => context.push('/dashboard/points'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // الصف الثاني: العملاء + المبيعات
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.people_outline,
+                title: 'العملاء',
+                value: '${store?.followersCount ?? 0}',
+                suffix: 'متابع',
+                color: Colors.blue,
+                onTap: () => context.push('/dashboard/customers'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                icon: Icons.star_outline,
+                title: 'المبيعات',
+                value: '0',
+                suffix: ' ',
+                color: Colors.amber,
+                onTap: () => context.push('/dashboard/sales'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    required String suffix,
+    required Color color,
+    VoidCallback? onTap,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    suffix,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// شبكة الأيقونات (4 أيقونات)
+  /// الترتيب: التسويق، أدوات الذكاء الاصطناعي، توليد الذكاء الاصطناعي، حزم التوفير
+  Widget _buildIconsGrid(BuildContext context) {
+    return Column(
+      children: [
+        // الصف الأول: التسويق، أدوات الذكاء الاصطناعي
+        SizedBox(
+          height: 110,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.campaign_outlined,
+                  label: 'التسويق',
+                  screen: 'Marketing',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.build_outlined,
+                  label: 'أدوات الذكاء الاصطناعي',
+                  screen: 'MbuyTools',
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        // الصف الثاني: توليد الذكاء الاصطناعي، حزم التوفير
+        SizedBox(
+          height: 110,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.auto_awesome_outlined,
+                  label: 'توليد الذكاء الاصطناعي',
+                  screen: 'MbuyStudio',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.card_giftcard_outlined,
+                  label: 'حزم التوفير',
+                  screen: 'MbuyPackage',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildBottomCard({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String screen,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      child: InkWell(
+        onTap: () => _navigateToScreen(context, screen, label),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.08),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(15),
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(icon, size: 36, color: AppTheme.primaryColor),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToScreen(BuildContext context, String screen, String label) {
+    switch (screen) {
+      case 'MbuyStudio':
+        context.push('/dashboard/studio');
+        break;
+      case 'MbuyTools':
+        context.push('/dashboard/tools');
+        break;
+      case 'Marketing':
+        context.push('/dashboard/marketing');
+        break;
+      case 'Products':
+        context.push('/dashboard/products');
+        break;
+      case 'EarnMore':
+        context.push('/dashboard/feature/${Uri.encodeComponent('اربح أكثر')}');
+        break;
+      case 'BoostSales':
+        context.push('/dashboard/boost-sales');
+        break;
+      case 'Shortcuts':
+        context.push('/dashboard/shortcuts');
+        break;
+      case 'DoubleExposure':
+        context.push('/dashboard/promotions');
+        break;
+      case 'MbuyPackage':
+        // TODO: ربط بصفحة الباقة عند إنشائها
+        context.push(
+          '/dashboard/feature/${Uri.encodeComponent('mbuy package')}',
+        );
+        break;
+      default:
+        context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
+    }
+  }
+
+  /// Drawer إعدادات الملف الشخصي
+  Widget _buildProfileDrawer(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'إعدادات الحساب',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            // Menu Items
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.lock_outline,
+                    title: 'تغيير كلمة السر',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to change password screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('تغيير كلمة السر')}',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.edit_outlined,
+                    title: 'تعديل معلومات الحساب',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to edit account screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('تعديل معلومات الحساب')}',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.lightbulb_outline,
+                    title: 'الاقتراحات',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to suggestions screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('الاقتراحات')}',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.delete_outline,
+                    title: 'حذف المتجر',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to delete store screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('حذف المتجر')}',
+                      );
+                    },
+                    textColor: Colors.red,
+                    iconColor: Colors.red,
+                  ),
+                  const Divider(),
+                  _buildDrawerItem(
+                    icon: Icons.share_outlined,
+                    title: 'شارك التطبيق',
+                    onTap: () {
+                      Navigator.pop(context);
+                      SharePlus.instance.share(
+                        ShareParams(
+                          text: 'جرب تطبيق MBUY لإدارة متجرك الإلكتروني',
+                          subject: 'تطبيق MBUY',
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.description_outlined,
+                    title: 'الشروط و الأحكام',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to terms screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('الشروط و الأحكام')}',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.card_membership_outlined,
+                    title: 'باقة المتجر',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to package screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('باقة المتجر')}',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.support_agent_outlined,
+                    title: 'اتصل بنا',
+                    onTap: () {
+                      Navigator.pop(context);
+                      // TODO: Navigate to contact screen
+                      context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('اتصل بنا')}',
+                      );
+                    },
+                  ),
+                  const Divider(),
+                  _buildDrawerItem(
+                    icon: Icons.logout,
+                    title: 'تسجيل الخروج',
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref.read(authControllerProvider.notifier).logout();
+                    },
+                    textColor: Colors.red,
+                    iconColor: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    Color? textColor,
+    Color? iconColor,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: iconColor ?? Colors.grey[700]),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: textColor ?? Colors.grey[800],
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.grey[400],
+      ),
+    );
+  }
+}
