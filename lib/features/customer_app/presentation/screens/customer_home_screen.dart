@@ -183,7 +183,7 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
   Widget _buildPromoBanner() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 150,
+      height: 180,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -467,7 +467,10 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to product details
+          final productId = product['id']?.toString();
+          if (productId != null) {
+            context.push('/product/$productId');
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Column(

@@ -10,6 +10,8 @@ import '../../../features/customer_app/presentation/screens/media_screen.dart';
 import '../../../features/customer_app/presentation/screens/customer_cart_screen.dart';
 import '../../../features/customer_app/presentation/screens/customer_profile_screen.dart';
 import '../../../features/customer_app/presentation/screens/store_details_screen.dart';
+import '../../../features/customer_app/presentation/screens/product_details_screen.dart';
+import '../../../features/customer_app/presentation/screens/category_products_screen.dart';
 import '../../../features/customer_app/presentation/shells/customer_shell.dart';
 
 /// Router خاص بتطبيق العميل فقط
@@ -91,6 +93,28 @@ class CustomerRouter {
           builder: (context, state) {
             final storeId = state.pathParameters['storeId'] ?? '';
             return StoreDetailsScreen(storeId: storeId);
+          },
+        ),
+        // صفحة تفاصيل المنتج
+        GoRoute(
+          path: '/product/:productId',
+          name: 'product-details',
+          builder: (context, state) {
+            final productId = state.pathParameters['productId'] ?? '';
+            return ProductDetailsScreen(productId: productId);
+          },
+        ),
+        // صفحة منتجات الفئة
+        GoRoute(
+          path: '/category/:categoryId',
+          name: 'category-products',
+          builder: (context, state) {
+            final categoryId = state.pathParameters['categoryId'] ?? '';
+            final categoryName = state.uri.queryParameters['name'] ?? 'فئة';
+            return CategoryProductsScreen(
+              categoryId: categoryId,
+              categoryName: categoryName,
+            );
           },
         ),
       ],

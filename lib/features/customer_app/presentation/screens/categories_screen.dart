@@ -119,16 +119,23 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
   }
 
   Widget _buildCategoryCard(Map<String, dynamic> category) {
-    final name = category['name']?.toString() ?? 'فئة';
+    // استخدم الاسم العربي إذا متوفر، وإلا الاسم الإنجليزي
+    final name =
+        category['name_ar']?.toString() ??
+        category['name']?.toString() ??
+        'فئة';
     final imageUrl = category['image_url']?.toString();
     final productsCount = category['products_count'] ?? 0;
+    final categoryId = category['id']?.toString();
 
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to category products
+          if (categoryId != null) {
+            context.push('/category/$categoryId?name=$name');
+          }
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(

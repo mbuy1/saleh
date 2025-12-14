@@ -208,7 +208,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to product details
+          final productId = product['id']?.toString();
+          if (productId != null) {
+            context.push('/product/$productId');
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Column(
