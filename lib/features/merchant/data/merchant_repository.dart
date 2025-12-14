@@ -114,13 +114,14 @@ class MerchantRepository {
 
   /// تحديث معلومات المتجر
   /// المسار: PUT /secure/stores/:id
-  /// Body: { name?, description?, city?, status? }
+  /// Body: { name?, description?, city?, status?, store_settings? }
   Future<Store> updateStore({
     required String storeId,
     String? name,
     String? description,
     String? city,
     String? status,
+    Map<String, dynamic>? settings,
   }) async {
     try {
       final token = await _tokenStorage.getAccessToken();
@@ -138,6 +139,7 @@ class MerchantRepository {
             'description': description,
           if (city != null && city.isNotEmpty) 'city': city,
           if (status != null) 'status': status,
+          if (settings != null) 'store_settings': settings,
         },
       );
 

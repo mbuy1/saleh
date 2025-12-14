@@ -2,11 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/controllers/root_controller.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
 
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                                                                           ║
+// ║   الصفحة الرئيسية - التصميم مثبت ومعتمد                                   ║
+// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║                                                                           ║
+// ║   العناصر المثبتة:                                                        ║
+// ║   • بطاقات الإحصائيات (4 بطاقات بدون أيقونات)                             ║
+// ║   • شبكة الأيقونات (6 أيقونات مربعة بدون ظل)                              ║
+// ║   • زر "متجرك على جوك"                                                    ║
+// ║                                                                           ║
+// ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
+// ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+/// الصفحة الرئيسية للتاجر
+/// 🔒 LOCKED DESIGN - تصميم مثبت
+/// Last updated: 2025-12-14
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
 
@@ -67,11 +88,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       // 2. الإحصائيات الأربعة
                       _buildStatsGrid(context, store: store),
                       const SizedBox(height: 12),
-                      // 3. القائمة الرئيسية (صف واحد)
-                      SizedBox(height: 90, child: _buildMainMenu(context)),
+                      // 3. شبكة الأيقونات (6 أيقونات)
+                      _buildIconsGrid(context),
                       const SizedBox(height: 12),
-                      // 4. الصف السفلي (3 تبويبات)
-                      _buildBottomRow(context),
+                      // 4. زر تجربة العميل
+                      _buildCustomerModeButton(context),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -102,16 +123,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.store,
                   color: AppTheme.primaryColor,
-                  size: 24,
+                  size: 32,
                 ),
               ),
               const SizedBox(width: 12),
@@ -119,11 +140,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'متجري',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 2),
                     isLoading
                         ? Container(
                             width: 80,
@@ -141,8 +157,44 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                               color: AppTheme.primaryColor,
                             ),
                           ),
+                    const SizedBox(height: 4),
+                    // زر عرض متجري (منقول)
+                    InkWell(
+                      onTap: () => context.push(
+                        '/dashboard/feature/${Uri.encodeComponent('عرض متجري')}',
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.visibility_outlined,
+                            size: 16,
+                            color: Colors.grey[700],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'عرض متجري',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
+              ),
+              // زر الإشعارات
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {
+                  context.push(
+                    '/dashboard/feature/${Uri.encodeComponent('الإشعارات')}',
+                  );
+                },
+                color: Colors.grey[700],
               ),
             ],
           ),
@@ -160,23 +212,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildLinkActionButton(
-                  icon: Icons.palette_outlined,
-                  label: 'مظهر المتجر',
-                  onTap: () => context.push(
-                    '/dashboard/feature/${Uri.encodeComponent('مظهر المتجر')}',
-                  ),
+                  icon: Icons.storefront_outlined,
+                  label: 'متجرك على جوك',
+                  onTap: () => context.push('/dashboard/store-on-jock'),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildLinkActionButton(
-                  icon: Icons.visibility_outlined,
-                  label: 'عرض متجري',
-                  onTap: () => context.push(
-                    '/dashboard/feature/${Uri.encodeComponent('عرض متجري')}',
-                  ),
-                ),
-              ),
+              // تم نقل زر عرض متجري للأعلى
             ],
           ),
           const SizedBox(height: 12),
@@ -205,6 +246,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ),
                 ),
                 const SizedBox(width: 8),
+                // زر النسخ
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.lightImpact();
@@ -233,6 +275,34 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // زر المشاركة
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    SharePlus.instance.share(
+                      ShareParams(
+                        text: 'تفضل بزيارة متجري على: $storeUrl',
+                        subject: 'رابط متجري',
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.share_outlined,
+                      size: 16,
+                      color: AppTheme.primaryColor,
                     ),
                   ),
                 ),
@@ -311,7 +381,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.people_outline,
-                title: 'المتابعين',
+                title: 'العملاء',
                 value: '${store?.followersCount ?? 0}',
                 suffix: 'متابع',
                 color: Colors.blue,
@@ -321,9 +391,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             Expanded(
               child: _buildStatCard(
                 icon: Icons.star_outline,
-                title: 'التقييم',
-                value: store?.rating?.toStringAsFixed(1) ?? '0.0',
-                suffix: '/ 5',
+                title: 'المبيعات',
+                value: '0',
+                suffix: ' ',
                 color: Colors.amber,
               ),
             ),
@@ -346,160 +416,184 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: Icon(icon, size: 24, color: color),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      suffix,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                suffix,
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+            ],
           ),
+          const SizedBox(height: 6),
+          Text(title, style: TextStyle(fontSize: 13, color: Colors.grey[600])),
         ],
       ),
     );
   }
 
-  /// القائمة الرئيسية - صف واحد
-  Widget _buildMainMenu(BuildContext context) {
-    return Row(
+  /// شبكة الأيقونات (6 أيقونات)
+  Widget _buildIconsGrid(BuildContext context) {
+    return Column(
       children: [
-        Expanded(
-          child: _buildMenuCard(
-            context: context,
-            icon: Icons.campaign_outlined,
-            label: 'التسويق',
-            screen: 'Marketing',
+        // الصف الأول
+        SizedBox(
+          height: 110,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.bolt_outlined,
+                  label: 'اختصاراتي',
+                  screen: 'Shortcuts',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.campaign_outlined,
+                  label: 'التسويق',
+                  screen: 'Marketing',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.rocket_launch_outlined,
+                  label: 'ارفع مبيعاتك',
+                  screen: 'BoostSales',
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildMenuCard(
-            context: context,
-            icon: Icons.inventory_2_outlined,
-            label: 'المنتجات',
-            screen: 'Products',
+        const SizedBox(height: 12),
+        // الصف الثاني
+        SizedBox(
+          height: 110,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.build_outlined,
+                  label: 'Mbuy Tools',
+                  screen: 'MbuyTools',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.auto_awesome_outlined,
+                  label: 'Mbuy Studio',
+                  screen: 'MbuyStudio',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBottomCard(
+                  context: context,
+                  icon: Icons.trending_up_outlined,
+                  label: 'ضاعف ظهورك',
+                  screen: 'DoubleExposure',
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildMenuCard({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required String screen,
-    Color? iconColor,
-  }) {
-    final color = iconColor ?? AppTheme.primaryColor;
+  /// زر الانتقال لتجربة العميل
+  Widget _buildCustomerModeButton(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
+      color: Colors.transparent,
       child: InkWell(
-        onTap: () => _navigateToScreen(context, screen, label),
-        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          // الانتقال لتطبيق العميل - التاجر يشاهد كعميل (يمكنه الرجوع)
+          ref
+              .read(rootControllerProvider.notifier)
+              .switchToCustomerAppFromMerchant();
+        },
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, size: 26, color: color),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
-                  ),
-                ),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.secondaryColor,
+                AppTheme.secondaryColor.withValues(alpha: 0.8),
               ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
             ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.shopping_bag_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'جرب تطبيق العميل',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'شاهد متجرك كما يراه العملاء',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white70,
+                size: 16,
+              ),
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  /// الصف السفلي - 3 تبويبات
-  Widget _buildBottomRow(BuildContext context) {
-    return SizedBox(
-      height: 110,
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildBottomCard(
-              context: context,
-              icon: Icons.build_outlined,
-              label: 'Mbuy Tools',
-              screen: 'MbuyTools',
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildBottomCard(
-              context: context,
-              icon: Icons.auto_awesome_outlined,
-              label: 'Mbuy Studio',
-              screen: 'MbuyStudio',
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildBottomCard(
-              context: context,
-              icon: Icons.trending_up_outlined,
-              label: 'ضاعف ظهورك',
-              screen: 'DoubleExposure',
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -518,26 +612,30 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         onTap: () => _navigateToScreen(context, screen, label),
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200, width: 1),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  width: double.infinity,
                   decoration: BoxDecoration(
                     color: AppTheme.primaryColor.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(15),
+                    ),
                   ),
-                  child: Icon(icon, size: 26, color: AppTheme.primaryColor),
+                  child: Center(
+                    child: Icon(icon, size: 36, color: AppTheme.primaryColor),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text(
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
                   label,
                   style: TextStyle(
                     fontSize: 12,
@@ -546,8 +644,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -570,6 +668,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         break;
       case 'EarnMore':
         context.push('/dashboard/feature/${Uri.encodeComponent('اربح أكثر')}');
+        break;
+      case 'BoostSales':
+        context.push('/dashboard/boost-sales');
+        break;
+      case 'Shortcuts':
+        // شاشات فارغة حالياً
+        context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
         break;
       default:
         context.push('/dashboard/feature/${Uri.encodeComponent(label)}');

@@ -25,6 +25,27 @@ class StoreTab extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // قسم إعدادات المتجر
+            _buildSectionTitle('إعدادات المتجر'),
+            const SizedBox(height: 12),
+            // معلومات المتجر
+            _buildStoreOptionCard(
+              context: context,
+              icon: Icons.store_outlined,
+              title: 'معلومات المتجر',
+              subtitle: 'تعديل اسم ووصف المتجر',
+              onTap: () => context.push('/dashboard/store/create-store'),
+            ),
+            const SizedBox(height: 12),
+            // متجرك على جوك
+            _buildStoreOptionCard(
+              context: context,
+              icon: Icons.storefront_outlined,
+              title: 'متجرك على جوك',
+              subtitle: 'تخصيص مظهر وإعدادات المتجر',
+              onTap: () => context.push('/dashboard/store-on-jock'),
+            ),
+            const SizedBox(height: 24),
             // قسم خيارات إضافية
             _buildSectionTitle('خيارات إضافية'),
             const SizedBox(height: 12),
@@ -36,6 +57,17 @@ class StoreTab extends StatelessWidget {
               subtitle: 'إدارة وثائق السجل التجاري',
               onTap: () => context.push(
                 '/dashboard/feature/${Uri.encodeComponent('سجل تجاري')}',
+              ),
+            ),
+            const SizedBox(height: 12),
+            // الدعم الفني
+            _buildStoreOptionCard(
+              context: context,
+              icon: Icons.support_agent_outlined,
+              title: 'الدعم الفني',
+              subtitle: 'تواصل مع فريق الدعم',
+              onTap: () => context.push(
+                '/dashboard/feature/${Uri.encodeComponent('الدعم الفني')}',
               ),
             ),
           ],

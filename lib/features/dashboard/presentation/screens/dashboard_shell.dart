@@ -3,9 +3,28 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                                                                           ║
+// ║   شريط التنقل السفلي - التصميم مثبت ومعتمد                                ║
+// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║                                                                           ║
+// ║   العناصر المثبتة:                                                        ║
+// ║   • 5 تبويبات: الرئيسية، الطلبات، +، المحادثات، المتجر                    ║
+// ║   • زر + بتدرج معدني (metallicGradient)                                   ║
+// ║   • الأيقونة النشطة: primaryColor                                         ║
+// ║                                                                           ║
+// ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
+// ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
 /// Dashboard Shell - يحتوي على البار السفلي الثابت
 /// يعرض الصفحات الفرعية داخله مع إبقاء البار السفلي ظاهراً
 /// التبويبات: الرئيسية، الطلبات، +، المحادثات، المتجر
+///
+/// 🔒 LOCKED DESIGN - تصميم مثبت
+/// Last updated: 2025-12-14
 class DashboardShell extends StatefulWidget {
   final Widget child;
 
@@ -64,7 +83,7 @@ class _DashboardShellState extends State<DashboardShell> {
           height: AppDimensions.bottomNavHeight,
           backgroundColor: AppTheme.surfaceColor,
           surfaceTintColor: Colors.transparent,
-          indicatorColor: AppTheme.accentColor.withValues(alpha: 0.15),
+          indicatorColor: AppTheme.primaryColor.withValues(alpha: 0.15),
           selectedIndex: currentIndex,
           onDestinationSelected: (index) => _onItemTapped(index, context),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
@@ -79,7 +98,7 @@ class _DashboardShellState extends State<DashboardShell> {
               selectedIcon: Icon(
                 Icons.home,
                 size: AppDimensions.iconM,
-                color: AppTheme.accentColor,
+                color: AppTheme.primaryColor,
               ),
               label: 'الرئيسية',
             ),
@@ -93,18 +112,25 @@ class _DashboardShellState extends State<DashboardShell> {
               selectedIcon: Icon(
                 Icons.shopping_bag,
                 size: AppDimensions.iconM,
-                color: AppTheme.accentColor,
+                color: AppTheme.primaryColor,
               ),
               label: 'الطلبات',
             ),
-            // 3. زر + (المنتجات)
+            // 3. زر + (المنتجات) - Meta AI Gradient
             NavigationDestination(
               icon: Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppTheme.accentColor,
+                  gradient: AppTheme.metallicGradient,
                   borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
@@ -112,8 +138,15 @@ class _DashboardShellState extends State<DashboardShell> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppTheme.accentColor,
+                  gradient: AppTheme.metallicGradient,
                   borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
@@ -129,7 +162,7 @@ class _DashboardShellState extends State<DashboardShell> {
               selectedIcon: Icon(
                 Icons.chat_bubble,
                 size: AppDimensions.iconM,
-                color: AppTheme.accentColor,
+                color: AppTheme.primaryColor,
               ),
               label: 'المحادثات',
             ),
@@ -143,7 +176,7 @@ class _DashboardShellState extends State<DashboardShell> {
               selectedIcon: Icon(
                 Icons.store,
                 size: AppDimensions.iconM,
-                color: AppTheme.accentColor,
+                color: AppTheme.primaryColor,
               ),
               label: 'المتجر',
             ),

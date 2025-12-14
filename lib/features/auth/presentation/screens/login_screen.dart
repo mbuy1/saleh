@@ -69,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         );
       } else {
-        context.go('/create-store');
+        context.go('/dashboard/store/create-store');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('يرجى إنشاء متجرك للمتابعة'),

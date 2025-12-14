@@ -1,74 +1,155 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// App Theme Configuration - Multi-Vendor Global Standards
-/// Based on Amazon, Noon, AliExpress best practices
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                                                                           ║
+// ║   هذا الملف يحتوي على التصميم المعتمد والنهائي للتطبيق                     ║
+// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║                                                                           ║
+// ║   ⛔ ممنوع تعديل الألوان أو التصميم إلا بطلب صريح وواضح من المالك          ║
+// ║   ⛔ DO NOT MODIFY colors or design without EXPLICIT owner request        ║
+// ║                                                                           ║
+// ║   الألوان المعتمدة:                                                       ║
+// ║   • Primary: Navy Blue #1E3A5F (الثقة والاحترافية)                        ║
+// ║   • Secondary: Teal #00B4B4 (الحداثة والانتعاش)                           ║
+// ║   • Accent: Orange #FF6B35 (الإجراءات والتحفيز)                           ║
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+
+/// App Theme Configuration - Modern E-commerce Palette
+/// Professional shopping app design with trust-inspiring colors
+///
+/// 🔒 LOCKED DESIGN - تصميم مثبت
+/// Last updated: 2025-12-14
+/// Do not change without explicit request
 class AppTheme {
   // ============================================================================
-  // Colors - Modern E-commerce Palette
+  // E-commerce Color Palette (Amazon/Noon/Shopify Inspired)
   // ============================================================================
 
-  // Primary Brand Colors
-  static const Color primaryColor = Color(
-    0xFF1A1A2E,
-  ); // Deep Navy (Trust & Authority)
-  static const Color secondaryColor = Color(0xFF16213E); // Dark Blue
-  static const Color accentColor = Color(
-    0xFFE94560,
-  ); // Vibrant Coral (CTA Actions)
+  // === Primary Colors (Deep Blue - Trust & Authority) ===
+  static const Color primaryColor = Color(0xFF1E3A5F); // Deep Navy Blue
+  static const Color primaryLight = Color(0xFF4A6FA5);
+  static const Color primaryDark = Color(0xFF0D2137);
 
-  // Background & Surface
-  static const Color backgroundColor = Color(
-    0xFFF8F9FA,
-  ); // Light Gray (Easy on eyes)
-  static const Color surfaceColor = Colors.white;
-  static const Color cardColor = Colors.white;
+  // === Secondary Colors (Teal - Fresh & Modern) ===
+  static const Color secondaryColor = Color(0xFF00B4B4); // Shopping Teal
+  static const Color secondaryLight = Color(0xFF4DD4D4);
+  static const Color secondaryDark = Color(0xFF008585);
 
-  // Status Colors
-  static const Color successColor = Color(
-    0xFF00C853,
-  ); // Green (Success/In Stock)
-  static const Color warningColor = Color(0xFFFFB300); // Amber (Limited Stock)
-  static const Color errorColor = Color(0xFFE53935); // Red (Error/Out of Stock)
-  static const Color infoColor = Color(0xFF2196F3); // Blue (Info)
+  // === Accent Colors (Orange - CTA & Urgency) ===
+  static const Color accentColor = Color(0xFFFF6B35); // Shopping Orange
+  static const Color accentLight = Color(0xFFFF9A6C);
+  static const Color accentDark = Color(0xFFE54D1B);
 
-  // Text Colors
-  static const Color textPrimaryColor = Color(
-    0xFF1A1A2E,
-  ); // Dark for readability
-  static const Color textSecondaryColor = Color(
-    0xFF6B7280,
-  ); // Gray for secondary
-  static const Color textHintColor = Color(0xFF9CA3AF); // Light gray for hints
+  // === Background & Surface (Light Mode) ===
+  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color surfaceColor = Color(0xFFFFFFFF);
+  static const Color cardColor = Color(0xFFFFFFFF);
 
-  // Price Colors
-  static const Color priceColor = Color(0xFF1A1A2E); // Original price
-  static const Color salePriceColor = Color(0xFFE53935); // Sale price (Red)
-  static const Color discountBadgeColor = Color(0xFFE53935); // Discount badge
+  // === Background & Surface (Dark Mode) ===
+  static const Color backgroundColorDark = Color(0xFF121212);
+  static const Color surfaceColorDark = Color(0xFF1E1E1E);
+  static const Color cardColorDark = Color(0xFF2D2D2D);
 
-  // Rating Colors
-  static const Color ratingStarColor = Color(0xFFFFC107); // Yellow stars
-  static const Color ratingTextColor = Color(0xFF6B7280); // Gray rating count
+  // === Text Colors (Light Mode) ===
+  static const Color textPrimaryColor = Color(0xFF1A1A1A);
+  static const Color textSecondaryColor = Color(0xFF666666);
+  static const Color textHintColor = Color(0xFF999999);
 
-  // Shipping & Badge Colors
-  static const Color freeShippingColor = Color(0xFF00C853); // Green badge
-  static const Color fastDeliveryColor = Color(0xFF2196F3); // Blue badge
-  static const Color verifiedSellerColor = Color(0xFF9C27B0); // Purple badge
+  // === Text Colors (Dark Mode) ===
+  static const Color textPrimaryColorDark = Color(0xFFEEEEEE);
+  static const Color textSecondaryColorDark = Color(0xFFB3B3B3);
+  static const Color textHintColorDark = Color(0xFF808080);
 
-  // Divider Color
-  static const Color dividerColor = Color(0xFFE5E7EB); // Light gray divider
+  // === Status Colors (Semantic - Do Not Change) ===
+  static const Color successColor = Color(0xFF28A745);
+  static const Color warningColor = Color(0xFFFFC107);
+  static const Color errorColor = Color(0xFFDC3545);
+  static const Color infoColor = Color(0xFF17A2B8);
+
+  // === Price Colors ===
+  static const Color priceColor = Color(0xFF1A1A1A);
+  static const Color salePriceColor = Color(0xFFE31837); // Sale Red
+  static const Color discountBadgeColor = Color(0xFFE31837);
+
+  // === Rating Colors (Semantic - Do Not Change) ===
+  static const Color ratingStarColor = Color(0xFFFFB800);
+  static const Color ratingTextColor = Color(0xFF666666);
+
+  // === Badge Colors ===
+  static const Color freeShippingColor = Color(0xFF28A745);
+  static const Color fastDeliveryColor = Color(0xFF17A2B8);
+  static const Color verifiedSellerColor = Color(0xFF6F42C1);
+
+  // === Divider & Border ===
+  static const Color dividerColor = Color(0xFFE0E0E0);
+  static const Color borderColor = Color(0xFFD0D0D0);
+  static const Color dividerColorDark = Color(0xFF404040);
+  static const Color borderColorDark = Color(0xFF505050);
 
   // ============================================================================
-  // Gradients
+  // Gradients - E-commerce Identity
   // ============================================================================
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryColor, secondaryColor],
+
+  // Brand Identity Gradient (Navy → Teal)
+  static const LinearGradient brandGradient = LinearGradient(
+    colors: [
+      Color(0xFF1E3A5F), // Deep Navy
+      Color(0xFF00B4B4), // Teal
+    ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
+  // Metallic Modern Gradient for FAB (Orange CTA)
+  static const LinearGradient metallicGradient = LinearGradient(
+    colors: [
+      Color(0xFFFF6B35), // Orange
+      Color(0xFFFF8C5A), // Light Orange
+      Color(0xFFFFAB7A), // Soft Orange
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Accent Gradient (Orange variations)
   static const LinearGradient accentGradient = LinearGradient(
-    colors: [accentColor, Color(0xFFFF6B6B)],
+    colors: [
+      Color(0xFFFF6B35), // Orange
+      Color(0xFFE54D1B), // Deep Orange
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Primary Gradient (Navy to Teal)
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [
+      Color(0xFF1E3A5F), // Navy
+      Color(0xFF00B4B4), // Teal
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Subtle Overlay Gradient (for cards/headers)
+  static const LinearGradient subtleGradient = LinearGradient(
+    colors: [
+      Color(0x0A1E3A5F), // Navy 4%
+      Color(0x0A00B4B4), // Teal 4%
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Sale/Promo Gradient
+  static const LinearGradient saleGradient = LinearGradient(
+    colors: [
+      Color(0xFFE31837), // Sale Red
+      Color(0xFFFF4757), // Bright Red
+    ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -100,25 +181,33 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
 
-      // Color Scheme
+      // Color Scheme - Meta AI Inspired
       colorScheme: const ColorScheme.light(
         primary: primaryColor,
-        secondary: secondaryColor,
-        tertiary: accentColor,
-        surface: surfaceColor,
-        error: errorColor,
         onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onTertiary: Colors.white,
+        primaryContainer: Color(0xFFE3F7FD),
+        onPrimaryContainer: primaryDark,
+        secondary: secondaryColor,
+        onSecondary: Color(0xFF1A1D21),
+        secondaryContainer: Color(0xFFE8FEF8),
+        onSecondaryContainer: secondaryDark,
+        tertiary: accentColor,
+        onTertiary: Color(0xFF1A1D21),
+        tertiaryContainer: Color(0xFFFEF0FA),
+        onTertiaryContainer: accentDark,
+        surface: surfaceColor,
         onSurface: textPrimaryColor,
+        surfaceContainerHighest: Color(0xFFF5F5F5),
+        error: errorColor,
         onError: Colors.white,
-        outline: Color(0xFFE5E7EB),
+        outline: borderColor,
+        outlineVariant: dividerColor,
       ),
 
       // Scaffold
       scaffoldBackgroundColor: backgroundColor,
 
-      // AppBar - Clean & Modern
+      // AppBar - Clean & Modern with Meta Blue
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
@@ -131,7 +220,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: textPrimaryColor,
         ),
-        iconTheme: const IconThemeData(color: textPrimaryColor, size: 24),
+        iconTheme: const IconThemeData(color: primaryColor, size: 24),
       ),
 
       // Text Theme - Cairo for Arabic
@@ -224,13 +313,13 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button - Primary CTA
+      // Elevated Button - Primary CTA with Meta Blue
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: accentColor,
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           elevation: buttonElevation,
-          shadowColor: accentColor.withValues(alpha: 0.4),
+          shadowColor: primaryColor.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadiusMedium),
@@ -261,7 +350,7 @@ class AppTheme {
       // Text Button
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: accentColor,
+          foregroundColor: primaryColor,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           textStyle: GoogleFonts.cairo(
             fontSize: 14,
@@ -338,11 +427,11 @@ class AppTheme {
         ),
       ),
 
-      // Bottom Navigation - Main Nav
+      // Bottom Navigation - Main Nav with Meta Colors
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surfaceColor,
         elevation: 8,
-        selectedItemColor: accentColor,
+        selectedItemColor: primaryColor,
         unselectedItemColor: textSecondaryColor,
         selectedLabelStyle: GoogleFonts.cairo(
           fontSize: 12,
@@ -360,13 +449,13 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surfaceColor,
         elevation: 8,
-        indicatorColor: accentColor.withValues(alpha: 0.1),
+        indicatorColor: primaryColor.withValues(alpha: 0.15),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return GoogleFonts.cairo(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: accentColor,
+              color: primaryColor,
             );
           }
           return GoogleFonts.cairo(
@@ -377,7 +466,7 @@ class AppTheme {
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: accentColor, size: 24);
+            return const IconThemeData(color: primaryColor, size: 24);
           }
           return const IconThemeData(color: textSecondaryColor, size: 24);
         }),
@@ -393,9 +482,9 @@ class AppTheme {
         ),
       ),
 
-      // Floating Action Button
+      // Floating Action Button with Meta Gradient
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: accentColor,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 6,
         shape: RoundedRectangleBorder(
@@ -405,7 +494,7 @@ class AppTheme {
 
       // Snackbar
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: primaryColor,
+        backgroundColor: textPrimaryColor,
         contentTextStyle: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadiusSmall),
@@ -469,23 +558,23 @@ class AppTheme {
       // Icon Theme
       iconTheme: const IconThemeData(color: textSecondaryColor, size: 24),
 
-      // Progress Indicator
+      // Progress Indicator with Meta Blue
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: accentColor,
-        linearTrackColor: Color(0xFFE5E7EB),
-        circularTrackColor: Color(0xFFE5E7EB),
+        color: primaryColor,
+        linearTrackColor: Color(0xFFE4E6EB),
+        circularTrackColor: Color(0xFFE4E6EB),
       ),
 
       // Badge Theme
       badgeTheme: BadgeThemeData(
         backgroundColor: accentColor,
-        textColor: Colors.white,
+        textColor: textPrimaryColor,
         textStyle: GoogleFonts.cairo(fontSize: 10, fontWeight: FontWeight.w600),
       ),
 
       // Splash & Highlight
-      splashColor: accentColor.withValues(alpha: 0.1),
-      highlightColor: accentColor.withValues(alpha: 0.05),
+      splashColor: primaryColor.withValues(alpha: 0.1),
+      highlightColor: primaryColor.withValues(alpha: 0.05),
     );
   }
 

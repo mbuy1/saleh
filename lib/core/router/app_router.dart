@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/data/auth_controller.dart';
+import '../../features/dashboard/presentation/screens/boost_sales_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../../features/dashboard/presentation/screens/home_tab.dart';
 import '../../features/dashboard/presentation/screens/orders_tab.dart';
@@ -12,12 +13,22 @@ import '../../features/dashboard/presentation/screens/store_tab.dart';
 import '../../features/dashboard/presentation/screens/placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/merchant_services_screen.dart';
 import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
+import '../../features/dashboard/presentation/screens/store_on_jock_screen.dart';
 import '../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
 import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
 import '../../features/marketing/presentation/screens/marketing_screen.dart';
+// Customer App Imports
+import '../../features/customer_app/presentation/screens/customer_home_screen.dart';
+import '../../features/customer_app/presentation/screens/categories_screen.dart';
+import '../../features/customer_app/presentation/screens/stores_screen.dart';
+import '../../features/customer_app/presentation/screens/media_screen.dart';
+import '../../features/customer_app/presentation/screens/customer_cart_screen.dart';
+import '../../features/customer_app/presentation/screens/customer_profile_screen.dart';
+import '../../features/customer_app/presentation/shells/customer_shell.dart';
+import '../providers/app_mode_provider.dart';
 
 /// App Router - Manages navigation throughout the application
 /// Uses go_router for declarative routing with authentication protection
@@ -26,6 +37,10 @@ import '../../features/marketing/presentation/screens/marketing_screen.dart';
 /// - صفحة Dashboard محمية وتتطلب تسجيل دخول
 /// - المستخدمون المسجلين لا يمكنهم الوصول لصفحة تسجيل الدخول
 /// - يتم إعادة توجيه المستخدمين تلقائياً بناءً على حالة المصادقة
+///
+/// الوضع المزدوج:
+/// - وضع التاجر: /dashboard/*
+/// - وضع العميل: /customer/*
 class AppRouter {
   /// إنشاء GoRouter مع ref للوصول إلى Riverpod
   static GoRouter createRouter(WidgetRef ref) {
@@ -37,6 +52,7 @@ class AppRouter {
         final authState = ref.read(authControllerProvider);
         final isAuthenticated = authState.isAuthenticated;
         final isLoggingIn = state.matchedLocation == '/login';
+        final appModeState = ref.read(appModeProvider);
 
         // إذا المستخدم غير مسجل ويحاول الوصول لصفحة محمية
         if (!isAuthenticated && !isLoggingIn) {
@@ -45,6 +61,10 @@ class AppRouter {
 
         // إذا المستخدم مسجل ويحاول الوصول لصفحة تسجيل الدخول
         if (isAuthenticated && isLoggingIn) {
+          // توجيه حسب الوضع المختار
+          if (appModeState.isCustomer) {
+            return '/customer/home';
+          }
           return '/dashboard';
         }
 
@@ -101,6 +121,16 @@ class AppRouter {
                   builder: (context, state) => const MerchantServicesScreen(),
                 ),
                 GoRoute(
+                  path: 'boost-sales',
+                  name: 'boost-sales',
+                  builder: (context, state) => const BoostSalesScreen(),
+                ),
+                GoRoute(
+                  path: 'store-on-jock',
+                  name: 'store-on-jock',
+                  builder: (context, state) => const StoreOnJockScreen(),
+                ),
+                GoRoute(
                   path: 'feature/:name',
                   name: 'feature',
                   builder: (context, state) {
@@ -133,7 +163,11 @@ class AppRouter {
                 GoRoute(
                   path: 'add',
                   name: 'add-product',
-                  builder: (context, state) => const AddProductScreen(),
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>?;
+                    final productType = extra?['productType'] as String?;
+                    return AddProductScreen(productType: productType);
+                  },
                 ),
                 GoRoute(
                   path: ':id',
@@ -165,6 +199,54 @@ class AppRouter {
               ],
             ),
           ],
+        ),
+
+        // ========================================================================
+        // Customer App Shell Route (محمية) - تجربة العميل
+        // ========================================================================
+        ShellRoute(
+          builder: (context, state, child) => CustomerShell(child: child),
+          routes: [
+            // الصفحة الرئيسية للعميل
+            GoRoute(
+              path: '/customer/home',
+              name: 'customer-home',
+              builder: (context, state) => const CustomerHomeScreen(),
+            ),
+            // صفحة الميديا
+            GoRoute(
+              path: '/customer/media',
+              name: 'customer-media',
+              builder: (context, state) => const MediaScreen(),
+            ),
+            // صفحة التصنيفات
+            GoRoute(
+              path: '/customer/categories',
+              name: 'customer-categories',
+              builder: (context, state) => const CategoriesScreen(),
+            ),
+            // صفحة المتاجر
+            GoRoute(
+              path: '/customer/stores',
+              name: 'customer-stores',
+              builder: (context, state) => const StoresScreen(),
+            ),
+            // صفحة السلة
+            GoRoute(
+              path: '/customer/cart',
+              name: 'customer-cart',
+              builder: (context, state) => const CustomerCartScreen(),
+            ),
+          ],
+        ),
+
+        // ========================================================================
+        // Customer Profile (خارج الـ Shell - بدون bottom navigation)
+        // ========================================================================
+        GoRoute(
+          path: '/customer/profile',
+          name: 'customer-profile',
+          builder: (context, state) => const CustomerProfileScreen(),
         ),
       ],
 

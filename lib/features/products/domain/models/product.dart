@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Product Media Model
 /// يمثل صورة أو فيديو للمنتج
 class ProductMedia {
@@ -20,6 +22,8 @@ class ProductMedia {
   });
 
   factory ProductMedia.fromJson(Map<String, dynamic> json) {
+    debugPrint('🎬 [ProductMedia.fromJson] JSON: $json');
+
     return ProductMedia(
       id: json['id'] as String,
       productId: json['product_id'] as String,
@@ -49,6 +53,11 @@ class Product {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<ProductMedia> media; // قائمة الصور والفيديوهات
+  final Map<String, dynamic>? extraData; // بيانات إضافية اختيارية
+  final String? subCategoryId;
+  final double? weight;
+  final int? preparationTime;
+  final List<String>? seoKeywords;
 
   Product({
     required this.id,
@@ -63,6 +72,11 @@ class Product {
     this.createdAt,
     this.updatedAt,
     this.media = const [],
+    this.extraData,
+    this.subCategoryId,
+    this.weight,
+    this.preparationTime,
+    this.seoKeywords,
   });
 
   /// الحصول على الصورة الرئيسية
@@ -116,6 +130,22 @@ class Product {
       mediaList = (json['product_media'] as List)
           .map((m) => ProductMedia.fromJson(m as Map<String, dynamic>))
           .toList();
+
+      // Debug logging
+      debugPrint('📦 [Product.fromJson] Product: ${json['name']}');
+      debugPrint(
+        '📦 [Product.fromJson] product_media count: ${mediaList.length}',
+      );
+      for (var i = 0; i < mediaList.length; i++) {
+        debugPrint(
+          '📦 [Product.fromJson] media[$i]: type=${mediaList[i].mediaType}, url=${mediaList[i].url}',
+        );
+      }
+    } else {
+      debugPrint(
+        '⚠️ [Product.fromJson] No product_media found for: ${json['name']}',
+      );
+      debugPrint('⚠️ [Product.fromJson] JSON keys: ${json.keys.toList()}');
     }
 
     // تحديد الصورة الرئيسية: main_image_url أو image_url
@@ -141,6 +171,17 @@ class Product {
           ? DateTime.parse(json['updated_at'] as String)
           : null,
       media: mediaList,
+      extraData: json['extra_data'] as Map<String, dynamic>?,
+      subCategoryId: json['sub_category_id'] as String?,
+      weight: json['weight'] != null
+          ? (json['weight'] is int
+                ? (json['weight'] as int).toDouble()
+                : (json['weight'] as num).toDouble())
+          : null,
+      preparationTime: json['preparation_time'] as int?,
+      seoKeywords: json['seo_keywords'] != null
+          ? List<String>.from(json['seo_keywords'])
+          : null,
     );
   }
 
@@ -158,6 +199,11 @@ class Product {
       'is_active': isActive,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
+      'extra_data': extraData,
+      'sub_category_id': subCategoryId,
+      'weight': weight,
+      'preparation_time': preparationTime,
+      'seo_keywords': seoKeywords,
     };
   }
 
@@ -175,6 +221,11 @@ class Product {
     DateTime? createdAt,
     DateTime? updatedAt,
     List<ProductMedia>? media,
+    Map<String, dynamic>? extraData,
+    String? subCategoryId,
+    double? weight,
+    int? preparationTime,
+    List<String>? seoKeywords,
   }) {
     return Product(
       id: id ?? this.id,
@@ -189,6 +240,11 @@ class Product {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       media: media ?? this.media,
+      extraData: extraData ?? this.extraData,
+      subCategoryId: subCategoryId ?? this.subCategoryId,
+      weight: weight ?? this.weight,
+      preparationTime: preparationTime ?? this.preparationTime,
+      seoKeywords: seoKeywords ?? this.seoKeywords,
     );
   }
 

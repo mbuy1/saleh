@@ -13,6 +13,7 @@ class Store {
   final int? followersCount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final Map<String, dynamic>? settings;
 
   Store({
     required this.id,
@@ -27,6 +28,7 @@ class Store {
     this.followersCount,
     this.createdAt,
     this.updatedAt,
+    this.settings,
   });
 
   /// تحويل من JSON إلى Object
@@ -52,6 +54,7 @@ class Store {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,
+      settings: json['store_settings'] as Map<String, dynamic>?,
     );
   }
 
@@ -70,6 +73,7 @@ class Store {
       'followers_count': followersCount,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
+      'store_settings': settings,
     };
   }
 
@@ -87,6 +91,7 @@ class Store {
     int? followersCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? settings,
   }) {
     return Store(
       id: id ?? this.id,
@@ -101,6 +106,7 @@ class Store {
       followersCount: followersCount ?? this.followersCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      settings: settings ?? this.settings,
     );
   }
 

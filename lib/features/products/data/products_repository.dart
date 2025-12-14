@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/auth_token_storage.dart';
@@ -38,15 +39,34 @@ class ProductsRepository {
         try {
           final data = jsonDecode(response.body);
 
+          debugPrint(
+            '🔍 [getMerchantProducts] Response data: ${jsonEncode(data)}',
+          );
+
           if (data['ok'] == true) {
             final List productsList = data['data'] ?? [];
+
+            debugPrint(
+              '🔍 [getMerchantProducts] Products count: ${productsList.length}',
+            );
+            if (productsList.isNotEmpty) {
+              debugPrint(
+                '🔍 [getMerchantProducts] First product keys: ${(productsList[0] as Map).keys.toList()}',
+              );
+              debugPrint(
+                '🔍 [getMerchantProducts] First product: ${jsonEncode(productsList[0])}',
+              );
+            }
+
             return productsList.map((json) => Product.fromJson(json)).toList();
           } else {
             // Worker returned ok:false - treat as empty for now
+            debugPrint('⚠️ [getMerchantProducts] Worker returned ok:false');
             return [];
           }
         } catch (parseError) {
           // JSON parse error - return empty list
+          debugPrint('❌ [getMerchantProducts] Parse error: $parseError');
           return [];
         }
       }
@@ -74,16 +94,12 @@ class ProductsRepository {
       }
 
       final body = {'files': files};
-      
 
       final response = await _apiService.post(
         '/secure/media/upload-urls',
         body: body,
         headers: {'Authorization': 'Bearer $token'},
       );
-
-      
-      
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
@@ -97,7 +113,6 @@ class ProductsRepository {
         'فشل الحصول على روابط الرفع: ${response.statusCode} - ${response.body}',
       );
     } catch (e) {
-      
       if (e is Exception) rethrow;
       throw Exception('خطأ في طلب روابط الرفع: $e');
     }
@@ -114,6 +129,7 @@ class ProductsRepository {
     String? imageUrl,
     String? categoryId,
     List<Map<String, dynamic>>? media,
+    Map<String, dynamic>? extraData,
   }) async {
     try {
       final token = await _tokenStorage.getAccessToken();
@@ -131,10 +147,9 @@ class ProductsRepository {
         if (categoryId != null && categoryId.isNotEmpty)
           'category_id': categoryId,
         if (media != null && media.isNotEmpty) 'media': media,
+        if (extraData != null) 'extra_data': extraData,
         'is_active': true,
       };
-
-      
 
       final response = await _apiService.post(
         '/secure/products',
@@ -142,14 +157,17 @@ class ProductsRepository {
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      
-      
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
         try {
           final data = jsonDecode(response.body);
 
           if (data['ok'] == true && data['data'] != null) {
+            // DEBUG: Print server debug info
+            if (data['debug'] != null) {
+              debugPrint(
+                '🔍 [CreateProduct] Server Debug Info: ${jsonEncode(data['debug'])}',
+              );
+            }
             return Product.fromJson(data['data']);
           } else {
             final errorMsg =
@@ -179,7 +197,6 @@ class ProductsRepository {
         }
       }
     } catch (e) {
-      
       if (e.toString().contains('لا يوجد رمز وصول')) {
         rethrow;
       }
@@ -200,6 +217,7 @@ class ProductsRepository {
     String? imageUrl,
     String? categoryId,
     bool? isActive,
+    Map<String, dynamic>? extraData,
   }) async {
     try {
       final token = await _tokenStorage.getAccessToken();
@@ -215,6 +233,7 @@ class ProductsRepository {
       if (imageUrl != null) body['image_url'] = imageUrl;
       if (categoryId != null) body['category_id'] = categoryId;
       if (isActive != null) body['is_active'] = isActive;
+      if (extraData != null) body['extra_data'] = extraData;
 
       final response = await _apiService.put(
         '/secure/products/$productId',
@@ -264,5 +283,3 @@ final productsRepositoryProvider = Provider<ProductsRepository>((ref) {
   final tokenStorage = ref.watch(authTokenStorageProvider);
   return ProductsRepository(apiService, tokenStorage);
 });
-
-

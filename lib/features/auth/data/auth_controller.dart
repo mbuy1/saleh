@@ -8,6 +8,7 @@ class AuthState {
   final String? errorMessage;
   final String? userRole;
   final String? userId;
+  final String? userEmail;
 
   const AuthState({
     this.isLoading = false,
@@ -15,6 +16,7 @@ class AuthState {
     this.errorMessage,
     this.userRole,
     this.userId,
+    this.userEmail,
   });
 
   AuthState copyWith({
@@ -23,6 +25,7 @@ class AuthState {
     String? errorMessage,
     String? userRole,
     String? userId,
+    String? userEmail,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -30,6 +33,7 @@ class AuthState {
       errorMessage: errorMessage,
       userRole: userRole ?? this.userRole,
       userId: userId ?? this.userId,
+      userEmail: userEmail ?? this.userEmail,
     );
   }
 }
@@ -50,11 +54,13 @@ class AuthController extends StateNotifier<AuthState> {
       if (hasSession) {
         final userRole = await _authRepository.getUserRole();
         final userId = await _authRepository.getUserId();
+        final userEmail = await _authRepository.getUserEmail();
 
         state = state.copyWith(
           isAuthenticated: true,
           userRole: userRole,
           userId: userId,
+          userEmail: userEmail,
         );
       }
     } catch (e) {
@@ -103,6 +109,7 @@ class AuthController extends StateNotifier<AuthState> {
         errorMessage: null,
         userRole: userRole,
         userId: user['id'] as String?,
+        userEmail: user['email'] as String?,
       );
     } on Exception catch (e) {
       // فشل تسجيل الدخول
@@ -149,11 +156,13 @@ class AuthController extends StateNotifier<AuthState> {
       if (hasSession) {
         final userRole = await _authRepository.getUserRole();
         final userId = await _authRepository.getUserId();
+        final userEmail = await _authRepository.getUserEmail();
 
         state = state.copyWith(
           isAuthenticated: true,
           userRole: userRole,
           userId: userId,
+          userEmail: userEmail,
         );
       } else {
         state = state.copyWith(isAuthenticated: false);
@@ -184,4 +193,9 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 /// Provider للحصول على دور المستخدم
 final userRoleProvider = Provider<String?>((ref) {
   return ref.watch(authControllerProvider).userRole;
+});
+
+/// Provider للحصول على إيميل المستخدم
+final userEmailProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).userEmail;
 });

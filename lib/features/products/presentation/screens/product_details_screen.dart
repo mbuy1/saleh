@@ -82,6 +82,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     }
   }
 
+  @override
+  void deactivate() {
+    // إيقاف الفيديو عند مغادرة الصفحة
+    if (_videoController != null && _videoController!.value.isPlaying) {
+      _videoController!.pause();
+    }
+    super.deactivate();
+  }
+
   void _initializeControllers(Product product) {
     if (_currentProduct?.id != product.id) {
       _currentProduct = product;
@@ -695,7 +704,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     if (totalItems == 0) {
       // لا توجد وسائط - عرض placeholder
       return Container(
-        height: 250,
+        height: 350, // زيادة الارتفاع ليكون مربعاً أكثر
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
@@ -712,8 +721,8 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return Column(
       children: [
         // معرض الصور القابل للتمرير
-        SizedBox(
-          height: 250,
+        AspectRatio(
+          aspectRatio: 1.0, // جعل الحاوية مربعة بالكامل
           child: PageView.builder(
             controller: _pageController,
             itemCount: totalItems,
@@ -723,11 +732,28 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             itemBuilder: (context, index) {
               // إذا كان الفيديو وهو في النهاية
               if (hasVideo && index == allImages.length) {
-                return _buildVideoPlayer();
+                return GestureDetector(
+                  behavior:
+                      HitTestBehavior.opaque, // جعل المنطقة كاملة قابلة للنقر
+                  onTap: () => _showFullScreenGallery(
+                    context,
+                    allImages,
+                    index,
+                    videoUrl: videoUrl,
+                  ),
+                  child: _buildVideoPlayer(),
+                );
               }
               // الصور
               return GestureDetector(
-                onTap: () => _showFullScreenImage(context, allImages[index]),
+                behavior:
+                    HitTestBehavior.opaque, // جعل المنطقة كاملة قابلة للنقر
+                onTap: () => _showFullScreenGallery(
+                  context,
+                  allImages,
+                  index,
+                  videoUrl: hasVideo ? videoUrl : null,
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   child: Image.network(
@@ -830,10 +856,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       child: Stack(
         alignment: Alignment.center,
+        fit: StackFit.expand, // ملء الحاوية بالكامل
         children: [
-          AspectRatio(
-            aspectRatio: _videoController!.value.aspectRatio,
-            child: VideoPlayer(_videoController!),
+          FittedBox(
+            fit: BoxFit.cover, // تغطية المساحة بالكامل (مثل الصور)
+            child: SizedBox(
+              width: _videoController!.value.size.width,
+              height: _videoController!.value.size.height,
+              child: VideoPlayer(_videoController!),
+            ),
           ),
           // زر التشغيل/الإيقاف
           GestureDetector(
@@ -861,40 +892,223 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               ),
             ),
           ),
+          // زر ملء الشاشة
+          Positioned(
+            bottom: 12,
+            right: 12,
+            child: GestureDetector(
+              onTap: () {
+                final allImages = widget.productId.isNotEmpty
+                    ? ref
+                          .read(productsControllerProvider)
+                          .products
+                          .firstWhere((p) => p.id == widget.productId)
+                          .imageUrls
+                    : <String>[];
+                final videoUrl = ref
+                    .read(productsControllerProvider)
+                    .products
+                    .firstWhere((p) => p.id == widget.productId)
+                    .videoUrl;
+                _showFullScreenGallery(
+                  context,
+                  allImages,
+                  allImages.length,
+                  videoUrl: videoUrl,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.fullscreen,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  /// عرض الصورة بالحجم الكامل
-  void _showFullScreenImage(BuildContext context, String imageUrl) {
+  /// عرض معرض الصور والفيديو بالحجم الكامل
+  void _showFullScreenGallery(
+    BuildContext context,
+    List<String> images,
+    int initialIndex, {
+    String? videoUrl,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            iconTheme: const IconThemeData(color: Colors.white),
+        builder: (context) => _FullScreenGalleryPage(
+          images: images,
+          initialIndex: initialIndex,
+          videoUrl: videoUrl,
+        ),
+      ),
+    );
+  }
+}
+
+class _FullScreenGalleryPage extends StatefulWidget {
+  final List<String> images;
+  final int initialIndex;
+  final String? videoUrl;
+
+  const _FullScreenGalleryPage({
+    required this.images,
+    required this.initialIndex,
+    this.videoUrl,
+  });
+
+  @override
+  State<_FullScreenGalleryPage> createState() => _FullScreenGalleryPageState();
+}
+
+class _FullScreenGalleryPageState extends State<_FullScreenGalleryPage> {
+  late PageController _pageController;
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
+  bool _showControls = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex);
+    if (widget.videoUrl != null) {
+      _initializeVideo();
+    }
+  }
+
+  void _initializeVideo() {
+    _videoController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!))
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() => _isVideoInitialized = true);
+              // إذا بدأنا بالفيديو، نشغله
+              if (widget.initialIndex == widget.images.length) {
+                // _videoController!.play(); // اختياري: التشغيل التلقائي
+              }
+            }
+          });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    // إيقاف الفيديو إذا انتقلنا بعيداً عنه
+    if (widget.videoUrl != null &&
+        index != widget.images.length &&
+        _videoController != null &&
+        _videoController!.value.isPlaying) {
+      _videoController!.pause();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final totalItems = widget.images.length + (widget.videoUrl != null ? 1 : 0);
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: _showControls
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
+              elevation: 0,
+            )
+          : null,
+      body: GestureDetector(
+        onTap: () => setState(() => _showControls = !_showControls),
+        behavior: HitTestBehavior.opaque,
+        child: PageView.builder(
+          itemCount: totalItems,
+          controller: _pageController,
+          onPageChanged: _onPageChanged,
+          itemBuilder: (context, index) {
+            // عرض الفيديو
+            if (widget.videoUrl != null && index == widget.images.length) {
+              return _buildVideoPage();
+            }
+
+            // عرض الصور
+            return Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Image.network(
+                  widget.images[index],
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 100,
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoPage() {
+    if (!_isVideoInitialized || _videoController == null) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // الفيديو يملأ الشاشة مع الحفاظ على النسبة
+        Center(
+          child: AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio,
+            child: VideoPlayer(_videoController!),
           ),
-          body: Center(
-            child: InteractiveViewer(
-              minScale: 0.5,
-              maxScale: 4.0,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.broken_image,
-                    color: Colors.white,
-                    size: 100,
-                  );
+        ),
+        // أزرار التحكم
+        if (_showControls)
+          Container(
+            color: Colors.black.withValues(alpha: 0.3),
+            child: Center(
+              child: IconButton(
+                iconSize: 64,
+                icon: Icon(
+                  _videoController!.value.isPlaying
+                      ? Icons.pause_circle_filled
+                      : Icons.play_circle_filled,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (_videoController!.value.isPlaying) {
+                      _videoController!.pause();
+                    } else {
+                      _videoController!.play();
+                    }
+                  });
                 },
               ),
             ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }

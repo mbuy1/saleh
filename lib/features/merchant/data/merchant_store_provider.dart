@@ -80,6 +80,7 @@ class MerchantStoreController extends StateNotifier<MerchantStoreState> {
     String? name,
     String? description,
     String? city,
+    Map<String, dynamic>? settings,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -89,6 +90,7 @@ class MerchantStoreController extends StateNotifier<MerchantStoreState> {
         name: name,
         description: description,
         city: city,
+        settings: settings,
       );
 
       state = MerchantStoreState(store: updatedStore, isLoading: false);
@@ -97,6 +99,17 @@ class MerchantStoreController extends StateNotifier<MerchantStoreState> {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
       return false;
     }
+  }
+
+  /// تحديث إعدادات المتجر فقط
+  Future<bool> updateStoreSettings(Map<String, dynamic> newSettings) async {
+    if (state.store == null) return false;
+
+    // دمج الإعدادات الجديدة مع القديمة
+    final currentSettings = state.store!.settings ?? {};
+    final mergedSettings = {...currentSettings, ...newSettings};
+
+    return updateStoreInfo(storeId: state.store!.id, settings: mergedSettings);
   }
 
   /// تحديث المتجر المحلي (بعد التعديل)

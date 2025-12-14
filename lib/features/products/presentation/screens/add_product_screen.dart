@@ -11,10 +11,12 @@ import '../../data/products_controller.dart';
 import '../../data/categories_repository.dart';
 import '../../data/products_repository.dart';
 import '../../domain/models/category.dart';
+import '../../../merchant/data/merchant_store_provider.dart';
 
 /// شاشة إضافة منتج جديد
 class AddProductScreen extends ConsumerStatefulWidget {
-  const AddProductScreen({super.key});
+  final String? productType;
+  const AddProductScreen({super.key, this.productType});
 
   @override
   ConsumerState<AddProductScreen> createState() => _AddProductScreenState();
@@ -26,6 +28,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _stockController = TextEditingController();
+  final _subCategoryController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _prepTimeController = TextEditingController();
+  final _keywordsController = TextEditingController();
 
   bool _isSubmitting = false;
   List<Category> _categories = [];
@@ -37,9 +43,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   XFile? _selectedVideo;
   final ImagePicker _picker = ImagePicker();
 
+  // بيانات التخصيص الإضافية
+  final Map<String, dynamic> _extraData = {};
+
   @override
   void initState() {
     super.initState();
+    if (widget.productType != null) {
+      _extraData['product_type'] = widget.productType;
+    }
     _loadCategories();
   }
 
@@ -183,6 +195,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _descriptionController.dispose();
     _priceController.dispose();
     _stockController.dispose();
+    _subCategoryController.dispose();
+    _weightController.dispose();
+    _prepTimeController.dispose();
+    _keywordsController.dispose();
     super.dispose();
   }
 
@@ -243,11 +259,21 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         final tempMediaList = <Map<String, dynamic>>[];
         int uploadedCount = 0;
 
+        // فصل روابط الصور عن الفيديو
+        final imageUploadUrls = uploadUrls
+            .where((u) => u['type'] == 'image')
+            .toList();
+        final videoUploadUrls = uploadUrls
+            .where((u) => u['type'] == 'video')
+            .toList();
+
         for (var i = 0; i < _selectedImages.length; i++) {
-          if (i >= uploadUrls.length) break; // تحقق من وجود upload URL
+          if (i >= imageUploadUrls.length) {
+            break;
+          }
 
           final image = _selectedImages[i];
-          final uploadData = uploadUrls[i];
+          final uploadData = imageUploadUrls[i];
 
           try {
             // قراءة بيانات الصورة
@@ -324,9 +350,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         }
 
         // رفع الفيديو إذا وجد
-        if (_selectedVideo != null &&
-            uploadUrls.length > _selectedImages.length) {
-          final videoUploadData = uploadUrls[_selectedImages.length];
+        if (_selectedVideo != null && videoUploadUrls.isNotEmpty) {
+          final videoUploadData = videoUploadUrls.first;
 
           try {
             // عرض رسالة بدء الرفع
@@ -461,24 +486,39 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         // تعيين mediaList فقط إذا تم رفع شيء
         if (tempMediaList.isNotEmpty) {
           mediaList = tempMediaList;
-
-          for (var i = 0; i < mediaList.length; i++) {}
         }
       }
 
       // 3. إنشاء المنتج مع الوسائط
+      // إضافة الحقول الجديدة إلى extraData
+      if (_subCategoryController.text.isNotEmpty) {
+        _extraData['sub_category'] = _subCategoryController.text;
+      }
+      if (_weightController.text.isNotEmpty) {
+        _extraData['weight'] = double.tryParse(_weightController.text);
+      }
+      if (_prepTimeController.text.isNotEmpty) {
+        _extraData['preparation_time'] = int.tryParse(_prepTimeController.text);
+      }
+      if (_keywordsController.text.isNotEmpty) {
+        _extraData['seo_keywords'] = _keywordsController.text
+            .split(',')
+            .map((e) => e.trim())
+            .toList();
+      }
 
       final success = await ref
           .read(productsControllerProvider.notifier)
           .addProduct(
             name: _nameController.text.trim(),
             price: double.parse(_priceController.text),
-            stock: int.parse(_stockController.text),
+            stock: int.tryParse(_stockController.text) ?? 0,
             categoryId: _selectedCategoryId,
             description: _descriptionController.text.trim().isEmpty
                 ? null
                 : _descriptionController.text.trim(),
             media: mediaList,
+            extraData: _extraData.isNotEmpty ? _extraData : null,
           );
 
       if (!mounted) return;
@@ -529,394 +569,436 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final storeState = ref.watch(merchantStoreProvider);
+    final settings = storeState?.settings ?? {};
+
+    final showSubCategory = settings['show_subcategory_field'] == true;
+    final showWeight = settings['show_weight_field'] == true;
+    final showPrepTime = settings['show_preparation_time_field'] == true;
+    final showSeoKeywords = settings['show_seo_keywords_field'] == true;
+
     return MbuyScaffold(
       showAppBar: false,
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: SingleChildScrollView(
             padding: AppDimensions.screenPadding,
-            children: [
-              _buildSubPageHeader(context, 'إضافة منتج جديد'),
-              // اسم المنتج
-              MbuyInputField(
-                controller: _nameController,
-                label: 'اسم المنتج *',
-                hint: 'مثال: هاتف آيفون 15',
-                prefixIcon: const Icon(
-                  Icons.inventory_2,
-                  color: AppTheme.textSecondaryColor,
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'الرجاء إدخال اسم المنتج';
-                  }
-                  if (value.trim().length < 3) {
-                    return 'يجب أن يكون الاسم 3 أحرف على الأقل';
-                  }
-                  return null;
-                },
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
+            child: Column(
+              children: [
+                _buildSubPageHeader(context, 'إضافة منتج جديد'),
 
-              // التصنيف
-              DropdownButtonFormField<String>(
-                initialValue: _selectedCategoryId,
-                decoration: InputDecoration(
-                  labelText: 'التصنيف *',
-                  hintText: 'اختر التصنيف',
+                // 1. كرت إضافة الصور والفيديو (مدمج)
+                _buildUnifiedMediaSection(),
+                const SizedBox(height: AppDimensions.spacing16),
+
+                // 2. اسم المنتج
+                MbuyInputField(
+                  controller: _nameController,
+                  label: 'اسم المنتج *',
+                  hint: 'مثال: هاتف آيفون 15',
                   prefixIcon: const Icon(
-                    Icons.category,
+                    Icons.inventory_2,
                     color: AppTheme.textSecondaryColor,
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'الرجاء إدخال اسم المنتج';
+                    }
+                    if (value.trim().length < 3) {
+                      return 'يجب أن يكون الاسم 3 أحرف على الأقل';
+                    }
+                    return null;
+                  },
+                  textInputAction: TextInputAction.next,
                 ),
-                items: _loadingCategories
-                    ? []
-                    : _categories.map((category) {
-                        return DropdownMenuItem<String>(
-                          value: category.id,
-                          child: Text(category.name),
-                        );
-                      }).toList(),
-                onChanged: _loadingCategories
-                    ? null
-                    : (value) {
-                        setState(() {
-                          _selectedCategoryId = value;
-                        });
-                      },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'الرجاء اختيار التصنيف';
-                  }
-                  return null;
-                },
-              ),
-              if (_loadingCategories)
-                const Padding(
-                  padding: EdgeInsets.only(top: AppDimensions.spacing8),
-                  child: Text(
-                    'جاري تحميل التصنيفات...',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontCaption,
-                      color: AppTheme.textHintColor,
-                    ),
-                  ),
-                ),
-              const SizedBox(height: AppDimensions.spacing16),
+                const SizedBox(height: AppDimensions.spacing16),
 
-              // قسم الصور
-              MbuyCard(
-                padding: const EdgeInsets.all(AppDimensions.spacing12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.photo_library,
-                          size: AppDimensions.iconS,
-                          color: AppTheme.textSecondaryColor,
-                        ),
-                        const SizedBox(width: AppDimensions.spacing8),
-                        const Text(
-                          'صور المنتج *',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppDimensions.fontBody,
-                            color: AppTheme.textPrimaryColor,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '${_selectedImages.length}/4',
-                          style: const TextStyle(
-                            color: AppTheme.textSecondaryColor,
-                            fontSize: AppDimensions.fontBody2,
-                          ),
-                        ),
-                      ],
+                // 3. سعر المنتج
+                MbuyInputField(
+                  controller: _priceController,
+                  label: 'السعر (ر.س) *',
+                  hint: '0.00',
+                  prefixIcon: const Icon(
+                    Icons.monetization_on,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
                     ),
-                    const SizedBox(height: AppDimensions.spacing12),
-                    if (_selectedImages.isEmpty)
-                      Center(
-                        child: TextButton.icon(
-                          onPressed: _pickImages,
-                          icon: const Icon(
-                            Icons.add_photo_alternate,
-                            color: AppTheme.accentColor,
-                          ),
-                          label: const Text(
-                            'اختر صور (حتى 4 صور)',
-                            style: TextStyle(color: AppTheme.accentColor),
-                          ),
-                        ),
-                      )
-                    else
-                      Wrap(
-                        spacing: AppDimensions.spacing8,
-                        runSpacing: AppDimensions.spacing8,
-                        children: [
-                          ..._selectedImages.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final image = entry.value;
-                            return Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusM,
-                                  ),
-                                  child: Image.file(
-                                    File(image.path),
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                    onTap: () => _removeImage(index),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: const BoxDecoration(
-                                        color: AppTheme.errorColor,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.close,
-                                        size: AppDimensions.iconXS,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                if (index == 0)
-                                  Positioned(
-                                    bottom: 4,
-                                    left: 4,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: AppDimensions.spacing6,
-                                        vertical: AppDimensions.spacing2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.accentColor,
-                                        borderRadius: BorderRadius.circular(
-                                          AppDimensions.radiusXS,
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'رئيسية',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: AppDimensions.fontCaption,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            );
-                          }),
-                          if (_selectedImages.length < 4)
-                            GestureDetector(
-                              onTap: _pickImages,
-                              child: Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppTheme.dividerColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusM,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.add,
-                                  color: AppTheme.textHintColor,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
                   ],
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'الرجاء إدخال السعر';
+                    }
+                    final price = double.tryParse(value);
+                    if (price == null || price <= 0) {
+                      return 'يجب أن يكون السعر أكبر من 0';
+                    }
+                    return null;
+                  },
+                  textInputAction: TextInputAction.next,
                 ),
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
+                const SizedBox(height: AppDimensions.spacing16),
 
-              // قسم الفيديو
-              MbuyCard(
-                padding: const EdgeInsets.all(AppDimensions.spacing12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.videocam,
-                          size: AppDimensions.iconS,
-                          color: AppTheme.textSecondaryColor,
-                        ),
-                        SizedBox(width: AppDimensions.spacing8),
-                        Text(
-                          'فيديو المنتج (اختياري)',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppDimensions.fontBody,
-                            color: AppTheme.textPrimaryColor,
-                          ),
-                        ),
-                      ],
+                // 4. التصنيف الأساسي
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedCategoryId,
+                  decoration: InputDecoration(
+                    labelText: 'التصنيف *',
+                    hintText: 'اختر التصنيف',
+                    prefixIcon: const Icon(
+                      Icons.category,
+                      color: AppTheme.textSecondaryColor,
                     ),
-                    const SizedBox(height: AppDimensions.spacing12),
-                    if (_selectedVideo == null)
-                      Center(
-                        child: TextButton.icon(
-                          onPressed: _pickVideo,
-                          icon: const Icon(
-                            Icons.video_library,
-                            color: AppTheme.accentColor,
-                          ),
-                          label: const Text(
-                            'اختر فيديو',
-                            style: TextStyle(color: AppTheme.accentColor),
-                          ),
-                        ),
-                      )
-                    else
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.videocam,
-                            size: AppDimensions.iconL,
-                            color: AppTheme.accentColor,
-                          ),
-                          const SizedBox(width: AppDimensions.spacing12),
-                          Expanded(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                    ),
+                  ),
+                  items: _loadingCategories
+                      ? []
+                      : _categories.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category.id,
                             child: Text(
-                              _selectedVideo!.name,
-                              style: const TextStyle(
-                                fontSize: AppDimensions.fontBody2,
-                                color: AppTheme.textPrimaryColor,
+                              category.getLocalizedName(
+                                Localizations.localeOf(context).languageCode,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          IconButton(
-                            onPressed: _removeVideo,
-                            icon: const Icon(
-                              Icons.delete,
-                              color: AppTheme.errorColor,
-                            ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
+                  onChanged: _loadingCategories
+                      ? null
+                      : (value) {
+                          setState(() {
+                            _selectedCategoryId = value;
+                          });
+                        },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'الرجاء اختيار التصنيف';
+                    }
+                    return null;
+                  },
+                ),
+                if (_loadingCategories)
+                  const Padding(
+                    padding: EdgeInsets.only(top: AppDimensions.spacing8),
+                    child: Text(
+                      'جاري تحميل التصنيفات...',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontCaption,
+                        color: AppTheme.textHintColor,
                       ),
+                    ),
+                  ),
+                const SizedBox(height: AppDimensions.spacing16),
+
+                // 5. التصنيف الفرعي (اختياري)
+                if (showSubCategory) ...[
+                  MbuyInputField(
+                    controller: _subCategoryController,
+                    label: 'التصنيف الفرعي (اختياري)',
+                    hint: 'مثال: هواتف ذكية',
+                    prefixIcon: const Icon(
+                      Icons.subdirectory_arrow_right,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing16),
+                ],
+
+                // 6. الكمية المتوفرة (اختياري)
+                MbuyInputField(
+                  controller: _stockController,
+                  label: 'الكمية المتوفرة (اختياري)',
+                  hint: '0',
+                  prefixIcon: const Icon(
+                    Icons.inventory,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: AppDimensions.spacing16),
+
+                // 7. وزن المنتج (اختياري)
+                if (showWeight) ...[
+                  MbuyInputField(
+                    controller: _weightController,
+                    label: 'وزن المنتج تقريباً (اختياري)',
+                    hint: 'مثال: 0.5 كجم',
+                    prefixIcon: const Icon(
+                      Icons.scale,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing16),
+                ],
+
+                // مدة التجهيز (اختياري)
+                if (showPrepTime) ...[
+                  MbuyInputField(
+                    controller: _prepTimeController,
+                    label: 'مدة تجهيز المنتج (اختياري)',
+                    hint: 'مثال: 3 أيام',
+                    prefixIcon: const Icon(
+                      Icons.timer,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: AppDimensions.spacing16),
+                ],
+
+                // زر الذكاء الاصطناعي (قبل الوصف)
+                _buildAIButton(),
+                const SizedBox(height: AppDimensions.spacing16),
+
+                // 8. الوصف
+                MbuyInputField(
+                  controller: _descriptionController,
+                  label: 'الوصف',
+                  hint: 'وصف تفصيلي للمنتج',
+                  prefixIcon: const Icon(
+                    Icons.description,
+                    color: AppTheme.textSecondaryColor,
+                  ),
+                  maxLines: 3,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: AppDimensions.spacing16),
+
+                // 9. الكلمات المفتاحية
+                if (showSeoKeywords) ...[
+                  MbuyInputField(
+                    controller: _keywordsController,
+                    label: 'الكلمات المفتاحية (SEO)',
+                    hint: 'كلمات مفصولة بفاصلة',
+                    prefixIcon: const Icon(
+                      Icons.tag,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing24),
+                ],
+
+                // أزرار الإجراءات
+                Row(
+                  children: [
+                    Expanded(
+                      child: MbuyButton(
+                        label: 'إلغاء',
+                        onPressed: _isSubmitting ? null : () => context.pop(),
+                        type: MbuyButtonType.secondary,
+                      ),
+                    ),
+                    const SizedBox(width: AppDimensions.spacing16),
+                    Expanded(
+                      flex: 2,
+                      child: MbuyButton(
+                        label: _isSubmitting
+                            ? 'جاري الإضافة...'
+                            : 'إضافة المنتج',
+                        onPressed: _isSubmitting ? null : _submitForm,
+                        isLoading: _isSubmitting,
+                        icon: Icons.add,
+                        type: MbuyButtonType.primary,
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
+                const SizedBox(
+                  height: AppDimensions.spacing48,
+                ), // Bottom padding
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-              // الوصف
-              MbuyInputField(
-                controller: _descriptionController,
-                label: 'الوصف',
-                hint: 'وصف تفصيلي للمنتج',
-                prefixIcon: const Icon(
-                  Icons.description,
-                  color: AppTheme.textSecondaryColor,
-                ),
-                maxLines: 3,
-                textInputAction: TextInputAction.next,
+  Widget _buildUnifiedMediaSection() {
+    return Column(
+      children: [
+        MbuyCard(
+          padding: const EdgeInsets.all(AppDimensions.spacing12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'الوسائط (صور وفيديو)',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: AppDimensions.spacing16),
-
-              // السعر
-              MbuyInputField(
-                controller: _priceController,
-                label: 'السعر (ر.س) *',
-                hint: '0.00',
-                prefixIcon: const Icon(
-                  Icons.monetization_on,
-                  color: AppTheme.textSecondaryColor,
-                ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                ],
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'الرجاء إدخال السعر';
-                  }
-                  final price = double.tryParse(value);
-                  if (price == null || price <= 0) {
-                    return 'يجب أن يكون السعر أكبر من 0';
-                  }
-                  return null;
-                },
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
-
-              // المخزون
-              MbuyInputField(
-                controller: _stockController,
-                label: 'المخزون *',
-                hint: '0',
-                prefixIcon: const Icon(
-                  Icons.inventory,
-                  color: AppTheme.textSecondaryColor,
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'الرجاء إدخال كمية المخزون';
-                  }
-                  final stock = int.tryParse(value);
-                  if (stock == null || stock < 0) {
-                    return 'يجب أن يكون المخزون 0 أو أكبر';
-                  }
-                  return null;
-                },
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: AppDimensions.spacing24),
-
-              // أزرار الإجراءات
-              Row(
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: MbuyButton(
-                      label: 'إلغاء',
-                      onPressed: _isSubmitting ? null : () => context.pop(),
-                      type: MbuyButtonType.secondary,
+                  // عرض الصور المختارة
+                  ..._selectedImages.asMap().entries.map((entry) {
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(entry.value.path),
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () => _removeImage(entry.key),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  // عرض الفيديو المختار
+                  if (_selectedVideo != null)
+                    Stack(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.videocam,
+                            size: 40,
+                            color: AppTheme.accentColor,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _removeVideo,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: AppDimensions.spacing16),
-                  Expanded(
-                    flex: 2,
-                    child: MbuyButton(
-                      label: _isSubmitting ? 'جاري الإضافة...' : 'إضافة المنتج',
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      isLoading: _isSubmitting,
-                      icon: Icons.add,
-                      type: MbuyButtonType.primary,
+                  // زر إضافة صورة
+                  if (_selectedImages.length < 4)
+                    GestureDetector(
+                      onTap: _pickImages,
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceColor,
+                          border: Border.all(color: AppTheme.dividerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_a_photo,
+                              color: AppTheme.textHintColor,
+                            ),
+                            Text('صورة', style: TextStyle(fontSize: 10)),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  // زر إضافة فيديو
+                  if (_selectedVideo == null)
+                    GestureDetector(
+                      onTap: _pickVideo,
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceColor,
+                          border: Border.all(color: AppTheme.dividerColor),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.videocam, color: AppTheme.textHintColor),
+                            Text('فيديو', style: TextStyle(fontSize: 10)),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ],
           ),
         ),
-      ),
+        const SizedBox(height: 8),
+        // كرت توليد الوسائط بالذكاء الاصطناعي
+        MbuyCard(
+          padding: const EdgeInsets.all(AppDimensions.spacing12),
+          child: ListTile(
+            leading: const Icon(
+              Icons.auto_awesome,
+              color: AppTheme.primaryColor,
+            ),
+            title: const Text('توليد وسائط بالذكاء الاصطناعي'),
+            subtitle: const Text('قريباً...'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('سيتم تفعيل هذه الميزة قريباً')),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAIButton() {
+    return MbuyButton(
+      label: 'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('سيتم تفعيل هذه الميزة قريباً')),
+        );
+      },
+      type: MbuyButtonType.secondary,
+      icon: Icons.auto_awesome,
     );
   }
 
@@ -950,7 +1032,24 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             ),
           ),
           const Spacer(),
-          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+          // زر التعديل (يفتح متجرك على جوك)
+          GestureDetector(
+            onTap: () {
+              context.push('/dashboard/store-on-jock');
+            },
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.accentColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: const Icon(
+                Icons.edit,
+                size: AppDimensions.iconS,
+                color: AppTheme.accentColor,
+              ),
+            ),
+          ),
         ],
       ),
     );
