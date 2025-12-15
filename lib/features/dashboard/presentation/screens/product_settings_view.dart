@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
@@ -62,28 +61,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
               horizontal: AppDimensions.spacing16,
             ),
             children: [
-              // زر متجرك على جوك
-              Card(
-                color: AppTheme.primaryColor,
-                child: ListTile(
-                  title: const Text(
-                    'متجرك على جوك',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                  ),
-                  onTap: () {
-                    context.push('/dashboard/store-on-jock');
-                  },
-                ),
-              ),
-              const SizedBox(height: AppDimensions.spacing16),
-
+              // تمت إزالة قسم "متجرك على جوك" من هنا حسب الطلب
               _buildSectionHeader('الإعدادات العامة'),
               _buildListTileAction('تخصيص التصنيفات', Icons.category, () {}),
               _buildSwitchTile(

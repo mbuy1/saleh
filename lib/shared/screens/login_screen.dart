@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_dimensions.dart';
@@ -20,7 +19,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  LoginIntent? _selectedIntent;
+  // تم تثبيت الدخول كتاجر فقط
+  final LoginIntent _selectedIntent = LoginIntent.merchant;
 
   @override
   void dispose() {
@@ -30,26 +30,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_selectedIntent == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('يرجى اختيار نوع الحساب أولاً'),
-          backgroundColor: AppTheme.warningColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.borderRadiusS,
-          ),
-        ),
-      );
-      return;
-    }
-
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     // حفظ النية مؤقتاً
-    ref.read(rootControllerProvider.notifier).setLoginIntent(_selectedIntent!);
+    ref.read(rootControllerProvider.notifier).setLoginIntent(_selectedIntent);
 
     // تنفيذ تسجيل الدخول
     await ref
@@ -57,9 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .login(
           identifier: _emailController.text.trim(),
           password: _passwordController.text,
-          loginAs: _selectedIntent == LoginIntent.merchant
-              ? 'merchant'
-              : 'customer',
+          loginAs: 'merchant',
         );
 
     final authState = ref.read(authControllerProvider);
@@ -67,49 +51,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // إذا كان بائع - تحميل بيانات المتجر
-      if (_selectedIntent == LoginIntent.merchant) {
-        final storeController = ref.read(
-          merchantStoreControllerProvider.notifier,
-        );
-        await storeController.loadMerchantStore();
+      // تحميل بيانات المتجر (دائماً merchant)
+      final storeController = ref.read(
+        merchantStoreControllerProvider.notifier,
+      );
+      await storeController.loadMerchantStore();
 
-        if (!mounted) return;
+      if (!mounted) return;
 
-        final hasStore = ref.read(hasMerchantStoreProvider);
+      final hasStore = ref.read(hasMerchantStoreProvider);
 
-        // التهيئة وفتح تطبيق التاجر
-        ref.read(rootControllerProvider.notifier).switchToMerchantApp();
+      // التهيئة وفتح تطبيق التاجر
+      ref.read(rootControllerProvider.notifier).switchToMerchantApp();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
-            ),
-            backgroundColor: hasStore
-                ? AppTheme.successColor
-                : AppTheme.warningColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppDimensions.borderRadiusS,
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
           ),
-        );
-      } else {
-        // عميل - فتح تطبيق العميل مباشرة
-        ref.read(rootControllerProvider.notifier).switchToCustomerApp();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('مرحباً بك في MBUY!'),
-            backgroundColor: AppTheme.successColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppDimensions.borderRadiusS,
-            ),
+          backgroundColor: hasStore
+              ? AppTheme.successColor
+              : AppTheme.warningColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppDimensions.borderRadiusS,
           ),
-        );
-      }
+        ),
+      );
     } else if (authState.errorMessage != null) {
       // مسح النية عند الفشل
       ref.read(rootControllerProvider.notifier).clearLoginIntent();
@@ -152,9 +120,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _buildTitle(),
                   const SizedBox(height: AppDimensions.spacing32),
 
-                  // اختيار نوع المستخدم
-                  _buildUserTypeSelection(),
-                  const SizedBox(height: AppDimensions.spacing32),
+                  // اختيار نوع المستخدم (تم إخفاؤه - الدخول كتاجر فقط)
+                  // _buildUserTypeSelection(),
+                  // const SizedBox(height: AppDimensions.spacing32),
 
                   // Email Field
                   _buildEmailField(),
@@ -225,125 +193,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  /// بناء اختيار نوع المستخدم
-  Widget _buildUserTypeSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'اختر نوع حسابك:',
-          style: TextStyle(
-            fontSize: AppDimensions.fontBody,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimaryColor,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacing12),
-        Row(
-          children: [
-            // زر البائع
-            Expanded(
-              child: _buildUserTypeCard(
-                intent: LoginIntent.merchant,
-                icon: Icons.store_outlined,
-                activeIcon: Icons.store,
-                label: 'بائع',
-                description: 'لإدارة متجرك',
-                color: AppTheme.primaryColor,
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacing12),
-            // زر العميل
-            Expanded(
-              child: _buildUserTypeCard(
-                intent: LoginIntent.customer,
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-                label: 'عميل',
-                description: 'للتسوق والشراء',
-                color: AppTheme.secondaryColor,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserTypeCard({
-    required LoginIntent intent,
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required String description,
-    required Color color,
-  }) {
-    final isSelected = _selectedIntent == intent;
-
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        setState(() => _selectedIntent = intent);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppDimensions.spacing16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: 0.1)
-              : AppTheme.surfaceColor,
-          borderRadius: AppDimensions.borderRadiusM,
-          border: Border.all(
-            color: isSelected ? color : Colors.grey.withValues(alpha: 0.2),
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(AppDimensions.spacing12),
-              decoration: BoxDecoration(
-                color: isSelected ? color : Colors.grey.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                size: 32,
-                color: isSelected ? Colors.white : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacing12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: AppDimensions.fontTitle,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? color : AppTheme.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: AppDimensions.fontCaption,
-                color: AppTheme.textSecondaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildEmailField() {
     return TextFormField(
@@ -386,10 +235,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: BorderSide(
-            color: _selectedIntent == LoginIntent.merchant
-                ? AppTheme.primaryColor
-                : AppTheme.secondaryColor,
+          borderSide: const BorderSide(
+            color: AppTheme.primaryColor,
             width: 2,
           ),
         ),
@@ -466,10 +313,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: BorderSide(
-            color: _selectedIntent == LoginIntent.merchant
-                ? AppTheme.primaryColor
-                : AppTheme.secondaryColor,
+          borderSide: const BorderSide(
+            color: AppTheme.primaryColor,
             width: 2,
           ),
         ),
@@ -495,11 +340,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildLoginButton(bool isLoading) {
-    final buttonColor = _selectedIntent == LoginIntent.merchant
-        ? AppTheme.primaryColor
-        : (_selectedIntent == LoginIntent.customer
-              ? AppTheme.secondaryColor
-              : AppTheme.accentColor);
+    const buttonColor = AppTheme.primaryColor;
 
     return SizedBox(
       height: AppDimensions.buttonHeightXL,
@@ -525,23 +366,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(
-                    _selectedIntent == LoginIntent.merchant
-                        ? Icons.store
-                        : (_selectedIntent == LoginIntent.customer
-                              ? Icons.person
-                              : Icons.login),
+                    Icons.store,
                     size: 20,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
-                    _selectedIntent == LoginIntent.merchant
-                        ? 'دخول كبائع'
-                        : (_selectedIntent == LoginIntent.customer
-                              ? 'دخول كعميل'
-                              : 'تسجيل الدخول'),
-                    style: const TextStyle(
+                    'دخول كبائع',
+                    style: TextStyle(
                       fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.bold,
                     ),

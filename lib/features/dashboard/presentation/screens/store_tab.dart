@@ -12,14 +12,21 @@ class StoreTab extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: AppTheme.surfaceColor,
+        foregroundColor: AppTheme.textPrimaryColor,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'المتجر',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppTheme.textPrimaryColor,
+          ),
         ),
         centerTitle: true,
-        elevation: 0,
+        iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
       ),
       body: SafeArea(
         child: ListView(

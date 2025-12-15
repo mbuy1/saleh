@@ -3,43 +3,114 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/theme/app_theme.dart';
 import '../core/controllers/root_controller.dart';
-import '../apps/customer/customer_app.dart';
+import '../core/services/api_service.dart';
 import '../apps/merchant/merchant_app.dart';
+import '../features/auth/data/auth_controller.dart';
 import 'screens/login_screen.dart';
 
 /// AppShell - يقرر أي تطبيق يعرض بناءً على RootController
 /// هذا هو Widget الجذري للتطبيق
-class AppShell extends ConsumerWidget {
+///
+/// يدعم حفظ الجلسة (Persistent Login):
+/// - عند فتح التطبيق يتحقق من وجود جلسة صالحة
+/// - إذا وجدت جلسة ينتقل للواجهة المناسبة حسب الدور
+/// - إذا لم توجد يعرض شاشة تسجيل الدخول
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  bool _isCheckingSession = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedSession();
+  }
+
+  /// التحقق من وجود جلسة محفوظة عند فتح التطبيق
+  /// يتحقق من وجود token وصحته قبل السماح بالدخول
+  Future<void> _checkSavedSession() async {
+    // انتظر قليلاً للسماح لـ AuthController بالتهيئة
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final apiService = ref.read(apiServiceProvider);
+    final rootController = ref.read(rootControllerProvider.notifier);
+    final authController = ref.read(authControllerProvider.notifier);
+
+    // 1. التحقق من وجود token
+    final hasToken = await apiService.hasValidTokens();
+    
+    if (!hasToken) {
+      // لا يوجد token - عرض شاشة تسجيل الدخول
+      if (mounted) {
+        setState(() => _isCheckingSession = false);
+      }
+      return;
+    }
+
+    // 2. التحقق من صحة token عبر التحقق من الجلسة
+    try {
+      await authController.checkSession();
+      final updatedAuthState = ref.read(authControllerProvider);
+
+      if (updatedAuthState.isAuthenticated && updatedAuthState.userRole != null) {
+        // توجد جلسة صالحة - انتقل لتطبيق التاجر فقط
+        // نتحقق من الدور (يجب أن يكون merchant)
+        if (updatedAuthState.userRole == 'merchant') {
+          rootController.switchToMerchantApp();
+        } else {
+          // إذا كان دور المستخدم ليس merchant، نعتبره merchant (للتوافق)
+          rootController.switchToMerchantApp();
+        }
+      } else {
+        // Token غير صالح - مسح الجلسة
+        await authController.logout();
+      }
+    } catch (e) {
+      // خطأ في التحقق - مسح الجلسة
+      await authController.logout();
+    }
+
+    if (mounted) {
+      setState(() => _isCheckingSession = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final rootState = ref.watch(rootControllerProvider);
 
-    // تحديد أي تطبيق يعرض
-    switch (rootState.currentApp) {
-      case CurrentApp.customer:
-        // تطبيق العميل - منفصل تماماً
-        return const CustomerApp();
+    // أثناء التحقق من الجلسة - عرض شاشة تحميل
+    if (_isCheckingSession) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
 
-      case CurrentApp.merchant:
-        // تطبيق التاجر - منفصل تماماً
-        return const MerchantApp();
-
-      case CurrentApp.none:
-        // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول
-        return MaterialApp(
-          title: 'MBUY',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('ar'), Locale('en')],
-          home: const LoginScreen(),
-        );
+    // تحديد أي تطبيق يعرض (Merchant فقط)
+    if (rootState.isMerchantApp) {
+      // تطبيق التاجر - الوحيد المتاح
+      return const MerchantApp();
+    } else {
+      // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول
+      return MaterialApp(
+        title: 'MBUY',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        home: const LoginScreen(),
+      );
     }
   }
 }

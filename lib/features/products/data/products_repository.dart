@@ -275,6 +275,42 @@ class ProductsRepository {
       throw Exception('خطأ في حذف المنتج: $e');
     }
   }
+
+  /// جلب منتجات الدروب شوبينق المتاحة
+  /// المسار: GET /secure/dropshipping/products
+  /// TODO: استبدال هذا بـ endpoint حقيقي عند توفر Worker endpoint
+  Future<List<Map<String, dynamic>>> getDropshippingProducts() async {
+    try {
+      final token = await _tokenStorage.getAccessToken();
+      if (token == null) {
+        throw Exception('لا يوجد رمز وصول - يجب تسجيل الدخول');
+      }
+
+      final response = await _apiService.get(
+        '/secure/dropshipping/products',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['ok'] == true && data['data'] != null) {
+          final List productsList = data['data'] as List;
+          return productsList
+              .map((json) => json as Map<String, dynamic>)
+              .toList();
+        }
+      } else if (response.statusCode == 404) {
+        // Endpoint غير موجود - نرجع قائمة فارغة
+        return [];
+      }
+
+      return [];
+    } catch (e) {
+      debugPrint('⚠️ [getDropshippingProducts] Error: $e');
+      // TODO: عند توفر endpoint، استخدمه هنا
+      return [];
+    }
+  }
 }
 
 /// Riverpod Provider for ProductsRepository

@@ -67,20 +67,31 @@ class ProductsTab extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
-          backgroundColor: AppTheme.primaryColor,
-          foregroundColor: Colors.white,
+          backgroundColor: AppTheme.surfaceColor,
+          foregroundColor: AppTheme.textPrimaryColor,
+          elevation: 0,
+          scrolledUnderElevation: 1,
+          surfaceTintColor: Colors.transparent,
           title: const Text(
             'المنتجات',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
             ),
           ),
           centerTitle: true,
-          elevation: 0,
+          iconTheme: const IconThemeData(
+            color: AppTheme.primaryColor,
+            size: AppDimensions.iconM,
+          ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.search, size: AppDimensions.iconM),
+              icon: const Icon(
+                Icons.search,
+                size: AppDimensions.iconM,
+                color: AppTheme.primaryColor,
+              ),
               onPressed: () {
                 _showSearchDialog(context);
               },
@@ -88,9 +99,9 @@ class ProductsTab extends ConsumerWidget {
           ],
           bottom: const TabBar(
             isScrollable: true,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
+            indicatorColor: AppTheme.primaryColor,
+            labelColor: AppTheme.primaryColor,
+            unselectedLabelColor: AppTheme.textSecondaryColor,
             tabs: [
               Tab(text: 'المنتجات'),
               Tab(text: 'إعدادات المنتجات'),
@@ -116,12 +127,26 @@ class ProductsTab extends ConsumerWidget {
             ),
             // 2. إعدادات المنتجات
             const ProductSettingsView(),
-            // 3. المخزون
-            _buildPlaceholderPage('إدارة المخزون'),
+            // 3. المخزون - صفحة انتقال سريع
+            _buildQuickAccessPage(
+              context,
+              title: 'إدارة المخزون',
+              subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
+              icon: Icons.inventory_2_outlined,
+              buttonText: 'فتح إدارة المخزون',
+              onPressed: () => context.push('/dashboard/inventory'),
+            ),
             // 4. دروب شوبينق
             _buildPlaceholderPage('دروب شوبينق'),
-            // 5. السجلات
-            _buildPlaceholderPage('سجلات المنتجات والمخزون'),
+            // 5. السجلات - صفحة انتقال سريع
+            _buildQuickAccessPage(
+              context,
+              title: 'سجلات النظام',
+              subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
+              icon: Icons.history_outlined,
+              buttonText: 'فتح السجلات',
+              onPressed: () => context.push('/dashboard/audit-logs'),
+            ),
             // 6. المحذوفات
             _buildPlaceholderPage('المنتجات المحذوفة'),
           ],
@@ -252,6 +277,70 @@ class ProductsTab extends ConsumerWidget {
             style: TextStyle(color: AppTheme.textHintColor),
           ),
         ],
+      ),
+    );
+  }
+
+  /// صفحة انتقال سريع للشاشات المعقدة
+  Widget _buildQuickAccessPage(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required String buttonText,
+    required VoidCallback onPressed,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 64, color: AppTheme.primaryColor),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textSecondaryColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: onPressed,
+              icon: const Icon(Icons.open_in_new),
+              label: Text(buttonText),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -34,9 +34,13 @@ class MbuyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: backgroundColor ?? AppTheme.primaryColor,
-      foregroundColor: foregroundColor ?? Colors.white,
+      backgroundColor:
+          backgroundColor ?? AppTheme.surfaceColor, // Light background (white)
+      foregroundColor:
+          foregroundColor ?? AppTheme.textPrimaryColor, // Dark text
       elevation: elevation,
+      scrolledUnderElevation: 1,
+      surfaceTintColor: Colors.transparent,
       centerTitle: centerTitle,
       toolbarHeight: AppDimensions.appBarHeight,
       automaticallyImplyLeading: false, // نتحكم نحن بالـ leading
@@ -46,15 +50,21 @@ class MbuyAppBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: const Icon(
                     Icons.arrow_back_ios_rounded,
                     size: AppDimensions.iconM,
+                    color: AppTheme.primaryColor, // Blue icon
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ))
           : leading,
+      iconTheme: const IconThemeData(
+        color: AppTheme.primaryColor, // Blue icons for actions
+        size: AppDimensions.iconM,
+      ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: AppDimensions.fontHeadline,
+          color: foregroundColor ?? AppTheme.textPrimaryColor,
         ),
       ),
       actions: actions,

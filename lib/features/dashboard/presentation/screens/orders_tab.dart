@@ -29,99 +29,170 @@ class _OrdersTabState extends State<OrdersTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
-        title: const Text(
-          'الطلبات',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: AppDimensions.fontHeadline,
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: AppTheme.surfaceColor,
+          foregroundColor: AppTheme.textPrimaryColor,
+          elevation: 0,
+          scrolledUnderElevation: 1,
+          surfaceTintColor: Colors.transparent,
+          title: const Text(
+            'الطلبات',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
           ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, size: AppDimensions.iconM),
-            onPressed: () {
-              _showFilterBottomSheet(context);
-            },
+          centerTitle: true,
+          iconTheme: const IconThemeData(
+            color: AppTheme.primaryColor,
+            size: AppDimensions.iconM,
           ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _refreshOrders,
-        color: AppTheme.accentColor,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              // كرت الطلبات الخاصة
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: _buildSpecialOrdersCard(context),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.filter_list,
+                size: AppDimensions.iconM,
+                color: AppTheme.primaryColor,
               ),
-              // محتوى الطلبات
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: _isLoading
-                    ? const SkeletonOrdersList()
-                    : Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: AppDimensions.avatarProfile,
-                              height: AppDimensions.avatarProfile,
-                              decoration: BoxDecoration(
-                                color: AppTheme.primaryColor.withValues(
-                                  alpha: 0.08,
-                                ),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.receipt_long_outlined,
-                                size: AppDimensions.iconDisplay,
-                                color: AppTheme.primaryColor.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppDimensions.spacing24),
-                            Text(
-                              'لا توجد طلبات',
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontDisplay3,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.textPrimaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: AppDimensions.spacing8),
-                            Text(
-                              'ستظهر الطلبات هنا عند استلامها',
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontBody,
-                                color: AppTheme.textSecondaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: AppDimensions.spacing16),
-                            Text(
-                              'اسحب للأسفل للتحديث',
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontCaption,
-                                color: AppTheme.textHintColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-              ),
+              onPressed: () {
+                _showFilterBottomSheet(context);
+              },
+            ),
+          ],
+          bottom: const TabBar(
+            isScrollable: true,
+            indicatorColor: AppTheme.primaryColor,
+            labelColor: AppTheme.primaryColor,
+            unselectedLabelColor: AppTheme.textSecondaryColor,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            tabs: [
+              Tab(text: 'إدارة الطلبات'),
+              Tab(text: 'الطلبات الخاصة'),
+              Tab(text: 'إعدادات الطلبات'),
+              Tab(text: 'تخصيص الفاتورة'),
             ],
           ),
         ),
+        body: TabBarView(
+          children: [
+            // 1) إدارة الطلبات (المحتوى الأصلي)
+            _buildOrdersContent(),
+            // 2) الطلبات الخاصة
+            _buildPlaceholder('الطلبات الخاصة'),
+            // 3) إعدادات الطلبات
+            _buildPlaceholder('إعدادات الطلبات'),
+            // 4) تخصيص الفاتورة
+            _buildPlaceholder('تخصيص الفاتورة'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrdersContent() {
+    return RefreshIndicator(
+      onRefresh: _refreshOrders,
+      color: AppTheme.accentColor,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            // كرت الطلبات الخاصة
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: _buildSpecialOrdersCard(context),
+            ),
+            // كرت طلبات التوريد (للمورد)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildSupplierOrdersCard(context),
+            ),
+            const SizedBox(height: 16),
+            // محتوى الطلبات
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: _isLoading
+                  ? const SkeletonOrdersList()
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: AppDimensions.avatarProfile,
+                            height: AppDimensions.avatarProfile,
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.08,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.receipt_long_outlined,
+                              size: AppDimensions.iconDisplay,
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppDimensions.spacing24),
+                          Text(
+                            'لا توجد طلبات',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontDisplay3,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: AppDimensions.spacing8),
+                          Text(
+                            'ستظهر الطلبات هنا عند استلامها',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontBody,
+                              color: AppTheme.textSecondaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: AppDimensions.spacing16),
+                          Text(
+                            'اسحب للأسفل للتحديث',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontCaption,
+                              color: AppTheme.textHintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(String title) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.build_circle_outlined, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text('قريباً...', style: TextStyle(color: Colors.grey[500])),
+          // TODO: Implement $title screen
+        ],
       ),
     );
   }
@@ -179,6 +250,70 @@ class _OrdersTabState extends State<OrdersTab> {
                     const SizedBox(height: 2),
                     Text(
                       'طلبات مخصصة من العملاء',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// كرت طلبات التوريد - للمورد
+  Widget _buildSupplierOrdersCard(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: () => context.push('/dashboard/supplier-orders'),
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.local_shipping_outlined,
+                  size: 26,
+                  color: Colors.orange,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'طلبات التوريد',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'طلبات دروب شوبينق للتجهيز',
                       style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],

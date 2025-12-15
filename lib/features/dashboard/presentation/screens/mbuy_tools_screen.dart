@@ -17,6 +17,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
   bool _isGenerating = false;
   String _statusMessage = '';
   String? _generatedImageUrl;
+  String? _selectedSectionKey;
 
   final Map<String, List<Map<String, dynamic>>> _sections = {
     'التحليلات و التقارير': [
@@ -77,7 +78,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         'badge': 'AI',
       },
     ],
-    'توليد / تحليل نصوص': [
+    'توليد/تحليل نصوص': [
       {
         'title': 'وصف منتجات',
         'icon': Icons.description,
@@ -155,7 +156,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         'badge': 'AI',
       },
     ],
-    'المساعد الذكي': [
+    'وكلاء الذكاء الاصطناعي': [
       {
         'title': 'مساعد شخصي',
         'icon': Icons.person,
@@ -181,37 +182,12 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         'badge': 'AI',
       },
     ],
-    'الأساسية': [
+    'الأدوات الأساسية': [
       {'title': 'تخصيص CSS/JS', 'icon': Icons.code, 'taskType': 'basic_css_js'},
-      {
-        'title': 'عملات متعددة',
-        'icon': Icons.currency_exchange,
-        'taskType': 'basic_multi_currency',
-      },
       {
         'title': 'محادثة موحدة',
         'icon': Icons.chat_bubble,
         'taskType': 'basic_unified_chat',
-      },
-      {
-        'title': 'سلة متروكة',
-        'icon': Icons.shopping_basket,
-        'taskType': 'basic_abandoned_cart',
-      },
-      {
-        'title': 'تخصيص الدفع',
-        'icon': Icons.payment,
-        'taskType': 'basic_payment',
-      },
-      {
-        'title': 'تخصيص الشحن',
-        'icon': Icons.local_shipping,
-        'taskType': 'basic_shipping',
-      },
-      {
-        'title': 'تخصيص العملاء',
-        'icon': Icons.people_outline,
-        'taskType': 'basic_customers',
       },
     ],
   };
@@ -230,25 +206,14 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSubPageHeader(context, 'أدوات MBuy'),
-            _buildBanner(),
-            const SizedBox(height: AppDimensions.spacing20),
-            ..._sections.entries.map((entry) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacing16,
-                    ),
-                    child: MbuySectionTitle(title: entry.key),
-                  ),
-                  const SizedBox(height: AppDimensions.spacing10),
-                  _buildSectionGrid(entry.value),
-                  const SizedBox(height: AppDimensions.spacing20),
-                ],
-              );
-            }),
+            _buildSubPageHeader(context, 'أدوات الذكاء الاصطناعي'),
+            if (_selectedSectionKey == null) ...[
+              _buildBanner(),
+              const SizedBox(height: AppDimensions.spacing20),
+              _buildSectionsGrid(),
+            ] else ...[
+              _buildSelectedSection(),
+            ],
           ],
         ),
       ),
@@ -272,7 +237,7 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 Text(
-                  'أدوات MBuy الذكية',
+                  'أدوات الذكاء الاصطناعي',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: AppDimensions.fontH2,
@@ -292,6 +257,116 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionsGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
+      mainAxisSpacing: AppDimensions.spacing16,
+      crossAxisSpacing: AppDimensions.spacing16,
+      children: _sections.keys.map((sectionKey) {
+        return _buildSectionTile(sectionKey);
+      }).toList(),
+    );
+  }
+
+  Widget _buildSectionTile(String title) {
+    IconData icon;
+    Color color;
+
+    switch (title) {
+      case 'التحليلات و التقارير':
+        icon = Icons.analytics;
+        color = Colors.blue;
+        break;
+      case 'توليد/تحليل نصوص':
+        icon = Icons.text_fields;
+        color = Colors.green;
+        break;
+      case 'وكلاء الذكاء الاصطناعي':
+        icon = Icons.smart_toy;
+        color = Colors.purple;
+        break;
+      case 'الأدوات الأساسية':
+        icon = Icons.build;
+        color = Colors.orange;
+        break;
+      default:
+        icon = Icons.category;
+        color = Colors.grey;
+    }
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 2,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedSectionKey = title;
+          });
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 32),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectedSection() {
+    final tools = _sections[_selectedSectionKey] ?? [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing16,
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    _selectedSectionKey = null;
+                  });
+                },
+              ),
+              Text(
+                _selectedSectionKey!,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppDimensions.spacing10),
+        _buildSectionGrid(tools),
+        const SizedBox(height: AppDimensions.spacing20),
+      ],
     );
   }
 
