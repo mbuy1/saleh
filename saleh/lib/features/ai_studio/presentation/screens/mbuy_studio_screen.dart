@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/mbuy_studio_service.dart';
@@ -17,41 +18,48 @@ class MbuyStudioScreen extends ConsumerStatefulWidget {
 
 class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   final TextEditingController _promptController = TextEditingController();
+  final TextEditingController _promptOptionalController =
+      TextEditingController();
   bool _isGenerating = false;
   String _statusMessage = '';
   String? _generatedImageUrl;
   int _currentBannerPage = 0;
+  String? _selectedDesignType; // للتصنيف المحدد في Pro/Premium
 
   @override
   void dispose() {
     _promptController.dispose();
+    _promptOptionalController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      initialIndex: 0,
-      child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
-        body: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: AppDimensions.spacing8),
-              _buildTabBar(),
-              Expanded(
-                child: TabBarView(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            // Purple Gradient Header with Search
+            SliverToBoxAdapter(child: _buildGradientHeader(context)),
+            // Main Content (White Background)
+            SliverToBoxAdapter(
+              child: Container(
+                color: Colors.white,
+                child: Column(
                   children: [
-                    _buildFreeTab(),
-                    _buildProTab(),
-                    _buildPremiumTab(),
+                    // C) Big Cards Grid (2 columns)
+                    _buildBigCardsSection(context),
+                    // D) Recent Projects
+                    _buildRecentProjectsSection(),
+                    // E) Tools Grid (3 columns)
+                    _buildToolsGridSection(context),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -80,7 +88,7 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
           borderRadius: AppDimensions.borderRadiusL,
         ),
         tabs: const [
-          Tab(text: 'مجاني'),
+          Tab(text: 'Free'),
           Tab(text: 'Pro'),
           Tab(text: 'Premium'),
         ],
@@ -90,15 +98,22 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
 
   Widget _buildFreeTab() {
     return SingleChildScrollView(
+      padding: AppDimensions.screenPaddingHorizontalOnly,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppDimensions.spacing16),
-          _buildHeroBanner(),
-          const SizedBox(height: AppDimensions.spacing24),
           _buildSectionTitle('قوالب جاهزة'),
           const SizedBox(height: AppDimensions.spacing12),
           _buildFreeTemplates(),
+          const SizedBox(height: AppDimensions.spacing24),
+          _buildSectionTitle('صور منتجات'),
+          const SizedBox(height: AppDimensions.spacing12),
+          _buildProductImagesGrid(),
+          const SizedBox(height: AppDimensions.spacing24),
+          _buildSectionTitle('بانرات'),
+          const SizedBox(height: AppDimensions.spacing12),
+          _buildBannersGrid(),
           const SizedBox(height: AppDimensions.spacing32),
         ],
       ),
@@ -107,16 +122,17 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
 
   Widget _buildProTab() {
     return SingleChildScrollView(
+      padding: AppDimensions.screenPaddingHorizontalOnly,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppDimensions.spacing24),
-          _buildMainCategories(),
+          _buildProCategories(),
           const SizedBox(height: AppDimensions.spacing24),
-          _buildSectionTitle('تطبيقات سريعة'),
-          const SizedBox(height: AppDimensions.spacing12),
-          _buildQuickApps(),
-          const SizedBox(height: AppDimensions.spacing32),
+          if (_generatedImageUrl != null) ...[
+            _buildGeneratedResult(),
+            const SizedBox(height: AppDimensions.spacing24),
+          ],
         ],
       ),
     );
@@ -124,16 +140,17 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
 
   Widget _buildPremiumTab() {
     return SingleChildScrollView(
+      padding: AppDimensions.screenPaddingHorizontalOnly,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppDimensions.spacing24),
-          _buildSectionTitle('أدوات متقدمة'),
-          const SizedBox(height: AppDimensions.spacing12),
-          _build3DModels(),
+          _buildPremiumCategories(),
           const SizedBox(height: AppDimensions.spacing24),
-          _buildNanoBananaCard(),
-          const SizedBox(height: AppDimensions.spacing32),
+          if (_generatedImageUrl != null) ...[
+            _buildGeneratedResult(),
+            const SizedBox(height: AppDimensions.spacing24),
+          ],
         ],
       ),
     );
@@ -175,72 +192,703 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  // Purple Gradient Header - Matching Image
+  Widget _buildGradientHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing16,
-        vertical: AppDimensions.spacing12,
-      ),
-      child: Row(
+      decoration: const BoxDecoration(gradient: AppTheme.headerBannerGradient),
+      child: Column(
         children: [
-          // زر الرجوع
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimensions.spacing8),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconS,
-                color: AppTheme.primaryColor,
-              ),
-            ),
-          ),
-          const Spacer(),
-          // العنوان
-          const Text(
-            'MBUY Studio',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontHeadline,
-              color: AppTheme.textPrimaryColor,
-            ),
-          ),
-          const Spacer(),
-          // رصيد AI
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacing10,
-              vertical: AppDimensions.spacing6,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.accentColor,
-              borderRadius: AppDimensions.borderRadiusL,
-            ),
+          // Search Icon (Top Left)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  '8',
-                  style: TextStyle(
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.search,
+                    size: 20,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppDimensions.fontBody,
                   ),
                 ),
-                const SizedBox(width: AppDimensions.spacing4),
-                Icon(
-                  Icons.auto_awesome,
-                  color: Colors.white,
-                  size: AppDimensions.iconXS,
+                const Spacer(),
+              ],
+            ),
+          ),
+          // Promo Chip
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.diamond, size: 16, color: Colors.white),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'جرب خطة Pro لمدة 7 يوم مقابل 0 ريال',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Banana Image Placeholder + Text
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              children: [
+                // Banana placeholder
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text('🍌', style: TextStyle(fontSize: 60)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // AI Tools Title
+                const Text(
+                  'أدوات الصور المدعومة بالذكاء الاصطناعي',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                // Powered by Nano Banana Pro
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'مدعومة من',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to Nano Banana info
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Nano Banana Pro',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_back_ios,
+                            size: 12,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // C) Big Cards Section
+  Widget _buildBigCardsSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildBigCard(
+              context: context,
+              title: 'تعديل الصورة',
+              icon: Icons.image_outlined,
+              hasProBadge: true,
+              onTap: () => _openImageEdit(context),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildBigCard(
+              context: context,
+              title: 'فيديو جديد',
+              icon: Icons.add_circle_outline,
+              isVideo: true,
+              onTap: () => _openVideoNew(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBigCard({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    bool hasProBadge = false,
+    bool isVideo = false,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.grey[50],
+          ),
+          child: AspectRatio(
+            aspectRatio: 1.7,
+            child: Stack(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (isVideo)
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                        ),
+                        child: Icon(
+                          icon,
+                          size: 28,
+                          color: AppTheme.primaryColor,
+                        ),
+                      )
+                    else
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(icon, size: 48, color: AppTheme.primaryColor),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Icon(
+                              Icons.auto_awesome,
+                              size: 16,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 12),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimaryColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                if (hasProBadge)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, size: 10, color: Colors.white),
+                          const SizedBox(width: 2),
+                          const Text(
+                            'Pro',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (hasProBadge)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, size: 10, color: Colors.white),
+                          const SizedBox(width: 2),
+                          const Text(
+                            'Nar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // D) Recent Projects Section
+  Widget _buildRecentProjectsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: const Text(
+            'المشاريع الأخيرة',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 74,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 74,
+                margin: EdgeInsets.only(right: index < 3 ? 10 : 0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Stack(
+                  children: [
+                    // Placeholder image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 32,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ),
+                    // Overlay icons/numbers
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Icon(
+                              Icons.play_arrow,
+                              size: 10,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 3,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '${1000 + index * 10}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  // E) Tools Grid Section
+  Widget _buildToolsGridSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.95,
+        ),
+        itemCount: 9,
+        itemBuilder: (context, index) => _buildToolTile(context, index),
+      ),
+    );
+  }
+
+  Widget _buildToolTile(BuildContext context, int index) {
+    final tools = [
+      {'title': 'المساحة', 'icon': Icons.cloud_outlined, 'hasPro': false},
+      {
+        'title': 'التنميق',
+        'icon': Icons.auto_fix_high_outlined,
+        'hasPro': false,
+      },
+      {'title': 'AutoCut', 'icon': Icons.play_circle_outline, 'hasPro': false},
+      {
+        'title': 'أدوات الصور',
+        'icon': Icons.camera_alt_outlined,
+        'hasPro': false,
+      },
+      {
+        'title': 'التحسين التلقائي',
+        'icon': Icons.auto_awesome_outlined,
+        'hasPro': false,
+      },
+      {
+        'title': 'أداة تعديل سطح المكتب',
+        'icon': Icons.desktop_windows_outlined,
+        'hasPro': true,
+      },
+      {
+        'title': 'الشرح التلقائي',
+        'icon': Icons.subtitles_outlined,
+        'hasPro': false,
+      },
+      {'title': 'إزالة الخلفية', 'icon': Icons.person_outline, 'hasPro': false},
+      {
+        'title': 'أدوات التسويق',
+        'icon': Icons.shopping_bag_outlined,
+        'hasPro': false,
+      },
+    ];
+
+    final tool = tools[index];
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => _openTool(context, tool['title'] as String),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+          ),
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    tool['icon'] as IconData,
+                    size: 26,
+                    color: AppTheme.primaryColor,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    tool['title'] as String,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              if (tool['hasPro'] == true)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF60A5FA),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'خطة Pro',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Navigation methods
+  void _openImageEdit(BuildContext context) {
+    // Open Pro/Premium tab or selection screen
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'اختر نوع التعديل',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.star_outline, color: Colors.orange),
+              title: const Text('Pro - تعديل بجودة عادية'),
+              onTap: () {
+                Navigator.pop(context);
+                _showProGeneration(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.star, color: Colors.amber),
+              title: const Text('Premium - تعديل احترافي'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPremiumGeneration(context);
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openVideoNew(BuildContext context) {
+    context.push('/dashboard/feature/${Uri.encodeComponent('فيديو جديد')}');
+  }
+
+  void _openTool(BuildContext context, String toolName) {
+    // Map tools to existing screens or placeholder
+    final toolRoutes = {
+      'أدوات التسويق': '/dashboard/marketing',
+      'تعديل الصور AI': '/dashboard/studio',
+    };
+
+    final route = toolRoutes[toolName];
+    if (route != null) {
+      context.push(route);
+    } else {
+      context.push('/dashboard/feature/${Uri.encodeComponent(toolName)}');
+    }
+  }
+
+  void _showProGeneration(BuildContext context) {
+    // Show Pro generation form
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'توليد تصميم (Pro)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _promptController,
+              decoration: const InputDecoration(
+                labelText: 'اسم/نوع المنتج',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _promptOptionalController,
+              decoration: const InputDecoration(
+                labelText: 'Prompt (اختياري)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _startProGeneration();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('توليد'),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPremiumGeneration(BuildContext context) {
+    // Show Premium generation form
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'توليد احترافي (Premium)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _promptController,
+              decoration: const InputDecoration(
+                labelText: 'اسم/نوع المنتج',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _promptOptionalController,
+              decoration: const InputDecoration(
+                labelText: 'Prompt (اختياري)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _startPremiumGeneration();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.accentColor,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('توليد'),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -440,7 +1088,11 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
       color: AppTheme.surfaceColor,
       borderRadius: AppDimensions.borderRadiusM,
       child: InkWell(
-        onTap: () => _showGenerateDialog(taskType: category.taskType),
+        onTap: () {
+          setState(() {
+            _selectedDesignType = category.taskType;
+          });
+        },
         borderRadius: AppDimensions.borderRadiusM,
         child: Container(
           padding: const EdgeInsets.all(AppDimensions.spacing12),
@@ -727,37 +1379,476 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: AppDimensions.screenPaddingHorizontalOnly,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: AppDimensions.spacing12,
         mainAxisSpacing: AppDimensions.spacing12,
-        childAspectRatio: 1.2,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return _buildFreeItemCard(
+          title: 'قالب ${index + 1}',
+          icon: Icons.image_outlined,
+          onTap: () => _useTemplate(index),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductImagesGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: AppDimensions.spacing12,
+        mainAxisSpacing: AppDimensions.spacing12,
+        childAspectRatio: 0.85,
       ),
       itemCount: 4,
       itemBuilder: (context, index) {
-        return Container(
+        return _buildFreeItemCard(
+          title: 'صورة منتج ${index + 1}',
+          icon: Icons.shopping_bag_outlined,
+          onTap: () => _downloadImage(index),
+        );
+      },
+    );
+  }
+
+  Widget _buildBannersGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: AppDimensions.spacing12,
+        mainAxisSpacing: AppDimensions.spacing12,
+        childAspectRatio: 1.3,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return _buildFreeItemCard(
+          title: 'بانر ${index + 1}',
+          icon: Icons.campaign_outlined,
+          onTap: () => _useBanner(index),
+        );
+      },
+    );
+  }
+
+  Widget _buildFreeItemCard({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: AppTheme.surfaceColor,
+      borderRadius: AppDimensions.borderRadiusM,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppDimensions.borderRadiusM,
+        child: Container(
           decoration: BoxDecoration(
             color: Colors.grey[100],
             borderRadius: AppDimensions.borderRadiusM,
             border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.image_outlined, color: Colors.grey[400], size: 32),
-              const SizedBox(height: 8),
-              Text(
-                'قالب ${index + 1}',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: AppDimensions.fontCaption,
+              // Preview placeholder
+              Expanded(
+                flex: 3,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(AppDimensions.radiusM),
+                    ),
+                  ),
+                  child: Icon(icon, color: Colors.grey[600], size: 40),
+                ),
+              ),
+              // Title and button
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: AppDimensions.fontCaption,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        height: 28,
+                        child: ElevatedButton.icon(
+                          onPressed: onTap,
+                          icon: const Icon(Icons.download, size: 14),
+                          label: const Text(
+                            'استخدام',
+                            style: TextStyle(fontSize: 11),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            minimumSize: const Size(0, 28),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProCategories() {
+    final categories = [
+      _CategoryItem(
+        title: 'صورة منتج',
+        taskType: 'product_image',
+        icon: Icons.image_outlined,
+        color: AppTheme.infoColor,
+      ),
+      _CategoryItem(
+        title: 'بانر',
+        taskType: 'banner',
+        icon: Icons.campaign_outlined,
+        color: AppTheme.accentColor,
+      ),
+      _CategoryItem(
+        title: 'تصميم سوشيال',
+        taskType: 'social_design',
+        icon: Icons.share_outlined,
+        color: AppTheme.successColor,
+      ),
+      _CategoryItem(
+        title: 'خلفية/دمج',
+        taskType: 'background_merge',
+        icon: Icons.layers_outlined,
+        color: AppTheme.warningColor,
+      ),
+    ];
+
+    return Column(
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: AppDimensions.spacing12,
+            mainAxisSpacing: AppDimensions.spacing12,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            return _buildCategoryCard(categories[index]);
+          },
+        ),
+        const SizedBox(height: AppDimensions.spacing24),
+        _buildProInputForm(),
+      ],
+    );
+  }
+
+  Widget _buildPremiumCategories() {
+    final categories = [
+      _CategoryItem(
+        title: 'صورة احترافية',
+        taskType: 'professional_image',
+        icon: Icons.high_quality_outlined,
+        color: AppTheme.infoColor,
+      ),
+      _CategoryItem(
+        title: 'إعلان',
+        taskType: 'advertisement',
+        icon: Icons.ads_click_outlined,
+        color: AppTheme.accentColor,
+      ),
+      _CategoryItem(
+        title: 'دمج مشهد',
+        taskType: 'scene_merge',
+        icon: Icons.landscape_outlined,
+        color: AppTheme.successColor,
+      ),
+      _CategoryItem(
+        title: 'فيديو قصير',
+        taskType: 'short_video',
+        icon: Icons.video_library_outlined,
+        color: AppTheme.warningColor,
+      ),
+    ];
+
+    return Column(
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: AppDimensions.spacing12,
+            mainAxisSpacing: AppDimensions.spacing12,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            return _buildCategoryCard(categories[index]);
+          },
+        ),
+        const SizedBox(height: AppDimensions.spacing24),
+        _buildPremiumInputForm(),
+      ],
+    );
+  }
+
+  Widget _buildProInputForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'توليد تصميم (Pro - Cloudflare)',
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            TextField(
+              controller: _promptController,
+              decoration: const InputDecoration(
+                labelText: 'اسم/نوع المنتج',
+                hintText: 'مثال: قهوة عربية',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            TextField(
+              controller: _promptOptionalController,
+              decoration: const InputDecoration(
+                labelText: 'Prompt (اختياري)',
+                hintText: 'وصف التصميم المطلوب...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppDimensions.spacing16),
+            if (_isGenerating) ...[
+              const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: AppDimensions.spacing8),
+              Text(
+                _statusMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.textSecondaryColor),
+              ),
+            ] else
+              ElevatedButton(
+                onPressed: () => _startProGeneration(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text('توليد'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumInputForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'توليد احترافي (Premium - Nano Banana)',
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            TextField(
+              controller: _promptController,
+              decoration: const InputDecoration(
+                labelText: 'اسم/نوع المنتج',
+                hintText: 'مثال: قهوة عربية',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            TextField(
+              controller: _promptOptionalController,
+              decoration: const InputDecoration(
+                labelText: 'Prompt (اختياري)',
+                hintText: 'وصف التصميم المطلوب...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppDimensions.spacing16),
+            if (_isGenerating) ...[
+              const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: AppDimensions.spacing8),
+              Text(
+                _statusMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.textSecondaryColor),
+              ),
+            ] else
+              ElevatedButton(
+                onPressed: () => _startPremiumGeneration(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.accentColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text('توليد'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGeneratedResult() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'النتيجة',
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            if (_generatedImageUrl != null)
+              ClipRRect(
+                borderRadius: AppDimensions.borderRadiusM,
+                child: Image.network(
+                  _generatedImageUrl!,
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 300,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.error_outline, size: 48),
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: AppDimensions.spacing12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _saveResult(),
+                    icon: const Icon(Icons.save),
+                    label: const Text('حفظ'),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.spacing12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _downloadResult(),
+                    icon: const Icon(Icons.download),
+                    label: const Text('تحميل'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _useTemplate(int index) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('تم استخدام القالب ${index + 1}'),
+        backgroundColor: AppTheme.successColor,
+      ),
+    );
+  }
+
+  void _downloadImage(int index) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('تم تحميل صورة المنتج ${index + 1}'),
+        backgroundColor: AppTheme.successColor,
+      ),
+    );
+  }
+
+  void _useBanner(int index) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('تم استخدام البانر ${index + 1}'),
+        backgroundColor: AppTheme.successColor,
+      ),
+    );
+  }
+
+  void _saveResult() {
+    // TODO: حفظ النتيجة في نظام الميديا
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تم حفظ النتيجة'),
+        backgroundColor: AppTheme.successColor,
+      ),
+    );
+  }
+
+  void _downloadResult() {
+    // TODO: تحميل النتيجة
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تم تحميل النتيجة'),
+        backgroundColor: AppTheme.successColor,
+      ),
     );
   }
 
@@ -931,10 +2022,14 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
                 height: AppDimensions.buttonHeightXL,
                 child: ElevatedButton(
                   onPressed: () {
+                    Navigator.pop(context);
                     if (taskType == 'nano_banana') {
-                      _startNanoBananaGeneration();
+                      _startPremiumGeneration();
                     } else {
-                      _startCloudflareGeneration(taskType);
+                      setState(() {
+                        _selectedDesignType = taskType;
+                      });
+                      _startProGeneration();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -962,11 +2057,11 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     );
   }
 
-  Future<void> _startCloudflareGeneration(String taskType) async {
+  Future<void> _startProGeneration() async {
     if (_promptController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('الرجاء كتابة وصف للمحتوى'),
+          content: const Text('الرجاء كتابة اسم/نوع المنتج'),
           backgroundColor: AppTheme.errorColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -979,23 +2074,37 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
 
     setState(() {
       _isGenerating = true;
-      _statusMessage = 'جاري الإبداع...';
+      _statusMessage = 'جاري توليد التصميم عبر Cloudflare...';
       _generatedImageUrl = null;
     });
 
     try {
       final service = ref.read(mbuyStudioServiceProvider);
-      final result = await service.generateCloudflareContent(
-        taskType: taskType,
-        prompt: _promptController.text,
+      final result = await service.generateDesign(
+        tier: 'pro',
+        productName: _promptController.text,
+        prompt: _promptOptionalController.text.isNotEmpty
+            ? _promptOptionalController.text
+            : null,
+        action: 'generate_design',
+        designType: _selectedDesignType ?? 'product_image',
       );
 
       if (!mounted) return;
       setState(() {
         _isGenerating = false;
-        _statusMessage = 'تم الانتهاء!';
-        if (result['result'] != null && result['result']['image'] != null) {
-          _generatedImageUrl = result['result']['image'];
+        if (result['ok'] == true || result['success'] == true) {
+          _statusMessage = 'تم الانتهاء!';
+          final data = result['data'] ?? result['result'] ?? result;
+          if (data['image'] != null) {
+            _generatedImageUrl = data['image'];
+          } else if (data is String && data.startsWith('data:image')) {
+            _generatedImageUrl = data;
+          } else if (data['url'] != null) {
+            _generatedImageUrl = data['url'];
+          }
+        } else {
+          _statusMessage = result['error'] ?? 'حدث خطأ غير معروف';
         }
       });
     } catch (e) {
@@ -1004,46 +2113,123 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
         _isGenerating = false;
         _statusMessage = 'حدث خطأ: $e';
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطأ: $e'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
     }
   }
 
-  Future<void> _startNanoBananaGeneration() async {
+  Future<void> _startPremiumGeneration() async {
     if (_promptController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('الرجاء كتابة وصف للمحتوى')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('الرجاء كتابة اسم/نوع المنتج'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
       return;
     }
 
     setState(() {
       _isGenerating = true;
-      _statusMessage = 'جاري بدء المهمة مع Nano Banana...';
+      _statusMessage = 'جاري توليد التصميم الاحترافي عبر Nano Banana...';
       _generatedImageUrl = null;
     });
 
     try {
       final service = ref.read(mbuyStudioServiceProvider);
-      final taskId = await service.generate(_promptController.text);
+      final result = await service.generateDesign(
+        tier: 'premium',
+        productName: _promptController.text,
+        prompt: _promptOptionalController.text.isNotEmpty
+            ? _promptOptionalController.text
+            : null,
+        action: 'generate_design',
+        designType: _selectedDesignType ?? 'professional_image',
+      );
 
       if (!mounted) return;
-      setState(() {
-        _statusMessage = 'تم بدء المهمة ($taskId). جاري المعالجة...';
-      });
 
-      // Simple polling simulation for demo/minimal patch
-      await Future.delayed(const Duration(seconds: 2));
+      // إذا كان هناك taskId، نبدأ polling
+      if (result['taskId'] != null) {
+        final taskId = result['taskId'] as String;
+        setState(() {
+          _statusMessage = 'تم بدء المهمة ($taskId). جاري المعالجة...';
+        });
 
-      if (!mounted) return;
-      setState(() {
-        _isGenerating = false;
-        _statusMessage = 'تم إرسال الطلب بنجاح (ID: $taskId)';
-      });
+        // Polling للحصول على النتيجة
+        int attempts = 0;
+        while (attempts < 10 && mounted) {
+          await Future.delayed(const Duration(seconds: 2));
+          attempts++;
+
+          try {
+            final taskInfo = await service.getTask(taskId);
+            if (taskInfo['status'] == 'completed' &&
+                taskInfo['result'] != null) {
+              final results = taskInfo['result'] as List?;
+              if (results != null && results.isNotEmpty) {
+                if (!mounted) return;
+                setState(() {
+                  _isGenerating = false;
+                  _statusMessage = 'تم الانتهاء!';
+                  _generatedImageUrl = results.first as String?;
+                });
+                return;
+              }
+            } else if (taskInfo['status'] == 'failed') {
+              if (!mounted) return;
+              setState(() {
+                _isGenerating = false;
+                _statusMessage = 'فشل التوليد';
+              });
+              return;
+            }
+          } catch (e) {
+            // Continue polling
+          }
+        }
+
+        if (!mounted) return;
+        setState(() {
+          _isGenerating = false;
+          _statusMessage = 'انتهت محاولات الاستعلام';
+        });
+      } else if (result['ok'] == true || result['success'] == true) {
+        // نتيجة مباشرة
+        setState(() {
+          _isGenerating = false;
+          _statusMessage = 'تم الانتهاء!';
+          final data = result['data'] ?? result['result'] ?? result;
+          if (data['image'] != null) {
+            _generatedImageUrl = data['image'];
+          } else if (data is String && data.startsWith('data:image')) {
+            _generatedImageUrl = data;
+          } else if (data['url'] != null) {
+            _generatedImageUrl = data['url'];
+          }
+        });
+      } else {
+        setState(() {
+          _isGenerating = false;
+          _statusMessage = result['error'] ?? 'حدث خطأ غير معروف';
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isGenerating = false;
         _statusMessage = 'حدث خطأ: $e';
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطأ: ${e.toString()}'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
     }
   }
 

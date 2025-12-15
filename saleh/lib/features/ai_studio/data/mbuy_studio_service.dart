@@ -55,6 +55,39 @@ class MbuyStudioService {
     }
   }
 
+  /// توليد تصميم حسب tier (Pro أو Premium)
+  Future<Map<String, dynamic>> generateDesign({
+    required String tier, // 'pro' or 'premium'
+    required String productName,
+    String? prompt,
+    String? action, // 'generate_design'
+    String? designType, // 'product_image', 'banner', etc.
+  }) async {
+    final body = {
+      'tier': tier,
+      'productName': productName,
+      'action': action ?? 'generate_design',
+      'provider': tier == 'pro' ? 'cloudflare' : 'nano_banana',
+    };
+
+    if (prompt != null && prompt.isNotEmpty) {
+      body['prompt'] = prompt;
+    }
+
+    if (designType != null) {
+      body['designType'] = designType;
+    }
+
+    final response = await _apiService.post('/secure/ai/generate', body: body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      final errorBody = response.body;
+      throw Exception('Failed to generate design: $errorBody');
+    }
+  }
+
   Future<Map<String, dynamic>> getAnalytics(String type) async {
     final response = await _apiService.get(
       '/secure/analytics',

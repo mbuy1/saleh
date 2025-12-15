@@ -87,6 +87,26 @@ class ApiService {
     });
   }
 
+  /// PATCH request
+  Future<http.Response> patch(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    final uri = _buildUri(path, null);
+    final mergedHeaders = await _withAuthHeaders(headers);
+    mergedHeaders['Content-Type'] = 'application/json';
+
+    return _makeRequest(() async {
+      final request = http.Request('PATCH', uri);
+      request.headers.addAll(mergedHeaders);
+      if (body != null) {
+        request.body = jsonEncode(body);
+      }
+      return await http.Response.fromStream(await http.Client().send(request));
+    });
+  }
+
   /// DELETE request
   Future<http.Response> delete(
     String path, {

@@ -28,10 +28,19 @@ class AppTheme {
   // E-commerce Color Palette (Amazon/Noon/Shopify Inspired)
   // ============================================================================
 
-  // === Primary Colors (Deep Blue - Trust & Authority) ===
-  static const Color primaryColor = Color(0xFF1E3A5F); // Deep Navy Blue
-  static const Color primaryLight = Color(0xFF4A6FA5);
-  static const Color primaryDark = Color(0xFF0D2137);
+  // === Primary Colors (Blue - From FAB Button) ===
+  static const Color primaryColor = Color(
+    0xFF2563EB,
+  ); // Blue - Main color from FAB
+  static const Color primaryLight = Color(0xFF3B82F6); // Blue-500
+  static const Color primaryDark = Color(0xFF1D4ED8); // Blue-700
+
+  // === Purple Colors (Reduced Usage) ===
+  static const Color purpleColor = Color(
+    0xFF9333EA,
+  ); // Purple-600 (Limited use)
+  static const Color purpleLight = Color(0xFFA855F7);
+  static const Color purpleDark = Color(0xFF7C3AED);
 
   // === Secondary Colors (Teal - Fresh & Modern) ===
   static const Color secondaryColor = Color(0xFF00B4B4); // Shopping Teal
@@ -43,20 +52,46 @@ class AppTheme {
   static const Color accentLight = Color(0xFFFF9A6C);
   static const Color accentDark = Color(0xFFE54D1B);
 
-  // === Background & Surface (Light Mode) ===
-  static const Color backgroundColor = Color(0xFFF5F5F5);
-  static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color cardColor = Color(0xFFFFFFFF);
+  // === Background & Surface (Light Mode) - Metallic Slate Theme ===
+  static const Color backgroundColor = Color(
+    0xFFF1F5F9,
+  ); // Slate-100 - Cool grey/lead tone
+  static const Color surfaceColor = Color(0xFFFFFFFF); // White
+  static const Color cardColor = Color(
+    0xFFFFFFFF,
+  ); // White (will use gradient in cards)
+
+  // === Metallic Slate Colors (matching image exactly) ===
+  static const Color slate100 = Color(
+    0xFFF1F5F9,
+  ); // Background with slight purple tint
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate300 = Color(0xFFCBD5E1); // Metallic edge border
+  static const Color slate400 = Color(0xFF94A3B8); // Inactive icons
+  static const Color slate600 = Color(0xFF7C3AED); // Purple-600 (Active color)
+  static const Color darkSlate = Color(
+    0xFF0F172A,
+  ); // Headings & Icons (dark slate grey)
+  static const Color mutedSlate = Color(
+    0xFF64748B,
+  ); // Body text & Inactive icons
+  static const Color slate700 = Color(
+    0xFF334155,
+  ); // Dark charcoal for ad banners
 
   // === Background & Surface (Dark Mode) ===
   static const Color backgroundColorDark = Color(0xFF121212);
   static const Color surfaceColorDark = Color(0xFF1E1E1E);
   static const Color cardColorDark = Color(0xFF2D2D2D);
 
-  // === Text Colors (Light Mode) ===
-  static const Color textPrimaryColor = Color(0xFF1A1A1A);
-  static const Color textSecondaryColor = Color(0xFF666666);
-  static const Color textHintColor = Color(0xFF999999);
+  // === Text Colors (Light Mode) - Metallic Slate Theme ===
+  static const Color textPrimaryColor = Color(
+    0xFF0F172A,
+  ); // Dark Slate - Headings
+  static const Color textSecondaryColor = Color(
+    0xFF64748B,
+  ); // Muted Slate - Body text
+  static const Color textHintColor = Color(0xFF94A3B8); // Slate-400
 
   // === Text Colors (Dark Mode) ===
   static const Color textPrimaryColorDark = Color(0xFFEEEEEE);
@@ -83,9 +118,21 @@ class AppTheme {
   static const Color fastDeliveryColor = Color(0xFF17A2B8);
   static const Color verifiedSellerColor = Color(0xFF6F42C1);
 
-  // === Divider & Border ===
-  static const Color dividerColor = Color(0xFFE0E0E0);
-  static const Color borderColor = Color(0xFFD0D0D0);
+  // === Pro Badge Colors (from image) ===
+  static const Color proBadgeColor = Color(
+    0xFF2563EB,
+  ); // Blue for "جرب خطة Pro"
+  static const Color proLabelColor = Color(
+    0xFF0EA5E9,
+  ); // Sky Blue for "خطة Pro" label
+
+  // === Divider & Border - Metallic Edge ===
+  static const Color dividerColor = Color(
+    0xFFCBD5E1,
+  ); // Slate-300 - Metallic edge
+  static const Color borderColor = Color(
+    0xFFCBD5E1,
+  ); // Slate-300 - Metallic edge
   static const Color dividerColorDark = Color(0xFF404040);
   static const Color borderColorDark = Color(0xFF505050);
 
@@ -103,12 +150,12 @@ class AppTheme {
     end: Alignment.bottomRight,
   );
 
-  // Metallic Modern Gradient for FAB (Orange CTA)
+  // Metallic Modern Gradient for FAB (Blue Gradient) - Main color
   static const LinearGradient metallicGradient = LinearGradient(
     colors: [
-      Color(0xFFFF6B35), // Orange
-      Color(0xFFFF8C5A), // Light Orange
-      Color(0xFFFFAB7A), // Soft Orange
+      Color(0xFF2563EB), // Blue - Primary
+      Color(0xFF3B82F6), // Blue-500
+      Color(0xFF60A5FA), // Blue-400
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -124,21 +171,63 @@ class AppTheme {
     end: Alignment.bottomRight,
   );
 
-  // Primary Gradient (Navy to Teal)
+  // Primary Gradient (Blue Gradient) - Reduced Purple Usage
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [
-      Color(0xFF1E3A5F), // Navy
-      Color(0xFF00B4B4), // Teal
+      Color(0xFF2563EB), // Blue - Primary
+      Color(0xFF3B82F6), // Blue-500
+      Color(0xFF60A5FA), // Blue-400
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Subtle Overlay Gradient (for cards/headers)
+  // Header Banner Gradient (Blue with minimal purple)
+  static const LinearGradient headerBannerGradient = LinearGradient(
+    colors: [
+      Color(0xFF2563EB), // Blue - Primary
+      Color(0xFF3B82F6), // Blue-500
+      Color(0xFF60A5FA), // Blue-400
+    ],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  // Card Gradient (White to Slate-100) - Metallic Surface
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [
+      Color(0xFFFFFFFF), // White
+      Color(0xFFF1F5F9), // Slate-100
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Card Gradient Deep (White to Slate-200) - For elevated cards
+  static const LinearGradient cardGradientDeep = LinearGradient(
+    colors: [
+      Color(0xFFFFFFFF), // White
+      Color(0xFFE2E8F0), // Slate-200
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Recessed Metal Input Gradient
+  static const LinearGradient recessedMetalGradient = LinearGradient(
+    colors: [
+      Color(0xFFE2E8F0), // Slate-200
+      Color(0xFFF1F5F9), // Slate-100
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Subtle Overlay Gradient (for cards/headers) - Blue only
   static const LinearGradient subtleGradient = LinearGradient(
     colors: [
-      Color(0x0A1E3A5F), // Navy 4%
-      Color(0x0A00B4B4), // Teal 4%
+      Color(0x0A2563EB), // Blue 4%
+      Color(0x0A3B82F6), // Blue-500 4%
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -204,9 +293,8 @@ class AppTheme {
         outlineVariant: dividerColor,
       ),
 
-      // Scaffold
-      scaffoldBackgroundColor: backgroundColor,
-
+      // Scaffold - Metallic Slate Background
+      scaffoldBackgroundColor: backgroundColor, // Slate-100
       // AppBar - Clean & Modern with Meta Blue
       appBarTheme: AppBarTheme(
         centerTitle: true,
@@ -359,21 +447,23 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration - Search & Forms
+      // Input Decoration - Recessed Metal Look
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceColor,
+        fillColor: slate200, // Recessed metal background
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(
+            color: slate300.withValues(alpha: 0.5),
+          ), // Subtle metallic edge
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: slate300.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
@@ -393,12 +483,13 @@ class AppTheme {
         suffixIconColor: textSecondaryColor,
       ),
 
-      // Card Theme - Product Cards
+      // Card Theme - Metallic Cards with Gradient
       cardTheme: CardThemeData(
         elevation: cardElevation,
         shadowColor: Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadiusLarge),
+          side: const BorderSide(color: borderColor, width: 1), // Metallic edge
         ),
         color: cardColor,
         surfaceTintColor: Colors.transparent,
@@ -533,9 +624,9 @@ class AppTheme {
         dragHandleSize: const Size(40, 4),
       ),
 
-      // Divider
+      // Divider - Metallic Edge
       dividerTheme: const DividerThemeData(
-        color: Color(0xFFE5E7EB),
+        color: slate300, // Metallic edge color
         thickness: 1,
         space: 1,
       ),
@@ -646,6 +737,55 @@ class AppTheme {
         color: Colors.black.withValues(alpha: 0.05),
         blurRadius: 10,
         offset: const Offset(0, 2),
+      ),
+    ],
+  );
+
+  // ============================================================================
+  // Metallic Card Decorations
+  // ============================================================================
+
+  /// Metallic Card Decoration with Gradient and Border
+  static BoxDecoration get metallicCardDecoration => BoxDecoration(
+    gradient: cardGradient,
+    borderRadius: BorderRadius.circular(borderRadiusLarge),
+    border: Border.all(
+      color: borderColor, // Metallic edge
+      width: 1,
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.05),
+        blurRadius: 10,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  );
+
+  /// Deep Metallic Card Decoration (for elevated cards)
+  static BoxDecoration get metallicCardDecorationDeep => BoxDecoration(
+    gradient: cardGradientDeep,
+    borderRadius: BorderRadius.circular(borderRadiusLarge),
+    border: Border.all(color: borderColor, width: 1),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.08),
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  );
+
+  /// Recessed Metal Input Decoration
+  static BoxDecoration get recessedMetalDecoration => BoxDecoration(
+    gradient: recessedMetalGradient,
+    borderRadius: BorderRadius.circular(borderRadiusMedium),
+    border: Border.all(color: slate300.withValues(alpha: 0.5), width: 1),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.03),
+        blurRadius: 4,
+        offset: const Offset(0, 1),
       ),
     ],
   );

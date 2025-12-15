@@ -43,9 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .login(
           identifier: _emailController.text.trim(),
           password: _passwordController.text,
-          loginAs: _selectedIntent == LoginIntent.merchant
-              ? 'merchant'
-              : 'customer',
+          loginAs: 'merchant',
         );
 
     final authState = ref.read(authControllerProvider);
@@ -53,49 +51,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // إذا كان بائع - تحميل بيانات المتجر
-      if (_selectedIntent == LoginIntent.merchant) {
-        final storeController = ref.read(
-          merchantStoreControllerProvider.notifier,
-        );
-        await storeController.loadMerchantStore();
+      // تحميل بيانات المتجر (دائماً merchant)
+      final storeController = ref.read(
+        merchantStoreControllerProvider.notifier,
+      );
+      await storeController.loadMerchantStore();
 
-        if (!mounted) return;
+      if (!mounted) return;
 
-        final hasStore = ref.read(hasMerchantStoreProvider);
+      final hasStore = ref.read(hasMerchantStoreProvider);
 
-        // التهيئة وفتح تطبيق التاجر
-        ref.read(rootControllerProvider.notifier).switchToMerchantApp();
+      // التهيئة وفتح تطبيق التاجر
+      ref.read(rootControllerProvider.notifier).switchToMerchantApp();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
-            ),
-            backgroundColor: hasStore
-                ? AppTheme.successColor
-                : AppTheme.warningColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppDimensions.borderRadiusS,
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
           ),
-        );
-      } else {
-        // عميل - فتح تطبيق العميل مباشرة
-        ref.read(rootControllerProvider.notifier).switchToCustomerApp();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('مرحباً بك في MBUY!'),
-            backgroundColor: AppTheme.successColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppDimensions.borderRadiusS,
-            ),
+          backgroundColor: hasStore
+              ? AppTheme.successColor
+              : AppTheme.warningColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppDimensions.borderRadiusS,
           ),
-        );
-      }
+        ),
+      );
     } else if (authState.errorMessage != null) {
       // مسح النية عند الفشل
       ref.read(rootControllerProvider.notifier).clearLoginIntent();
@@ -253,10 +235,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: BorderSide(
-            color: _selectedIntent == LoginIntent.merchant
-                ? AppTheme.primaryColor
-                : AppTheme.secondaryColor,
+          borderSide: const BorderSide(
+            color: AppTheme.primaryColor,
             width: 2,
           ),
         ),
@@ -333,10 +313,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: BorderSide(
-            color: _selectedIntent == LoginIntent.merchant
-                ? AppTheme.primaryColor
-                : AppTheme.secondaryColor,
+          borderSide: const BorderSide(
+            color: AppTheme.primaryColor,
             width: 2,
           ),
         ),
@@ -362,11 +340,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildLoginButton(bool isLoading) {
-    final buttonColor = _selectedIntent == LoginIntent.merchant
-        ? AppTheme.primaryColor
-        : (_selectedIntent == LoginIntent.customer
-              ? AppTheme.secondaryColor
-              : AppTheme.accentColor);
+    const buttonColor = AppTheme.primaryColor;
 
     return SizedBox(
       height: AppDimensions.buttonHeightXL,
@@ -392,23 +366,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(
-                    _selectedIntent == LoginIntent.merchant
-                        ? Icons.store
-                        : (_selectedIntent == LoginIntent.customer
-                              ? Icons.person
-                              : Icons.login),
+                    Icons.store,
                     size: 20,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
-                    _selectedIntent == LoginIntent.merchant
-                        ? 'دخول كبائع'
-                        : (_selectedIntent == LoginIntent.customer
-                              ? 'دخول كعميل'
-                              : 'تسجيل الدخول'),
-                    style: const TextStyle(
+                    'دخول كبائع',
+                    style: TextStyle(
                       fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.bold,
                     ),

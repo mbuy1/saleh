@@ -990,51 +990,65 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen> {
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: ShortcutLayoutStyle.values.map((style) {
-            final isSelected = _layoutStyle == style;
-            return GestureDetector(
-              onTap: () {
-                _changeLayoutStyle(style);
-                setSheetState(() {});
-              },
-              child: Container(
-                width: 95,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppTheme.primaryColor : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppTheme.primaryColor
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      style.icon,
-                      color: isSelected ? Colors.white : Colors.grey[700],
-                      size: 24,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      style.label,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: isSelected ? Colors.white : Colors.grey[700],
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = constraints.maxWidth;
+            final itemWidth =
+                (screenWidth - 32 - 20) / 3; // 32 padding, 20 spacing
+            return Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              alignment: WrapAlignment.start,
+              children: ShortcutLayoutStyle.values.map((style) {
+                final isSelected = _layoutStyle == style;
+                return GestureDetector(
+                  onTap: () {
+                    _changeLayoutStyle(style);
+                    setSheetState(() {});
+                  },
+                  child: Container(
+                    width: itemWidth,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppTheme.primaryColor
+                          : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppTheme.primaryColor
+                            : Colors.grey.shade300,
                       ),
                     ),
-                  ],
-                ),
-              ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          style.icon,
+                          color: isSelected ? Colors.white : Colors.grey[700],
+                          size: 24,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          style.label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isSelected ? Colors.white : Colors.grey[700],
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
       ],
     );

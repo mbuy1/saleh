@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/theme/app_theme.dart';
 import '../core/controllers/root_controller.dart';
-import '../apps/customer/customer_app.dart';
+import '../core/services/api_service.dart';
 import '../apps/merchant/merchant_app.dart';
 import '../features/auth/data/auth_controller.dart';
 import 'screens/login_screen.dart';
@@ -32,20 +32,47 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   /// التحقق من وجود جلسة محفوظة عند فتح التطبيق
+  /// يتحقق من وجود token وصحته قبل السماح بالدخول
   Future<void> _checkSavedSession() async {
     // انتظر قليلاً للسماح لـ AuthController بالتهيئة
     await Future.delayed(const Duration(milliseconds: 100));
 
-    final authState = ref.read(authControllerProvider);
+    final apiService = ref.read(apiServiceProvider);
     final rootController = ref.read(rootControllerProvider.notifier);
+    final authController = ref.read(authControllerProvider.notifier);
 
-    if (authState.isAuthenticated && authState.userRole != null) {
-      // توجد جلسة صالحة - انتقل للتطبيق المناسب حسب الدور
-      if (authState.userRole == 'merchant') {
-        rootController.switchToMerchantApp();
-      } else {
-        rootController.switchToCustomerApp();
+    // 1. التحقق من وجود token
+    final hasToken = await apiService.hasValidTokens();
+    
+    if (!hasToken) {
+      // لا يوجد token - عرض شاشة تسجيل الدخول
+      if (mounted) {
+        setState(() => _isCheckingSession = false);
       }
+      return;
+    }
+
+    // 2. التحقق من صحة token عبر التحقق من الجلسة
+    try {
+      await authController.checkSession();
+      final updatedAuthState = ref.read(authControllerProvider);
+
+      if (updatedAuthState.isAuthenticated && updatedAuthState.userRole != null) {
+        // توجد جلسة صالحة - انتقل لتطبيق التاجر فقط
+        // نتحقق من الدور (يجب أن يكون merchant)
+        if (updatedAuthState.userRole == 'merchant') {
+          rootController.switchToMerchantApp();
+        } else {
+          // إذا كان دور المستخدم ليس merchant، نعتبره merchant (للتوافق)
+          rootController.switchToMerchantApp();
+        }
+      } else {
+        // Token غير صالح - مسح الجلسة
+        await authController.logout();
+      }
+    } catch (e) {
+      // خطأ في التحقق - مسح الجلسة
+      await authController.logout();
     }
 
     if (mounted) {
@@ -66,30 +93,24 @@ class _AppShellState extends ConsumerState<AppShell> {
       );
     }
 
-    // تحديد أي تطبيق يعرض
-    switch (rootState.currentApp) {
-      case CurrentApp.customer:
-        // تطبيق العميل - منفصل تماماً
-        return const CustomerApp();
-
-      case CurrentApp.merchant:
-        // تطبيق التاجر - منفصل تماماً
-        return const MerchantApp();
-
-      case CurrentApp.none:
-        // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول
-        return MaterialApp(
-          title: 'MBUY',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('ar'), Locale('en')],
-          home: const LoginScreen(),
-        );
+    // تحديد أي تطبيق يعرض (Merchant فقط)
+    if (rootState.isMerchantApp) {
+      // تطبيق التاجر - الوحيد المتاح
+      return const MerchantApp();
+    } else {
+      // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول
+      return MaterialApp(
+        title: 'MBUY',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        home: const LoginScreen(),
+      );
     }
   }
 }

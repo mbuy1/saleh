@@ -96,6 +96,12 @@ class _OrdersTabState extends State<OrdersTab> {
               padding: const EdgeInsets.all(16),
               child: _buildSpecialOrdersCard(context),
             ),
+            // كرت طلبات التوريد (للمورد)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _buildSupplierOrdersCard(context),
+            ),
+            const SizedBox(height: 16),
             // محتوى الطلبات
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.5,
@@ -233,6 +239,70 @@ class _OrdersTabState extends State<OrdersTab> {
                     const SizedBox(height: 2),
                     Text(
                       'طلبات مخصصة من العملاء',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// كرت طلبات التوريد - للمورد
+  Widget _buildSupplierOrdersCard(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: () => context.push('/dashboard/supplier-orders'),
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.local_shipping_outlined,
+                  size: 26,
+                  color: Colors.orange,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'طلبات التوريد',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'طلبات دروب شوبينق للتجهيز',
                       style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],

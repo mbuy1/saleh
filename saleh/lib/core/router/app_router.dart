@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../shared/screens/login_screen.dart';
 import '../../features/auth/data/auth_controller.dart';
 import '../../features/dashboard/presentation/screens/boost_sales_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_shell.dart';
@@ -14,57 +13,63 @@ import '../../features/dashboard/presentation/screens/placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/merchant_services_screen.dart';
 import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
 import '../../features/dashboard/presentation/screens/store_on_jock_screen.dart';
+import '../../features/dashboard/presentation/screens/shortcuts_screen.dart';
+import '../../features/dashboard/presentation/screens/inventory_screen.dart';
+import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
+import '../../features/dashboard/presentation/screens/view_my_store_screen.dart';
+import '../../features/dashboard/presentation/screens/notifications_screen.dart';
+import '../../features/dashboard/presentation/screens/customers_screen.dart';
+import '../../features/dashboard/presentation/screens/wallet_screen.dart';
+import '../../features/dashboard/presentation/screens/points_screen.dart';
+import '../../features/dashboard/presentation/screens/sales_screen.dart';
+import '../../features/dashboard/presentation/screens/dropshipping_screen.dart';
+import '../../features/dashboard/presentation/screens/supplier_orders_screen.dart';
 import '../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
 import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
 import '../../features/marketing/presentation/screens/marketing_screen.dart';
-// Customer App Imports
-import '../../features/customer_app/presentation/screens/customer_home_screen.dart';
-import '../../features/customer_app/presentation/screens/categories_screen.dart';
-import '../../features/customer_app/presentation/screens/stores_screen.dart';
-import '../../features/customer_app/presentation/screens/media_screen.dart';
-import '../../features/customer_app/presentation/screens/customer_cart_screen.dart';
-import '../../features/customer_app/presentation/screens/customer_profile_screen.dart';
-import '../../features/customer_app/presentation/shells/customer_shell.dart';
-import '../providers/app_mode_provider.dart';
+import 'go_router_refresh_stream.dart';
 
 /// App Router - Manages navigation throughout the application
 /// Uses go_router for declarative routing with authentication protection
 ///
 /// الحماية:
-/// - صفحة Dashboard محمية وتتطلب تسجيل دخول
+/// - صفحة Dashboard محمية وتتطلب تسجيل دخول + دور merchant
 /// - المستخدمون المسجلين لا يمكنهم الوصول لصفحة تسجيل الدخول
-/// - يتم إعادة توجيه المستخدمين تلقائياً بناءً على حالة المصادقة
+/// - يتم إعادة توجيه المستخدمين تلقائياً بناءً على حالة المصادقة والدور
 ///
-/// الوضع المزدوج:
-/// - وضع التاجر: /dashboard/*
-/// - وضع العميل: /customer/*
+/// الوضع الوحيد:
+/// - وضع التاجر فقط: /dashboard/*
 class AppRouter {
   /// إنشاء GoRouter مع ref للوصول إلى Riverpod
   static GoRouter createRouter(WidgetRef ref) {
     return GoRouter(
       initialLocation: '/login',
 
-      // التحقق من حالة المصادقة عند كل تنقل
+      // التحقق من حالة المصادقة والدور عند كل تنقل
       redirect: (context, state) {
         final authState = ref.read(authControllerProvider);
         final isAuthenticated = authState.isAuthenticated;
+        final userRole = authState.userRole;
         final isLoggingIn = state.matchedLocation == '/login';
-        final appModeState = ref.read(appModeProvider);
+        final isDashboardRoute = state.matchedLocation.startsWith('/dashboard');
 
         // إذا المستخدم غير مسجل ويحاول الوصول لصفحة محمية
         if (!isAuthenticated && !isLoggingIn) {
           return '/login';
         }
 
+        // Role-based protection: فقط merchant يمكنه الوصول لـ dashboard
+        if (isAuthenticated && isDashboardRoute && userRole != 'merchant') {
+          // إذا كان المستخدم ليس merchant، نعيده لصفحة تسجيل الدخول
+          return '/login';
+        }
+
         // إذا المستخدم مسجل ويحاول الوصول لصفحة تسجيل الدخول
         if (isAuthenticated && isLoggingIn) {
-          // توجيه حسب الوضع المختار
-          if (appModeState.isCustomer) {
-            return '/customer/home';
-          }
+          // توجيه لـ dashboard (merchant فقط)
           return '/dashboard';
         }
 
@@ -146,6 +151,68 @@ class AppRouter {
                     return PlaceholderScreen(title: decodedName);
                   },
                 ),
+                // الشاشات الجديدة v2.0
+                GoRoute(
+                  path: 'shortcuts',
+                  name: 'shortcuts',
+                  builder: (context, state) => const ShortcutsScreen(),
+                ),
+                GoRoute(
+                  path: 'promotions',
+                  name: 'promotions',
+                  redirect: (context, state) => '/dashboard',
+                ),
+                GoRoute(
+                  path: 'inventory',
+                  name: 'inventory',
+                  builder: (context, state) => const InventoryScreen(),
+                ),
+                GoRoute(
+                  path: 'audit-logs',
+                  name: 'audit-logs',
+                  builder: (context, state) => const AuditLogsScreen(),
+                ),
+                GoRoute(
+                  path: 'view-store',
+                  name: 'view-store',
+                  builder: (context, state) => const ViewMyStoreScreen(),
+                ),
+                GoRoute(
+                  path: 'notifications',
+                  name: 'notifications',
+                  builder: (context, state) => const NotificationsScreen(),
+                ),
+                GoRoute(
+                  path: 'dropshipping',
+                  name: 'dropshipping',
+                  builder: (context, state) => const DropshippingScreen(),
+                ),
+                GoRoute(
+                  path: 'supplier-orders',
+                  name: 'supplier-orders',
+                  builder: (context, state) => const SupplierOrdersScreen(),
+                ),
+                GoRoute(
+                  path: 'customers',
+                  name: 'customers',
+                  builder: (context, state) => const CustomersScreen(),
+                ),
+                // صفحات الإحصائيات (بطاقات الرصيد/النقاط/المبيعات)
+                GoRoute(
+                  path: 'wallet',
+                  name: 'wallet',
+                  builder: (context, state) => const WalletScreen(),
+                ),
+                GoRoute(
+                  path: 'points',
+                  name: 'points',
+                  builder: (context, state) => const PointsScreen(),
+                ),
+                GoRoute(
+                  path: 'sales',
+                  name: 'sales',
+                  builder: (context, state) => const SalesScreen(),
+                ),
               ],
             ),
             // تبويب الطلبات
@@ -200,54 +267,6 @@ class AppRouter {
             ),
           ],
         ),
-
-        // ========================================================================
-        // Customer App Shell Route (محمية) - تجربة العميل
-        // ========================================================================
-        ShellRoute(
-          builder: (context, state, child) => CustomerShell(child: child),
-          routes: [
-            // الصفحة الرئيسية للعميل
-            GoRoute(
-              path: '/customer/home',
-              name: 'customer-home',
-              builder: (context, state) => const CustomerHomeScreen(),
-            ),
-            // صفحة الميديا
-            GoRoute(
-              path: '/customer/media',
-              name: 'customer-media',
-              builder: (context, state) => const MediaScreen(),
-            ),
-            // صفحة التصنيفات
-            GoRoute(
-              path: '/customer/categories',
-              name: 'customer-categories',
-              builder: (context, state) => const CategoriesScreen(),
-            ),
-            // صفحة المتاجر
-            GoRoute(
-              path: '/customer/stores',
-              name: 'customer-stores',
-              builder: (context, state) => const StoresScreen(),
-            ),
-            // صفحة السلة
-            GoRoute(
-              path: '/customer/cart',
-              name: 'customer-cart',
-              builder: (context, state) => const CustomerCartScreen(),
-            ),
-          ],
-        ),
-
-        // ========================================================================
-        // Customer Profile (خارج الـ Shell - بدون bottom navigation)
-        // ========================================================================
-        GoRoute(
-          path: '/customer/profile',
-          name: 'customer-profile',
-          builder: (context, state) => const CustomerProfileScreen(),
-        ),
       ],
 
       // Error handler
@@ -263,20 +282,3 @@ class AppRouter {
   }
 }
 
-/// Helper class لجعل GoRouter يستمع لتغييرات StateNotifier
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-      (dynamic _) => notifyListeners(),
-    );
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
-}

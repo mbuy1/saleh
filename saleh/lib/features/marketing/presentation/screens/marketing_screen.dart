@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/exports.dart';
 
 class MarketingScreen extends StatefulWidget {
@@ -11,7 +12,6 @@ class MarketingScreen extends StatefulWidget {
 
 class _MarketingScreenState extends State<MarketingScreen> {
   bool _isLoading = false;
-
 
   Future<void> _refreshData() async {
     HapticFeedback.lightImpact();
@@ -26,6 +26,20 @@ class _MarketingScreenState extends State<MarketingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'التسويق',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _refreshData,
@@ -128,5 +142,4 @@ class _MarketingScreenState extends State<MarketingScreen> {
       ),
     );
   }
-
 }

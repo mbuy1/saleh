@@ -1,7 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/router/go_router_refresh_stream.dart';
 import '../../../features/auth/data/auth_controller.dart';
 import '../../../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../../../features/dashboard/presentation/screens/home_tab.dart';
@@ -239,23 +239,5 @@ class MerchantRouter {
         ),
       ),
     );
-  }
-}
-
-/// Helper class لجعل GoRouter يستمع لتغييرات StateNotifier
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-      (dynamic _) => notifyListeners(),
-    );
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 }

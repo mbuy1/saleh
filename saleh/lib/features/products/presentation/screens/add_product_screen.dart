@@ -32,11 +32,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   final _weightController = TextEditingController();
   final _prepTimeController = TextEditingController();
   final _keywordsController = TextEditingController();
+  final _wholesalePriceController = TextEditingController();
+  final _slaDaysController = TextEditingController();
 
   bool _isSubmitting = false;
   List<Category> _categories = [];
   bool _loadingCategories = false;
   String? _selectedCategoryId;
+  bool _dropshippingEnabled = false;
 
   // وسائط المنتج
   final List<XFile> _selectedImages = [];
@@ -199,6 +202,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _weightController.dispose();
     _prepTimeController.dispose();
     _keywordsController.dispose();
+    _wholesalePriceController.dispose();
+    _slaDaysController.dispose();
     super.dispose();
   }
 
@@ -507,6 +512,20 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             .toList();
       }
 
+      // بيانات الدروب شوبينق
+      if (_dropshippingEnabled) {
+        _extraData['dropship_enabled'] = true;
+        if (_wholesalePriceController.text.isNotEmpty) {
+          _extraData['wholesale_price'] =
+              double.tryParse(_wholesalePriceController.text);
+        }
+        if (_slaDaysController.text.isNotEmpty) {
+          _extraData['sla_days'] = int.tryParse(_slaDaysController.text);
+        }
+        // TODO: إضافة سياسة الإرجاع عند توفرها في DB
+        // _extraData['return_policy'] = ...
+      }
+
       final success = await ref
           .read(productsControllerProvider.notifier)
           .addProduct(
@@ -790,8 +809,97 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       color: AppTheme.textSecondaryColor,
                     ),
                   ),
-                  const SizedBox(height: AppDimensions.spacing24),
+                  const SizedBox(height: AppDimensions.spacing16),
                 ],
+
+                // 10. تفعيل الدروب شوبينق
+                Card(
+                  color: Colors.grey[50],
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SwitchListTile(
+                          title: const Text(
+                            'فعّل للدروب شوبينق',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: const Text(
+                            'السماح للتجار الآخرين ببيع هذا المنتج',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          value: _dropshippingEnabled,
+                          onChanged: (value) {
+                            setState(() {
+                              _dropshippingEnabled = value;
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        if (_dropshippingEnabled) ...[
+                          const SizedBox(height: 12),
+                          MbuyInputField(
+                            controller: _wholesalePriceController,
+                            label: 'سعر الجملة (ر.س) *',
+                            hint: '0.00',
+                            prefixIcon: const Icon(
+                              Icons.store,
+                              color: AppTheme.textSecondaryColor,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d+\.?\d{0,2}'),
+                              ),
+                            ],
+                            validator: _dropshippingEnabled
+                                ? (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'الرجاء إدخال سعر الجملة';
+                                    }
+                                    final price = double.tryParse(value);
+                                    if (price == null || price <= 0) {
+                                      return 'يجب أن يكون السعر أكبر من 0';
+                                    }
+                                    return null;
+                                  }
+                                : null,
+                          ),
+                          const SizedBox(height: 12),
+                          MbuyInputField(
+                            controller: _slaDaysController,
+                            label: 'مدة التجهيز بالأيام *',
+                            hint: 'مثال: 3',
+                            prefixIcon: const Icon(
+                              Icons.schedule,
+                              color: AppTheme.textSecondaryColor,
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: _dropshippingEnabled
+                                ? (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'الرجاء إدخال مدة التجهيز';
+                                    }
+                                    final days = int.tryParse(value);
+                                    if (days == null || days <= 0) {
+                                      return 'يجب أن تكون المدة أكبر من 0';
+                                    }
+                                    return null;
+                                  }
+                                : null,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacing24),
 
                 // أزرار الإجراءات
                 Row(
