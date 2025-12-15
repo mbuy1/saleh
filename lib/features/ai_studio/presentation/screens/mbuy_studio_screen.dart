@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element, unused_field
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -23,7 +25,6 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   bool _isGenerating = false;
   String _statusMessage = '';
   String? _generatedImageUrl;
-  int _currentBannerPage = 0;
   String? _selectedDesignType; // للتصنيف المحدد في Pro/Premium
 
   @override
@@ -62,133 +63,6 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildTabBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppDimensions.borderRadiusL,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TabBar(
-        labelColor: AppTheme.primaryColor,
-        unselectedLabelColor: AppTheme.textSecondaryColor,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: AppTheme.primaryColor.withValues(alpha: 0.1),
-          borderRadius: AppDimensions.borderRadiusL,
-        ),
-        tabs: const [
-          Tab(text: 'Free'),
-          Tab(text: 'Pro'),
-          Tab(text: 'Premium'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFreeTab() {
-    return SingleChildScrollView(
-      padding: AppDimensions.screenPaddingHorizontalOnly,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: AppDimensions.spacing16),
-          _buildSectionTitle('قوالب جاهزة'),
-          const SizedBox(height: AppDimensions.spacing12),
-          _buildFreeTemplates(),
-          const SizedBox(height: AppDimensions.spacing24),
-          _buildSectionTitle('صور منتجات'),
-          const SizedBox(height: AppDimensions.spacing12),
-          _buildProductImagesGrid(),
-          const SizedBox(height: AppDimensions.spacing24),
-          _buildSectionTitle('بانرات'),
-          const SizedBox(height: AppDimensions.spacing12),
-          _buildBannersGrid(),
-          const SizedBox(height: AppDimensions.spacing32),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProTab() {
-    return SingleChildScrollView(
-      padding: AppDimensions.screenPaddingHorizontalOnly,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: AppDimensions.spacing24),
-          _buildProCategories(),
-          const SizedBox(height: AppDimensions.spacing24),
-          if (_generatedImageUrl != null) ...[
-            _buildGeneratedResult(),
-            const SizedBox(height: AppDimensions.spacing24),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPremiumTab() {
-    return SingleChildScrollView(
-      padding: AppDimensions.screenPaddingHorizontalOnly,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: AppDimensions.spacing24),
-          _buildPremiumCategories(),
-          const SizedBox(height: AppDimensions.spacing24),
-          if (_generatedImageUrl != null) ...[
-            _buildGeneratedResult(),
-            const SizedBox(height: AppDimensions.spacing24),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroBanner() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 160,
-          child: PageView.builder(
-            onPageChanged: (index) {
-              setState(() => _currentBannerPage = index);
-            },
-            itemCount: 3,
-            itemBuilder: (context, index) => _buildBannerCard(),
-          ),
-        ),
-        const SizedBox(height: AppDimensions.spacing12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(3, (index) {
-            final isActive = _currentBannerPage == index;
-            return AnimatedContainer(
-              duration: AppDimensions.animationFast,
-              margin: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing4,
-              ),
-              width: isActive ? 24 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                borderRadius: AppDimensions.borderRadiusXS,
-                color: isActive ? AppTheme.accentColor : Colors.grey[300],
-              ),
-            );
-          }),
-        ),
-      ],
     );
   }
 
@@ -1044,45 +918,6 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     );
   }
 
-  Widget _buildMainCategories() {
-    final categories = [
-      _CategoryItem(
-        title: 'توليد الصور',
-        taskType: 'ai_image',
-        icon: Icons.image_outlined,
-        color: AppTheme.infoColor,
-      ),
-      _CategoryItem(
-        title: 'توليد الفيديو',
-        taskType: 'video_promo',
-        icon: Icons.play_circle_outline,
-        color: AppTheme.accentColor,
-      ),
-      _CategoryItem(
-        title: 'توليد فوري',
-        taskType: 'image_instant',
-        icon: Icons.flash_on_outlined,
-        color: AppTheme.successColor,
-      ),
-    ];
-
-    return Padding(
-      padding: AppDimensions.screenPaddingHorizontalOnly,
-      child: Row(
-        children: categories.map((cat) {
-          return Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing4,
-              ),
-              child: _buildCategoryCard(cat),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   Widget _buildCategoryCard(_CategoryItem category) {
     return Material(
       color: AppTheme.surfaceColor,
@@ -1171,55 +1006,6 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     );
   }
 
-  Widget _buildQuickApps() {
-    final apps = [
-      _QuickAppItem(
-        title: 'التحسين الجماعي',
-        taskType: 'bulk_improve',
-        icon: Icons.auto_awesome,
-        isNew: true,
-        isBulk: true,
-      ),
-      _QuickAppItem(
-        title: 'نقل الأسلوب',
-        taskType: 'style_transfer',
-        icon: Icons.style_outlined,
-        isNew: false,
-      ),
-      _QuickAppItem(
-        title: 'الحفاظ على الوجه',
-        taskType: 'face_preserve',
-        icon: Icons.face_outlined,
-        isNew: true,
-      ),
-      _QuickAppItem(
-        title: 'إزالة العلامة المائية',
-        taskType: 'remove_watermark',
-        icon: Icons.layers_clear_outlined,
-        isNew: true,
-      ),
-      _QuickAppItem(
-        title: 'تحسين الصورة',
-        taskType: 'enhance_image',
-        icon: Icons.auto_fix_high,
-        isNew: false,
-      ),
-    ];
-
-    return SizedBox(
-      height: 160,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: AppDimensions.screenPaddingHorizontalOnly,
-        itemCount: apps.length,
-        itemBuilder: (context, index) {
-          final app = apps[index];
-          return _buildQuickAppCard(app);
-        },
-      ),
-    );
-  }
-
   Widget _buildQuickAppCard(_QuickAppItem app) {
     return Container(
       width: 130,
@@ -1228,13 +1014,7 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
         color: AppTheme.surfaceColor,
         borderRadius: AppDimensions.borderRadiusM,
         child: InkWell(
-          onTap: () {
-            if (app.isBulk) {
-              _showBulkImproveDialog();
-            } else {
-              _showGenerateDialog(taskType: app.taskType);
-            }
-          },
+          onTap: () => _showGenerateDialog(taskType: app.taskType),
           borderRadius: AppDimensions.borderRadiusM,
           child: Container(
             decoration: BoxDecoration(
@@ -2413,13 +2193,11 @@ class _QuickAppItem {
   final String taskType;
   final IconData icon;
   final bool isNew;
-  final bool isBulk;
 
   const _QuickAppItem({
     required this.title,
     required this.taskType,
     required this.icon,
     required this.isNew,
-    this.isBulk = false,
   });
 }
