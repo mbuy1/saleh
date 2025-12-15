@@ -36,7 +36,11 @@ class _AiStudioCardsScreenState extends ConsumerState<AiStudioCardsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MBuy Studio'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text('توليد AI'),
         actions: [
           IconButton(
             icon: const Icon(Icons.library_books_outlined),

@@ -84,86 +84,109 @@ class _DashboardShellState extends State<DashboardShell> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: widget.child,
+      extendBody: true, // Important: allows FAB to extend above nav bar
       bottomNavigationBar: _buildCustomBottomNav(context, currentIndex),
     );
   }
 
   Widget _buildCustomBottomNav(BuildContext context, int currentIndex) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(20),
-        topRight: Radius.circular(20),
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          height: AppDimensions.bottomNavHeight + 20, // Extra height for FAB
-          decoration: BoxDecoration(
-            color: Colors.white, // Full opacity for better visibility
-            border: const Border(
-              top: BorderSide(
-                color: AppTheme.slate300,
-                width: 2,
-              ), // Thicker border for better visibility
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 15,
-                offset: const Offset(0, -4),
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Navigation Icons Row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    // 1. الرئيسية
-                    _buildNavIcon(
-                      icon: Icons.home_outlined,
-                      selectedIcon: Icons.home,
-                      label: 'الرئيسية',
-                      isSelected: currentIndex == 0,
-                      onTap: () => _onItemTapped(0, context),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 30, left: 12, right: 12),
+      child: SizedBox(
+        height:
+            AppDimensions.bottomNavHeight + 36, // Extra height for FAB overflow
+        child: Stack(
+          clipBehavior: Clip.none, // Allow FAB to overflow
+          children: [
+            // Glass Navigation Bar
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 28, // Move nav bar down to align with FAB top
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    height: AppDimensions.bottomNavHeight + 10,
+                    decoration: BoxDecoration(
+                      // Glassmorphism effect
+                      color: Colors.white.withValues(alpha: 0.92),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          width: 1.5,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 25,
+                          offset: const Offset(0, -8),
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    // 2. الطلبات
-                    _buildNavIcon(
-                      icon: Icons.shopping_bag_outlined,
-                      selectedIcon: Icons.shopping_bag,
-                      label: 'الطلبات',
-                      isSelected: currentIndex == 1,
-                      onTap: () => _onItemTapped(1, context),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // 1. الرئيسية
+                          _buildNavIcon(
+                            icon: Icons.home_outlined,
+                            selectedIcon: Icons.home,
+                            label: 'الرئيسية',
+                            isSelected: currentIndex == 0,
+                            onTap: () => _onItemTapped(0, context),
+                          ),
+                          // 2. الطلبات
+                          _buildNavIcon(
+                            icon: Icons.shopping_bag_outlined,
+                            selectedIcon: Icons.shopping_bag,
+                            label: 'الطلبات',
+                            isSelected: currentIndex == 1,
+                            onTap: () => _onItemTapped(1, context),
+                          ),
+                          // Spacer for FAB
+                          const SizedBox(width: 70),
+                          // 4. المحادثات
+                          _buildNavIcon(
+                            icon: Icons.chat_bubble_outline,
+                            selectedIcon: Icons.chat_bubble,
+                            label: 'المحادثات',
+                            isSelected: currentIndex == 3,
+                            onTap: () => _onItemTapped(3, context),
+                          ),
+                          // 5. دروب شوبينقنا (تم التبديل مع اختصاراتي)
+                          _buildNavIcon(
+                            icon: Icons.shopping_bag_outlined,
+                            selectedIcon: Icons.shopping_bag,
+                            label: 'دروب شوبينقنا',
+                            isSelected: currentIndex == 4,
+                            onTap: () => _onItemTapped(4, context),
+                          ),
+                        ],
+                      ),
                     ),
-                    // Spacer for FAB
-                    const SizedBox(width: 60),
-                    // 4. المحادثات
-                    _buildNavIcon(
-                      icon: Icons.chat_bubble_outline,
-                      selectedIcon: Icons.chat_bubble,
-                      label: 'المحادثات',
-                      isSelected: currentIndex == 3,
-                      onTap: () => _onItemTapped(3, context),
-                    ),
-                    // 5. دروب شوبينقنا (تم التبديل مع اختصاراتي)
-                    _buildNavIcon(
-                      icon: Icons.shopping_bag_outlined,
-                      selectedIcon: Icons.shopping_bag,
-                      label: 'دروب شوبينقنا',
-                      isSelected: currentIndex == 4,
-                      onTap: () => _onItemTapped(4, context),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              // Floating Action Button (FAB) - Centered
-              Positioned(
-                top: -20,
+            ),
+            // Floating Action Button (FAB) - Elevated above nav bar
+            Positioned(
+              top: 2,
+              left: 0,
+              right: 0,
+              child: Center(
                 child: GestureDetector(
                   onTap: () => _onItemTapped(2, context),
                   child: Container(
@@ -172,36 +195,28 @@ class _DashboardShellState extends State<DashboardShell> {
                     decoration: BoxDecoration(
                       gradient: AppTheme.metallicGradient,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 5),
+                      border: Border.all(color: Colors.white, width: 3.5),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryColor.withValues(
-                            alpha: 0.7,
-                          ), // Stronger shadow for better visibility
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
-                          spreadRadius: 6,
-                        ),
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                          blurRadius: 20,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                          blurRadius: 16,
                           offset: const Offset(0, 6),
-                          spreadRadius: 3,
+                          spreadRadius: 1,
                         ),
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 15,
-                          offset: const Offset(0, 4),
-                          spreadRadius: 2,
+                          color: Colors.black.withValues(alpha: 0.12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                          spreadRadius: 0,
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 30),
+                    child: const Icon(Icons.add, color: Colors.white, size: 28),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -220,30 +235,33 @@ class _DashboardShellState extends State<DashboardShell> {
         button: true,
         label: label,
         selected: isSelected,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? selectedIcon : icon,
-              size: AppDimensions.iconM,
-              color: isSelected
-                  ? AppTheme
-                        .primaryColor // Blue (#2563EB) - Active icon
-                  : AppTheme.slate600, // Darker for better contrast
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isSelected ? selectedIcon : icon,
+                size: 28, // Bigger icon size
                 color: isSelected
                     ? AppTheme
-                          .primaryColor // Blue (#2563EB)
-                    : AppTheme.slate700, // Darker text for better readability
+                          .primaryColor // Blue (#2563EB) - Active icon
+                    : Colors.grey[800], // Darker for better contrast
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11, // Slightly smaller for long text
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  color: isSelected
+                      ? AppTheme
+                            .primaryColor // Blue (#2563EB)
+                      : Colors.grey[800], // Darker text for better readability
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -63,7 +63,7 @@ class ProductsTab extends ConsumerWidget {
     }
 
     return DefaultTabController(
-      length: 6,
+      length: 5,
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
@@ -106,7 +106,6 @@ class ProductsTab extends ConsumerWidget {
               Tab(text: 'المنتجات'),
               Tab(text: 'إعدادات المنتجات'),
               Tab(text: 'المخزون'),
-              Tab(text: 'دروب شوبينق'),
               Tab(text: 'السجلات'),
               Tab(text: 'المحذوفات'),
             ],
@@ -136,9 +135,7 @@ class ProductsTab extends ConsumerWidget {
               buttonText: 'فتح إدارة المخزون',
               onPressed: () => context.push('/dashboard/inventory'),
             ),
-            // 4. دروب شوبينق
-            _buildPlaceholderPage('دروب شوبينق'),
-            // 5. السجلات - صفحة انتقال سريع
+            // 4. السجلات - صفحة انتقال سريع
             _buildQuickAccessPage(
               context,
               title: 'سجلات النظام',
@@ -147,7 +144,7 @@ class ProductsTab extends ConsumerWidget {
               buttonText: 'فتح السجلات',
               onPressed: () => context.push('/dashboard/audit-logs'),
             ),
-            // 6. المحذوفات
+            // 5. المحذوفات
             _buildPlaceholderPage('المنتجات المحذوفة'),
           ],
         ),

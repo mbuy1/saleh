@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
 
@@ -15,28 +16,53 @@ class MbuyStudioService {
     String path,
     Map<String, dynamic> body,
   ) async {
+    debugPrint('[MbuyStudioService] POST $path');
+    debugPrint('[MbuyStudioService] Body: $body');
+
     final response = await _api.post(path, body: body);
+    debugPrint('[MbuyStudioService] Status: ${response.statusCode}');
+    debugPrint('[MbuyStudioService] Response: ${response.body}');
+
     final data = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return data is Map<String, dynamic> ? data : {'data': data};
     }
-    throw Exception(
-      data is Map && data['error'] != null ? data['error'] : 'Request failed',
-    );
+
+    // Better error handling
+    String errorMessage = 'Request failed';
+    if (data is Map) {
+      errorMessage =
+          data['detail'] ??
+          data['error'] ??
+          data['message'] ??
+          'Request failed';
+    }
+    throw Exception(errorMessage);
   }
 
   Future<Map<String, dynamic>> _get(
     String path, {
     Map<String, String>? query,
   }) async {
+    debugPrint('[MbuyStudioService] GET $path');
+
     final response = await _api.get(path, queryParams: query);
+    debugPrint('[MbuyStudioService] Status: ${response.statusCode}');
+
     final data = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return data is Map<String, dynamic> ? data : {'data': data};
     }
-    throw Exception(
-      data is Map && data['error'] != null ? data['error'] : 'Request failed',
-    );
+
+    String errorMessage = 'Request failed';
+    if (data is Map) {
+      errorMessage =
+          data['detail'] ??
+          data['error'] ??
+          data['message'] ??
+          'Request failed';
+    }
+    throw Exception(errorMessage);
   }
 
   Future<Map<String, dynamic>> generateText(String prompt) =>

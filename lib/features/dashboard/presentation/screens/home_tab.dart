@@ -734,17 +734,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         context.push('/dashboard/promotions');
         break;
       case 'MbuyPackage':
-        // تم تفعيل الصفحة الاحتياطية
-        context.push(
-          '/dashboard/feature/${Uri.encodeComponent('mbuy package')}',
-        );
+        // صفحة حزم التوفير
+        context.push('/dashboard/packages');
         break;
       case 'DropShipping':
         context.push('/dashboard/dropshipping');
         break;
       case 'Reports':
-        // تم تفعيل الصفحة الاحتياطية
-        context.push('/dashboard/feature/${Uri.encodeComponent('Reports')}');
+        // صفحة التقارير والسجلات
+        context.push('/dashboard/reports');
       default:
         context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
     }

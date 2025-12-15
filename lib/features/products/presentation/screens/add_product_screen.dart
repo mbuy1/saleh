@@ -516,8 +516,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       if (_dropshippingEnabled) {
         _extraData['dropship_enabled'] = true;
         if (_wholesalePriceController.text.isNotEmpty) {
-          _extraData['wholesale_price'] =
-              double.tryParse(_wholesalePriceController.text);
+          _extraData['wholesale_price'] = double.tryParse(
+            _wholesalePriceController.text,
+          );
         }
         if (_slaDaysController.text.isNotEmpty) {
           _extraData['sla_days'] = int.tryParse(_slaDaysController.text);
@@ -906,7 +907,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   children: [
                     Expanded(
                       child: MbuyButton(
-                        label: 'إلغاء',
+                        text: 'إلغاء',
                         onPressed: _isSubmitting ? null : () => context.pop(),
                         type: MbuyButtonType.secondary,
                       ),
@@ -915,7 +916,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     Expanded(
                       flex: 2,
                       child: MbuyButton(
-                        label: _isSubmitting
+                        text: _isSubmitting
                             ? 'جاري الإضافة...'
                             : 'إضافة المنتج',
                         onPressed: _isSubmitting ? null : _submitForm,
@@ -1099,7 +1100,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   Widget _buildAIButton() {
     return MbuyButton(
-      label: 'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
+      text: 'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
       onPressed: () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('سيتم تفعيل هذه الميزة قريباً')),

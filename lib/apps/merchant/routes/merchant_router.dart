@@ -21,6 +21,29 @@ import '../../../features/dashboard/presentation/screens/customers_screen.dart';
 import '../../../features/dashboard/presentation/screens/wallet_screen.dart';
 import '../../../features/dashboard/presentation/screens/points_screen.dart';
 import '../../../features/dashboard/presentation/screens/sales_screen.dart';
+import '../../../features/dashboard/presentation/screens/coupons_screen.dart';
+import '../../../features/dashboard/presentation/screens/flash_sales_screen.dart';
+import '../../../features/merchant/screens/abandoned_cart_screen.dart';
+import '../../../features/merchant/screens/referral_screen.dart';
+import '../../../features/merchant/screens/smart_analytics_screen.dart';
+import '../../../features/merchant/screens/auto_reports_screen.dart';
+import '../../../features/merchant/screens/heatmap_screen.dart';
+import '../../../features/merchant/screens/ai_assistant_screen.dart';
+import '../../../features/merchant/screens/content_generator_screen.dart';
+import '../../../features/merchant/screens/smart_pricing_screen.dart';
+import '../../../features/merchant/screens/customer_segments_screen.dart';
+import '../../../features/merchant/screens/custom_messages_screen.dart';
+import '../../../features/merchant/screens/loyalty_program_screen.dart';
+import '../../../features/merchant/screens/product_variants_screen.dart';
+import '../../../features/merchant/screens/product_bundles_screen.dart';
+import '../../../features/merchant/screens/digital_products_screen.dart';
+import '../features/shipping/shipping_screen.dart';
+import '../features/delivery/delivery_options_screen.dart';
+import '../features/payments/payment_methods_screen.dart';
+import '../features/payments/cod_settings_screen.dart';
+import '../features/webstore/webstore_screen.dart';
+import '../features/whatsapp/whatsapp_screen.dart';
+import '../features/qrcode/qr_code_screen.dart';
 import '../../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../../features/products/presentation/screens/add_product_screen.dart';
 import '../../../features/products/presentation/screens/product_details_screen.dart';
@@ -148,6 +171,126 @@ class MerchantRouter {
                   name: 'sales',
                   builder: (context, state) => const SalesScreen(),
                 ),
+                // ====== الميزات الجديدة ======
+                // 1. الكوبونات
+                GoRoute(
+                  path: 'coupons',
+                  name: 'coupons',
+                  builder: (context, state) => const CouponsScreen(),
+                ),
+                // 2. العروض الخاطفة
+                GoRoute(
+                  path: 'flash-sales',
+                  name: 'flash-sales',
+                  builder: (context, state) => const FlashSalesScreen(),
+                ),
+                // 3-23. الميزات الأخرى (placeholder)
+                GoRoute(
+                  path: 'abandoned-cart',
+                  name: 'abandoned-cart',
+                  builder: (context, state) => const AbandonedCartScreen(),
+                ),
+                GoRoute(
+                  path: 'referral',
+                  name: 'referral',
+                  builder: (context, state) => const ReferralScreen(),
+                ),
+                GoRoute(
+                  path: 'smart-analytics',
+                  name: 'smart-analytics',
+                  builder: (context, state) => const SmartAnalyticsScreen(),
+                ),
+                GoRoute(
+                  path: 'auto-reports',
+                  name: 'auto-reports',
+                  builder: (context, state) => const AutoReportsScreen(),
+                ),
+                GoRoute(
+                  path: 'heatmap',
+                  name: 'heatmap',
+                  builder: (context, state) => const HeatmapScreen(),
+                ),
+                GoRoute(
+                  path: 'ai-assistant',
+                  name: 'ai-assistant',
+                  builder: (context, state) => const AiAssistantScreen(),
+                ),
+                GoRoute(
+                  path: 'content-generator',
+                  name: 'content-generator',
+                  builder: (context, state) => const ContentGeneratorScreen(),
+                ),
+                GoRoute(
+                  path: 'smart-pricing',
+                  name: 'smart-pricing',
+                  builder: (context, state) => const SmartPricingScreen(),
+                ),
+                GoRoute(
+                  path: 'customer-segments',
+                  name: 'customer-segments',
+                  builder: (context, state) => const CustomerSegmentsScreen(),
+                ),
+                GoRoute(
+                  path: 'custom-messages',
+                  name: 'custom-messages',
+                  builder: (context, state) => const CustomMessagesScreen(),
+                ),
+                GoRoute(
+                  path: 'loyalty-program',
+                  name: 'loyalty-program',
+                  builder: (context, state) => const LoyaltyProgramScreen(),
+                ),
+                GoRoute(
+                  path: 'product-variants',
+                  name: 'product-variants',
+                  builder: (context, state) => const ProductVariantsScreen(),
+                ),
+                GoRoute(
+                  path: 'product-bundles',
+                  name: 'product-bundles',
+                  builder: (context, state) => const ProductBundlesScreen(),
+                ),
+                GoRoute(
+                  path: 'digital-products',
+                  name: 'digital-products',
+                  builder: (context, state) => const DigitalProductsScreen(),
+                ),
+                GoRoute(
+                  path: 'shipping-integration',
+                  name: 'shipping-integration',
+                  builder: (context, state) => const ShippingScreen(),
+                ),
+                GoRoute(
+                  path: 'delivery-options',
+                  name: 'delivery-options',
+                  builder: (context, state) => const DeliveryOptionsScreen(),
+                ),
+                GoRoute(
+                  path: 'payment-methods',
+                  name: 'payment-methods',
+                  builder: (context, state) => const PaymentMethodsScreen(),
+                ),
+                GoRoute(
+                  path: 'cod-settings',
+                  name: 'cod-settings',
+                  builder: (context, state) => const CodSettingsScreen(),
+                ),
+                GoRoute(
+                  path: 'webstore',
+                  name: 'webstore',
+                  builder: (context, state) => const WebstoreScreen(),
+                ),
+                GoRoute(
+                  path: 'whatsapp-integration',
+                  name: 'whatsapp-integration',
+                  builder: (context, state) => const WhatsappScreen(),
+                ),
+                GoRoute(
+                  path: 'qrcode-generator',
+                  name: 'qrcode-generator',
+                  builder: (context, state) => const QrCodeScreen(),
+                ),
+                // ====== نهاية الميزات الجديدة ======
                 GoRoute(
                   path: 'feature/:name',
                   name: 'feature',

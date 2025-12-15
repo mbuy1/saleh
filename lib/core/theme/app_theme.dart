@@ -68,7 +68,10 @@ class AppTheme {
   static const Color slate200 = Color(0xFFE2E8F0);
   static const Color slate300 = Color(0xFFCBD5E1); // Metallic edge border
   static const Color slate400 = Color(0xFF94A3B8); // Inactive icons
-  static const Color slate600 = Color(0xFF7C3AED); // Purple-600 (Active color)
+  static const Color slate500 = Color(0xFF64748B); // Medium slate
+  static const Color slate600 = Color(
+    0xFF475569,
+  ); // Dark slate for better contrast
   static const Color darkSlate = Color(
     0xFF0F172A,
   ); // Headings & Icons (dark slate grey)
