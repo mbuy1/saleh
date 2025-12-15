@@ -25,7 +25,7 @@ import '../../../features/conversations/presentation/screens/conversations_scree
 import '../../../features/products/presentation/screens/add_product_screen.dart';
 import '../../../features/products/presentation/screens/product_details_screen.dart';
 import '../../../features/merchant/presentation/screens/create_store_screen.dart';
-import '../../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
+import '../../../features/ai_studio/presentation/screens/ai_studio_cards_screen.dart';
 import '../../../features/marketing/presentation/screens/marketing_screen.dart';
 
 /// Router خاص بتطبيق التاجر فقط
@@ -69,7 +69,7 @@ class MerchantRouter {
                 GoRoute(
                   path: 'studio',
                   name: 'mbuy-studio',
-                  builder: (context, state) => const MbuyStudioScreen(),
+                  builder: (context, state) => const AiStudioCardsScreen(),
                 ),
                 GoRoute(
                   path: 'tools',

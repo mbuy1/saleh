@@ -378,7 +378,7 @@ class AppTheme {
           height: 1.5,
         ),
         bodySmall: GoogleFonts.cairo(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: FontWeight.normal,
           color: textSecondaryColor,
           height: 1.4,
@@ -395,7 +395,7 @@ class AppTheme {
           color: textSecondaryColor,
         ),
         labelSmall: GoogleFonts.cairo(
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: FontWeight.w500,
           color: textSecondaryColor,
         ),

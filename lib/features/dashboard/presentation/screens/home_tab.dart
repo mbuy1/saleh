@@ -213,12 +213,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 ),
               ),
               // زر الإشعارات
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {
-                  context.push('/dashboard/notifications');
-                },
-                color: AppTheme.darkSlate, // Dark Slate for icons
+              Semantics(
+                label: 'الإشعارات',
+                button: true,
+                child: IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {
+                    context.push('/dashboard/notifications');
+                  },
+                  color: AppTheme.darkSlate, // Dark Slate for icons
+                ),
               ),
             ],
           ),
@@ -286,62 +290,70 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 ),
                 const SizedBox(width: 8),
                 // زر النسخ
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    Clipboard.setData(ClipboardData(text: storeUrl));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('تم نسخ الرابط'),
-                        backgroundColor: AppTheme.successColor,
-                        behavior: SnackBarBehavior.floating,
+                Semantics(
+                  label: 'نسخ رابط المتجر',
+                  button: true,
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Clipboard.setData(ClipboardData(text: storeUrl));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('تم نسخ الرابط'),
+                          backgroundColor: AppTheme.successColor,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
                       ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'نسخ',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'نسخ',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 // زر المشاركة
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    SharePlus.instance.share(
-                      ShareParams(
-                        text: 'تفضل بزيارة متجري على: $storeUrl',
-                        subject: 'رابط متجري',
+                Semantics(
+                  label: 'مشاركة رابط المتجر',
+                  button: true,
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      SharePlus.instance.share(
+                        ShareParams(
+                          text: 'تفضل بزيارة متجري على: $storeUrl',
+                          subject: 'رابط متجري',
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
                       ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(
-                      Icons.share_outlined,
-                      size: 16,
-                      color: AppTheme.primaryColor,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.share_outlined,
+                        size: 16,
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                   ),
                 ),
@@ -358,38 +370,42 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     required String label,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
+    return Semantics(
+      button: true,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            gradient: AppTheme.cardGradient,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.borderColor, width: 1),
-          ),
-          child: Column(
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: AppTheme
-                    .darkSlate, // Dark Slate (#0F172A) for icons from image
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              gradient: AppTheme.cardGradient,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.borderColor, width: 1),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
                   color: AppTheme
-                      .mutedSlate, // Muted Slate (#64748B) for labels from image
-                  fontWeight: FontWeight.w500,
+                      .darkSlate, // Dark Slate (#0F172A) for icons from image
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme
+                        .mutedSlate, // Muted Slate (#64748B) for labels from image
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -616,70 +632,75 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     required String label,
     required String screen,
   }) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: () => _navigateToScreen(context, screen, label),
+    return Semantics(
+      button: true,
+      label: label,
+      hint: 'انقر للانتقال إلى $label',
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(18),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: AppTheme.cardGradient,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: AppTheme.borderColor, // Metallic edge
-              width: 1,
+        child: InkWell(
+          onTap: () => _navigateToScreen(context, screen, label),
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: AppTheme.cardGradient,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: AppTheme.borderColor, // Metallic edge
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.primaryColor.withValues(alpha: 0.1),
-                        AppTheme.primaryLight.withValues(alpha: 0.1),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.primaryColor.withValues(alpha: 0.1),
+                          AppTheme.primaryLight.withValues(alpha: 0.1),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(17),
+                      ),
                     ),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(17),
-                    ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      icon,
-                      size: 36,
-                      color: AppTheme
-                          .darkSlate, // Dark Slate for feature icons from image
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        size: 36,
+                        color: AppTheme
+                            .darkSlate, // Dark Slate for feature icons from image
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.darkSlate, // Dark Slate for headings
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkSlate, // Dark Slate for headings
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -713,7 +734,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         context.push('/dashboard/promotions');
         break;
       case 'MbuyPackage':
-        // TODO: ربط بصفحة الباقة عند إنشائها
+        // تم تفعيل الصفحة الاحتياطية
         context.push(
           '/dashboard/feature/${Uri.encodeComponent('mbuy package')}',
         );
@@ -722,8 +743,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         context.push('/dashboard/dropshipping');
         break;
       case 'Reports':
-        // TODO: ربط بصفحة السجلات والتقارير عند إنشائها
-        break;
+        // تم تفعيل الصفحة الاحتياطية
+        context.push('/dashboard/feature/${Uri.encodeComponent('Reports')}');
       default:
         context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
     }
@@ -775,7 +796,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'تغيير كلمة السر',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to change password screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('تغيير كلمة السر')}',
                       );
@@ -786,7 +806,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'تعديل معلومات الحساب',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to edit account screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('تعديل معلومات الحساب')}',
                       );
@@ -797,7 +816,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'الاقتراحات',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to suggestions screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('الاقتراحات')}',
                       );
@@ -808,7 +826,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'حذف المتجر',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to delete store screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('حذف المتجر')}',
                       );
@@ -835,7 +852,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'الشروط و الأحكام',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to terms screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('الشروط و الأحكام')}',
                       );
@@ -846,7 +862,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'باقة المتجر',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to package screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('باقة المتجر')}',
                       );
@@ -857,7 +872,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     title: 'اتصل بنا',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Navigate to contact screen
                       context.push(
                         '/dashboard/feature/${Uri.encodeComponent('اتصل بنا')}',
                       );

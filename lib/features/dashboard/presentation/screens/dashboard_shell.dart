@@ -216,30 +216,35 @@ class _DashboardShellState extends State<DashboardShell> {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isSelected ? selectedIcon : icon,
-            size: AppDimensions.iconM,
-            color: isSelected
-                ? AppTheme
-                      .primaryColor // Blue (#2563EB) - Active icon
-                : AppTheme.mutedSlate, // Muted Slate (#64748B) - Inactive icons
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      child: Semantics(
+        button: true,
+        label: label,
+        selected: isSelected,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? selectedIcon : icon,
+              size: AppDimensions.iconM,
               color: isSelected
                   ? AppTheme
-                        .primaryColor // Blue (#2563EB)
-                  : AppTheme.mutedSlate, // Muted Slate (#64748B)
+                        .primaryColor // Blue (#2563EB) - Active icon
+                  : AppTheme.slate600, // Darker for better contrast
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? AppTheme
+                          .primaryColor // Blue (#2563EB)
+                    : AppTheme.slate700, // Darker text for better readability
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -64,7 +64,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.local_offer_outlined,
                       color: const Color(0xFF4CAF50),
                       onTap: () {
-                        // TODO: Navigate to Coupons
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('الكوبونات')}',
+                        );
                       },
                     ),
                     _buildGridItem(
@@ -72,7 +74,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.monetization_on_outlined,
                       color: const Color(0xFF2196F3),
                       onTap: () {
-                        // TODO: Navigate to Cashback
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('كاش باك')}',
+                        );
                       },
                     ),
                     _buildGridItem(
@@ -80,7 +84,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.campaign_outlined,
                       color: const Color(0xFF9C27B0),
                       onTap: () {
-                        // TODO: Navigate to Campaigns
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('الحملات')}',
+                        );
                       },
                     ),
                     _buildGridItem(
@@ -88,7 +94,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.shopping_cart_checkout_outlined,
                       color: const Color(0xFFE91E63),
                       onTap: () {
-                        // TODO: Navigate to Abandoned Cart
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('السلة المتروكة')}',
+                        );
                       },
                     ),
                     _buildGridItem(
@@ -96,7 +104,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.loyalty_outlined,
                       color: const Color(0xFF00BCD4),
                       onTap: () {
-                        // TODO: Navigate to Loyalty Program
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('برنامج الولاء')}',
+                        );
                       },
                     ),
                     _buildGridItem(
@@ -104,7 +114,9 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       icon: Icons.person_outline,
                       color: Colors.orange,
                       onTap: () {
-                        // TODO: Navigate to Personal Marketing Agent
+                        context.push(
+                          '/dashboard/feature/${Uri.encodeComponent('وكيل تسويق شخصي')}',
+                        );
                       },
                     ),
                   ],

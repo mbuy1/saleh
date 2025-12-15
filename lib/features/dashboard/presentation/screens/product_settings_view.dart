@@ -375,15 +375,29 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
                 : null,
           );
         } else {
-          return RadioListTile<String>(
-            title: Text(option),
-            value: option,
-            // ignore: deprecated_member_use
-            groupValue: selectedOption,
-            // ignore: deprecated_member_use
-            onChanged: isEnabled
-                ? (value) => _updateSetting('${key}_option', value)
+          return InkWell(
+            onTap: isEnabled
+                ? () => _updateSetting('${key}_option', option)
                 : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  // ignore: deprecated_member_use
+                  Radio<String>(
+                    value: option,
+                    // ignore: deprecated_member_use
+                    groupValue: selectedOption,
+                    // ignore: deprecated_member_use
+                    onChanged: isEnabled
+                        ? (value) => _updateSetting('${key}_option', value)
+                        : null,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(option)),
+                ],
+              ),
+            ),
           );
         }
       }).toList(),
