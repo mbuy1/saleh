@@ -12,7 +12,7 @@ class AppStrings {
   // =========================================================================
   // General
   // =========================================================================
-  
+
   static const String appName = 'MBUY';
   static const String loading = 'جاري التحميل...';
   static const String error = 'حدث خطأ';
@@ -41,7 +41,7 @@ class AppStrings {
   // =========================================================================
   // Authentication
   // =========================================================================
-  
+
   static const String login = 'تسجيل الدخول';
   static const String logout = 'تسجيل الخروج';
   static const String register = 'إنشاء حساب';
@@ -66,7 +66,7 @@ class AppStrings {
   // =========================================================================
   // Navigation
   // =========================================================================
-  
+
   static const String home = 'الرئيسية';
   static const String orders = 'الطلبات';
   static const String products = 'المنتجات';
@@ -87,7 +87,7 @@ class AppStrings {
   // =========================================================================
   // Dashboard
   // =========================================================================
-  
+
   static const String dashboard = 'لوحة التحكم';
   static const String totalSales = 'إجمالي المبيعات';
   static const String totalOrders = 'إجمالي الطلبات';
@@ -104,7 +104,7 @@ class AppStrings {
   // =========================================================================
   // Products
   // =========================================================================
-  
+
   static const String addProduct = 'إضافة منتج';
   static const String editProduct = 'تعديل المنتج';
   static const String productName = 'اسم المنتج';
@@ -134,7 +134,7 @@ class AppStrings {
   // =========================================================================
   // Orders
   // =========================================================================
-  
+
   static const String orderNumber = 'رقم الطلب';
   static const String orderDate = 'تاريخ الطلب';
   static const String orderStatus = 'حالة الطلب';
@@ -157,7 +157,7 @@ class AppStrings {
   // =========================================================================
   // Store
   // =========================================================================
-  
+
   static const String storeName = 'اسم المتجر';
   static const String storeDescription = 'وصف المتجر';
   static const String storeLogo = 'شعار المتجر';
@@ -173,7 +173,7 @@ class AppStrings {
   // =========================================================================
   // Marketing
   // =========================================================================
-  
+
   static const String coupons = 'الكوبونات';
   static const String flashSales = 'العروض الخاطفة';
   static const String promotions = 'الترويج';
@@ -195,7 +195,7 @@ class AppStrings {
   // =========================================================================
   // AI Studio
   // =========================================================================
-  
+
   static const String aiStudio = 'استوديو AI';
   static const String aiTools = 'أدوات AI';
   static const String generateImage = 'توليد صورة';
@@ -214,7 +214,7 @@ class AppStrings {
   // =========================================================================
   // Analytics
   // =========================================================================
-  
+
   static const String smartAnalytics = 'تحليلات ذكية';
   static const String salesChart = 'مخطط المبيعات';
   static const String topProducts = 'المنتجات الأكثر مبيعاً';
@@ -231,7 +231,7 @@ class AppStrings {
   // =========================================================================
   // Dropshipping
   // =========================================================================
-  
+
   static const String dropshipping = 'دروب شيبينج';
   static const String supplierProducts = 'منتجات الموردين';
   static const String resellerListings = 'قوائم الموزعين';
@@ -245,7 +245,7 @@ class AppStrings {
   // =========================================================================
   // Inventory
   // =========================================================================
-  
+
   static const String inventoryOverview = 'نظرة عامة على المخزون';
   static const String adjustStock = 'تعديل المخزون';
   static const String stockMovements = 'حركات المخزون';
@@ -260,7 +260,7 @@ class AppStrings {
   // =========================================================================
   // Wallet & Points
   // =========================================================================
-  
+
   static const String currentBalance = 'الرصيد الحالي';
   static const String availableBalance = 'الرصيد المتاح';
   static const String pendingBalance = 'الرصيد المعلق';
@@ -277,7 +277,7 @@ class AppStrings {
   // =========================================================================
   // Notifications
   // =========================================================================
-  
+
   static const String noNotifications = 'لا توجد إشعارات';
   static const String markAllRead = 'تحديد الكل كمقروء';
   static const String clearAll = 'مسح الكل';
@@ -289,7 +289,7 @@ class AppStrings {
   // =========================================================================
   // Errors
   // =========================================================================
-  
+
   static const String unexpectedError = 'حدث خطأ غير متوقع';
   static const String networkError = 'خطأ في الاتصال بالإنترنت';
   static const String serverError = 'خطأ في الخادم';
@@ -303,7 +303,7 @@ class AppStrings {
   // =========================================================================
   // Empty States
   // =========================================================================
-  
+
   static const String noData = 'لا توجد بيانات';
   static const String emptyList = 'القائمة فارغة';
   static const String noResults = 'لا توجد نتائج';
@@ -315,7 +315,7 @@ class AppStrings {
   // =========================================================================
   // Success Messages
   // =========================================================================
-  
+
   static const String savedSuccessfully = 'تم الحفظ بنجاح';
   static const String deletedSuccessfully = 'تم الحذف بنجاح';
   static const String updatedSuccessfully = 'تم التحديث بنجاح';
@@ -326,7 +326,7 @@ class AppStrings {
   // =========================================================================
   // Confirmations
   // =========================================================================
-  
+
   static const String areYouSure = 'هل أنت متأكد؟';
   static const String confirmDelete = 'هل تريد الحذف؟';
   static const String confirmCancel = 'هل تريد الإلغاء؟';
@@ -339,7 +339,7 @@ class AppStrings {
   // =========================================================================
   // Settings
   // =========================================================================
-  
+
   static const String accountSettings = 'إعدادات الحساب';
   static const String notificationSettings = 'إعدادات الإشعارات';
   static const String privacySettings = 'إعدادات الخصوصية';
@@ -363,7 +363,7 @@ class AppStrings {
   // =========================================================================
   // Time & Dates
   // =========================================================================
-  
+
   static const String today = 'اليوم';
   static const String yesterday = 'أمس';
   static const String thisWeek = 'هذا الأسبوع';
