@@ -167,13 +167,65 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
     );
 
     if (confirmed == true && mounted) {
-      // TODO: تنفيذ عملية الدفع
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('جاري تفعيل ${package.name}...'),
-          backgroundColor: AppTheme.primaryColor,
-        ),
-      );
+      setState(() => _isLoading = true);
+
+      try {
+        // محاكاة عملية الدفع
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            _selectedPackage = package.id;
+            _isLoading = false;
+          });
+
+          // عرض رسالة نجاح
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              icon: const Icon(
+                Icons.check_circle,
+                color: AppTheme.successColor,
+                size: 64,
+              ),
+              title: const Text('تم الاشتراك بنجاح!'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('مبروك! تم تفعيل ${package.name}'),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'يمكنك الآن الاستمتاع بجميع المميزات',
+                    style: TextStyle(color: AppTheme.textSecondaryColor),
+                  ),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.pop(); // العودة للشاشة السابقة
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                  ),
+                  child: const Text('ابدأ الآن'),
+                ),
+              ],
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطأ في الدفع: ${e.toString()}'),
+              backgroundColor: AppTheme.errorColor,
+            ),
+          );
+        }
+      }
     }
   }
 

@@ -1059,12 +1059,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-                    // TODO: Implement session playback
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('قريباً: تشغيل تسجيل الجلسة'),
-                      ),
-                    );
+                    _showSessionPlayback(session);
                   },
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('تشغيل التسجيل'),
@@ -1231,4 +1226,336 @@ class HeatmapPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+/// Session Playback Dialog
+extension SessionPlayback on _HeatmapScreenState {
+  void _showSessionPlayback(Map<String, dynamic> session) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _SessionPlaybackDialog(session: session),
+    );
+  }
+}
+
+class _SessionPlaybackDialog extends StatefulWidget {
+  final Map<String, dynamic> session;
+
+  const _SessionPlaybackDialog({required this.session});
+
+  @override
+  State<_SessionPlaybackDialog> createState() => _SessionPlaybackDialogState();
+}
+
+class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPlaying = false;
+  int _currentEventIndex = 0;
+  double _playbackSpeed = 1.0;
+
+  // محاكاة أحداث الجلسة
+  late List<Map<String, dynamic>> _events;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 30),
+    );
+
+    // إنشاء أحداث محاكاة بناءً على بيانات الجلسة
+    _events = _generateMockEvents();
+
+    _controller.addListener(() {
+      if (_controller.isAnimating) {
+        final progress = _controller.value;
+        final newIndex = (progress * _events.length).floor();
+        if (newIndex != _currentEventIndex && newIndex < _events.length) {
+          setState(() => _currentEventIndex = newIndex);
+        }
+      }
+    });
+  }
+
+  List<Map<String, dynamic>> _generateMockEvents() {
+    final pagesVisited = widget.session['pages_visited'] ?? 3;
+    final eventsCount = widget.session['events_count'] ?? 10;
+
+    List<Map<String, dynamic>> events = [];
+
+    // إضافة أحداث تنقل
+    for (int i = 0; i < pagesVisited; i++) {
+      events.add({
+        'type': 'pageview',
+        'page': i == 0 ? (widget.session['entry_page'] ?? '/') : '/page-$i',
+        'time': '${i * 10}s',
+      });
+    }
+
+    // إضافة أحداث نقر
+    for (int i = 0; i < eventsCount - pagesVisited; i++) {
+      events.add({
+        'type': 'click',
+        'x': (20 + (i * 15) % 60).toDouble(),
+        'y': (30 + (i * 20) % 40).toDouble(),
+        'element': ['زر', 'رابط', 'صورة', 'نص'][i % 4],
+      });
+    }
+
+    // إضافة صفحة الخروج
+    if (widget.session['exit_page'] != null) {
+      events.add({'type': 'exit', 'page': widget.session['exit_page']});
+    }
+
+    return events;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _togglePlayback() {
+    setState(() {
+      _isPlaying = !_isPlaying;
+      if (_isPlaying) {
+        _controller.forward();
+      } else {
+        _controller.stop();
+      }
+    });
+  }
+
+  void _resetPlayback() {
+    setState(() {
+      _controller.reset();
+      _currentEventIndex = 0;
+      _isPlaying = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.all(16),
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.play_circle, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'تشغيل جلسة: ${widget.session['session_id']?.toString().substring(0, 8) ?? 'غير معروف'}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            // Playback Area
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Stack(
+                  children: [
+                    // محاكاة صفحة الويب
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.web, size: 64, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          Text(
+                            _currentEventIndex < _events.length
+                                ? _events[_currentEventIndex]['page'] ??
+                                      'الصفحة الرئيسية'
+                                : 'انتهى التشغيل',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // مؤشر النقر
+                    if (_currentEventIndex < _events.length &&
+                        _events[_currentEventIndex]['type'] == 'click')
+                      Positioned(
+                        left:
+                            (_events[_currentEventIndex]['x'] as double) *
+                            MediaQuery.of(context).size.width /
+                            100,
+                        top:
+                            (_events[_currentEventIndex]['y'] as double) *
+                            300 /
+                            100,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor.withAlpha(150),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.primaryColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.touch_app,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Event Timeline
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _events.length,
+                itemBuilder: (context, index) {
+                  final event = _events[index];
+                  final isActive = index == _currentEventIndex;
+
+                  return Container(
+                    width: 60,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppTheme.primaryColor.withAlpha(50)
+                          : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isActive
+                            ? AppTheme.primaryColor
+                            : Colors.grey[300]!,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          event['type'] == 'pageview'
+                              ? Icons.web
+                              : event['type'] == 'click'
+                              ? Icons.touch_app
+                              : Icons.exit_to_app,
+                          size: 20,
+                          color: isActive ? AppTheme.primaryColor : Colors.grey,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${index + 1}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isActive
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isActive
+                                ? AppTheme.primaryColor
+                                : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Controls
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.replay),
+                    onPressed: _resetPlayback,
+                    tooltip: 'إعادة',
+                  ),
+                  const SizedBox(width: 16),
+                  FloatingActionButton(
+                    onPressed: _togglePlayback,
+                    backgroundColor: AppTheme.primaryColor,
+                    child: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                  ),
+                  const SizedBox(width: 16),
+                  // Speed control
+                  PopupMenuButton<double>(
+                    icon: const Icon(Icons.speed),
+                    tooltip: 'سرعة التشغيل',
+                    onSelected: (speed) {
+                      setState(() => _playbackSpeed = speed);
+                      _controller.duration = Duration(
+                        milliseconds: (30000 / speed).round(),
+                      );
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 0.5, child: Text('0.5x')),
+                      const PopupMenuItem(value: 1.0, child: Text('1x')),
+                      const PopupMenuItem(value: 1.5, child: Text('1.5x')),
+                      const PopupMenuItem(value: 2.0, child: Text('2x')),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Progress
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) => LinearProgressIndicator(
+                  value: _controller.value,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation(AppTheme.primaryColor),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

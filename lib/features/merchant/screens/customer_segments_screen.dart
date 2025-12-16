@@ -976,16 +976,377 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 ],
               ),
             ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'قائمة العملاء قريباً',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
+            Expanded(child: _buildCustomersList(segment)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomersList(Map<String, dynamic> segment) {
+    // محاكاة قائمة العملاء بناءً على الشريحة
+    final customers = _generateMockCustomers(segment);
+
+    if (customers.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'لا يوجد عملاء في هذه الشريحة',
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ],
         ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: customers.length,
+      itemBuilder: (context, index) {
+        final customer = customers[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: AppTheme.primaryColor.withAlpha(30),
+              child: Text(
+                customer['name'].toString().substring(0, 1).toUpperCase(),
+                style: const TextStyle(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            title: Text(
+              customer['name'],
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(customer['email']),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    _buildCustomerStat(
+                      Icons.shopping_cart,
+                      '${customer['orders']} طلب',
+                    ),
+                    const SizedBox(width: 16),
+                    _buildCustomerStat(
+                      Icons.attach_money,
+                      '${customer['total_spent']} ر.س',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            trailing: PopupMenuButton(
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'view',
+                  child: Row(
+                    children: [
+                      Icon(Icons.visibility, size: 20),
+                      SizedBox(width: 8),
+                      Text('عرض التفاصيل'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'message',
+                  child: Row(
+                    children: [
+                      Icon(Icons.message, size: 20),
+                      SizedBox(width: 8),
+                      Text('إرسال رسالة'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'tag',
+                  child: Row(
+                    children: [
+                      Icon(Icons.label, size: 20),
+                      SizedBox(width: 8),
+                      Text('إضافة وسم'),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                switch (value) {
+                  case 'view':
+                    _showCustomerDetails(customer);
+                    break;
+                  case 'message':
+                    _sendMessageToCustomer(customer);
+                    break;
+                  case 'tag':
+                    _addTagToCustomer(customer);
+                    break;
+                }
+              },
+            ),
+            isThreeLine: true,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomerStat(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: Colors.grey[600]),
+        const SizedBox(width: 4),
+        Text(text, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+      ],
+    );
+  }
+
+  List<Map<String, dynamic>> _generateMockCustomers(
+    Map<String, dynamic> segment,
+  ) {
+    final segmentType = segment['segment_type'] ?? 'general';
+    final count = segment['customer_count'] ?? 5;
+
+    List<Map<String, dynamic>> customers = [];
+
+    for (int i = 0; i < count && i < 20; i++) {
+      customers.add({
+        'id': 'cust_${i + 1}',
+        'name': _getRandomName(i),
+        'email': 'customer${i + 1}@example.com',
+        'phone': '+966 5${50 + i} ${100 + i * 10} ${1000 + i * 100}',
+        'orders': segmentType == 'vip' ? 20 + i * 5 : 3 + i,
+        'total_spent': segmentType == 'vip' ? 5000 + i * 1000 : 500 + i * 100,
+        'last_order': DateTime.now()
+            .subtract(Duration(days: i * 3))
+            .toIso8601String(),
+        'segment': segment['name'],
+        'tags': i % 3 == 0 ? ['عميل مميز'] : [],
+      });
+    }
+
+    return customers;
+  }
+
+  String _getRandomName(int index) {
+    final names = [
+      'أحمد محمد',
+      'سارة علي',
+      'محمد عبدالله',
+      'فاطمة أحمد',
+      'خالد إبراهيم',
+      'نورة سعد',
+      'عمر يوسف',
+      'ريم خالد',
+      'سلطان فهد',
+      'هدى عبدالرحمن',
+      'فيصل ناصر',
+      'منيرة سليمان',
+      'راشد عبدالعزيز',
+      'عائشة محمد',
+      'بندر صالح',
+      'لطيفة أحمد',
+      'ماجد علي',
+      'أسماء عمر',
+      'تركي فهد',
+      'دانة سعود',
+    ];
+    return names[index % names.length];
+  }
+
+  void _showCustomerDetails(Map<String, dynamic> customer) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppTheme.primaryColor.withAlpha(30),
+                  child: Text(
+                    customer['name'].toString().substring(0, 1).toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  customer['name'],
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  customer['email'],
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildDetailCard('معلومات الاتصال', [
+                _buildDetailRow('البريد', customer['email']),
+                _buildDetailRow('الهاتف', customer['phone']),
+              ]),
+              const SizedBox(height: 16),
+              _buildDetailCard('إحصائيات الشراء', [
+                _buildDetailRow('عدد الطلبات', '${customer['orders']}'),
+                _buildDetailRow(
+                  'إجمالي المشتريات',
+                  '${customer['total_spent']} ر.س',
+                ),
+                _buildDetailRow('الشريحة', customer['segment']),
+              ]),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _sendMessageToCustomer(customer);
+                      },
+                      icon: const Icon(Icons.message),
+                      label: const Text('رسالة'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // فتح صفحة طلبات العميل
+                      },
+                      icon: const Icon(Icons.shopping_bag),
+                      label: const Text('الطلبات'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(String title, List<Widget> children) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const Divider(),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey[600])),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  void _sendMessageToCustomer(Map<String, dynamic> customer) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('إرسال رسالة إلى ${customer['name']}...'),
+        backgroundColor: AppTheme.primaryColor,
+      ),
+    );
+  }
+
+  void _addTagToCustomer(Map<String, dynamic> customer) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إضافة وسم'),
+        content: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _tags.map((tag) {
+            return ActionChip(
+              label: Text(tag['name'] ?? 'وسم'),
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'تم إضافة وسم "${tag['name']}" لـ ${customer['name']}',
+                    ),
+                    backgroundColor: AppTheme.successColor,
+                  ),
+                );
+              },
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+        ],
       ),
     );
   }

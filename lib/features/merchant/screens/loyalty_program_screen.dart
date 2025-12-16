@@ -827,34 +827,748 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
   // Dialogs
   void _showSettingsDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('قريباً: تعديل إعدادات البرنامج')),
+    int pointsPerSar = _program['points_per_sar'] ?? 1;
+    int pointsValue = _program['points_value'] ?? 100;
+    bool enrollOnPurchase = _program['auto_enroll'] ?? true;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('إعدادات البرنامج'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // النقاط لكل ريال
+                Row(
+                  children: [
+                    Expanded(child: Text('نقطة لكل $pointsPerSar ر.س')),
+                    Slider(
+                      value: pointsPerSar.toDouble(),
+                      min: 1,
+                      max: 10,
+                      divisions: 9,
+                      label: '$pointsPerSar ر.س',
+                      onChanged: (v) =>
+                          setDialogState(() => pointsPerSar = v.toInt()),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // قيمة النقاط
+                Row(
+                  children: [
+                    Expanded(child: Text('كل $pointsValue نقطة = 1 ر.س')),
+                    Slider(
+                      value: pointsValue.toDouble(),
+                      min: 50,
+                      max: 500,
+                      divisions: 9,
+                      label: '$pointsValue',
+                      onChanged: (v) =>
+                          setDialogState(() => pointsValue = v.toInt()),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('تسجيل تلقائي عند الشراء'),
+                  value: enrollOnPurchase,
+                  onChanged: (v) => setDialogState(() => enrollOnPurchase = v),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _program['points_per_sar'] = pointsPerSar;
+                  _program['points_value'] = pointsValue;
+                  _program['auto_enroll'] = enrollOnPurchase;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم حفظ الإعدادات'),
+                    backgroundColor: AppTheme.successColor,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   void _showAddTierDialog() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('قريباً: إضافة مستوى جديد')));
+    final formKey = GlobalKey<FormState>();
+    String tierName = '';
+    int minPoints = 0;
+    double discount = 5;
+    Color tierColor = AppTheme.primaryColor;
+
+    final colors = [
+      AppTheme.primaryColor,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.indigo,
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('إضافة مستوى جديد'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'اسم المستوى',
+                      hintText: 'مثال: الفضي',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    onSaved: (v) => tierName = v ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'الحد الأدنى من النقاط',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: '0',
+                    onSaved: (v) => minPoints = int.tryParse(v ?? '0') ?? 0,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Text('نسبة الخصم: ${discount.toInt()}%'),
+                      Expanded(
+                        child: Slider(
+                          value: discount,
+                          min: 0,
+                          max: 30,
+                          divisions: 6,
+                          label: '${discount.toInt()}%',
+                          onChanged: (v) => setDialogState(() => discount = v),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('لون المستوى'),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: colors.map((color) {
+                      return GestureDetector(
+                        onTap: () => setDialogState(() => tierColor = color),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: tierColor == color
+                                ? Border.all(color: Colors.black, width: 3)
+                                : null,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() == true) {
+                  formKey.currentState?.save();
+                  Navigator.pop(context);
+
+                  setState(() {
+                    _tiers.add({
+                      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                      'name': tierName,
+                      'min_points': minPoints,
+                      'discount_percent': discount,
+                      'color': tierColor.value.toRadixString(16),
+                      'members_count': 0,
+                    });
+                    // ترتيب المستويات حسب النقاط
+                    _tiers.sort(
+                      (a, b) => (a['min_points'] ?? 0).compareTo(
+                        b['min_points'] ?? 0,
+                      ),
+                    );
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم إضافة مستوى "$tierName"'),
+                      backgroundColor: AppTheme.successColor,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('إضافة'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showEditTierDialog(Map<String, dynamic> tier) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('قريباً: تعديل المستوى')));
+    final formKey = GlobalKey<FormState>();
+    String tierName = tier['name'] ?? '';
+    int minPoints = tier['min_points'] ?? 0;
+    double discount = (tier['discount_percent'] ?? 5).toDouble();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('تعديل مستوى: $tierName'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'اسم المستوى',
+                      border: OutlineInputBorder(),
+                    ),
+                    initialValue: tierName,
+                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    onSaved: (v) => tierName = v ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'الحد الأدنى من النقاط',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: minPoints.toString(),
+                    onSaved: (v) => minPoints = int.tryParse(v ?? '0') ?? 0,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Text('نسبة الخصم: ${discount.toInt()}%'),
+                      Expanded(
+                        child: Slider(
+                          value: discount,
+                          min: 0,
+                          max: 30,
+                          divisions: 6,
+                          label: '${discount.toInt()}%',
+                          onChanged: (v) => setDialogState(() => discount = v),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // حذف المستوى
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('حذف المستوى'),
+                    content: Text('هل تريد حذف مستوى "$tierName"؟'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('إلغاء'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            _tiers.removeWhere((t) => t['id'] == tier['id']);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('تم حذف المستوى'),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text('حذف'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() == true) {
+                  formKey.currentState?.save();
+                  Navigator.pop(context);
+
+                  setState(() {
+                    final index = _tiers.indexWhere(
+                      (t) => t['id'] == tier['id'],
+                    );
+                    if (index != -1) {
+                      _tiers[index] = {
+                        ...tier,
+                        'name': tierName,
+                        'min_points': minPoints,
+                        'discount_percent': discount,
+                      };
+                    }
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تم تحديث المستوى'),
+                      backgroundColor: AppTheme.successColor,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showAddRewardDialog() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('قريباً: إضافة مكافأة جديدة')));
+    final formKey = GlobalKey<FormState>();
+    String rewardName = '';
+    String rewardType = 'discount';
+    int pointsCost = 100;
+    String rewardValue = '10';
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('إضافة مكافأة جديدة'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'اسم المكافأة',
+                      hintText: 'مثال: خصم 10%',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    onSaved: (v) => rewardName = v ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: rewardType,
+                    decoration: const InputDecoration(
+                      labelText: 'نوع المكافأة',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'discount',
+                        child: Text('خصم نسبة مئوية'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'fixed',
+                        child: Text('خصم مبلغ ثابت'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'free_shipping',
+                        child: Text('شحن مجاني'),
+                      ),
+                      DropdownMenuItem(value: 'gift', child: Text('هدية')),
+                      DropdownMenuItem(value: 'coupon', child: Text('كوبون')),
+                    ],
+                    onChanged: (v) => setDialogState(() => rewardType = v!),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'النقاط المطلوبة',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: '100',
+                    onSaved: (v) =>
+                        pointsCost = int.tryParse(v ?? '100') ?? 100,
+                  ),
+                  const SizedBox(height: 16),
+                  if (rewardType == 'discount' || rewardType == 'fixed')
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: rewardType == 'discount'
+                            ? 'نسبة الخصم (%)'
+                            : 'قيمة الخصم (ر.س)',
+                        border: const OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                      initialValue: '10',
+                      onSaved: (v) => rewardValue = v ?? '10',
+                    ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() == true) {
+                  formKey.currentState?.save();
+                  Navigator.pop(context);
+
+                  setState(() {
+                    _rewards.add({
+                      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                      'name': rewardName,
+                      'type': rewardType,
+                      'points_cost': pointsCost,
+                      'value': rewardValue,
+                      'is_active': true,
+                      'redemptions_count': 0,
+                    });
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم إضافة مكافأة "$rewardName"'),
+                      backgroundColor: AppTheme.successColor,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('إضافة'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showMemberDetails(Map<String, dynamic> member) {
-    // Show member details bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.5,
+        minChildSize: 0.3,
+        maxChildSize: 0.8,
+        expand: false,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppTheme.primaryColor.withAlpha(30),
+                  child: Text(
+                    (member['name'] ?? 'U')
+                        .toString()
+                        .substring(0, 1)
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  member['name'] ?? 'عضو',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withAlpha(20),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    member['tier'] ?? 'أساسي',
+                    style: const TextStyle(color: AppTheme.primaryColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildMemberStatRow('النقاط الحالية', '${member['points'] ?? 0}'),
+              _buildMemberStatRow(
+                'إجمالي النقاط المكتسبة',
+                '${member['total_earned'] ?? 0}',
+              ),
+              _buildMemberStatRow(
+                'النقاط المستبدلة',
+                '${member['total_redeemed'] ?? 0}',
+              ),
+              _buildMemberStatRow(
+                'عدد الطلبات',
+                '${member['orders_count'] ?? 0}',
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _showAddPointsDialog(member);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('إضافة نقاط'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                      label: const Text('إغلاق'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMemberStatRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey[600])),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  void _showAddPointsDialog(Map<String, dynamic> member) {
+    final pointsController = TextEditingController();
+    String reason = 'manual';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('إضافة نقاط لـ ${member['name']}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: pointsController,
+              decoration: const InputDecoration(
+                labelText: 'عدد النقاط',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: reason,
+              decoration: const InputDecoration(
+                labelText: 'السبب',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'manual', child: Text('إضافة يدوية')),
+                DropdownMenuItem(value: 'bonus', child: Text('مكافأة')),
+                DropdownMenuItem(value: 'compensation', child: Text('تعويض')),
+                DropdownMenuItem(value: 'promotion', child: Text('عرض ترويجي')),
+              ],
+              onChanged: (v) => reason = v!,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final points = int.tryParse(pointsController.text) ?? 0;
+              if (points > 0) {
+                Navigator.pop(context);
+                setState(() {
+                  final index = _members.indexWhere(
+                    (m) => m['id'] == member['id'],
+                  );
+                  if (index != -1) {
+                    _members[index]['points'] =
+                        (_members[index]['points'] ?? 0) + points;
+                    _members[index]['total_earned'] =
+                        (_members[index]['total_earned'] ?? 0) + points;
+                  }
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('تم إضافة $points نقطة'),
+                    backgroundColor: AppTheme.successColor,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+            ),
+            child: const Text('إضافة'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showRewardDetails(Map<String, dynamic> reward) {
-    // Show reward details
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(reward['name'] ?? 'مكافأة'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRewardDetailRow('النوع', _getRewardTypeLabel(reward['type'])),
+            _buildRewardDetailRow(
+              'النقاط المطلوبة',
+              '${reward['points_cost'] ?? 0}',
+            ),
+            _buildRewardDetailRow(
+              'عدد الاستبدالات',
+              '${reward['redemptions_count'] ?? 0}',
+            ),
+            _buildRewardDetailRow(
+              'الحالة',
+              reward['is_active'] == true ? 'نشط' : 'متوقف',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _rewards.removeWhere((r) => r['id'] == reward['id']);
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم حذف المكافأة'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            },
+            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
   }
 }

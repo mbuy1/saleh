@@ -865,8 +865,144 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
   }
 
   void _showAddRuleDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('قريباً: إنشاء قاعدة تسعير جديدة')),
+    final formKey = GlobalKey<FormState>();
+    String ruleName = '';
+    String ruleType = 'time_based';
+    String description = '';
+    double discountPercent = 10;
+    bool isActive = true;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('إنشاء قاعدة تسعير جديدة'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'اسم القاعدة',
+                      hintText: 'مثال: خصم نهاية الأسبوع',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    onSaved: (v) => ruleName = v ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: ruleType,
+                    decoration: const InputDecoration(
+                      labelText: 'نوع القاعدة',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'time_based',
+                        child: Text('حسب الوقت'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'quantity_based',
+                        child: Text('حسب الكمية'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'customer_based',
+                        child: Text('حسب العميل'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'competitor_based',
+                        child: Text('حسب المنافسين'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'inventory_based',
+                        child: Text('حسب المخزون'),
+                      ),
+                    ],
+                    onChanged: (v) => setDialogState(() => ruleType = v!),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'الوصف (اختياري)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 2,
+                    onSaved: (v) => description = v ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text('نسبة الخصم: ${discountPercent.toInt()}%'),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Slider(
+                          value: discountPercent,
+                          min: 5,
+                          max: 50,
+                          divisions: 9,
+                          label: '${discountPercent.toInt()}%',
+                          onChanged: (v) =>
+                              setDialogState(() => discountPercent = v),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    title: const Text('تفعيل فوري'),
+                    value: isActive,
+                    onChanged: (v) => setDialogState(() => isActive = v),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() == true) {
+                  formKey.currentState?.save();
+                  Navigator.pop(context);
+
+                  // إضافة القاعدة محلياً
+                  setState(() {
+                    _rules.add({
+                      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                      'name': ruleName,
+                      'rule_type': ruleType,
+                      'description': description,
+                      'discount_percent': discountPercent,
+                      'is_active': isActive,
+                      'created_at': DateTime.now().toIso8601String(),
+                    });
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم إنشاء قاعدة "$ruleName" بنجاح'),
+                      backgroundColor: AppTheme.successColor,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('إنشاء'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
