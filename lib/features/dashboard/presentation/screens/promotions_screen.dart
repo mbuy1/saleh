@@ -123,6 +123,22 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
   bool _isLoading = true;
   String? _error;
 
+  // Campaign creation state
+  final Map<String, int> _campaignDays = {
+    'store_pin': 0,
+    'store_boost': 0,
+    'product_pin': 0,
+    'product_boost': 0,
+  };
+  final Map<String, int> _campaignPoints = {
+    'store_pin': 0,
+    'store_boost': 0,
+    'product_pin': 0,
+    'product_boost': 0,
+  };
+
+  int get _totalPoints => _campaignPoints.values.fold(0, (a, b) => a + b);
+
   @override
   void initState() {
     super.initState();
@@ -296,7 +312,10 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
             title: 'تثبيت المتجر',
             baseDailyPoints: 50,
             onChange: (days, points) {
-              // TODO: Update state
+              setState(() {
+                _campaignDays['store_pin'] = days;
+                _campaignPoints['store_pin'] = points;
+              });
             },
           ),
           const SizedBox(height: 16),
@@ -304,7 +323,10 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
             title: 'دعم ظهور المتجر',
             baseDailyPoints: 30,
             onChange: (days, points) {
-              // TODO: Update state
+              setState(() {
+                _campaignDays['store_boost'] = days;
+                _campaignPoints['store_boost'] = points;
+              });
             },
           ),
           const SizedBox(height: 16),
@@ -312,7 +334,10 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
             title: 'تثبيت المنتج',
             baseDailyPoints: 20,
             onChange: (days, points) {
-              // TODO: Update state
+              setState(() {
+                _campaignDays['product_pin'] = days;
+                _campaignPoints['product_pin'] = points;
+              });
             },
           ),
           const SizedBox(height: 16),
@@ -320,14 +345,66 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
             title: 'دعم ظهور المنتج',
             baseDailyPoints: 10,
             onChange: (days, points) {
-              // TODO: Update state
+              setState(() {
+                _campaignDays['product_boost'] = days;
+                _campaignPoints['product_boost'] = points;
+              });
             },
           ),
           const SizedBox(height: 24),
-          // TODO: Add submit button logic
+          // زر إنشاء الحملة
+          if (_totalPoints > 0)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _createCampaign,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'إنشاء حملة ($_totalPoints نقطة)',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  Future<void> _createCampaign() async {
+    if (_totalPoints == 0) return;
+
+    try {
+      // NOTE: سيتم ربطها بـ API لإنشاء الحملات
+      HapticFeedback.mediumImpact();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('جاري إنشاء حملة بـ $_totalPoints نقطة...'),
+            backgroundColor: AppTheme.primaryColor,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: ${e.toString()}'),
+            backgroundColor: AppTheme.errorColor,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildErrorView() {

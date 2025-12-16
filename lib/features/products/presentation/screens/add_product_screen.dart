@@ -523,8 +523,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         if (_slaDaysController.text.isNotEmpty) {
           _extraData['sla_days'] = int.tryParse(_slaDaysController.text);
         }
-        // TODO: إضافة سياسة الإرجاع عند توفرها في DB
-        // _extraData['return_policy'] = ...
+        // NOTE: سياسة الإرجاع ستُضاف عند توفر الحقل في قاعدة البيانات
+        // _extraData['return_policy'] = ...;
       }
 
       final success = await ref

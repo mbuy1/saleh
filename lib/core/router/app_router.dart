@@ -9,7 +9,7 @@ import '../../features/dashboard/presentation/screens/home_tab.dart';
 import '../../features/dashboard/presentation/screens/orders_tab.dart';
 import '../../features/dashboard/presentation/screens/products_tab.dart';
 import '../../features/dashboard/presentation/screens/store_tab.dart';
-import '../../features/dashboard/presentation/screens/placeholder_screen.dart';
+import '../../shared/widgets/base_screen.dart';
 import '../../features/dashboard/presentation/screens/merchant_services_screen.dart';
 import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
 import '../../features/dashboard/presentation/screens/store_on_jock_screen.dart';
@@ -150,7 +150,7 @@ class AppRouter {
                       // إذا فشل الفك، نستخدم النص كما هو
                       decodedName = name;
                     }
-                    return PlaceholderScreen(title: decodedName);
+                    return ComingSoonScreen(title: decodedName);
                   },
                 ),
                 // الشاشات الجديدة v2.0

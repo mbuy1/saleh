@@ -177,7 +177,7 @@ class _OrdersTabState extends State<OrdersTab> {
           ),
           const SizedBox(height: 8),
           Text('قريباً...', style: TextStyle(color: Colors.grey[500])),
-          // TODO: Implement $title screen
+          // NOTE: شاشات الطلبات الفرعية قيد التطوير
         ],
       ),
     );

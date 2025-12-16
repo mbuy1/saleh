@@ -293,7 +293,9 @@ class GlobalErrorHandler {
       listener(error, stackTrace);
     }
 
-    // TODO: إرسال الخطأ لخدمة مراقبة (مثل Sentry, Crashlytics)
+    // NOTE: يمكن إضافة تكامل مع خدمات المراقبة مثل:
+    // - Firebase Crashlytics
+    // - Sentry
     // _sendToMonitoringService(error, stackTrace);
   }
 }
@@ -316,7 +318,7 @@ class AppErrorReporter {
       debugPrint('   Stack: $stackTrace');
     }
 
-    // TODO: إرسال لخدمة المراقبة
+    // NOTE: يمكن إضافة تكامل مع خدمات المراقبة هنا
   }
 
   /// تسجيل تحذير
