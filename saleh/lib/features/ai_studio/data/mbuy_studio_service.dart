@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
 
@@ -7,97 +8,173 @@ final mbuyStudioServiceProvider = Provider<MbuyStudioService>((ref) {
 });
 
 class MbuyStudioService {
-  final ApiService _apiService;
+  final ApiService _api;
 
-  MbuyStudioService(this._apiService);
+  MbuyStudioService(this._api);
 
-  Future<String> generate(String prompt) async {
-    final response = await _apiService.post(
-      '/secure/ai/nano-banana/generate',
-      body: {'prompt': prompt},
-    );
+  Future<Map<String, dynamic>> _post(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    debugPrint('[MbuyStudioService] POST $path');
+    debugPrint('[MbuyStudioService] Body: $body');
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['taskId'];
-    } else {
-      throw Exception('Failed to start generation: ${response.body}');
+    final response = await _api.post(path, body: body);
+    debugPrint('[MbuyStudioService] Status: ${response.statusCode}');
+    debugPrint('[MbuyStudioService] Response: ${response.body}');
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return data is Map<String, dynamic> ? data : {'data': data};
     }
+
+    // Better error handling
+    String errorMessage = 'Request failed';
+    if (data is Map) {
+      errorMessage =
+          data['detail'] ??
+          data['error'] ??
+          data['message'] ??
+          'Request failed';
+    }
+    throw Exception(errorMessage);
   }
 
-  Future<Map<String, dynamic>> getTask(String taskId) async {
-    final response = await _apiService.get(
-      '/secure/ai/nano-banana/task',
-      queryParams: {'taskId': taskId},
-    );
+  Future<Map<String, dynamic>> _get(
+    String path, {
+    Map<String, String>? query,
+  }) async {
+    debugPrint('[MbuyStudioService] GET $path');
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to get task info: ${response.body}');
+    final response = await _api.get(path, queryParams: query);
+    debugPrint('[MbuyStudioService] Status: ${response.statusCode}');
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return data is Map<String, dynamic> ? data : {'data': data};
     }
+
+    String errorMessage = 'Request failed';
+    if (data is Map) {
+      errorMessage =
+          data['detail'] ??
+          data['error'] ??
+          data['message'] ??
+          'Request failed';
+    }
+    throw Exception(errorMessage);
   }
+
+  Future<Map<String, dynamic>> generateText(String prompt) =>
+      _post('/secure/ai/generate/text', {'prompt': prompt});
+
+  Future<Map<String, dynamic>> generateImage(
+    String prompt, {
+    String? style,
+    String? size,
+  }) => _post('/secure/ai/generate/image', {
+    'prompt': prompt,
+    if (style != null) 'style': style,
+    if (size != null) 'size': size,
+  });
+
+  Future<Map<String, dynamic>> generateBanner(
+    String prompt, {
+    String? placement,
+    String? sizePreset,
+  }) => _post('/secure/ai/generate/banner', {
+    'prompt': prompt,
+    if (placement != null) 'placement': placement,
+    if (sizePreset != null) 'sizePreset': sizePreset,
+  });
+
+  Future<Map<String, dynamic>> generateVideo(
+    String prompt, {
+    int? duration,
+    String? aspect,
+  }) => _post('/secure/ai/generate/video', {
+    'prompt': prompt,
+    if (duration != null) 'duration': duration,
+    if (aspect != null) 'aspect': aspect,
+  });
+
+  Future<Map<String, dynamic>> generateAudio(
+    String text, {
+    String? voice,
+    String? language,
+  }) => _post('/secure/ai/generate/audio', {
+    'text': text,
+    if (voice != null) 'voice_type': voice,
+    if (language != null) 'language': language,
+  });
+
+  Future<Map<String, dynamic>> generateProductDescription({
+    required String prompt,
+    String? productId,
+    String? language,
+    String? tone,
+  }) => _post('/secure/ai/generate/product-description', {
+    'prompt': prompt,
+    if (productId != null) 'product_id': productId,
+    if (language != null) 'language': language,
+    if (tone != null) 'tone': tone,
+  });
+
+  Future<Map<String, dynamic>> generateKeywords({
+    required String prompt,
+    String? productId,
+    String? language,
+  }) => _post('/secure/ai/generate/keywords', {
+    'prompt': prompt,
+    if (productId != null) 'product_id': productId,
+    if (language != null) 'language': language,
+  });
+
+  Future<Map<String, dynamic>> generateLogo({
+    required String brandName,
+    String? style,
+    String? colors,
+    String? prompt,
+  }) => _post('/secure/ai/generate/logo', {
+    'brand_name': brandName,
+    if (style != null) 'style': style,
+    if (colors != null) 'colors': colors,
+    if (prompt != null) 'prompt': prompt,
+  });
+
+  Future<Map<String, dynamic>> getLibrary(String type) =>
+      _get('/secure/ai/library', query: {'type': type});
+
+  Future<Map<String, dynamic>> getJob(String jobId) =>
+      _get('/secure/ai/jobs/$jobId');
+
+  // Legacy compatibility helpers
+  Future<Map<String, dynamic>> generateDesign({
+    required String tier,
+    required String productName,
+    String? prompt,
+    String? action,
+    String? designType,
+  }) {
+    // Map banners to banner endpoint, otherwise image
+    if ((designType ?? '').contains('banner')) {
+      return generateBanner(prompt ?? productName);
+    }
+    return generateImage(prompt ?? productName);
+  }
+
+  Future<Map<String, dynamic>> getTask(String taskId) => getJob(taskId);
+
+  Future<Map<String, dynamic>> getAnalytics(String type) =>
+      _get('/secure/analytics', query: {'type': type});
 
   Future<Map<String, dynamic>> generateCloudflareContent({
     required String taskType,
     required String prompt,
     String? imageBase64,
-  }) async {
-    final response = await _apiService.post(
-      '/secure/ai/cloudflare/generate',
-      body: {'taskType': taskType, 'prompt': prompt, 'image': imageBase64},
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to generate content: ${response.body}');
-    }
-  }
-
-  /// توليد تصميم حسب tier (Pro أو Premium)
-  Future<Map<String, dynamic>> generateDesign({
-    required String tier, // 'pro' or 'premium'
-    required String productName,
-    String? prompt,
-    String? action, // 'generate_design'
-    String? designType, // 'product_image', 'banner', etc.
-  }) async {
-    final body = {
-      'tier': tier,
-      'productName': productName,
-      'action': action ?? 'generate_design',
-      'provider': tier == 'pro' ? 'cloudflare' : 'nano_banana',
-    };
-
-    if (prompt != null && prompt.isNotEmpty) {
-      body['prompt'] = prompt;
-    }
-
-    if (designType != null) {
-      body['designType'] = designType;
-    }
-
-    final response = await _apiService.post('/secure/ai/generate', body: body);
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      final errorBody = response.body;
-      throw Exception('Failed to generate design: $errorBody');
-    }
-  }
-
-  Future<Map<String, dynamic>> getAnalytics(String type) async {
-    final response = await _apiService.get(
-      '/secure/analytics',
-      queryParams: {'type': type},
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to get analytics: ${response.body}');
-    }
-  }
+  }) => _post('/secure/ai/cloudflare/generate', {
+    'taskType': taskType,
+    'prompt': prompt,
+    if (imageBase64 != null) 'image': imageBase64,
+  });
 }

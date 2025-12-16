@@ -229,7 +229,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
 
                 // زر الحفظ
                 MbuyButton(
-                  label: _isEditMode ? 'حفظ التعديلات' : 'إنشاء المتجر',
+                  text: _isEditMode ? 'حفظ التعديلات' : 'إنشاء المتجر',
                   onPressed: isLoading ? null : _handleSaveStore,
                   isLoading: isLoading,
                   type: MbuyButtonType.primary,

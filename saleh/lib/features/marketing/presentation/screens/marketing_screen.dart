@@ -63,49 +63,49 @@ class _MarketingScreenState extends State<MarketingScreen> {
                       title: 'الكوبونات',
                       icon: Icons.local_offer_outlined,
                       color: const Color(0xFF4CAF50),
-                      onTap: () {
-                        // TODO: Navigate to Coupons
-                      },
+                      onTap: () => context.push('/dashboard/coupons'),
                     ),
                     _buildGridItem(
-                      title: 'كاش باك',
-                      icon: Icons.monetization_on_outlined,
-                      color: const Color(0xFF2196F3),
-                      onTap: () {
-                        // TODO: Navigate to Cashback
-                      },
+                      title: 'العروض الخاطفة',
+                      icon: Icons.flash_on_outlined,
+                      color: const Color(0xFFEF4444),
+                      onTap: () => context.push('/dashboard/flash-sales'),
                     ),
                     _buildGridItem(
-                      title: 'الحملات',
-                      icon: Icons.campaign_outlined,
-                      color: const Color(0xFF9C27B0),
-                      onTap: () {
-                        // TODO: Navigate to Campaigns
-                      },
-                    ),
-                    _buildGridItem(
-                      title: 'السلة المتروكة',
+                      title: 'السلات المتروكة',
                       icon: Icons.shopping_cart_checkout_outlined,
                       color: const Color(0xFFE91E63),
-                      onTap: () {
-                        // TODO: Navigate to Abandoned Cart
-                      },
+                      onTap: () => context.push('/dashboard/abandoned-cart'),
+                    ),
+                    _buildGridItem(
+                      title: 'برنامج الإحالة',
+                      icon: Icons.share_outlined,
+                      color: const Color(0xFF10B981),
+                      onTap: () => context.push('/dashboard/referral'),
                     ),
                     _buildGridItem(
                       title: 'برنامج الولاء',
                       icon: Icons.loyalty_outlined,
                       color: const Color(0xFF00BCD4),
-                      onTap: () {
-                        // TODO: Navigate to Loyalty Program
-                      },
+                      onTap: () => context.push('/dashboard/loyalty-program'),
                     ),
                     _buildGridItem(
-                      title: 'وكيل تسويق شخصي',
-                      icon: Icons.person_outline,
+                      title: 'شرائح العملاء',
+                      icon: Icons.group_work_outlined,
+                      color: const Color(0xFF3B82F6),
+                      onTap: () => context.push('/dashboard/customer-segments'),
+                    ),
+                    _buildGridItem(
+                      title: 'رسائل مخصصة',
+                      icon: Icons.message_outlined,
+                      color: const Color(0xFF22C55E),
+                      onTap: () => context.push('/dashboard/custom-messages'),
+                    ),
+                    _buildGridItem(
+                      title: 'التسعير الذكي',
+                      icon: Icons.price_change_outlined,
                       color: Colors.orange,
-                      onTap: () {
-                        // TODO: Navigate to Personal Marketing Agent
-                      },
+                      onTap: () => context.push('/dashboard/smart-pricing'),
                     ),
                   ],
                 ),

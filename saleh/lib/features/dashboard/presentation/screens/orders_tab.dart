@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
@@ -30,7 +29,7 @@ class _OrdersTabState extends State<OrdersTab> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
@@ -72,7 +71,6 @@ class _OrdersTabState extends State<OrdersTab> {
             labelStyle: TextStyle(fontWeight: FontWeight.bold),
             tabs: [
               Tab(text: 'إدارة الطلبات'),
-              Tab(text: 'الطلبات الخاصة'),
               Tab(text: 'إعدادات الطلبات'),
               Tab(text: 'تخصيص الفاتورة'),
             ],
@@ -82,11 +80,9 @@ class _OrdersTabState extends State<OrdersTab> {
           children: [
             // 1) إدارة الطلبات (المحتوى الأصلي)
             _buildOrdersContent(),
-            // 2) الطلبات الخاصة
-            _buildPlaceholder('الطلبات الخاصة'),
-            // 3) إعدادات الطلبات
+            // 2) إعدادات الطلبات
             _buildPlaceholder('إعدادات الطلبات'),
-            // 4) تخصيص الفاتورة
+            // 3) تخصيص الفاتورة
             _buildPlaceholder('تخصيص الفاتورة'),
           ],
         ),
@@ -102,20 +98,10 @@ class _OrdersTabState extends State<OrdersTab> {
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
-            // كرت الطلبات الخاصة
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildSpecialOrdersCard(context),
-            ),
-            // كرت طلبات التوريد (للمورد)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildSupplierOrdersCard(context),
-            ),
             const SizedBox(height: 16),
             // محتوى الطلبات
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
+              height: MediaQuery.of(context).size.height * 0.6,
               child: _isLoading
                   ? const SkeletonOrdersList()
                   : Center(
@@ -193,136 +179,6 @@ class _OrdersTabState extends State<OrdersTab> {
           Text('قريباً...', style: TextStyle(color: Colors.grey[500])),
           // TODO: Implement $title screen
         ],
-      ),
-    );
-  }
-
-  /// كرت الطلبات الخاصة - نُقل من الصفحة الرئيسية
-  Widget _buildSpecialOrdersCard(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: () => context.push(
-          '/dashboard/feature/${Uri.encodeComponent('الطلبات الخاصة')}',
-        ),
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.assignment_outlined,
-                  size: 26,
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'الطلبات الخاصة',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'طلبات مخصصة من العملاء',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// كرت طلبات التوريد - للمورد
-  Widget _buildSupplierOrdersCard(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: () => context.push('/dashboard/supplier-orders'),
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.local_shipping_outlined,
-                  size: 26,
-                  color: Colors.orange,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'طلبات التوريد',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'طلبات دروب شوبينق للتجهيز',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-            ],
-          ),
-        ),
       ),
     );
   }

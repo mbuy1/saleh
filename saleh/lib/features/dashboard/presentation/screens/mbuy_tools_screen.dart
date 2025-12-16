@@ -203,10 +203,11 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
     return MbuyScaffold(
       showAppBar: false,
       body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 100), // مسافة للبار السفلي
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSubPageHeader(context, 'أدوات الذكاء الاصطناعي'),
+            _buildSubPageHeader(context, 'أدوات AI'),
             if (_selectedSectionKey == null) ...[
               _buildBanner(),
               const SizedBox(height: AppDimensions.spacing20),

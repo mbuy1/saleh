@@ -657,7 +657,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             children: [
               Expanded(
                 child: MbuyButton(
-                  label: 'إلغاء',
+                  text: 'إلغاء',
                   onPressed: _isSubmitting
                       ? null
                       : () {
@@ -671,7 +671,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               Expanded(
                 flex: 2,
                 child: MbuyButton(
-                  label: _isSubmitting ? 'جاري الحفظ...' : 'حفظ التعديلات',
+                  text: _isSubmitting ? 'جاري الحفظ...' : 'حفظ التعديلات',
                   onPressed: _isSubmitting ? null : _updateProduct,
                   isLoading: _isSubmitting,
                   icon: Icons.save,

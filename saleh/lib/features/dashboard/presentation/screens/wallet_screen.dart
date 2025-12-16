@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة محفظة التاجر
-/// TODO: ربط بالبيانات الحقيقية من API
+/// ملاحظة: مطلوب ربطها بالبيانات الحقيقية من API مستقبلاً
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
 
@@ -51,10 +52,42 @@ class WalletScreen extends StatelessWidget {
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
-            // TODO: إضافة قائمة المعاملات
-            const Text(
-              'لا توجد معاملات حتى الآن',
-              style: TextStyle(color: Colors.grey),
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing24),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppDimensions.spacing20),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: AppDimensions.iconDisplay,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing16),
+                  const Text(
+                    'لا توجد معاملات حتى الآن',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacing8),
+                  Text(
+                    'ابدأ بإضافة منتجات وتحقيق المبيعات',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

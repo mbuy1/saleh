@@ -24,6 +24,8 @@ import '../../features/dashboard/presentation/screens/points_screen.dart';
 import '../../features/dashboard/presentation/screens/sales_screen.dart';
 import '../../features/dashboard/presentation/screens/dropshipping_screen.dart';
 import '../../features/dashboard/presentation/screens/supplier_orders_screen.dart';
+import '../../features/dashboard/presentation/screens/mbuy_packages_screen.dart';
+import '../../features/dashboard/presentation/screens/reports_screen.dart';
 import '../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
@@ -193,6 +195,16 @@ class AppRouter {
                   builder: (context, state) => const SupplierOrdersScreen(),
                 ),
                 GoRoute(
+                  path: 'packages',
+                  name: 'packages',
+                  builder: (context, state) => const MbuyPackagesScreen(),
+                ),
+                GoRoute(
+                  path: 'reports',
+                  name: 'reports',
+                  builder: (context, state) => const ReportsScreen(),
+                ),
+                GoRoute(
                   path: 'customers',
                   name: 'customers',
                   builder: (context, state) => const CustomersScreen(),
@@ -281,4 +293,3 @@ class AppRouter {
     );
   }
 }
-
