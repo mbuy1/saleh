@@ -9,6 +9,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../../shared/widgets/app_search_delegate.dart';
+import '../../../onboarding/presentation/widgets/feature_spotlight.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
 import '../../../auth/data/auth_controller.dart';
@@ -54,10 +55,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   void _openSearch(BuildContext context) {
     HapticFeedback.lightImpact();
-    showSearch(
-      context: context,
-      delegate: AppSearchDelegate(),
-    );
+    showSearch(context: context, delegate: AppSearchDelegate());
   }
 
   @override
@@ -229,21 +227,27 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ],
                 ),
               ),
-              // زر البحث
-              Semantics(
-                label: 'البحث في التطبيق',
-                button: true,
-                child: IconButton(
-                  icon: SvgPicture.asset(
-                    AppIcons.search,
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      AppTheme.darkSlate,
-                      BlendMode.srcIn,
+              // زر البحث مع Spotlight
+              FeatureSpotlight(
+                featureId: 'global_search',
+                title: 'البحث السريع ✨',
+                description: 'ابحث في جميع ميزات التطبيق بنقرة واحدة! جرب البحث عن "كوبونات" أو "منتجات"',
+                position: SpotlightPosition.bottom,
+                child: Semantics(
+                  label: 'البحث في التطبيق',
+                  button: true,
+                  child: IconButton(
+                    icon: SvgPicture.asset(
+                      AppIcons.search,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        AppTheme.darkSlate,
+                        BlendMode.srcIn,
+                      ),
                     ),
+                    onPressed: () => _openSearch(context),
                   ),
-                  onPressed: () => _openSearch(context),
                 ),
               ),
               // زر الإشعارات

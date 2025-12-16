@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../shared/screens/login_screen.dart';
 import '../../features/auth/data/auth_controller.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/dashboard/presentation/screens/boost_sales_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../../features/dashboard/presentation/screens/home_tab.dart';
@@ -32,6 +33,14 @@ import '../../features/products/presentation/screens/product_details_screen.dart
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
 import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
 import '../../features/marketing/presentation/screens/marketing_screen.dart';
+import '../../features/dashboard/presentation/screens/coupons_screen.dart';
+import '../../features/dashboard/presentation/screens/flash_sales_screen.dart';
+import '../../features/merchant/screens/abandoned_cart_screen.dart';
+import '../../features/merchant/screens/referral_screen.dart';
+import '../../features/merchant/screens/loyalty_program_screen.dart';
+import '../../features/merchant/screens/customer_segments_screen.dart';
+import '../../features/merchant/screens/custom_messages_screen.dart';
+import '../../features/merchant/screens/smart_pricing_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 /// App Router - Manages navigation throughout the application
@@ -92,6 +101,15 @@ class AppRouter {
           path: '/login',
           name: 'login',
           builder: (context, state) => const LoginScreen(),
+        ),
+
+        // ========================================================================
+        // Onboarding Route - جولة تعريفية للمستخدم الجديد
+        // ========================================================================
+        GoRoute(
+          path: '/onboarding',
+          name: 'onboarding',
+          builder: (context, state) => const OnboardingScreen(),
         ),
 
         // ========================================================================
@@ -224,6 +242,47 @@ class AppRouter {
                   path: 'sales',
                   name: 'sales',
                   builder: (context, state) => const SalesScreen(),
+                ),
+                // ====== ميزات التسويق ======
+                GoRoute(
+                  path: 'coupons',
+                  name: 'coupons',
+                  builder: (context, state) => const CouponsScreen(),
+                ),
+                GoRoute(
+                  path: 'flash-sales',
+                  name: 'flash-sales',
+                  builder: (context, state) => const FlashSalesScreen(),
+                ),
+                GoRoute(
+                  path: 'abandoned-cart',
+                  name: 'abandoned-cart',
+                  builder: (context, state) => const AbandonedCartScreen(),
+                ),
+                GoRoute(
+                  path: 'referral',
+                  name: 'referral',
+                  builder: (context, state) => const ReferralScreen(),
+                ),
+                GoRoute(
+                  path: 'loyalty-program',
+                  name: 'loyalty-program',
+                  builder: (context, state) => const LoyaltyProgramScreen(),
+                ),
+                GoRoute(
+                  path: 'customer-segments',
+                  name: 'customer-segments',
+                  builder: (context, state) => const CustomerSegmentsScreen(),
+                ),
+                GoRoute(
+                  path: 'custom-messages',
+                  name: 'custom-messages',
+                  builder: (context, state) => const CustomMessagesScreen(),
+                ),
+                GoRoute(
+                  path: 'smart-pricing',
+                  name: 'smart-pricing',
+                  builder: (context, state) => const SmartPricingScreen(),
                 ),
               ],
             ),
