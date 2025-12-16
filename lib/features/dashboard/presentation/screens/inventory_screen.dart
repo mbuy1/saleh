@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -113,20 +116,20 @@ class InventoryMovement {
     }
   }
 
-  IconData get typeIcon {
+  String get typeIcon {
     switch (movementType) {
       case 'sale':
-        return Icons.shopping_cart_checkout;
+        return AppIcons.cart;
       case 'purchase':
-        return Icons.add_shopping_cart;
+        return AppIcons.cart;
       case 'return':
-        return Icons.assignment_return;
+        return AppIcons.returnIcon;
       case 'adjustment':
-        return Icons.edit;
+        return AppIcons.edit;
       case 'damage':
-        return Icons.broken_image;
+        return AppIcons.warning;
       default:
-        return Icons.sync_alt;
+        return AppIcons.sync;
     }
   }
 
@@ -311,7 +314,15 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         surfaceTintColor: Colors.transparent,
         iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         bottom: TabBar(
@@ -410,10 +421,15 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          SvgPicture.asset(
+            AppIcons.error,
+            width: 64,
+            height: 64,
+            colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+          ),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error!, style: TextStyle(color: Colors.grey[600])),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton(
             onPressed: _loadData,
             child: const Text('إعادة المحاولة'),
@@ -425,21 +441,21 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
 
   Widget _buildStatsCards() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Row(
         children: [
           Expanded(
             child: _buildStatCard(
-              icon: Icons.inventory_2,
+              iconPath: AppIcons.inventory2,
               title: 'إجمالي المخزون',
               value: NumberFormat('#,###').format(_totalStock),
               color: AppTheme.primaryColor,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _buildStatCard(
-              icon: Icons.warning_amber,
+              iconPath: AppIcons.warning,
               title: 'تنبيهات',
               value: '${_lowStockCount + _outOfStockCount}',
               color: Colors.orange,
@@ -451,16 +467,16 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   }
 
   Widget _buildStatCard({
-    required IconData icon,
+    required String iconPath,
     required String title,
     required String value,
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
@@ -471,7 +487,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: SvgPicture.asset(
+              iconPath,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -481,14 +502,17 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: AppDimensions.fontDisplay3,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[800],
                   ),
                 ),
                 Text(
                   title,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontLabel,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -504,11 +528,19 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            SvgPicture.asset(
+              AppIcons.inventory2,
+              width: 64,
+              height: 64,
+              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            ),
+            SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد منتجات',
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: AppDimensions.fontTitle,
+              ),
             ),
           ],
         ),
@@ -518,7 +550,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: products.length,
         itemBuilder: (context, index) {
           return _buildProductCard(products[index]);
@@ -532,29 +564,45 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
+        contentPadding: AppDimensions.paddingS,
         leading: Container(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
             color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimensions.borderRadiusS,
           ),
           child: product.imageUrl != null
               ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppDimensions.borderRadiusS,
                   child: Image.network(
                     product.imageUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.image, color: Colors.grey[400]),
+                        SvgPicture.asset(
+                          AppIcons.image,
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey[400]!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                   ),
                 )
-              : Icon(Icons.image, color: Colors.grey[400]),
+              : SvgPicture.asset(
+                  AppIcons.image,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    Colors.grey[400]!,
+                    BlendMode.srcIn,
+                  ),
+                ),
         ),
         title: Text(
           product.productName,
@@ -575,13 +623,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                   ),
                   decoration: BoxDecoration(
                     color: product.stockColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppDimensions.borderRadiusM,
                   ),
                   child: Text(
                     '${product.stock} وحدة',
                     style: TextStyle(
                       color: product.stockColor,
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -596,7 +644,15 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.edit_outlined, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.edit,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => _adjustStock(product),
         ),
       ),
@@ -609,11 +665,19 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            SvgPicture.asset(
+              AppIcons.history,
+              width: 64,
+              height: 64,
+              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            ),
+            SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد حركات',
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: AppDimensions.fontTitle,
+              ),
             ),
           ],
         ),
@@ -623,7 +687,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _movements.length,
         itemBuilder: (context, index) {
           return _buildMovementCard(_movements[index]);
@@ -639,11 +703,11 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
+        contentPadding: AppDimensions.paddingS,
         leading: Container(
           width: 44,
           height: 44,
@@ -651,7 +715,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             color: movement.typeColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(movement.typeIcon, color: movement.typeColor, size: 22),
+          child: SvgPicture.asset(
+            movement.typeIcon,
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(movement.typeColor, BlendMode.srcIn),
+          ),
         ),
         title: Text(
           movement.productName,

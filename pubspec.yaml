@@ -51,6 +51,9 @@ dependencies:
   url_launcher: ^6.3.2
   share_plus: ^12.0.1
   fl_chart: ^1.1.1
+  
+  # SVG Icons
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +69,6 @@ flutter:
   uses-material-design: true
   
   # Assets
-  # assets:
-  #   - assets/images/
-  #   - assets/icons/
+  assets:
+    - assets/images/
+    - assets/icons/

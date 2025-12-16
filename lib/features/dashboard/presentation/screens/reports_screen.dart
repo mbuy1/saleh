@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة السجلات والتقارير - تقارير شاملة عن نشاط المتجر
@@ -87,35 +90,35 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           'action': 'طلب جديد',
           'details': 'طلب #1234 بقيمة 350 ر.س',
           'time': DateTime.now().subtract(const Duration(minutes: 15)),
-          'icon': Icons.shopping_cart,
+          'iconPath': AppIcons.cart,
           'color': AppTheme.successColor,
         },
         {
           'action': 'منتج جديد',
           'details': 'تم إضافة "قميص أزرق"',
           'time': DateTime.now().subtract(const Duration(hours: 2)),
-          'icon': Icons.add_box,
+          'iconPath': AppIcons.add,
           'color': AppTheme.primaryColor,
         },
         {
           'action': 'تعديل سعر',
           'details': 'تم تعديل سعر "حذاء رياضي"',
           'time': DateTime.now().subtract(const Duration(hours: 5)),
-          'icon': Icons.edit,
+          'iconPath': AppIcons.edit,
           'color': AppTheme.warningColor,
         },
         {
           'action': 'عميل جديد',
           'details': 'تسجيل عميل جديد: أحمد',
           'time': DateTime.now().subtract(const Duration(days: 1)),
-          'icon': Icons.person_add,
+          'iconPath': AppIcons.person,
           'color': AppTheme.infoColor,
         },
         {
           'action': 'مخزون منخفض',
           'details': 'تنبيه: "ساعة ذكية" أقل من 5 قطع',
           'time': DateTime.now().subtract(const Duration(days: 1)),
-          'icon': Icons.warning,
+          'iconPath': AppIcons.warning,
           'color': AppTheme.errorColor,
         },
       ];
@@ -135,26 +138,50 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'السجلات والتقارير',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: AppDimensions.fontHeadline,
             color: AppTheme.textPrimaryColor,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_outlined),
+            icon: SvgPicture.asset(
+              AppIcons.download,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                AppTheme.textPrimaryColor,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: _exportReport,
             tooltip: 'تصدير التقرير',
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: SvgPicture.asset(
+              AppIcons.refresh,
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                AppTheme.textPrimaryColor,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: _loadData,
             tooltip: 'تحديث',
           ),
@@ -195,7 +222,15 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+              leading: SvgPicture.asset(
+                AppIcons.document,
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(
+                  Colors.red,
+                  BlendMode.srcIn,
+                ),
+              ),
               title: const Text('PDF'),
               onTap: () {
                 Navigator.pop(context);
@@ -205,7 +240,15 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.table_chart, color: Colors.green),
+              leading: SvgPicture.asset(
+                AppIcons.chart,
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(
+                  Colors.green,
+                  BlendMode.srcIn,
+                ),
+              ),
               title: const Text('Excel'),
               onTap: () {
                 Navigator.pop(context);
@@ -222,7 +265,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   Widget _buildSalesTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -233,52 +276,52 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 child: _buildStatCard(
                   'إجمالي المبيعات',
                   '${NumberFormat('#,##0.00').format(_salesData['total'])} ر.س',
-                  Icons.attach_money,
+                  AppIcons.attachMoney,
                   AppTheme.successColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'هذا الشهر',
                   '${NumberFormat('#,##0.00').format(_salesData['thisMonth'])} ر.س',
-                  Icons.trending_up,
+                  AppIcons.trendingUp,
                   AppTheme.primaryColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
                 child: _buildStatCard(
                   'عدد الطلبات',
                   '${_salesData['orders']}',
-                  Icons.shopping_bag,
+                  AppIcons.shoppingBag,
                   AppTheme.infoColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'متوسط الطلب',
                   '${NumberFormat('#,##0.00').format(_salesData['avgOrderValue'])} ر.س',
-                  Icons.analytics,
+                  AppIcons.analytics,
                   AppTheme.accentColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Growth Indicator
           _buildGrowthCard(),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Chart Placeholder
           _buildChartPlaceholder(),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Top Products
           _buildTopProductsSection(),
@@ -289,7 +332,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   Widget _buildProductsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -300,44 +343,44 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 child: _buildStatCard(
                   'إجمالي المنتجات',
                   '${_productsData['total']}',
-                  Icons.inventory_2,
+                  AppIcons.inventory,
                   AppTheme.primaryColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'منتجات نشطة',
                   '${_productsData['active']}',
-                  Icons.check_circle,
+                  AppIcons.checkCircle,
                   AppTheme.successColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
                 child: _buildStatCard(
                   'نفد المخزون',
                   '${_productsData['outOfStock']}',
-                  Icons.remove_shopping_cart,
+                  AppIcons.removeShoppingCart,
                   AppTheme.errorColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'مخزون منخفض',
                   '${_productsData['lowStock']}',
-                  Icons.warning,
+                  AppIcons.warning,
                   AppTheme.warningColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Top Viewed
           _buildSection(
@@ -346,9 +389,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             (item) => ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
-                child: const Icon(
-                  Icons.visibility,
-                  color: AppTheme.primaryColor,
+                child: SvgPicture.asset(
+                  AppIcons.visibility,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               title: Text(item['name']),
@@ -365,7 +413,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   Widget _buildCustomersTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -376,44 +424,44 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 child: _buildStatCard(
                   'إجمالي العملاء',
                   '${_customersData['total']}',
-                  Icons.people,
+                  AppIcons.people,
                   AppTheme.primaryColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'عملاء جدد',
                   '${_customersData['newThisMonth']}',
-                  Icons.person_add,
+                  AppIcons.personAdd,
                   AppTheme.successColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
                 child: _buildStatCard(
                   'عملاء عائدون',
                   '${_customersData['returning']}',
-                  Icons.replay,
+                  AppIcons.refresh,
                   AppTheme.infoColor,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'متوسط الإنفاق',
                   '${NumberFormat('#,##0.00').format(_customersData['avgLifetimeValue'])} ر.س',
-                  Icons.account_balance_wallet,
+                  AppIcons.wallet,
                   AppTheme.accentColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Top Customers
           _buildSection(
@@ -422,7 +470,15 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             (item) => ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppTheme.accentColor.withValues(alpha: 0.1),
-                child: const Icon(Icons.person, color: AppTheme.accentColor),
+                child: SvgPicture.asset(
+                  AppIcons.person,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.accentColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
               title: Text(item['name']),
               subtitle: Text('${item['orders']} طلب'),
@@ -442,7 +498,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   Widget _buildActivityTab() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _activityLogs.length,
       itemBuilder: (context, index) {
         final log = _activityLogs[index];
@@ -454,14 +510,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   Widget _buildStatCard(
     String title,
     String value,
-    IconData icon,
+    String iconPath,
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -475,22 +531,36 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: AppDimensions.paddingXS,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppDimensions.borderRadiusS,
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: SvgPicture.asset(
+                  iconPath,
+                  width: AppDimensions.iconS,
+                  height: AppDimensions.iconS,
+                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Text(
             value,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontDisplay3,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(title, style: TextStyle(fontSize: 12, color: AppTheme.slate600)),
+          SizedBox(height: AppDimensions.spacing4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: AppDimensions.fontLabel,
+              color: AppTheme.slate600,
+            ),
+          ),
         ],
       ),
     );
@@ -514,10 +584,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       ),
       child: Row(
         children: [
-          Icon(
-            isPositive ? Icons.trending_up : Icons.trending_down,
-            color: isPositive ? AppTheme.successColor : AppTheme.errorColor,
-            size: 32,
+          SvgPicture.asset(
+            isPositive ? AppIcons.trendingUp : AppIcons.trendingDown,
+            width: 32,
+            height: 32,
+            colorFilter: ColorFilter.mode(
+              isPositive ? AppTheme.successColor : AppTheme.errorColor,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -642,9 +716,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: AppTheme.successColor.withValues(alpha: 0.1),
-                child: const Icon(
-                  Icons.shopping_bag,
-                  color: AppTheme.successColor,
+                child: SvgPicture.asset(
+                  AppIcons.shoppingBag,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.successColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               title: Text(product['name']),
@@ -716,10 +795,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               color: (log['color'] as Color).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              log['icon'] as IconData,
-              color: log['color'] as Color,
-              size: 20,
+            child: SvgPicture.asset(
+              log['iconPath'] as String,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                log['color'] as Color,
+                BlendMode.srcIn,
+              ),
             ),
           ),
           const SizedBox(width: 12),

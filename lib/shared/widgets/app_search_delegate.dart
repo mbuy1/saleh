@@ -10,13 +10,13 @@ import 'app_icon.dart';
 /// يوفر بحثاً سريعاً في جميع ميزات التطبيق
 class AppSearchDelegate extends SearchDelegate<String?> {
   AppSearchDelegate()
-      : super(
-          searchFieldLabel: 'ابحث في التطبيق...',
-          searchFieldStyle: const TextStyle(
-            fontSize: 16,
-            color: AppTheme.textPrimaryColor,
-          ),
-        );
+    : super(
+        searchFieldLabel: 'ابحث في التطبيق...',
+        searchFieldStyle: const TextStyle(
+          fontSize: 16,
+          color: AppTheme.textPrimaryColor,
+        ),
+      );
 
   // قائمة جميع الميزات القابلة للبحث
   static final List<SearchItem> _allItems = [
@@ -331,18 +331,12 @@ class AppSearchDelegate extends SearchDelegate<String?> {
             const SizedBox(height: 16),
             Text(
               'لا توجد نتائج لـ "$query"',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'جرب كلمات بحث مختلفة',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[400],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[400]),
             ),
           ],
         ),
@@ -395,7 +389,11 @@ class AppSearchDelegate extends SearchDelegate<String?> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              AppIcon(AppIcons.trendingUp, size: 18, color: AppTheme.primaryColor),
+              AppIcon(
+                AppIcons.trendingUp,
+                size: 18,
+                color: AppTheme.primaryColor,
+              ),
               const SizedBox(width: 8),
               const Text(
                 'الأكثر استخداماً',
@@ -411,7 +409,9 @@ class AppSearchDelegate extends SearchDelegate<String?> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: popularItems.map((item) => _buildQuickChip(context, item)).toList(),
+          children: popularItems
+              .map((item) => _buildQuickChip(context, item))
+              .toList(),
         ),
         const SizedBox(height: 24),
 
@@ -445,14 +445,13 @@ class AppSearchDelegate extends SearchDelegate<String?> {
     }
 
     return categories.map((category) {
-      final categoryItems = _allItems.where((i) => i.category == category).toList();
+      final categoryItems = _allItems
+          .where((i) => i.category == category)
+          .toList();
       return ExpansionTile(
         title: Text(
           category,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
         children: categoryItems
             .map((item) => _buildSearchResultItem(context, item))
@@ -464,10 +463,7 @@ class AppSearchDelegate extends SearchDelegate<String?> {
   Widget _buildQuickChip(BuildContext context, SearchItem item) {
     return ActionChip(
       avatar: AppIcon(item.icon, size: 16, color: AppTheme.primaryColor),
-      label: Text(
-        item.title,
-        style: const TextStyle(fontSize: 12),
-      ),
+      label: Text(item.title, style: const TextStyle(fontSize: 12)),
       backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
       onPressed: () {
         HapticFeedback.lightImpact();
@@ -492,17 +488,11 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       ),
       title: Text(
         item.title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
       ),
       subtitle: Text(
         item.subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.grey[600],
-        ),
+        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
       ),
       trailing: AppIcon(AppIcons.chevronLeft, size: 16, color: Colors.grey),
       onTap: () {

@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -102,7 +105,7 @@ class Promotion {
   }
 
   String get typeText => type == 'PIN' ? 'تثبيت' : 'تعزيز';
-  IconData get typeIcon => type == 'PIN' ? Icons.push_pin : Icons.rocket_launch;
+  String get typeIcon => type == 'PIN' ? AppIcons.pin : AppIcons.rocket;
 }
 
 /// شاشة ضاعف ظهورك - إدارة الحملات الإعلانية
@@ -265,7 +268,15 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
         surfaceTintColor: Colors.transparent,
         iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         bottom: TabBar(
@@ -305,7 +316,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
 
   Widget _buildNewCampaignTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           _CampaignDurationCard(
@@ -318,7 +329,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
               });
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _CampaignDurationCard(
             title: 'دعم ظهور المتجر',
             baseDailyPoints: 30,
@@ -329,7 +340,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
               });
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _CampaignDurationCard(
             title: 'تثبيت المنتج',
             baseDailyPoints: 20,
@@ -340,7 +351,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
               });
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _CampaignDurationCard(
             title: 'دعم ظهور المنتج',
             baseDailyPoints: 10,
@@ -351,7 +362,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
               });
             },
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
           // زر إنشاء الحملة
           if (_totalPoints > 0)
             SizedBox(
@@ -360,15 +371,15 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                 onPressed: _createCampaign,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: AppDimensions.paddingVerticalM,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppDimensions.borderRadiusM,
                   ),
                 ),
                 child: Text(
                   'إنشاء حملة ($_totalPoints نقطة)',
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontTitle,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -412,10 +423,15 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          SvgPicture.asset(
+            AppIcons.error,
+            width: 64,
+            height: 64,
+            colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+          ),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error!, style: TextStyle(color: Colors.grey[600])),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton(
             onPressed: _loadData,
             child: const Text('إعادة المحاولة'),
@@ -433,7 +449,12 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.campaign_outlined, size: 64, color: Colors.grey[400]),
+            SvgPicture.asset(
+              AppIcons.campaign,
+              width: 64,
+              height: 64,
+              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            ),
             const SizedBox(height: 16),
             Text(
               'لا توجد حملات نشطة',
@@ -452,7 +473,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _activePromotions.length,
         itemBuilder: (context, index) {
           return _buildPromotionCard(
@@ -470,7 +491,12 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history, size: 64, color: Colors.grey[400]),
+            SvgPicture.asset(
+              AppIcons.history,
+              width: 64,
+              height: 64,
+              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            ),
             const SizedBox(height: 16),
             Text(
               'لا يوجد سجل حملات',
@@ -484,7 +510,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _historyPromotions.length,
         itemBuilder: (context, index) {
           return _buildPromotionCard(
@@ -501,14 +527,14 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppDimensions.paddingM,
             child: Row(
               children: [
                 Container(
@@ -517,13 +543,17 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                     color: promotion.statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
+                  child: SvgPicture.asset(
                     promotion.typeIcon,
-                    color: promotion.statusColor,
-                    size: 24,
+                    width: AppDimensions.iconM,
+                    height: AppDimensions.iconM,
+                    colorFilter: ColorFilter.mode(
+                      promotion.statusColor,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,12 +562,12 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                         children: [
                           Text(
                             promotion.typeText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: AppDimensions.fontTitle,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.spacing8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -547,13 +577,13 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                               color: promotion.statusColor.withValues(
                                 alpha: 0.1,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppDimensions.borderRadiusM,
                             ),
                             child: Text(
                               promotion.statusText,
                               style: TextStyle(
                                 color: promotion.statusColor,
-                                fontSize: 12,
+                                fontSize: AppDimensions.fontLabel,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -580,23 +610,43 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'report',
                         child: Row(
                           children: [
-                            Icon(Icons.assessment, size: 20),
-                            SizedBox(width: 8),
-                            Text('عرض التقرير'),
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SvgPicture.asset(
+                                AppIcons.assessment,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.black87,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('عرض التقرير'),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'end',
                         child: Row(
                           children: [
-                            Icon(Icons.stop, size: 20, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text(
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SvgPicture.asset(
+                                AppIcons.stop,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.red,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
                               'إنهاء الحملة',
                               style: TextStyle(color: Colors.red),
                             ),
@@ -619,15 +669,21 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                     children: [
                       Text(
                         'المستهلك: ${promotion.spent}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: AppDimensions.fontLabel,
+                        ),
                       ),
                       Text(
                         'المتبقي: ${promotion.remaining}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: AppDimensions.fontLabel,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
@@ -642,12 +698,12 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
             ),
           // Footer with dates
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: AppDimensions.paddingS,
             decoration: BoxDecoration(
               color: Colors.grey[50],
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(AppDimensions.radiusL),
+                bottomRight: Radius.circular(AppDimensions.radiusL),
               ),
             ),
             child: Row(
@@ -657,13 +713,16 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
                   'الميزانية: ${NumberFormat('#,###').format(promotion.budget)} نقطة',
                   style: TextStyle(
                     color: Colors.grey[700],
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   DateFormat('yyyy/MM/dd').format(promotion.createdAt),
-                  style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: AppDimensions.fontLabel,
+                  ),
                 ),
               ],
             ),
@@ -748,8 +807,15 @@ class _CampaignDurationCardState extends State<_CampaignDurationCard> {
               const SizedBox(width: 16),
               IconButton(
                 onPressed: () => _updateDays(_days - 1),
-                icon: const Icon(Icons.remove_circle_outline),
-                color: AppTheme.primaryColor,
+                icon: SvgPicture.asset(
+                  AppIcons.removeCircle,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
               SizedBox(
                 width: 60,
@@ -772,8 +838,15 @@ class _CampaignDurationCardState extends State<_CampaignDurationCard> {
               ),
               IconButton(
                 onPressed: () => _updateDays(_days + 1),
-                icon: const Icon(Icons.add_circle_outline),
-                color: AppTheme.primaryColor,
+                icon: SvgPicture.asset(
+                  AppIcons.addCircle,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ],
           ),
@@ -870,7 +943,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                     type: 'PIN',
                     title: 'تثبيت',
                     subtitle: 'تثبيت في أعلى القائمة',
-                    icon: Icons.push_pin,
+                    iconPath: AppIcons.pin,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -879,7 +952,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                     type: 'BOOST',
                     title: 'تعزيز',
                     subtitle: 'زيادة الظهور بالبحث',
-                    icon: Icons.rocket_launch,
+                    iconPath: AppIcons.rocket,
                   ),
                 ),
               ],
@@ -961,7 +1034,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
     required String type,
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String iconPath,
   }) {
     final isSelected = _type == type;
     return GestureDetector(
@@ -980,10 +1053,14 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
-              size: 28,
+            SvgPicture.asset(
+              iconPath,
+              width: 28,
+              height: 28,
+              colorFilter: ColorFilter.mode(
+                isSelected ? AppTheme.primaryColor : Colors.grey[600]!,
+                BlendMode.srcIn,
+              ),
             ),
             const SizedBox(height: 8),
             Text(

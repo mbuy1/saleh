@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -141,6 +145,15 @@ class _HeatmapScreenState extends State<HeatmapScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('الخريطة الحرارية'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -225,9 +238,9 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -251,7 +264,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       onRefresh: _loadData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -266,7 +279,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'الجلسات الفريدة',
@@ -277,7 +290,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -288,7 +301,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                     Colors.orange,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'إجمالي النقرات',
@@ -312,11 +325,11 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               'أكثر الصفحات تفاعلاً',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             if (_pages.isEmpty)
               const Card(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
+                  padding: AppDimensions.paddingXXL,
                   child: Center(
                     child: Column(
                       children: [
@@ -325,7 +338,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           size: 48,
                           color: Colors.grey,
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: AppDimensions.spacing8),
                         Text(
                           'لا توجد بيانات بعد',
                           style: TextStyle(color: Colors.grey),
@@ -338,7 +351,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
             else
               ..._pages.take(5).map((page) => _buildPagePreviewCard(page)),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
 
             // Quick Tips
             _buildTipsCard(),
@@ -356,11 +369,11 @@ class _HeatmapScreenState extends State<HeatmapScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           children: [
             Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -389,7 +402,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -399,7 +412,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   isEnabled ? Icons.check_circle : Icons.cancel,
                   color: isEnabled ? Colors.green : Colors.red,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 Text(
                   isEnabled ? 'التتبع نشط' : 'التتبع متوقف',
                   style: TextStyle(
@@ -479,21 +492,21 @@ class _HeatmapScreenState extends State<HeatmapScreen>
     return Card(
       color: Colors.blue.withAlpha(25),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.lightbulb, color: Colors.amber[700]),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'نصائح لتحسين التجربة',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildTipItem('راقب أماكن النقرات الأكثر شيوعاً'),
             _buildTipItem('حلل عمق التمرير لفهم اهتمام الزوار'),
             _buildTipItem('استخدم تسجيلات الجلسات لاكتشاف المشاكل'),
@@ -529,9 +542,9 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.analytics_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد صفحات متتبعة بعد'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'ستظهر الصفحات هنا عند بدء تتبع تفاعلات الزوار',
                     style: TextStyle(color: Colors.grey),
@@ -541,7 +554,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _pages.length,
               itemBuilder: (context, index) {
                 final page = _pages[index];
@@ -558,9 +571,9 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => _loadPageHeatmap(page),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -595,7 +608,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   const Icon(Icons.chevron_left, color: Colors.grey),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -639,7 +652,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       children: [
         // Header with back button
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           color: Colors.white,
           child: Row(
             children: [
@@ -652,7 +665,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   });
                 },
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacing8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,7 +692,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           child: _loadingHeatmap
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppDimensions.paddingM,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -693,7 +706,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                               Colors.blue,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           Expanded(
                             child: _buildMiniStatCard(
                               'الزوار',
@@ -701,7 +714,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                               Colors.green,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           Expanded(
                             child: _buildMiniStatCard(
                               'عمق التمرير',
@@ -722,7 +735,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
                       _buildHeatmapVisualization(),
 
                       const SizedBox(height: 24),
@@ -735,7 +748,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
                       _buildHotZonesList(),
 
                       const SizedBox(height: 24),
@@ -748,7 +761,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
                       _buildTopElementsList(),
                     ],
                   ),
@@ -760,10 +773,10 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
   Widget _buildMiniStatCard(String label, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppDimensions.borderRadiusS,
       ),
       child: Column(
         children: [
@@ -789,7 +802,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
     if (clicks.isEmpty) {
       return const Card(
         child: Padding(
-          padding: EdgeInsets.all(32),
+          padding: AppDimensions.paddingXXL,
           child: Center(
             child: Text(
               'لا توجد بيانات نقرات كافية',
@@ -806,7 +819,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
         child: Container(
           decoration: BoxDecoration(
             color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimensions.borderRadiusS,
           ),
           child: CustomPaint(painter: HeatmapPainter(clicks)),
         ),
@@ -822,7 +835,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
     if (hotZones.isEmpty) {
       return const Card(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Text(
             'لا توجد مناطق ساخنة',
             style: TextStyle(color: Colors.grey),
@@ -866,7 +879,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
     if (elements.isEmpty) {
       return const Card(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Text('لا توجد عناصر', style: TextStyle(color: Colors.grey)),
         ),
       );
@@ -919,9 +932,9 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.videocam_off, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد تسجيلات جلسات'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'فعّل تسجيل الجلسات من الإعدادات',
                     style: TextStyle(color: Colors.grey),
@@ -930,7 +943,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _sessions.length,
               itemBuilder: (context, index) {
                 final session = _sessions[index];
@@ -1021,7 +1034,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1040,7 +1053,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 'تفاصيل الجلسة',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               _buildDetailRow('معرف الزائر', session['visitor_id'] ?? '-'),
               _buildDetailRow('الجهاز', session['device_type'] ?? '-'),
               _buildDetailRow(
@@ -1229,7 +1242,7 @@ class HeatmapPainter extends CustomPainter {
 }
 
 /// Session Playback Dialog
-extension SessionPlayback on _HeatmapScreenState {
+extension _SessionPlayback on _HeatmapScreenState {
   void _showSessionPlayback(Map<String, dynamic> session) {
     showDialog(
       context: context,
@@ -1341,7 +1354,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.all(16),
+      insetPadding: AppDimensions.paddingM,
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
@@ -1350,7 +1363,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor,
                 borderRadius: const BorderRadius.vertical(
@@ -1360,7 +1373,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
               child: Row(
                 children: [
                   const Icon(Icons.play_circle, color: Colors.white),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   Expanded(
                     child: Text(
                       'تشغيل جلسة: ${widget.session['session_id']?.toString().substring(0, 8) ?? 'غير معروف'}',
@@ -1381,10 +1394,10 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
             // Playback Area
             Expanded(
               child: Container(
-                margin: const EdgeInsets.all(16),
+                margin: AppDimensions.paddingM,
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppDimensions.borderRadiusS,
                   border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: Stack(
@@ -1395,7 +1408,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.web, size: 64, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
                           Text(
                             _currentEventIndex < _events.length
                                 ? _events[_currentEventIndex]['page'] ??
@@ -1463,7 +1476,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                       color: isActive
                           ? AppTheme.primaryColor.withAlpha(50)
                           : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppDimensions.borderRadiusS,
                       border: Border.all(
                         color: isActive
                             ? AppTheme.primaryColor
@@ -1504,7 +1517,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
 
             // Controls
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1513,16 +1526,26 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                     onPressed: _resetPlayback,
                     tooltip: 'إعادة',
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing16),
                   FloatingActionButton(
                     onPressed: _togglePlayback,
                     backgroundColor: AppTheme.primaryColor,
                     child: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing16),
                   // Speed control
                   PopupMenuButton<double>(
-                    icon: const Icon(Icons.speed),
+                    icon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.speed),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${_playbackSpeed}x',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
                     tooltip: 'سرعة التشغيل',
                     onSelected: (speed) {
                       setState(() => _playbackSpeed = speed);

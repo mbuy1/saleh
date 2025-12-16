@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة المبيعات
@@ -11,6 +14,18 @@ class SalesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text(
           'المبيعات',
           style: TextStyle(
@@ -35,7 +50,15 @@ class SalesScreen extends StatelessWidget {
                 color: Colors.amber.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(100),
               ),
-              child: const Icon(Icons.bar_chart, size: 64, color: Colors.amber),
+              child: SvgPicture.asset(
+                AppIcons.chart,
+                width: 64,
+                height: 64,
+                colorFilter: const ColorFilter.mode(
+                  Colors.amber,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             const Text(
@@ -58,10 +81,14 @@ class SalesScreen extends StatelessWidget {
                       color: AppTheme.successColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.analytics_outlined,
-                      size: AppDimensions.iconDisplay,
-                      color: AppTheme.successColor,
+                    child: SvgPicture.asset(
+                      AppIcons.analytics,
+                      width: AppDimensions.iconDisplay,
+                      height: AppDimensions.iconDisplay,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.successColor,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),

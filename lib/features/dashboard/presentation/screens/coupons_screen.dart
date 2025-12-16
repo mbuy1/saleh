@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -75,6 +79,15 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('الكوبونات'),
         centerTitle: true,
         actions: [
@@ -120,9 +133,9 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error ?? 'حدث خطأ', style: const TextStyle(color: Colors.red)),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton.icon(
             onPressed: _loadCoupons,
             icon: const Icon(Icons.refresh),
@@ -144,12 +157,15 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
               size: 80,
               color: Colors.grey.shade300,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد كوبونات',
-              style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                color: Colors.grey.shade600,
+              ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             const Text('أنشئ كوبون جديد لجذب المزيد من العملاء'),
           ],
         ),
@@ -159,7 +175,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
     return RefreshIndicator(
       onRefresh: _loadCoupons,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: coupons.length,
         itemBuilder: (context, index) => _buildCouponCard(coupons[index]),
       ),
@@ -168,16 +184,19 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
 
   Widget _buildSmartCouponsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Smart Coupon Types
-          const Text(
+          Text(
             'إنشاء كوبون ذكي',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontHeadline,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _buildSmartCouponOption(
             'first_order',
             'خصم الترحيب',
@@ -208,12 +227,15 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
           ),
 
           if (_smartCoupons.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: AppDimensions.spacing24),
+            Text(
               'الكوبونات الذكية النشطة',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             ..._smartCoupons.map((c) => _buildCouponCard(c)),
           ],
         ],
@@ -249,12 +271,12 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
   Widget _buildCouponCard(Coupon coupon) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusM),
       child: InkWell(
         onTap: () => _showCouponDetails(coupon),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -270,7 +292,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                       color: coupon.isExpired
                           ? Colors.grey
                           : AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppDimensions.borderRadiusXL,
                     ),
                     child: Text(
                       coupon.discountText,
@@ -280,16 +302,16 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           coupon.titleAr ?? coupon.code,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                           ),
                         ),
                         if (coupon.smartType != null)
@@ -327,7 +349,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               // Code Display
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -336,7 +358,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                 ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppDimensions.borderRadiusS,
                   border: Border.all(
                     color: Colors.grey.shade300,
                     style: BorderStyle.solid,
@@ -345,8 +367,11 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.confirmation_number_outlined, size: 16),
-                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.confirmation_number_outlined,
+                      size: AppDimensions.iconXS,
+                    ),
+                    SizedBox(width: AppDimensions.spacing8),
                     Text(
                       coupon.code,
                       style: const TextStyle(
@@ -358,7 +383,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               // Stats Row
               Row(
                 children: [
@@ -367,7 +392,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                     '${coupon.timesUsed}',
                     'استخدام',
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.spacing12),
                   if (coupon.usageLimit != null)
                     _buildStatChip(
                       Icons.inventory_2_outlined,
@@ -381,7 +406,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                           ? 'منتهي'
                           : 'ينتهي ${_formatDate(coupon.expiresAt!)}',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppDimensions.fontLabel,
                         color: coupon.isExpired ? Colors.red : Colors.grey,
                       ),
                     ),
@@ -404,11 +429,14 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.grey.shade600),
-          const SizedBox(width: 4),
+          Icon(icon, size: AppDimensions.fontBody, color: Colors.grey.shade600),
+          SizedBox(width: AppDimensions.spacing4),
           Text(
             '$value $label',
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            style: TextStyle(
+              fontSize: AppDimensions.fontLabel,
+              color: Colors.grey.shade700,
+            ),
           ),
         ],
       ),

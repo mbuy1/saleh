@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 
@@ -29,7 +31,15 @@ class BoostSalesScreen extends ConsumerWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, size: 20),
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Colors.black87,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: () => context.pop(),
           ),
         ),
@@ -37,7 +47,15 @@ class BoostSalesScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.store_outlined, size: 64, color: Colors.grey),
+              SvgPicture.asset(
+                AppIcons.store,
+                width: 64,
+                height: 64,
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.srcIn,
+                ),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'لا يوجد متجر',
@@ -74,7 +92,15 @@ class BoostSalesScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 20,
+            height: 20,
+            colorFilter: const ColorFilter.mode(
+              Colors.black87,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -109,7 +135,15 @@ class BoostSalesScreen extends ConsumerWidget {
                           );
                         }
                       },
-                      icon: const Icon(Icons.visibility_outlined, size: 18),
+                      icon: SvgPicture.asset(
+                        AppIcons.visibility,
+                        width: 18,
+                        height: 18,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.primaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       label: const Text('عرض متجري'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.primaryColor,
@@ -224,10 +258,14 @@ class BoostSalesScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.check_circle_outline,
-            size: 18,
-            color: AppTheme.primaryColor,
+          SvgPicture.asset(
+            AppIcons.checkCircle,
+            width: 18,
+            height: 18,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(

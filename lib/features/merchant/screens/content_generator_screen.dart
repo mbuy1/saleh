@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -182,6 +186,15 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('محتوى تسويقي'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -205,9 +218,9 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -228,13 +241,13 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
 
   Widget _buildGenerateTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Platform selector
           const Text('المنصة', style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacing8),
           Wrap(
             spacing: 8,
             children: [
@@ -253,7 +266,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
             'اختر قالباً',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacing8),
           SizedBox(
             height: 120,
             child: ListView.builder(
@@ -274,7 +287,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
               'أدخل البيانات',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             ..._inputControllers.entries.map(
               (entry) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -289,7 +302,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
 
             SizedBox(
               width: double.infinity,
@@ -319,14 +332,14 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
             const SizedBox(height: 24),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         const Icon(Icons.check_circle, color: Colors.green),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacing8),
                         const Text(
                           'المحتوى المُنشأ',
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -358,12 +371,12 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
 
             // Variations
             if (_variations.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               const Text(
                 'نسخ بديلة',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               ..._variations.map(
                 (v) => Card(
                   margin: const EdgeInsets.only(bottom: 8),
@@ -422,13 +435,13 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
         margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primaryColor : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimensions.borderRadiusM,
           border: Border.all(
             color: isSelected ? AppTheme.primaryColor : Colors.grey[300]!,
             width: 2,
           ),
         ),
-        padding: const EdgeInsets.all(12),
+        padding: AppDimensions.paddingS,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -436,7 +449,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
               _getTemplateIcon(template['template_type']),
               color: isSelected ? Colors.white : AppTheme.primaryColor,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               template['name'] ?? '',
               style: TextStyle(
@@ -467,9 +480,9 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.folder_open, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text('المكتبة فارغة'),
-            SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               'احفظ المحتوى المُنشأ هنا',
               style: TextStyle(color: Colors.grey),
@@ -480,7 +493,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _library.length,
       itemBuilder: (context, index) {
         final item = _library[index];
@@ -530,7 +543,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.history, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text('لا يوجد سجل'),
           ],
         ),
@@ -538,7 +551,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _history.length,
       itemBuilder: (context, index) {
         final item = _history[index];

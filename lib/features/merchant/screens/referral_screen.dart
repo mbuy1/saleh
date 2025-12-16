@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 
 // ============================================================================
@@ -336,6 +340,10 @@ class _ReferralScreenState extends State<ReferralScreen>
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('برنامج الإحالة'),
           centerTitle: true,
           actions: [
@@ -377,21 +385,21 @@ class _ReferralScreenState extends State<ReferralScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Program status card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: AppDimensions.paddingL,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: _settings?.isEnabled == true
                       ? [Colors.green, Colors.green.shade700]
                       : [Colors.grey, Colors.grey.shade700],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppDimensions.borderRadiusL,
               ),
               child: Row(
                 children: [
@@ -402,7 +410,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                     color: Colors.white,
                     size: 40,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -451,7 +459,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'إحالات ناجحة',
@@ -462,7 +470,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -473,7 +481,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                     Colors.orange,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'المكافآت الموزعة',
@@ -494,7 +502,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
 
             _buildRewardInfoCard(
               'مكافأة المُحيل',
@@ -537,7 +545,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
 
             ..._codes.take(3).map((code) => _buildTopReferrerCard(code)),
           ],
@@ -553,14 +561,14 @@ class _ReferralScreenState extends State<ReferralScreen>
     Color color,
   ) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Text(
               value,
               style: TextStyle(
@@ -592,22 +600,22 @@ class _ReferralScreenState extends State<ReferralScreen>
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: AppDimensions.paddingXS,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimensions.borderRadiusS,
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Text(
               title,
@@ -627,10 +635,10 @@ class _ReferralScreenState extends State<ReferralScreen>
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
@@ -644,7 +652,7 @@ class _ReferralScreenState extends State<ReferralScreen>
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -685,7 +693,7 @@ class _ReferralScreenState extends State<ReferralScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _codes.length,
         itemBuilder: (context, index) => _buildCodeCard(_codes[index]),
       ),
@@ -697,9 +705,9 @@ class _ReferralScreenState extends State<ReferralScreen>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -719,7 +727,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -751,7 +759,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           InkWell(
                             onTap: () => _copyCode(code.code),
                             child: Icon(
@@ -772,9 +780,9 @@ class _ReferralScreenState extends State<ReferralScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             const Divider(),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -821,7 +829,7 @@ class _ReferralScreenState extends State<ReferralScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _referrals.length,
         itemBuilder: (context, index) => _buildReferralCard(_referrals[index]),
       ),
@@ -833,9 +841,9 @@ class _ReferralScreenState extends State<ReferralScreen>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -847,7 +855,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                       : CupertinoIcons.clock,
                   color: referral.statusColor,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -855,7 +863,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                   ),
                   decoration: BoxDecoration(
                     color: referral.statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimensions.borderRadiusS,
                   ),
                   child: Text(
                     referral.statusText,
@@ -874,7 +882,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -910,7 +918,7 @@ class _ReferralScreenState extends State<ReferralScreen>
               ],
             ),
             if (referral.orderId != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               Text(
                 'رقم الطلب: ${referral.orderId}',
                 style: TextStyle(fontSize: 12, color: theme.hintColor),
@@ -945,7 +953,7 @@ class _ReferralScreenState extends State<ReferralScreen>
           textDirection: TextDirection.rtl,
           child: Container(
             height: MediaQuery.of(context).size.height * 0.85,
-            padding: const EdgeInsets.all(24),
+            padding: AppDimensions.paddingXL,
             decoration: BoxDecoration(
               color: theme.scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
@@ -993,7 +1001,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                           'مكافأة المُحيل',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         Row(
                           children: [
                             Expanded(
@@ -1006,7 +1014,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacing8),
                             Expanded(
                               child: _buildTypeButton(
                                 'fixed',
@@ -1018,7 +1026,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacing12),
                         Row(
                           children: [
                             Expanded(
@@ -1048,7 +1056,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                           'مكافأة المُحال (العميل الجديد)',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         Row(
                           children: [
                             Expanded(
@@ -1061,7 +1069,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacing8),
                             Expanded(
                               child: _buildTypeButton(
                                 'fixed',
@@ -1073,7 +1081,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacing12),
                         TextFormField(
                           initialValue: refereeValue.toInt().toString(),
                           keyboardType: TextInputType.number,
@@ -1097,7 +1105,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                           'الحد الأدنى للطلب',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         TextFormField(
                           initialValue: minOrder.toInt().toString(),
                           keyboardType: TextInputType.number,
@@ -1112,7 +1120,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -1151,14 +1159,14 @@ class _ReferralScreenState extends State<ReferralScreen>
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppDimensions.borderRadiusM,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary.withValues(alpha: 0.1)
               : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimensions.borderRadiusM,
           border: Border.all(
             color: isSelected ? theme.colorScheme.primary : Colors.transparent,
             width: 2,
@@ -1189,7 +1197,7 @@ class _ReferralScreenState extends State<ReferralScreen>
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: AppDimensions.paddingXXL,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1200,7 +1208,7 @@ class _ReferralScreenState extends State<ReferralScreen>
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               subtitle,
               style: TextStyle(color: theme.hintColor),

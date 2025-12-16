@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io';
 import '../../../../shared/widgets/exports.dart';
 import '../../../../core/services/auth_token_storage.dart';
@@ -425,16 +426,24 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               if (mounted) {
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.white),
-                        SizedBox(width: 12),
-                        Text('تم رفع الفيديو بنجاح'),
+                        SvgPicture.asset(
+                          AppIcons.checkCircle,
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text('تم رفع الفيديو بنجاح'),
                       ],
                     ),
                     backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -617,9 +626,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   controller: _nameController,
                   label: 'اسم المنتج *',
                   hint: 'مثال: هاتف آيفون 15',
-                  prefixIcon: const Icon(
-                    Icons.inventory_2,
-                    color: AppTheme.textSecondaryColor,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      AppIcons.inventory2,
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.textSecondaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -639,9 +656,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   controller: _priceController,
                   label: 'السعر (ر.س) *',
                   hint: '0.00',
-                  prefixIcon: const Icon(
-                    Icons.monetization_on,
-                    color: AppTheme.textSecondaryColor,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      AppIcons.monetization,
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.textSecondaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -671,9 +696,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   decoration: InputDecoration(
                     labelText: 'التصنيف *',
                     hintText: 'اختر التصنيف',
-                    prefixIcon: const Icon(
-                      Icons.category,
-                      color: AppTheme.textSecondaryColor,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.category,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
@@ -726,9 +759,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     controller: _subCategoryController,
                     label: 'التصنيف الفرعي (اختياري)',
                     hint: 'مثال: هواتف ذكية',
-                    prefixIcon: const Icon(
-                      Icons.subdirectory_arrow_right,
-                      color: AppTheme.textSecondaryColor,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.subdirectory,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
@@ -739,9 +780,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   controller: _stockController,
                   label: 'الكمية المتوفرة (اختياري)',
                   hint: '0',
-                  prefixIcon: const Icon(
-                    Icons.inventory,
-                    color: AppTheme.textSecondaryColor,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      AppIcons.inventory,
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.textSecondaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -755,9 +804,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     controller: _weightController,
                     label: 'وزن المنتج تقريباً (اختياري)',
                     hint: 'مثال: 0.5 كجم',
-                    prefixIcon: const Icon(
-                      Icons.scale,
-                      color: AppTheme.textSecondaryColor,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.scale,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -772,9 +829,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     controller: _prepTimeController,
                     label: 'مدة تجهيز المنتج (اختياري)',
                     hint: 'مثال: 3 أيام',
-                    prefixIcon: const Icon(
-                      Icons.timer,
-                      color: AppTheme.textSecondaryColor,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.timer,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -790,9 +855,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   controller: _descriptionController,
                   label: 'الوصف',
                   hint: 'وصف تفصيلي للمنتج',
-                  prefixIcon: const Icon(
-                    Icons.description,
-                    color: AppTheme.textSecondaryColor,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      AppIcons.description,
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.textSecondaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   maxLines: 3,
                   textInputAction: TextInputAction.next,
@@ -805,9 +878,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     controller: _keywordsController,
                     label: 'الكلمات المفتاحية (SEO)',
                     hint: 'كلمات مفصولة بفاصلة',
-                    prefixIcon: const Icon(
-                      Icons.tag,
-                      color: AppTheme.textSecondaryColor,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.tag,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
@@ -844,9 +925,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             controller: _wholesalePriceController,
                             label: 'سعر الجملة (ر.س) *',
                             hint: '0.00',
-                            prefixIcon: const Icon(
-                              Icons.store,
-                              color: AppTheme.textSecondaryColor,
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: SvgPicture.asset(
+                                AppIcons.store,
+                                width: 24,
+                                height: 24,
+                                colorFilter: const ColorFilter.mode(
+                                  AppTheme.textSecondaryColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -874,9 +963,17 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             controller: _slaDaysController,
                             label: 'مدة التجهيز بالأيام *',
                             hint: 'مثال: 3',
-                            prefixIcon: const Icon(
-                              Icons.schedule,
-                              color: AppTheme.textSecondaryColor,
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: SvgPicture.asset(
+                                AppIcons.schedule,
+                                width: 24,
+                                height: 24,
+                                colorFilter: const ColorFilter.mode(
+                                  AppTheme.textSecondaryColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                             keyboardType: TextInputType.number,
                             inputFormatters: [
@@ -978,10 +1075,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                                size: 20,
+                              child: SvgPicture.asset(
+                                AppIcons.cancel,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.red,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                           ),
@@ -1000,10 +1101,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             color: Colors.black12,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
-                            Icons.videocam,
-                            size: 40,
-                            color: AppTheme.accentColor,
+                          child: SvgPicture.asset(
+                            AppIcons.videocam,
+                            width: 40,
+                            height: 40,
+                            colorFilter: const ColorFilter.mode(
+                              AppTheme.accentColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                         Positioned(
@@ -1016,10 +1121,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                                size: 20,
+                              child: SvgPicture.asset(
+                                AppIcons.cancel,
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.red,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                           ),
@@ -1038,14 +1147,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                           border: Border.all(color: AppTheme.dividerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.add_a_photo,
-                              color: AppTheme.textHintColor,
+                            SvgPicture.asset(
+                              AppIcons.addPhoto,
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                AppTheme.textHintColor,
+                                BlendMode.srcIn,
+                              ),
                             ),
-                            Text('صورة', style: TextStyle(fontSize: 10)),
+                            const Text('صورة', style: TextStyle(fontSize: 10)),
                           ],
                         ),
                       ),
@@ -1062,11 +1176,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                           border: Border.all(color: AppTheme.dividerColor),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.videocam, color: AppTheme.textHintColor),
-                            Text('فيديو', style: TextStyle(fontSize: 10)),
+                            SvgPicture.asset(
+                              AppIcons.videocam,
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                AppTheme.textHintColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const Text('فيديو', style: TextStyle(fontSize: 10)),
                           ],
                         ),
                       ),
@@ -1081,9 +1203,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         MbuyCard(
           padding: const EdgeInsets.all(AppDimensions.spacing12),
           child: ListTile(
-            leading: const Icon(
-              Icons.auto_awesome,
-              color: AppTheme.primaryColor,
+            leading: SvgPicture.asset(
+              AppIcons.autoAwesome,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.primaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             title: const Text('توليد وسائط بالذكاء الاصطناعي'),
             subtitle: const Text('قريباً...'),
@@ -1124,10 +1251,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconS,
-                color: AppTheme.primaryColor,
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -1152,10 +1283,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 color: AppTheme.accentColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: const Icon(
-                Icons.edit,
-                size: AppDimensions.iconS,
-                color: AppTheme.accentColor,
+              child: SvgPicture.asset(
+                AppIcons.edit,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.accentColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),

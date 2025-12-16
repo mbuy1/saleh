@@ -163,7 +163,11 @@ class _FeatureSpotlightState extends ConsumerState<FeatureSpotlight>
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: AppIcon(AppIcons.sparkle, size: 16, color: Colors.white),
+                      child: AppIcon(
+                        AppIcons.sparkle,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -178,7 +182,11 @@ class _FeatureSpotlightState extends ConsumerState<FeatureSpotlight>
                     ),
                     GestureDetector(
                       onTap: _dismissSpotlight,
-                      child: AppIcon(AppIcons.close, size: 18, color: Colors.white70),
+                      child: AppIcon(
+                        AppIcons.close,
+                        size: 18,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -360,7 +368,11 @@ class WhatsNewBottomSheet extends StatelessWidget {
                     gradient: AppTheme.metallicGradient,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: AppIcon(AppIcons.sparkle, size: 32, color: Colors.white),
+                  child: AppIcon(
+                    AppIcons.sparkle,
+                    size: 32,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -374,10 +386,7 @@ class WhatsNewBottomSheet extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'اكتشف الميزات الجديدة في هذا التحديث',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -407,10 +416,7 @@ class WhatsNewBottomSheet extends StatelessWidget {
                 ),
                 child: const Text(
                   'رائع، فهمت!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -456,10 +462,7 @@ class WhatsNewBottomSheet extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   feature.description,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
               ],
             ),

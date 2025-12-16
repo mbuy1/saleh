@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 
@@ -45,7 +47,18 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
             controller: _searchController,
             decoration: InputDecoration(
               hintText: 'البحث عن منتج...',
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  AppIcons.search,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.grey,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
               border: OutlineInputBorder(
                 borderRadius: AppDimensions.borderRadiusM,
               ),
@@ -63,7 +76,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
             children: [
               // تمت إزالة قسم "متجرك على جوك" من هنا حسب الطلب
               _buildSectionHeader('الإعدادات العامة'),
-              _buildListTileAction('تخصيص التصنيفات', Icons.category, () {}),
+              _buildListTileAction('تخصيص التصنيفات', AppIcons.category, () {}),
               _buildSwitchTile(
                 'تكرار المنتج',
                 'allow_duplicate_product',
@@ -248,7 +261,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
                   ),
                   _buildListTileAction(
                     'استيراد/تصدير المنتجات',
-                    Icons.import_export,
+                    AppIcons.importExport,
                     () {},
                   ),
                   _buildSwitchTile(
@@ -289,7 +302,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
                   ),
                   _buildListTileAction(
                     'صفحة المنتجات المحذوفة',
-                    Icons.delete_outline,
+                    AppIcons.delete,
                     () {},
                   ),
                 ],
@@ -455,11 +468,28 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
     );
   }
 
-  Widget _buildListTileAction(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildListTileAction(
+    String title,
+    String iconPath,
+    VoidCallback onTap,
+  ) {
     return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryColor),
+      leading: SvgPicture.asset(
+        iconPath,
+        width: 24,
+        height: 24,
+        colorFilter: const ColorFilter.mode(
+          AppTheme.primaryColor,
+          BlendMode.srcIn,
+        ),
+      ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      trailing: SvgPicture.asset(
+        AppIcons.chevronRight,
+        width: 16,
+        height: 16,
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+      ),
       onTap: onTap,
     );
   }

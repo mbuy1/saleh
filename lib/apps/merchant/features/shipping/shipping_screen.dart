@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 
 class ShippingScreen extends StatefulWidget {
   const ShippingScreen({super.key});
@@ -29,6 +34,10 @@ class _ShippingScreenState extends State<ShippingScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('إدارة الشحن'),
           bottom: TabBar(
             controller: _tabController,
@@ -53,7 +62,7 @@ class _ShippingScreenState extends State<ShippingScreen>
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -87,14 +96,14 @@ class _ShippingScreenState extends State<ShippingScreen>
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Carriers Section
           const Text(
             'شركات الشحن المتاحة',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           _buildCarriersList(),
         ],
       ),
@@ -109,12 +118,12 @@ class _ShippingScreenState extends State<ShippingScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -195,12 +204,12 @@ class _ShippingScreenState extends State<ShippingScreen>
             size: 64,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(
             'لا توجد شحنات',
             style: TextStyle(color: Colors.grey[600], fontSize: 18),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppDimensions.spacing8),
           ElevatedButton.icon(
             onPressed: () => _showCreateShipmentDialog(),
             icon: const Icon(Icons.add),
@@ -213,14 +222,14 @@ class _ShippingScreenState extends State<ShippingScreen>
 
   Widget _buildSettingsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Shipping Zones
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -241,7 +250,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   ListTile(
                     leading: const Icon(Icons.location_city),
                     title: const Text('المنطقة الوسطى'),
@@ -264,12 +273,12 @@ class _ShippingScreenState extends State<ShippingScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Default Settings
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -277,7 +286,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                     'الإعدادات الافتراضية',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تأمين الشحنات'),
                     subtitle: const Text('إضافة تأمين تلقائي على الشحنات'),
@@ -311,12 +320,12 @@ class _ShippingScreenState extends State<ShippingScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Sender Info
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -324,7 +333,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                     'معلومات المرسل',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'اسم المرسل',
@@ -332,7 +341,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                     ),
                     initialValue: 'متجري',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'رقم الجوال',
@@ -340,7 +349,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                     ),
                     initialValue: '05xxxxxxxx',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'العنوان',
@@ -348,7 +357,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                     ),
                     maxLines: 2,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   Row(
                     children: [
                       Expanded(
@@ -359,7 +368,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: AppDimensions.spacing12),
                       Expanded(
                         child: TextFormField(
                           decoration: const InputDecoration(
@@ -370,7 +379,7 @@ class _ShippingScreenState extends State<ShippingScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -407,28 +416,28 @@ class _ShippingScreenState extends State<ShippingScreen>
                 ],
                 onChanged: (v) {},
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'رقم الطلب',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'اسم المستلم',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'رقم الجوال',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'العنوان',

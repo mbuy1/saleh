@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 
 class DeliveryOptionsScreen extends StatefulWidget {
   const DeliveryOptionsScreen({super.key});
@@ -29,6 +34,10 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('خيارات التوصيل'),
           bottom: TabBar(
             controller: _tabController,
@@ -53,7 +62,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
 
   Widget _buildDeliveryMethodsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // Stats Row
@@ -67,7 +76,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                   Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'نشطة',
@@ -78,7 +87,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppDimensions.spacing24),
 
           // Delivery Methods List
           Row(
@@ -95,7 +104,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           _buildMethodCard(
             'توصيل عادي',
             'التوصيل خلال 2-3 أيام عمل',
@@ -141,11 +150,11 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           children: [
             Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -176,14 +185,14 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: AppDimensions.paddingS,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppDimensions.borderRadiusM,
               ),
               child: Icon(icon, color: color, size: 28),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: AppDimensions.spacing16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +227,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
 
   Widget _buildPickupPointsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           Row(
@@ -235,7 +244,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           _buildPickupPointCard(
             'الفرع الرئيسي',
             'شارع الملك فهد، الرياض',
@@ -293,7 +302,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                         color: isActive
                             ? Colors.green.withValues(alpha: 0.1)
                             : Colors.grey.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppDimensions.borderRadiusM,
                       ),
                       child: Text(
                         isActive ? 'نشط' : 'غير نشط',
@@ -312,15 +321,15 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
             Row(
               children: [
                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                SizedBox(width: AppDimensions.spacing4),
                 Text(address, style: TextStyle(color: Colors.grey[600])),
               ],
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: AppDimensions.spacing4),
             Row(
               children: [
                 const Icon(Icons.access_time, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                SizedBox(width: AppDimensions.spacing4),
                 Text(hours, style: TextStyle(color: Colors.grey[600])),
               ],
             ),
@@ -332,13 +341,13 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
 
   Widget _buildSettingsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // Same Day Delivery
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -346,7 +355,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     'التوصيل في نفس اليوم',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تفعيل التوصيل في نفس اليوم'),
                     value: true,
@@ -360,7 +369,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     ),
                     initialValue: '14:00',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'رسوم التوصيل في نفس اليوم',
@@ -373,12 +382,12 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Express Delivery
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -386,7 +395,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     'التوصيل السريع',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تفعيل التوصيل السريع'),
                     value: true,
@@ -399,7 +408,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     ),
                     initialValue: '2',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'رسوم التوصيل السريع',
@@ -412,12 +421,12 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Delivery Slots
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -425,7 +434,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     'فترات التوصيل',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تفعيل اختيار فترة التوصيل'),
                     value: true,
@@ -438,7 +447,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     ),
                     initialValue: '7',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'وقت التجهيز الافتراضي (دقيقة)',
@@ -450,12 +459,12 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Tracking Settings
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -463,7 +472,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                     'إعدادات التتبع',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تتبع العميل للشحنة'),
                     subtitle: const Text('السماح للعميل بتتبع موقع الشحنة'),
@@ -492,7 +501,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -520,14 +529,14 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'الوصف',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'نوع الطريقة',
@@ -541,7 +550,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                 ],
                 onChanged: (v) {},
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'السعر',
@@ -549,7 +558,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                   suffixText: 'ر.س',
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'الشحن المجاني فوق',
@@ -589,7 +598,7 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'العنوان',
@@ -597,21 +606,21 @@ class _DeliveryOptionsScreenState extends State<DeliveryOptionsScreen>
                 ),
                 maxLines: 2,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'المدينة',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'رقم الهاتف',
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'ساعات العمل',

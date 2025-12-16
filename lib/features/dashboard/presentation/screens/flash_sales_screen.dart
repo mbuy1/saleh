@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -77,6 +81,15 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('العروض الخاطفة'),
         centerTitle: true,
         actions: [
@@ -131,9 +144,9 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error ?? 'حدث خطأ', style: const TextStyle(color: Colors.red)),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton.icon(
             onPressed: _loadFlashSales,
             icon: const Icon(Icons.refresh),
@@ -155,12 +168,15 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
               size: 80,
               color: Colors.grey.shade300,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد عروض',
-              style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                color: Colors.grey.shade600,
+              ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             const Text('أنشئ عرضاً خاطفاً لزيادة مبيعاتك'),
           ],
         ),
@@ -170,7 +186,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
     return RefreshIndicator(
       onRefresh: _loadFlashSales,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: sales.length,
         itemBuilder: (context, index) =>
             _buildFlashSaleCard(sales[index], showTimer: showTimer),
@@ -181,7 +197,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
   Widget _buildFlashSaleCard(FlashSale sale, {bool showTimer = false}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _showFlashSaleDetails(sale),
@@ -237,22 +253,22 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
                       ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(sale.status),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: AppDimensions.borderRadiusXL,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             _getStatusIcon(sale.status),
-                            size: 14,
+                            size: AppDimensions.fontBody,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: AppDimensions.spacing4),
                           Text(
                             _getStatusText(sale.status),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: AppDimensions.fontLabel,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -272,37 +288,37 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
             ),
             // Content
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     sale.titleAr ?? sale.title,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Row(
                     children: [
                       Icon(
                         Icons.inventory_2_outlined,
-                        size: 16,
+                        size: AppDimensions.iconXS,
                         color: Colors.grey.shade600,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: AppDimensions.spacing4),
                       Text(
                         '${sale.productsCount} منتج',
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: AppDimensions.spacing16),
                       Icon(
                         Icons.calendar_today_outlined,
-                        size: 16,
+                        size: AppDimensions.iconXS,
                         color: Colors.grey.shade600,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: AppDimensions.spacing4),
                       Text(
                         _formatDateRange(sale.startsAt, sale.endsAt),
                         style: TextStyle(color: Colors.grey.shade600),
@@ -310,7 +326,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
                     ],
                   ),
                   if (sale.isFeatured) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: AppDimensions.spacing8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -318,21 +334,21 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
                       ),
                       decoration: BoxDecoration(
                         color: Colors.amber.shade50,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppDimensions.borderRadiusS,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.star,
-                            size: 14,
+                            size: AppDimensions.fontBody,
                             color: Colors.amber.shade700,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: AppDimensions.spacing4),
                           Text(
                             'عرض مميز',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: AppDimensions.fontLabel,
                               color: Colors.amber.shade700,
                               fontWeight: FontWeight.w500,
                             ),
@@ -486,13 +502,17 @@ class _CountdownTimerState extends State<_CountdownTimer> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppDimensions.borderRadiusS,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.timer_outlined, color: Colors.white, size: 16),
-          const SizedBox(width: 8),
+          Icon(
+            Icons.timer_outlined,
+            color: Colors.white,
+            size: AppDimensions.iconXS,
+          ),
+          SizedBox(width: AppDimensions.spacing8),
           Text(
             '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
             style: const TextStyle(

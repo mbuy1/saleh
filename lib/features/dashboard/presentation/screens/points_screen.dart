@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة نقاط التاجر - نظام المكافآت والنقاط
@@ -80,7 +82,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           title: 'خصم 5%',
           description: 'خصم على الباقة التالية',
           pointsCost: 500,
-          icon: Icons.discount,
+          iconPath: AppIcons.discount,
           color: Colors.green,
         ),
         PointReward(
@@ -88,7 +90,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           title: 'خصم 10%',
           description: 'خصم على الباقة التالية',
           pointsCost: 900,
-          icon: Icons.discount,
+          iconPath: AppIcons.discount,
           color: Colors.blue,
         ),
         PointReward(
@@ -96,7 +98,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           title: '5 صور AI مجانية',
           description: 'صور إضافية لهذا الشهر',
           pointsCost: 300,
-          icon: Icons.image,
+          iconPath: AppIcons.image,
           color: Colors.purple,
         ),
         PointReward(
@@ -104,7 +106,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           title: 'فيديو AI مجاني',
           description: 'فيديو واحد إضافي',
           pointsCost: 600,
-          icon: Icons.videocam,
+          iconPath: AppIcons.videocam,
           color: Colors.orange,
         ),
         PointReward(
@@ -112,7 +114,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           title: 'دعم أولوية',
           description: 'أسبوع من الدعم المميز',
           pointsCost: 1000,
-          icon: Icons.support_agent,
+          iconPath: AppIcons.supportAgent,
           color: Colors.red,
         ),
       ];
@@ -139,7 +141,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(reward.icon, size: 48, color: reward.color),
+            SvgPicture.asset(
+              reward.iconPath,
+              width: 48,
+              height: 48,
+              colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
+            ),
             const SizedBox(height: 16),
             Text('سيتم خصم ${reward.pointsCost} نقطة من رصيدك'),
             const SizedBox(height: 8),
@@ -201,7 +208,15 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -215,7 +230,15 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline),
+            icon: SvgPicture.asset(
+              AppIcons.help,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textPrimaryColor,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: _showHelpDialog,
             tooltip: 'كيف أكسب النقاط؟',
           ),
@@ -286,11 +309,19 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star, color: Colors.white, size: 16),
-                    SizedBox(width: 4),
+                    SvgPicture.asset(
+                      AppIcons.star,
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
                     Text(
                       'VIP',
                       style: TextStyle(
@@ -368,7 +399,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           child: _buildStatItem(
             'إجمالي المكتسب',
             '$_lifetimePoints',
-            Icons.trending_up,
+            AppIcons.trendingUp,
             AppTheme.successColor,
           ),
         ),
@@ -377,7 +408,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           child: _buildStatItem(
             'تم استبداله',
             '$_redeemedPoints',
-            Icons.redeem,
+            AppIcons.gift,
             AppTheme.primaryColor,
           ),
         ),
@@ -388,7 +419,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
   Widget _buildStatItem(
     String label,
     String value,
-    IconData icon,
+    String iconPath,
     Color color,
   ) {
     return Container(
@@ -411,7 +442,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: SvgPicture.asset(
+              iconPath,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            ),
           ),
           const SizedBox(width: 12),
           Column(
@@ -503,7 +539,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 color: reward.color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(reward.icon, color: reward.color, size: 28),
+              child: SvgPicture.asset(
+                reward.iconPath,
+                width: 28,
+                height: 28,
+                colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -515,7 +556,15 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.stars, size: 14, color: Colors.orange),
+                SvgPicture.asset(
+                  AppIcons.star,
+                  width: 14,
+                  height: 14,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.orange,
+                    BlendMode.srcIn,
+                  ),
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${reward.pointsCost}',
@@ -593,11 +642,11 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       PointTransactionType.bonus => Colors.purple,
       PointTransactionType.expired => AppTheme.slate600,
     };
-    final icon = switch (transaction.type) {
-      PointTransactionType.earned => Icons.add_circle,
-      PointTransactionType.redeemed => Icons.remove_circle,
-      PointTransactionType.bonus => Icons.card_giftcard,
-      PointTransactionType.expired => Icons.access_time,
+    final iconPath = switch (transaction.type) {
+      PointTransactionType.earned => AppIcons.addCircle,
+      PointTransactionType.redeemed => AppIcons.removeCircle,
+      PointTransactionType.bonus => AppIcons.gift,
+      PointTransactionType.expired => AppIcons.time,
     };
 
     return ListTile(
@@ -607,7 +656,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: color, size: 20),
+        child: SvgPicture.asset(
+          iconPath,
+          width: 20,
+          height: 20,
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        ),
       ),
       title: Text(
         transaction.description,
@@ -654,31 +708,31 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _HelpItem(
-                icon: Icons.shopping_cart,
+                iconPath: AppIcons.cart,
                 title: 'المبيعات',
                 description: 'اكسب 1 نقطة عن كل ريال مبيعات',
               ),
               SizedBox(height: 12),
               _HelpItem(
-                icon: Icons.add_box,
+                iconPath: AppIcons.add,
                 title: 'إضافة منتجات',
                 description: '30 نقطة عن كل منتج جديد',
               ),
               SizedBox(height: 12),
               _HelpItem(
-                icon: Icons.check_circle,
+                iconPath: AppIcons.checkCircle,
                 title: 'التحديات اليومية',
                 description: 'أكمل التحديات واكسب حتى 100 نقطة',
               ),
               SizedBox(height: 12),
               _HelpItem(
-                icon: Icons.share,
+                iconPath: AppIcons.share,
                 title: 'دعوة أصدقاء',
                 description: '500 نقطة عن كل صديق يسجل',
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               _HelpItem(
-                icon: Icons.star,
+                iconPath: AppIcons.star,
                 title: 'التقييمات',
                 description: '10 نقاط عن كل تقييم 5 نجوم',
               ),
@@ -697,12 +751,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
 }
 
 class _HelpItem extends StatelessWidget {
-  final IconData icon;
+  final String iconPath;
   final String title;
   final String description;
 
   const _HelpItem({
-    required this.icon,
+    required this.iconPath,
     required this.title,
     required this.description,
   });
@@ -717,7 +771,15 @@ class _HelpItem extends StatelessWidget {
             color: AppTheme.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: AppTheme.primaryColor, size: 20),
+          child: SvgPicture.asset(
+            iconPath,
+            width: 20,
+            height: 20,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -761,7 +823,7 @@ class PointReward {
   final String title;
   final String description;
   final int pointsCost;
-  final IconData icon;
+  final String iconPath;
   final Color color;
 
   PointReward({
@@ -769,7 +831,7 @@ class PointReward {
     required this.title,
     required this.description,
     required this.pointsCost,
-    required this.icon,
+    required this.iconPath,
     required this.color,
   });
 }

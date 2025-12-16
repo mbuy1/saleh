@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_icons.dart';
 import '../../core/theme/app_theme.dart';
 import '../widgets/mbuy_button.dart';
 
@@ -31,10 +33,14 @@ class DialogHelper {
                 color: AppTheme.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.error_outline,
-                color: AppTheme.errorColor,
-                size: AppDimensions.iconL,
+              child: SvgPicture.asset(
+                AppIcons.error,
+                width: AppDimensions.iconL,
+                height: AppDimensions.iconL,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.errorColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: AppDimensions.spacing12),
@@ -98,10 +104,14 @@ class DialogHelper {
                 color: AppTheme.successColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.check_circle_outline,
-                color: AppTheme.successColor,
-                size: AppDimensions.iconL,
+              child: SvgPicture.asset(
+                AppIcons.checkCircle,
+                width: AppDimensions.iconL,
+                height: AppDimensions.iconL,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.successColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: AppDimensions.spacing12),
@@ -157,10 +167,14 @@ class DialogHelper {
                 color: AppTheme.warningColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.warning_amber_outlined,
-                color: AppTheme.warningColor,
-                size: AppDimensions.iconL,
+              child: SvgPicture.asset(
+                AppIcons.warning,
+                width: AppDimensions.iconL,
+                height: AppDimensions.iconL,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.warningColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: AppDimensions.spacing12),
@@ -221,10 +235,14 @@ class DialogHelper {
                 color: AppTheme.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.delete_outline,
-                color: AppTheme.errorColor,
-                size: AppDimensions.iconL,
+              child: SvgPicture.asset(
+                AppIcons.delete,
+                width: AppDimensions.iconL,
+                height: AppDimensions.iconL,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.errorColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: AppDimensions.spacing12),

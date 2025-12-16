@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_icons.dart';
 import '../../core/controllers/root_controller.dart';
 import '../../features/auth/data/auth_controller.dart';
 import '../../features/merchant/data/merchant_store_provider.dart';
@@ -161,10 +163,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.primaryColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
-      child: const Icon(
-        Icons.shopping_bag_outlined,
-        size: AppDimensions.iconDisplay,
-        color: AppTheme.primaryColor,
+      child: SvgPicture.asset(
+        AppIcons.shoppingBag,
+        width: AppDimensions.iconDisplay,
+        height: AppDimensions.iconDisplay,
+        colorFilter: const ColorFilter.mode(
+          AppTheme.primaryColor,
+          BlendMode.srcIn,
+        ),
       ),
     );
   }
@@ -193,7 +199,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-
   Widget _buildEmailField() {
     return TextFormField(
       controller: _emailController,
@@ -214,10 +219,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           color: AppTheme.textSecondaryColor,
           fontSize: AppDimensions.fontBody,
         ),
-        prefixIcon: const Icon(
-          Icons.email_outlined,
-          color: AppTheme.textSecondaryColor,
-          size: AppDimensions.iconS,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12),
+          child: SvgPicture.asset(
+            AppIcons.email,
+            width: AppDimensions.iconS,
+            height: AppDimensions.iconS,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.textSecondaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
         filled: true,
         fillColor: AppTheme.surfaceColor,
@@ -235,10 +247,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: const BorderSide(
-            color: AppTheme.primaryColor,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
@@ -280,18 +289,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           color: AppTheme.textSecondaryColor,
           fontSize: AppDimensions.fontBody,
         ),
-        prefixIcon: const Icon(
-          Icons.lock_outline,
-          color: AppTheme.textSecondaryColor,
-          size: AppDimensions.iconS,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12),
+          child: SvgPicture.asset(
+            AppIcons.lock,
+            width: AppDimensions.iconS,
+            height: AppDimensions.iconS,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.textSecondaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
         suffixIcon: IconButton(
-          icon: Icon(
-            _obscurePassword
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
-            color: AppTheme.textSecondaryColor,
-            size: AppDimensions.iconS,
+          icon: SvgPicture.asset(
+            _obscurePassword ? AppIcons.visibility : AppIcons.visibilityOff,
+            width: AppDimensions.iconS,
+            height: AppDimensions.iconS,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.textSecondaryColor,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () {
             setState(() => _obscurePassword = !_obscurePassword);
@@ -313,10 +331,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
-          borderSide: const BorderSide(
-            color: AppTheme.primaryColor,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppDimensions.borderRadiusM,
@@ -366,13 +381,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    Icons.store,
-                    size: 20,
+                children: [
+                  SvgPicture.asset(
+                    AppIcons.store,
+                    width: 20,
+                    height: 20,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
-                  SizedBox(width: 8),
-                  Text(
+                  const SizedBox(width: 8),
+                  const Text(
                     'دخول كبائع',
                     style: TextStyle(
                       fontSize: AppDimensions.fontTitle,
@@ -395,10 +415,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppTheme.errorColor,
-            size: AppDimensions.iconM,
+          SvgPicture.asset(
+            AppIcons.error,
+            width: AppDimensions.iconM,
+            height: AppDimensions.iconM,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.errorColor,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: AppDimensions.spacing12),
           Expanded(
@@ -438,10 +462,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(width: AppDimensions.spacing8),
-              Icon(
-                Icons.info_outline,
-                color: AppTheme.infoColor,
-                size: AppDimensions.iconS,
+              SvgPicture.asset(
+                AppIcons.info,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: ColorFilter.mode(
+                  AppTheme.infoColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ],
           ),

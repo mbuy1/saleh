@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -156,7 +159,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
         ),
         iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         bottom: PreferredSize(
@@ -174,11 +185,22 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                   onChanged: (v) => setState(() => _searchQuery = v),
                   decoration: InputDecoration(
                     hintText: 'بحث عن عميل...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SvgPicture.asset(
+                        AppIcons.search,
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.grey,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppDimensions.borderRadiusM,
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -230,10 +252,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
+          SvgPicture.asset(
+            AppIcons.errorOutline,
+            width: 64,
+            height: 64,
+            colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+          ),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error!, style: const TextStyle(color: Colors.red)),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton(
             onPressed: _loadCustomers,
             child: const Text('إعادة المحاولة'),
@@ -245,31 +272,31 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
 
   Widget _buildStatsBar() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       color: Colors.white,
       child: Row(
         children: [
           Expanded(
             child: _buildStatCard(
-              icon: Icons.people,
+              iconPath: AppIcons.people,
               label: 'إجمالي العملاء',
               value: '$_totalCustomers',
               color: Colors.blue,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _buildStatCard(
-              icon: Icons.favorite,
+              iconPath: AppIcons.favorite,
               label: 'المتابعون',
               value: '$_totalFollowers',
               color: Colors.red,
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: _buildStatCard(
-              icon: Icons.attach_money,
+              iconPath: AppIcons.attachMoney,
               label: 'الإيرادات',
               value: _totalRevenue.toStringAsFixed(0),
               color: Colors.green,
@@ -281,26 +308,31 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
   }
 
   Widget _buildStatCard({
-    required IconData icon,
+    required String iconPath,
     required String label,
     required String value,
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
+          SvgPicture.asset(
+            iconPath,
+            width: AppDimensions.iconM,
+            height: AppDimensions.iconM,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+          ),
+          SizedBox(height: AppDimensions.spacing4),
           Text(
             value,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: AppDimensions.fontTitle,
               color: color,
             ),
           ),
@@ -320,12 +352,17 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            const Text(
+            SvgPicture.asset(
+              AppIcons.peopleOutline,
+              width: 64,
+              height: 64,
+              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            ),
+            SizedBox(height: AppDimensions.spacing16),
+            Text(
               'لا يوجد عملاء',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.fontTitle,
                 color: AppTheme.textSecondaryColor,
               ),
             ),
@@ -337,9 +374,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     return RefreshIndicator(
       onRefresh: _loadCustomers,
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: customers.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 8),
+        separatorBuilder: (_, _) => SizedBox(height: AppDimensions.spacing8),
         itemBuilder: (context, index) {
           final customer = customers[index];
           return _buildCustomerCard(customer);
@@ -352,7 +389,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -363,12 +400,12 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: InkWell(
           onTap: () => _showCustomerDetails(customer),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimensions.borderRadiusM,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppDimensions.paddingM,
             child: Row(
               children: [
                 // Avatar
@@ -391,7 +428,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                         )
                       : null,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: AppDimensions.spacing12),
                 // Info
                 Expanded(
                   child: Column(
@@ -416,17 +453,21 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.red.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: AppDimensions.borderRadiusS,
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.favorite,
-                                    size: 12,
-                                    color: Colors.red,
+                                  SvgPicture.asset(
+                                    AppIcons.favorite,
+                                    width: AppDimensions.fontLabel,
+                                    height: AppDimensions.fontLabel,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.red,
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
-                                  SizedBox(width: 4),
+                                  SizedBox(width: AppDimensions.spacing4),
                                   Text(
                                     'متابع',
                                     style: TextStyle(
@@ -448,16 +489,16 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                             color: Colors.grey[600],
                           ),
                         ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: AppDimensions.spacing8),
                       Row(
                         children: [
                           _buildMiniStat(
-                            Icons.shopping_bag_outlined,
+                            AppIcons.shoppingBagOutlined,
                             '${customer.totalOrders} طلب',
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: AppDimensions.spacing16),
                           _buildMiniStat(
-                            Icons.attach_money,
+                            AppIcons.attachMoney,
                             '${customer.totalSpent.toStringAsFixed(0)} ر.س',
                           ),
                         ],
@@ -466,10 +507,14 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                   ),
                 ),
                 // Arrow
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Colors.grey[400],
+                SvgPicture.asset(
+                  AppIcons.arrowForward,
+                  width: AppDimensions.iconXS,
+                  height: AppDimensions.iconXS,
+                  colorFilter: ColorFilter.mode(
+                    Colors.grey[400]!,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),
@@ -479,13 +524,24 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     );
   }
 
-  Widget _buildMiniStat(IconData icon, String text) {
+  Widget _buildMiniStat(String iconPath, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: Colors.grey[500]),
-        const SizedBox(width: 4),
-        Text(text, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        SvgPicture.asset(
+          iconPath,
+          width: AppDimensions.fontBody,
+          height: AppDimensions.fontBody,
+          colorFilter: ColorFilter.mode(Colors.grey[500]!, BlendMode.srcIn),
+        ),
+        SizedBox(width: AppDimensions.spacing4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: AppDimensions.fontLabel,
+            color: Colors.grey[600],
+          ),
+        ),
       ],
     );
   }
@@ -557,11 +613,19 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                           ),
                         ),
                         if (customer.isFollower)
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.favorite, size: 14, color: Colors.red),
-                              SizedBox(width: 4),
-                              Text(
+                              SvgPicture.asset(
+                                AppIcons.favorite,
+                                width: 14,
+                                height: 14,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.red,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
                                 'متابع للمتجر',
                                 style: TextStyle(color: Colors.red),
                               ),
@@ -582,7 +646,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                 const SizedBox(height: 12),
                 if (customer.phone != null)
                   _buildContactRow(
-                    Icons.phone,
+                    AppIcons.phone,
                     customer.phone!,
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: customer.phone!));
@@ -594,7 +658,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                   ),
                 if (customer.email != null)
                   _buildContactRow(
-                    Icons.email,
+                    AppIcons.email,
                     customer.email!,
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: customer.email!));
@@ -618,7 +682,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                     child: _buildDetailStat(
                       'عدد الطلبات',
                       '${customer.totalOrders}',
-                      Icons.shopping_bag,
+                      AppIcons.shoppingBag,
                       Colors.blue,
                     ),
                   ),
@@ -627,7 +691,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                     child: _buildDetailStat(
                       'إجمالي المشتريات',
                       '${customer.totalSpent.toStringAsFixed(0)} ر.س',
-                      Icons.attach_money,
+                      AppIcons.attachMoney,
                       Colors.green,
                     ),
                   ),
@@ -638,7 +702,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                 _buildDetailStat(
                   'آخر طلب',
                   DateFormat('dd/MM/yyyy').format(customer.lastOrderDate!),
-                  Icons.calendar_today,
+                  AppIcons.calendar,
                   Colors.orange,
                   fullWidth: true,
                 ),
@@ -656,7 +720,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                           '/dashboard/orders?customer=${customer.id}',
                         );
                       },
-                      icon: const Icon(Icons.shopping_bag_outlined),
+                      icon: SvgPicture.asset(
+                        AppIcons.shoppingBagOutlined,
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(
+                          AppTheme.primaryColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       label: const Text('عرض الطلبات'),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -673,18 +745,31 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     );
   }
 
-  Widget _buildContactRow(IconData icon, String text, {VoidCallback? onTap}) {
+  Widget _buildContactRow(String iconPath, String text, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Colors.grey[600]),
+            SvgPicture.asset(
+              iconPath,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
+            ),
             const SizedBox(width: 12),
             Expanded(child: Text(text)),
             if (onTap != null)
-              Icon(Icons.copy, size: 16, color: Colors.grey[400]),
+              SvgPicture.asset(
+                AppIcons.copy,
+                width: 16,
+                height: 16,
+                colorFilter: ColorFilter.mode(
+                  Colors.grey[400]!,
+                  BlendMode.srcIn,
+                ),
+              ),
           ],
         ),
       ),
@@ -694,7 +779,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
   Widget _buildDetailStat(
     String label,
     String value,
-    IconData icon,
+    String iconPath,
     Color color, {
     bool fullWidth = false,
   }) {
@@ -706,7 +791,12 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
       ),
       child: Row(
         children: [
-          Icon(icon, color: color),
+          SvgPicture.asset(
+            iconPath,
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

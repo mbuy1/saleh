@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -223,11 +227,21 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () =>
-              setState(() => _showConversations = !_showConversations),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.list),
+            tooltip: 'المحادثات',
+            onPressed: () =>
+                setState(() => _showConversations = !_showConversations),
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'محادثة جديدة',
@@ -260,9 +274,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -297,7 +311,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           color: Colors.grey[100],
           child: Row(
             children: [
@@ -406,7 +420,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _messages.length + (_isSending ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _messages.length && _isSending) {
@@ -419,12 +433,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
   Widget _buildWelcomeScreen() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimensions.paddingXL,
       child: Column(
         children: [
           const SizedBox(height: 40),
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimensions.paddingXL,
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withAlpha(25),
               shape: BoxShape.circle,
@@ -440,7 +454,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             'مرحباً! أنا مساعدك الذكي',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacing8),
           Text(
             'يمكنني مساعدتك في إدارة متجرك',
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
@@ -450,7 +464,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             'جرب أن تسألني عن:',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -468,7 +482,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             'الأوامر السريعة',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
           ..._quickCommands.take(4).map((cmd) => _buildQuickCommandCard(cmd)),
         ],
       ),
@@ -525,10 +539,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               : CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: AppDimensions.paddingS,
               decoration: BoxDecoration(
                 color: isUser ? AppTheme.primaryColor : Colors.white,
-                borderRadius: BorderRadius.circular(16).copyWith(
+                borderRadius: AppDimensions.borderRadiusL.copyWith(
                   bottomRight: isUser ? const Radius.circular(4) : null,
                   bottomLeft: !isUser ? const Radius.circular(4) : null,
                 ),
@@ -565,7 +579,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                         );
                       },
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacing8),
                     IconButton(
                       icon: Icon(
                         Icons.thumb_up_outlined,
@@ -604,10 +618,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppDimensions.borderRadiusL,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -642,7 +656,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -683,7 +697,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 onSubmitted: (_) => _sendMessage(),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacing8),
             CircleAvatar(
               backgroundColor: AppTheme.primaryColor,
               child: IconButton(
@@ -736,7 +750,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         builder: (context, scrollController) => Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 children: [
                   Container(
@@ -747,7 +761,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   const Text(
                     'الأوامر السريعة',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -805,7 +819,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           children: [
             Text(command['description'] ?? ''),
             if (requiresSelection) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextField(
                 controller: _messageController,
                 decoration: const InputDecoration(

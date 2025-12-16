@@ -176,7 +176,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _currentPage == _pages.length - 1 ? 'ابدأ الآن' : 'التالي',
+                        _currentPage == _pages.length - 1
+                            ? 'ابدأ الآن'
+                            : 'التالي',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -216,7 +218,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               borderRadius: BorderRadius.circular(35),
               boxShadow: [
                 BoxShadow(
-                  color: (page.gradient as LinearGradient).colors.first.withValues(alpha: 0.4),
+                  color: (page.gradient as LinearGradient).colors.first
+                      .withValues(alpha: 0.4),
                   blurRadius: 30,
                   offset: const Offset(0, 15),
                 ),

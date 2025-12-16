@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 
 // ============================================================================
 // Models
@@ -375,6 +379,10 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('السلات المتروكة'),
           centerTitle: true,
           actions: [
@@ -425,7 +433,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _abandonedCarts.length,
         itemBuilder: (context, index) {
           return _buildCartCard(_abandonedCarts[index]);
@@ -439,12 +447,12 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: InkWell(
         onTap: () => _showCartDetails(cart),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -465,7 +473,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,9 +515,9 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                 ],
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
 
               // Products preview
               SizedBox(
@@ -518,7 +526,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                   scrollDirection: Axis.horizontal,
                   itemCount: cart.cartItems.length.clamp(0, 4),
                   separatorBuilder: (context, index) =>
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                   itemBuilder: (context, index) {
                     final item = cart.cartItems[index];
                     return Container(
@@ -528,7 +536,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                       ),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppDimensions.borderRadiusS,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -553,7 +561,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
 
               // Actions
               Row(
@@ -567,7 +575,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                       ),
                       decoration: BoxDecoration(
                         color: Colors.orange.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppDimensions.borderRadiusS,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -622,7 +630,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         itemCount: _convertedCarts.length,
         itemBuilder: (context, index) {
           return _buildRecoveredCard(_convertedCarts[index]);
@@ -636,9 +644,9 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -651,7 +659,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     color: Colors.green,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -677,7 +685,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Row(
               children: [
                 Icon(CupertinoIcons.bell, size: 14, color: theme.hintColor),
@@ -708,7 +716,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     return RefreshIndicator(
       onRefresh: _loadData,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -723,7 +731,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     Colors.orange,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'تم استردادها',
@@ -734,7 +742,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -745,7 +753,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     theme.colorScheme.primary,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'الإيرادات المستردة',
@@ -762,7 +770,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
             // Pending value card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: AppDimensions.paddingL,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -770,7 +778,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     theme.colorScheme.primary.withValues(alpha: 0.7),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppDimensions.borderRadiusL,
               ),
               child: Column(
                 children: [
@@ -778,7 +786,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     'قيمة السلات المنتظرة',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   Text(
                     '${_stats!.totalPendingValue.toStringAsFixed(0)} ر.س',
                     style: const TextStyle(
@@ -805,7 +813,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildTipCard(
               CupertinoIcons.clock,
               'التوقيت المثالي',
@@ -834,14 +842,14 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     Color color,
   ) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Text(
               value,
               style: TextStyle(
@@ -868,15 +876,15 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
           Icon(icon, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -931,7 +939,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
 
               // Header
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: AppDimensions.paddingL,
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -948,7 +956,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppDimensions.spacing16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -986,7 +994,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: AppDimensions.paddingL,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -997,7 +1005,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                             CupertinoIcons.clock,
                             'منذ ${cart.timeSinceAbandoned}',
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacing8),
                           _buildInfoChip(
                             CupertinoIcons.bell,
                             '${cart.reminderCount} تذكير',
@@ -1013,14 +1021,14 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacing12),
 
                       // Products list
                       ...cart.cartItems.map((item) => _buildProductItem(item)),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
                       const Divider(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing16),
 
                       // Total
                       Row(
@@ -1050,7 +1058,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
 
               // Actions
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: AppDimensions.paddingL,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
                   boxShadow: [
@@ -1076,7 +1084,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacing12),
                     Expanded(
                       child: FilledButton.icon(
                         onPressed: () => _markAsRecovered(cart),
@@ -1103,7 +1111,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppDimensions.borderRadiusXL,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1120,10 +1128,10 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
@@ -1132,11 +1140,11 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
             height: 50,
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimensions.borderRadiusS,
             ),
             child: const Icon(CupertinoIcons.cube_box, size: 24),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1173,7 +1181,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
         builder: (context, setSheetState) => Directionality(
           textDirection: TextDirection.rtl,
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimensions.paddingXL,
             decoration: BoxDecoration(
               color: theme.scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
@@ -1199,7 +1207,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                   'إرسال تذكير',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacing8),
                 Text(
                   'سيتم إرسال تذكير لـ ${cart.displayName}',
                   style: TextStyle(color: theme.hintColor),
@@ -1211,7 +1219,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                   'طريقة الإرسال',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 Row(
                   children: [
                     _buildTypeOption(
@@ -1222,7 +1230,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                       setSheetState,
                       (v) => selectedType = v,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacing8),
                     _buildTypeOption(
                       'sms',
                       selectedType,
@@ -1231,7 +1239,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                       setSheetState,
                       (v) => selectedType = v,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacing8),
                     _buildTypeOption(
                       'email',
                       selectedType,
@@ -1271,7 +1279,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
               ],
             ),
           ),
@@ -1296,14 +1304,14 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
         onTap: () {
           setState(() => onSelect(value));
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: isSelected
                 ? theme.colorScheme.primary.withValues(alpha: 0.1)
                 : theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimensions.borderRadiusM,
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
@@ -1352,7 +1360,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
           textDirection: TextDirection.rtl,
           child: Container(
             height: MediaQuery.of(context).size.height * 0.7,
-            padding: const EdgeInsets.all(24),
+            padding: AppDimensions.paddingXL,
             decoration: BoxDecoration(
               color: theme.scaffoldBackgroundColor,
               borderRadius: const BorderRadius.vertical(
@@ -1409,12 +1417,12 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                         ),
 
                         if (autoEnabled) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
                           const Text(
                             'توقيت التذكيرات',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppDimensions.spacing12),
                           _buildTimingTile(
                             'التذكير الأول',
                             'بعد ساعة من ترك السلة',
@@ -1445,7 +1453,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
                         ),
 
                         if (includeDiscount) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacing16),
                           Text('نسبة الخصم: ${discountValue.toInt()}%'),
                           Slider(
                             value: discountValue,
@@ -1492,15 +1500,15 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: AppDimensions.paddingS,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
           Icon(icon, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1528,7 +1536,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: AppDimensions.paddingXXL,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1539,7 +1547,7 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               subtitle,
               style: TextStyle(color: theme.hintColor),

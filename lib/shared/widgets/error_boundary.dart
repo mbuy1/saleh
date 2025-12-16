@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_icons.dart';
 
 /// ============================================================================
 /// Error Boundary - معالج الأخطاء الشامل
@@ -144,10 +146,14 @@ class _DefaultErrorWidget extends StatelessWidget {
                   color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.error_outline_rounded,
-                  size: 64,
-                  color: Colors.red,
+                child: SvgPicture.asset(
+                  AppIcons.error,
+                  width: 64,
+                  height: 64,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.red,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.spacing24),
@@ -196,7 +202,15 @@ class _DefaultErrorWidget extends StatelessWidget {
                   if (onRetry != null)
                     ElevatedButton.icon(
                       onPressed: onRetry,
-                      icon: const Icon(Icons.refresh),
+                      icon: SvgPicture.asset(
+                        AppIcons.refresh,
+                        width: 20,
+                        height: 20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       label: const Text('إعادة المحاولة'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
@@ -215,7 +229,15 @@ class _DefaultErrorWidget extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     },
-                    icon: const Icon(Icons.home),
+                    icon: SvgPicture.asset(
+                      AppIcons.home,
+                      width: 20,
+                      height: 20,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     label: const Text('الرئيسية'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.primaryColor,

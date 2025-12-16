@@ -1,4 +1,9 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -79,6 +84,15 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('الرسائل المخصصة'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -104,9 +118,9 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -137,7 +151,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       onRefresh: _loadData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -152,7 +166,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'الأتمتة النشطة',
@@ -163,7 +177,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -174,7 +188,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     Colors.purple,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'معدل التسليم',
@@ -193,7 +207,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               'إجراءات سريعة',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -228,11 +242,11 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             if (_campaigns.isEmpty)
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: AppDimensions.paddingXL,
                   child: Center(
                     child: Text(
                       'لا توجد حملات',
@@ -262,12 +276,12 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -309,9 +323,9 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.campaign_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد حملات'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أنشئ حملة لإرسال رسائل لعملائك',
                     style: TextStyle(color: Colors.grey),
@@ -322,7 +336,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 itemCount: _campaigns.length,
                 itemBuilder: (context, index) {
                   return _buildCampaignCard(_campaigns[index]);
@@ -346,9 +360,9 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => _showCampaignDetails(campaign),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -363,7 +377,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,7 +418,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -471,9 +485,9 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.auto_mode_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد رسائل تلقائية'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أنشئ رسالة تلقائية لأحداث معينة',
                     style: TextStyle(color: Colors.grey),
@@ -484,7 +498,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 itemCount: _automation.length,
                 itemBuilder: (context, index) {
                   return _buildAutomationCard(_automation[index]);
@@ -547,7 +561,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد قوالب'),
                 ],
               ),
@@ -555,7 +569,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 itemCount: _templates.length,
                 itemBuilder: (context, index) {
                   return _buildTemplateCard(_templates[index]);
@@ -591,7 +605,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           children: [
             Text(template['name'] ?? ''),
             if (isSystem) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacing8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -635,21 +649,21 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
     return Card(
       color: Colors.blue.withAlpha(25),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.tips_and_updates, color: Colors.blue[700]),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'نصائح للرسائل',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildTipItem('استخدم اسم العميل للتخصيص'),
             _buildTipItem('اختر الوقت المناسب للإرسال'),
             _buildTipItem('اجعل الرسالة قصيرة ومباشرة'),
@@ -888,7 +902,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   ],
                   onChanged: (v) => setDialogState(() => selectedChannel = v!),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 TextField(
                   controller: phoneController,
                   decoration: InputDecoration(
@@ -907,7 +921,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       ? TextInputType.emailAddress
                       : TextInputType.phone,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 if (_templates.isNotEmpty)
                   DropdownButtonFormField<String>(
                     value: selectedTemplate,
@@ -949,7 +963,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                             valueColor: AlwaysStoppedAnimation(Colors.white),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacing12),
                         Text(
                           'جاري إرسال رسالة تجريبية عبر $selectedChannel...',
                         ),
@@ -962,6 +976,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                 Future.delayed(const Duration(seconds: 2), () {
                   if (mounted) {
+                    // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('✓ تم إرسال الرسالة التجريبية بنجاح'),
@@ -1009,7 +1024,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => campaignName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: channel,
                     decoration: const InputDecoration(
@@ -1037,7 +1052,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ],
                     onChanged: (v) => setDialogState(() => channel = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: targetSegment,
                     decoration: const InputDecoration(
@@ -1062,7 +1077,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ],
                     onChanged: (v) => setDialogState(() => targetSegment = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('موعد الإرسال'),
@@ -1078,6 +1093,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                         lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       if (date != null) {
+                        if (!context.mounted) return;
                         final time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.fromDateTime(scheduledDate),
@@ -1169,7 +1185,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => automationName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: trigger,
                     decoration: const InputDecoration(
@@ -1204,7 +1220,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ],
                     onChanged: (v) => setDialogState(() => trigger = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: channel,
                     decoration: const InputDecoration(
@@ -1222,7 +1238,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ],
                     onChanged: (v) => setDialogState(() => channel = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<int>(
                     value: delayMinutes,
                     decoration: const InputDecoration(
@@ -1310,7 +1326,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => templateName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: category,
                     decoration: const InputDecoration(
@@ -1328,7 +1344,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ],
                     onChanged: (v) => setDialogState(() => category = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'محتوى القالب',
@@ -1339,7 +1355,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => templateContent = v ?? '',
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   Wrap(
                     spacing: 8,
                     children: [
@@ -1415,7 +1431,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.all(24),
+          padding: AppDimensions.paddingXL,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1437,8 +1453,11 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
-              _buildCampaignDetailRow('الحالة', campaign['status'] ?? 'غير معروف'),
+              const SizedBox(height: AppDimensions.spacing8),
+              _buildCampaignDetailRow(
+                'الحالة',
+                campaign['status'] ?? 'غير معروف',
+              ),
               _buildCampaignDetailRow('القناة', campaign['channel'] ?? 'SMS'),
               _buildCampaignDetailRow('الشريحة', campaign['segment'] ?? 'الكل'),
               const SizedBox(height: 24),
@@ -1463,7 +1482,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       child: const Text('إلغاء الحملة'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
@@ -1508,12 +1527,12 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               'المحتوى:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: AppDimensions.paddingS,
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimensions.borderRadiusS,
               ),
               child: Text(template['content'] ?? 'لا يوجد محتوى'),
             ),

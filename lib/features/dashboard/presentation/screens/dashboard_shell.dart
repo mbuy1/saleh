@@ -1,8 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../shared/widgets/app_icon.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
@@ -90,100 +90,76 @@ class _DashboardShellState extends State<DashboardShell> {
   }
 
   Widget _buildCustomBottomNav(BuildContext context, int currentIndex) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 30, left: 12, right: 12),
-      child: SizedBox(
-        height:
-            AppDimensions.bottomNavHeight + 36, // Extra height for FAB overflow
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    return Container(
+      height: 70 + bottomPadding, // ارتفاع نحيف + SafeArea
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomPadding),
         child: Stack(
-          clipBehavior: Clip.none, // Allow FAB to overflow
+          clipBehavior: Clip.none,
           children: [
-            // Glass Navigation Bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 28, // Move nav bar down to align with FAB top
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: Container(
-                    height: AppDimensions.bottomNavHeight + 10,
-                    decoration: BoxDecoration(
-                      // Glassmorphism effect
-                      color: Colors.white.withValues(alpha: 0.92),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
-                      ),
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          width: 1.5,
+            // Navigation Bar
+            Positioned.fill(
+              child: Row(
+                children: [
+                  // الجزء الأيسر - عنصرين
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(
+                          icon: AppIcons.home,
+                          label: 'الرئيسية',
+                          isSelected: currentIndex == 0,
+                          onTap: () => _onItemTapped(0, context),
                         ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 25,
-                          offset: const Offset(0, -8),
-                          spreadRadius: 2,
+                        _buildNavItem(
+                          icon: AppIcons.orders,
+                          label: 'الطلبات',
+                          isSelected: currentIndex == 1,
+                          onTap: () => _onItemTapped(1, context),
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          // 1. الرئيسية
-                          _buildNavIcon(
-                            icon: Icons.home_outlined,
-                            selectedIcon: Icons.home,
-                            label: 'الرئيسية',
-                            isSelected: currentIndex == 0,
-                            onTap: () => _onItemTapped(0, context),
-                          ),
-                          // 2. الطلبات
-                          _buildNavIcon(
-                            icon: Icons.shopping_bag_outlined,
-                            selectedIcon: Icons.shopping_bag,
-                            label: 'الطلبات',
-                            isSelected: currentIndex == 1,
-                            onTap: () => _onItemTapped(1, context),
-                          ),
-                          // Spacer for FAB
-                          const SizedBox(width: 70),
-                          // 4. المحادثات
-                          _buildNavIcon(
-                            icon: Icons.chat_bubble_outline,
-                            selectedIcon: Icons.chat_bubble,
-                            label: 'المحادثات',
-                            isSelected: currentIndex == 3,
-                            onTap: () => _onItemTapped(3, context),
-                          ),
-                          // 5. دروب شوبينقنا (تم التبديل مع اختصاراتي)
-                          _buildNavIcon(
-                            icon: Icons.shopping_bag_outlined,
-                            selectedIcon: Icons.shopping_bag,
-                            label: 'دروب شوبينقنا',
-                            isSelected: currentIndex == 4,
-                            onTap: () => _onItemTapped(4, context),
-                          ),
-                        ],
-                      ),
+                  ),
+                  // مساحة للزر المركزي
+                  const SizedBox(width: 72),
+                  // الجزء الأيمن - عنصرين
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(
+                          icon: AppIcons.chat,
+                          label: 'المحادثات',
+                          isSelected: currentIndex == 3,
+                          onTap: () => _onItemTapped(3, context),
+                        ),
+                        _buildNavItem(
+                          icon: AppIcons.shipping,
+                          label: 'دروب شيب',
+                          isSelected: currentIndex == 4,
+                          onTap: () => _onItemTapped(4, context),
+                        ),
+                      ],
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-            // Floating Action Button (FAB) - Elevated above nav bar
+            // زر + في المنتصف
             Positioned(
-              top: 2,
+              top: -20,
               left: 0,
               right: 0,
               child: Center(
@@ -195,23 +171,16 @@ class _DashboardShellState extends State<DashboardShell> {
                     decoration: BoxDecoration(
                       gradient: AppTheme.metallicGradient,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3.5),
+                      border: Border.all(color: Colors.white, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.5),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                          spreadRadius: 1,
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                          spreadRadius: 0,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 28),
+                    child: AppIcon(AppIcons.add, color: Colors.white, size: 28),
                   ),
                 ),
               ),
@@ -222,46 +191,37 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  Widget _buildNavIcon({
-    required IconData icon,
-    required IconData selectedIcon,
+  Widget _buildNavItem({
+    required String icon,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Semantics(
-        button: true,
-        label: label,
-        selected: isSelected,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isSelected ? selectedIcon : icon,
-                size: 28, // Bigger icon size
-                color: isSelected
-                    ? AppTheme
-                          .primaryColor // Blue (#2563EB) - Active icon
-                    : Colors.grey[800], // Darker for better contrast
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 70,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppIcon(
+              icon,
+              size: 24,
+              color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
               ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11, // Slightly smaller for long text
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: isSelected
-                      ? AppTheme
-                            .primaryColor // Blue (#2563EB)
-                      : Colors.grey[800], // Darker text for better readability
-                ),
-              ),
-            ],
-          ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

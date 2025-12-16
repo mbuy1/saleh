@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -100,6 +104,15 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('تصنيف العملاء'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -130,9 +143,9 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -159,9 +172,9 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.pie_chart_outline, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد شرائح عملاء'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أنشئ شريحة لتصنيف عملائك',
                     style: TextStyle(color: Colors.grey),
@@ -172,7 +185,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 itemCount: _segments.length,
                 itemBuilder: (context, index) {
                   final segment = _segments[index];
@@ -197,16 +210,16 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => _showSegmentDetails(segment),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           child: Row(
             children: [
               CircleAvatar(
                 backgroundColor: color.withAlpha(25),
                 child: Icon(_getIconByName(segment['icon']), color: color),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +230,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                           segment['name'] ?? '',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacing8),
                         if (segment['segment_type'] == 'auto')
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -285,9 +298,9 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.label_outline, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد وسوم'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أنشئ وسماً لتمييز عملائك',
                     style: TextStyle(color: Colors.grey),
@@ -298,7 +311,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           : RefreshIndicator(
               onRefresh: _loadData,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 itemCount: _tags.length,
                 itemBuilder: (context, index) {
                   final tag = _tags[index];
@@ -333,7 +346,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               '${tag['customer_count'] ?? 0}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacing8),
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 20),
               onPressed: () => _deleteTag(tag['id']),
@@ -352,7 +365,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       onRefresh: _loadData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -366,7 +379,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildSummaryCard(
                     'الأبطال',
@@ -376,7 +389,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -386,7 +399,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     Colors.green,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildSummaryCard(
                     'معرضين للخسارة',
@@ -404,7 +417,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               'توزيع العملاء حسب التصنيف',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildTierDistribution(tiers, total),
 
             const SizedBox(height: 24),
@@ -425,7 +438,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             ..._topCustomers
                 .take(5)
                 .map((customer) => _buildCustomerCard(customer)),
@@ -443,7 +456,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   Widget _buildSummaryCard(String label, String value, Color color) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -478,7 +491,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           children: tierData.map((tier) {
             final count = (tiers[tier['key']] ?? 0) as int;
@@ -508,7 +521,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   SizedBox(
                     width: 50,
                     child: Text(
@@ -553,7 +566,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         subtitle: Row(
           children: [
             _buildTierBadge(tier),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacing8),
             Text(
               '$totalOrders طلب',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
@@ -593,21 +606,21 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
     return Card(
       color: Colors.blue.withAlpha(25),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.info_outline, color: Colors.blue[700]),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'ما هو تحليل RFM؟',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildRfmItem('R - Recency', 'متى آخر مرة اشترى فيها العميل'),
             _buildRfmItem('F - Frequency', 'كم مرة يشتري العميل'),
             _buildRfmItem('M - Monetary', 'كم ينفق العميل'),
@@ -718,7 +731,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 TextField(
                   controller: descController,
                   decoration: const InputDecoration(
@@ -726,14 +739,14 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 SwitchListTile(
                   title: const Text('تصنيف تلقائي'),
                   subtitle: const Text('تعبئة العملاء تلقائياً'),
                   value: isAuto,
                   onChanged: (v) => setDialogState(() => isAuto = v),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 Wrap(
                   spacing: 8,
                   children:
@@ -826,7 +839,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               Wrap(
                 spacing: 8,
                 children:
@@ -937,7 +950,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         builder: (context, scrollController) => Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               decoration: BoxDecoration(
                 color: _parseColor(segment['color'] ?? '#6366F1').withAlpha(25),
               ),
@@ -950,7 +963,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -993,7 +1006,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا يوجد عملاء في هذه الشريحة',
               style: TextStyle(color: Colors.grey[600]),
@@ -1004,7 +1017,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: customers.length,
       itemBuilder: (context, index) {
         final customer = customers[index];
@@ -1036,7 +1049,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                       Icons.shopping_cart,
                       '${customer['orders']} طلب',
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppDimensions.spacing16),
                     _buildCustomerStat(
                       Icons.attach_money,
                       '${customer['total_spent']} ر.س',
@@ -1052,7 +1065,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   child: Row(
                     children: [
                       Icon(Icons.visibility, size: 20),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.spacing8),
                       Text('عرض التفاصيل'),
                     ],
                   ),
@@ -1062,7 +1075,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   child: Row(
                     children: [
                       Icon(Icons.message, size: 20),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.spacing8),
                       Text('إرسال رسالة'),
                     ],
                   ),
@@ -1072,7 +1085,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   child: Row(
                     children: [
                       Icon(Icons.label, size: 20),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.spacing8),
                       Text('إضافة وسم'),
                     ],
                   ),
@@ -1177,7 +1190,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.all(24),
+          padding: AppDimensions.paddingXL,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1206,7 +1219,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               Center(
                 child: Text(
                   customer['name'],
@@ -1227,7 +1240,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 _buildDetailRow('البريد', customer['email']),
                 _buildDetailRow('الهاتف', customer['phone']),
               ]),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               _buildDetailCard('إحصائيات الشراء', [
                 _buildDetailRow('عدد الطلبات', '${customer['orders']}'),
                 _buildDetailRow(
@@ -1249,7 +1262,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                       label: const Text('رسالة'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
@@ -1274,10 +1287,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
   Widget _buildDetailCard(String title, List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         border: Border.all(color: Colors.grey[200]!),
       ),
       child: Column(

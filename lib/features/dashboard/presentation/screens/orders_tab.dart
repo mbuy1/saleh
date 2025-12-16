@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 
@@ -53,10 +55,14 @@ class _OrdersTabState extends State<OrdersTab> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.filter_list,
-                size: AppDimensions.iconM,
-                color: AppTheme.primaryColor,
+              icon: SvgPicture.asset(
+                AppIcons.filter,
+                width: AppDimensions.iconM,
+                height: AppDimensions.iconM,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
               onPressed: () {
                 _showFilterBottomSheet(context);
@@ -117,11 +123,13 @@ class _OrdersTabState extends State<OrdersTab> {
                               ),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              Icons.receipt_long_outlined,
-                              size: AppDimensions.iconDisplay,
-                              color: AppTheme.primaryColor.withValues(
-                                alpha: 0.5,
+                            child: SvgPicture.asset(
+                              AppIcons.orders,
+                              width: AppDimensions.iconDisplay,
+                              height: AppDimensions.iconDisplay,
+                              colorFilter: ColorFilter.mode(
+                                AppTheme.primaryColor.withValues(alpha: 0.5),
+                                BlendMode.srcIn,
                               ),
                             ),
                           ),
@@ -165,7 +173,12 @@ class _OrdersTabState extends State<OrdersTab> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.build_circle_outlined, size: 64, color: Colors.grey[400]),
+          SvgPicture.asset(
+            AppIcons.tools,
+            width: 64,
+            height: 64,
+            colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+          ),
           const SizedBox(height: 16),
           Text(
             title,
@@ -212,11 +225,15 @@ class _OrdersTabState extends State<OrdersTab> {
                 ),
               ),
               const SizedBox(height: AppDimensions.spacing16),
-              _buildFilterOption(context, 'جميع الطلبات', Icons.all_inbox),
-              _buildFilterOption(context, 'طلبات جديدة', Icons.fiber_new),
-              _buildFilterOption(context, 'قيد التنفيذ', Icons.pending_actions),
-              _buildFilterOption(context, 'مكتملة', Icons.check_circle_outline),
-              _buildFilterOption(context, 'ملغاة', Icons.cancel_outlined),
+              _buildFilterOption(context, 'جميع الطلبات', AppIcons.orders),
+              _buildFilterOption(
+                context,
+                'طلبات جديدة',
+                AppIcons.notifications,
+              ),
+              _buildFilterOption(context, 'قيد التنفيذ', AppIcons.time),
+              _buildFilterOption(context, 'مكتملة', AppIcons.checkCircle),
+              _buildFilterOption(context, 'ملغاة', AppIcons.close),
               const SizedBox(height: AppDimensions.spacing16),
             ],
           ),
@@ -225,11 +242,28 @@ class _OrdersTabState extends State<OrdersTab> {
     );
   }
 
-  Widget _buildFilterOption(BuildContext context, String label, IconData icon) {
+  Widget _buildFilterOption(
+    BuildContext context,
+    String label,
+    String iconPath,
+  ) {
     return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryColor),
+      leading: SvgPicture.asset(
+        iconPath,
+        width: 24,
+        height: 24,
+        colorFilter: const ColorFilter.mode(
+          AppTheme.primaryColor,
+          BlendMode.srcIn,
+        ),
+      ),
       title: Text(label),
-      trailing: const Icon(Icons.chevron_left),
+      trailing: SvgPicture.asset(
+        AppIcons.chevronLeft,
+        width: 20,
+        height: 20,
+        colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+      ),
       onTap: () {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(

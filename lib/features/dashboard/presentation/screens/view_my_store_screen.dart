@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
+import '../../../../core/constants/app_icons.dart';
 
 /// شاشة معاينة متجر التاجر
 class ViewMyStoreScreen extends ConsumerStatefulWidget {
@@ -111,7 +113,12 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          SvgPicture.asset(
+            AppIcons.errorOutline,
+            width: 64,
+            height: 64,
+            colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+          ),
           const SizedBox(height: 16),
           Text(_error!, style: const TextStyle(color: Colors.red)),
           const SizedBox(height: 16),
@@ -134,12 +141,42 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
           backgroundColor: AppTheme.primaryColor,
           foregroundColor: Colors.white,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: () => context.pop(),
           ),
           actions: [
-            IconButton(icon: const Icon(Icons.share), onPressed: _shareStore),
-            IconButton(icon: const Icon(Icons.copy), onPressed: _copyStoreLink),
+            IconButton(
+              icon: SvgPicture.asset(
+                AppIcons.share,
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed: _shareStore,
+            ),
+            IconButton(
+              icon: SvgPicture.asset(
+                AppIcons.copy,
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed: _copyStoreLink,
+            ),
           ],
           flexibleSpace: FlexibleSpaceBar(
             background: Stack(
@@ -199,10 +236,14 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                                   fit: BoxFit.cover,
                                 ),
                               )
-                            : const Icon(
-                                Icons.store,
-                                size: 40,
-                                color: AppTheme.primaryColor,
+                            : SvgPicture.asset(
+                                AppIcons.store,
+                                width: 40,
+                                height: 40,
+                                colorFilter: const ColorFilter.mode(
+                                  AppTheme.primaryColor,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                       ),
                       const SizedBox(width: 16),
@@ -224,12 +265,12 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                             Row(
                               children: [
                                 _buildStatChip(
-                                  Icons.shopping_bag,
+                                  AppIcons.shoppingBag,
                                   '${_products.length}',
                                 ),
                                 const SizedBox(width: 8),
                                 _buildStatChip(
-                                  Icons.visibility,
+                                  AppIcons.visibility,
                                   '${_store?['views_count'] ?? 0}',
                                 ),
                               ],
@@ -310,10 +351,14 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                   ),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.inventory_2_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
+                      SvgPicture.asset(
+                        AppIcons.inventory2,
+                        width: 64,
+                        height: 64,
+                        colorFilter: ColorFilter.mode(
+                          Colors.grey[400]!,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -328,7 +373,15 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                       ElevatedButton.icon(
                         onPressed: () =>
                             context.push('/dashboard/products/add'),
-                        icon: const Icon(Icons.add),
+                        icon: SvgPicture.asset(
+                          AppIcons.add,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         label: const Text('إضافة منتج'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryColor,
@@ -361,7 +414,7 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
     );
   }
 
-  Widget _buildStatChip(IconData icon, String value) {
+  Widget _buildStatChip(String iconPath, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -371,7 +424,12 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 14),
+          SvgPicture.asset(
+            iconPath,
+            width: 14,
+            height: 14,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
           const SizedBox(width: 4),
           Text(
             value,
@@ -417,10 +475,14 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                         product['main_image_url'],
                         fit: BoxFit.cover,
                       )
-                    : Icon(
-                        Icons.image_outlined,
-                        size: 40,
-                        color: Colors.grey[400],
+                    : SvgPicture.asset(
+                        AppIcons.image,
+                        width: 40,
+                        height: 40,
+                        colorFilter: ColorFilter.mode(
+                          Colors.grey[400]!,
+                          BlendMode.srcIn,
+                        ),
                       ),
               ),
             ),

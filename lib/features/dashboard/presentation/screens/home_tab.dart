@@ -231,7 +231,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               FeatureSpotlight(
                 featureId: 'global_search',
                 title: 'البحث السريع ✨',
-                description: 'ابحث في جميع ميزات التطبيق بنقرة واحدة! جرب البحث عن "كوبونات" أو "منتجات"',
+                description:
+                    'ابحث في جميع ميزات التطبيق بنقرة واحدة! جرب البحث عن "كوبونات" أو "منتجات"',
                 position: SpotlightPosition.bottom,
                 child: Semantics(
                   label: 'البحث في التطبيق',

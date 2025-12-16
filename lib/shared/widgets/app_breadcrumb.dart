@@ -39,10 +39,7 @@ class AppBreadcrumb extends StatelessWidget {
               if (items.isNotEmpty) _buildSeparator(),
             ],
             for (int i = 0; i < items.length; i++) ...[
-              _BreadcrumbChip(
-                item: items[i],
-                isLast: i == items.length - 1,
-              ),
+              _BreadcrumbChip(item: items[i], isLast: i == items.length - 1),
               if (i < items.length - 1) _buildSeparator(),
             ],
           ],
@@ -54,11 +51,7 @@ class AppBreadcrumb extends StatelessWidget {
   Widget _buildSeparator() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: AppIcon(
-        AppIcons.chevronLeft,
-        size: 14,
-        color: Colors.grey[400],
-      ),
+      child: AppIcon(AppIcons.chevronLeft, size: 14, color: Colors.grey[400]),
     );
   }
 }
@@ -67,10 +60,7 @@ class _BreadcrumbChip extends StatelessWidget {
   final BreadcrumbItem item;
   final bool isLast;
 
-  const _BreadcrumbChip({
-    required this.item,
-    required this.isLast,
-  });
+  const _BreadcrumbChip({required this.item, required this.isLast});
 
   @override
   Widget build(BuildContext context) {
@@ -125,11 +115,7 @@ class BreadcrumbItem {
   final String route;
   final String? icon;
 
-  const BreadcrumbItem({
-    required this.label,
-    required this.route,
-    this.icon,
-  });
+  const BreadcrumbItem({required this.label, required this.route, this.icon});
 }
 
 /// AppBar مع Breadcrumb مدمج
@@ -178,7 +164,10 @@ class BreadcrumbAppBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   if (showBackButton)
                     IconButton(
-                      icon: AppIcon(AppIcons.arrowBack, color: AppTheme.primaryColor),
+                      icon: AppIcon(
+                        AppIcons.arrowBack,
+                        color: AppTheme.primaryColor,
+                      ),
                       onPressed: onBack ?? () => context.pop(),
                     ),
                   Expanded(
@@ -189,11 +178,14 @@ class BreadcrumbAppBar extends StatelessWidget implements PreferredSizeWidget {
                         fontWeight: FontWeight.bold,
                         color: AppTheme.textPrimaryColor,
                       ),
-                      textAlign: showBackButton ? TextAlign.start : TextAlign.center,
+                      textAlign: showBackButton
+                          ? TextAlign.start
+                          : TextAlign.center,
                     ),
                   ),
                   if (actions != null) ...actions!,
-                  if (actions == null && showBackButton) const SizedBox(width: 48),
+                  if (actions == null && showBackButton)
+                    const SizedBox(width: 48),
                 ],
               ),
             ),

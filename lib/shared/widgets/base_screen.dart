@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_icons.dart';
 import '../../core/theme/app_theme.dart';
 
 /// ============================================================================
@@ -40,9 +42,6 @@ class BaseScreen extends StatelessWidget {
 
   /// دالة التحديث (Pull to Refresh)
   final Future<void> Function()? onRefresh;
-
-  /// أيقونة الحالة الفارغة
-  final IconData? emptyIcon;
 
   /// عنوان الحالة الفارغة
   final String? emptyTitle;
@@ -88,7 +87,6 @@ class BaseScreen extends StatelessWidget {
     this.errorMessage,
     this.onRetry,
     this.onRefresh,
-    this.emptyIcon,
     this.emptyTitle,
     this.emptySubtitle,
     this.emptyAction,
@@ -101,14 +99,37 @@ class BaseScreen extends StatelessWidget {
     this.showBackButton = true,
     this.centerTitle = true,
     this.padding,
+    this.useSafeArea = true,
+    this.safeAreaTop = true,
+    this.safeAreaBottom = true,
   });
+
+  /// Whether to wrap body in SafeArea
+  final bool useSafeArea;
+
+  /// Whether to respect top safe area (status bar)
+  final bool safeAreaTop;
+
+  /// Whether to respect bottom safe area (navigation bar)
+  final bool safeAreaBottom;
 
   @override
   Widget build(BuildContext context) {
+    Widget bodyContent = _buildBody(context);
+
+    // Wrap with SafeArea if enabled and no AppBar (AppBar handles top safe area)
+    if (useSafeArea) {
+      bodyContent = SafeArea(
+        top: !showAppBar && safeAreaTop, // AppBar handles top safe area
+        bottom: safeAreaBottom,
+        child: bodyContent,
+      );
+    }
+
     return Scaffold(
       backgroundColor: backgroundColor ?? AppTheme.backgroundColor,
       appBar: showAppBar ? _buildAppBar(context) : null,
-      body: _buildBody(context),
+      body: bodyContent,
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
@@ -127,10 +148,14 @@ class BaseScreen extends StatelessWidget {
       automaticallyImplyLeading: false,
       leading: showBackButton
           ? IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconM,
-                color: AppTheme.primaryColor,
+              icon: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconM,
+                height: AppDimensions.iconM,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
               onPressed: () => context.pop(),
             )
@@ -162,7 +187,7 @@ class BaseScreen extends StatelessWidget {
         break;
       case ScreenState.empty:
         content = _EmptyState(
-          icon: emptyIcon ?? Icons.inbox_outlined,
+          iconPath: AppIcons.inbox,
           title: emptyTitle ?? 'لا توجد بيانات',
           subtitle: emptySubtitle,
           action: emptyAction,
@@ -233,10 +258,14 @@ class _ErrorState extends StatelessWidget {
                 color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.error_outline,
-                size: AppDimensions.iconDisplay,
-                color: Colors.red,
+              child: SvgPicture.asset(
+                AppIcons.error,
+                width: AppDimensions.iconDisplay,
+                height: AppDimensions.iconDisplay,
+                colorFilter: const ColorFilter.mode(
+                  Colors.red,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(height: AppDimensions.spacing16),
@@ -261,7 +290,15 @@ class _ErrorState extends StatelessWidget {
               const SizedBox(height: AppDimensions.spacing24),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
+                icon: SvgPicture.asset(
+                  AppIcons.refresh,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
                 label: const Text('إعادة المحاولة'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
@@ -285,13 +322,13 @@ class _ErrorState extends StatelessWidget {
 
 /// حالة البيانات الفارغة
 class _EmptyState extends StatelessWidget {
-  final IconData icon;
+  final String iconPath;
   final String title;
   final String? subtitle;
   final Widget? action;
 
   const _EmptyState({
-    required this.icon,
+    required this.iconPath,
     required this.title,
     this.subtitle,
     this.action,
@@ -311,10 +348,14 @@ class _EmptyState extends StatelessWidget {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: AppDimensions.iconDisplay,
-                color: AppTheme.primaryColor,
+              child: SvgPicture.asset(
+                iconPath,
+                width: AppDimensions.iconDisplay,
+                height: AppDimensions.iconDisplay,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(height: AppDimensions.spacing16),
@@ -391,10 +432,14 @@ class SubPageScreen extends StatelessWidget {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: const Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconS,
-                color: AppTheme.primaryColor,
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -449,10 +494,14 @@ class ComingSoonScreen extends StatelessWidget {
                   color: AppTheme.accentColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon ?? Icons.construction_outlined,
-                  size: AppDimensions.iconDisplay,
-                  color: AppTheme.accentColor,
+                child: SvgPicture.asset(
+                  AppIcons.tools,
+                  width: AppDimensions.iconDisplay,
+                  height: AppDimensions.iconDisplay,
+                  colorFilter: ColorFilter.mode(
+                    AppTheme.accentColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.spacing24),
@@ -484,16 +533,20 @@ class ComingSoonScreen extends StatelessWidget {
                   color: AppTheme.accentColor.withValues(alpha: 0.1),
                   borderRadius: AppDimensions.borderRadiusM,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.schedule,
-                      size: AppDimensions.iconS,
-                      color: AppTheme.accentColor,
+                    SvgPicture.asset(
+                      AppIcons.time,
+                      width: AppDimensions.iconS,
+                      height: AppDimensions.iconS,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.accentColor,
+                        BlendMode.srcIn,
+                      ),
                     ),
-                    SizedBox(width: AppDimensions.spacing8),
-                    Text(
+                    const SizedBox(width: AppDimensions.spacing8),
+                    const Text(
                       'قريباً',
                       style: TextStyle(
                         fontSize: AppDimensions.fontCaption,

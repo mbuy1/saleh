@@ -99,6 +99,10 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          onPressed: () => context.pop(),
+        ),
         title: const Text(
           'اختصاراتي',
           style: TextStyle(

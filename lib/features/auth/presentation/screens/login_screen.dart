@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/auth_controller.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
@@ -120,10 +122,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       color: AppTheme.accentColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.store,
-                      size: AppDimensions.iconDisplay,
-                      color: AppTheme.accentColor,
+                    child: SvgPicture.asset(
+                      AppIcons.store,
+                      width: AppDimensions.iconDisplay,
+                      height: AppDimensions.iconDisplay,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.accentColor,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
@@ -154,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: _emailController,
                     label: 'البريد الإلكتروني',
                     hint: 'example@domain.com',
-                    icon: Icons.email_outlined,
+                    iconPath: AppIcons.email,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -173,15 +179,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: _passwordController,
                     label: 'كلمة المرور',
                     hint: '••••••••',
-                    icon: Icons.lock_outline,
+                    iconPath: AppIcons.lock,
                     obscureText: _obscurePassword,
                     suffixIcon: IconButton(
-                      icon: Icon(
+                      icon: SvgPicture.asset(
                         _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: AppTheme.textSecondaryColor,
-                        size: AppDimensions.iconS,
+                            ? AppIcons.visibility
+                            : AppIcons.visibilityOff,
+                        width: AppDimensions.iconS,
+                        height: AppDimensions.iconS,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.textSecondaryColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       onPressed: () {
                         setState(() {
@@ -259,7 +269,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    required IconData icon,
+    required String iconPath,
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
@@ -285,10 +295,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           color: AppTheme.textSecondaryColor,
           fontSize: AppDimensions.fontBody,
         ),
-        prefixIcon: Icon(
-          icon,
-          color: AppTheme.textSecondaryColor,
-          size: AppDimensions.iconS,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12),
+          child: SvgPicture.asset(
+            iconPath,
+            width: AppDimensions.iconS,
+            height: AppDimensions.iconS,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.textSecondaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
         suffixIcon: suffixIcon,
         filled: true,
@@ -332,10 +349,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppTheme.errorColor,
-            size: AppDimensions.iconM,
+          SvgPicture.asset(
+            AppIcons.errorOutline,
+            width: AppDimensions.iconM,
+            height: AppDimensions.iconM,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.errorColor,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: AppDimensions.spacing12),
           Expanded(
@@ -375,10 +396,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(width: AppDimensions.spacing8),
-              Icon(
-                Icons.info_outline,
-                color: AppTheme.infoColor,
-                size: AppDimensions.iconS,
+              SvgPicture.asset(
+                AppIcons.info,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: ColorFilter.mode(
+                  AppTheme.infoColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ],
           ),

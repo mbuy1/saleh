@@ -1,4 +1,9 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -107,6 +112,15 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('برنامج الولاء'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -140,9 +154,9 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -173,24 +187,24 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
       onRefresh: _loadData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Program status
             if (!isActive)
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: AppDimensions.paddingS,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
                   color: Colors.orange.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppDimensions.borderRadiusS,
                   border: Border.all(color: Colors.orange.withAlpha(50)),
                 ),
                 child: Row(
                   children: [
                     const Icon(Icons.warning, color: Colors.orange),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacing12),
                     const Expanded(
                       child: Text('برنامج الولاء غير مفعل حالياً'),
                     ),
@@ -213,7 +227,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'النقاط الممنوحة',
@@ -224,7 +238,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -235,7 +249,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     Colors.green,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
                     'النقاط المعلقة',
@@ -254,10 +268,10 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               'إعدادات البرنامج',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 child: Column(
                   children: [
                     _buildSettingRow(
@@ -301,7 +315,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 'توزيع الأعضاء',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               _buildTierDistribution(),
             ],
 
@@ -323,12 +337,12 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -371,7 +385,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           children: tiers.map((tier) {
             final count = (tier['count'] ?? 0) as int;
@@ -405,7 +419,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   SizedBox(
                     width: 40,
                     child: Text('$count', textAlign: TextAlign.end),
@@ -431,13 +445,13 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد مستويات'),
                 ],
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _tiers.length,
               itemBuilder: (context, index) {
                 final tier = _tiers[index];
@@ -459,7 +473,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -469,7 +483,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   backgroundColor: color.withAlpha(25),
                   child: Icon(_getIconByName(tier['icon']), color: color),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,13 +560,13 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا يوجد أعضاء'),
                 ],
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _members.length,
               itemBuilder: (context, index) {
                 return _buildMemberCard(_members[index]);
@@ -608,7 +622,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacing8),
             ],
             Text(
               '$lifetimePoints نقطة كلية',
@@ -647,13 +661,13 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     size: 64,
                     color: Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد مكافآت'),
                 ],
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _rewards.length,
               itemBuilder: (context, index) {
                 return _buildRewardCard(_rewards[index]);
@@ -713,21 +727,21 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     return Card(
       color: Colors.blue.withAlpha(25),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.help_outline, color: Colors.blue[700]),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'كيف يعمل البرنامج؟',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildStep('1', 'العميل يشتري من متجرك'),
             _buildStep('2', 'يكسب نقاط على كل ريال'),
             _buildStep('3', 'يستبدل النقاط بمكافآت وخصومات'),
@@ -751,7 +765,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: const TextStyle(color: Colors.white, fontSize: 12),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacing8),
           Text(text, style: const TextStyle(fontSize: 13)),
         ],
       ),
@@ -855,7 +869,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 // قيمة النقاط
                 Row(
                   children: [
@@ -871,7 +885,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing16),
                 SwitchListTile(
                   title: const Text('تسجيل تلقائي عند الشراء'),
                   value: enrollOnPurchase,
@@ -947,7 +961,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => tierName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'الحد الأدنى من النقاط',
@@ -957,7 +971,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     initialValue: '0',
                     onSaved: (v) => minPoints = int.tryParse(v ?? '0') ?? 0,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
                       Text('نسبة الخصم: ${discount.toInt()}%'),
@@ -973,9 +987,9 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   const Text('لون المستوى'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   Wrap(
                     spacing: 8,
                     children: colors.map((color) {
@@ -1016,7 +1030,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       'name': tierName,
                       'min_points': minPoints,
                       'discount_percent': discount,
-                      'color': tierColor.value.toRadixString(16),
+                      'color': tierColor.toARGB32().toRadixString(16),
                       'members_count': 0,
                     });
                     // ترتيب المستويات حسب النقاط
@@ -1072,7 +1086,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => tierName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'الحد الأدنى من النقاط',
@@ -1082,7 +1096,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     initialValue: minPoints.toString(),
                     onSaved: (v) => minPoints = int.tryParse(v ?? '0') ?? 0,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
                       Text('نسبة الخصم: ${discount.toInt()}%'),
@@ -1207,7 +1221,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => rewardName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: rewardType,
                     decoration: const InputDecoration(
@@ -1232,7 +1246,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     ],
                     onChanged: (v) => setDialogState(() => rewardType = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'النقاط المطلوبة',
@@ -1243,7 +1257,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     onSaved: (v) =>
                         pointsCost = int.tryParse(v ?? '100') ?? 100,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   if (rewardType == 'discount' || rewardType == 'fixed')
                     TextFormField(
                       decoration: InputDecoration(
@@ -1316,7 +1330,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.all(24),
+          padding: AppDimensions.paddingXL,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1348,7 +1362,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               Center(
                 child: Text(
                   member['name'] ?? 'عضو',
@@ -1358,7 +1372,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               Center(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -1367,7 +1381,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   ),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryColor.withAlpha(20),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppDimensions.borderRadiusXL,
                   ),
                   child: Text(
                     member['tier'] ?? 'أساسي',
@@ -1402,7 +1416,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       label: const Text('إضافة نقاط'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => Navigator.pop(context),
@@ -1454,7 +1468,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             DropdownButtonFormField<String>(
               value: reason,
               decoration: const InputDecoration(

@@ -244,10 +244,7 @@ class AccessibleIconButton extends StatelessWidget {
               : null,
           borderRadius: BorderRadius.circular(24),
           child: Container(
-            constraints: const BoxConstraints(
-              minWidth: 48,
-              minHeight: 48,
-            ),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(24),
@@ -256,7 +253,9 @@ class AccessibleIconButton extends StatelessWidget {
               child: AppIcon(
                 icon,
                 size: size,
-                color: isEnabled ? (color ?? AppTheme.primaryColor) : Colors.grey,
+                color: isEnabled
+                    ? (color ?? AppTheme.primaryColor)
+                    : Colors.grey,
               ),
             ),
           ),
@@ -265,10 +264,7 @@ class AccessibleIconButton extends StatelessWidget {
     );
 
     if (tooltip != null) {
-      return Tooltip(
-        message: tooltip!,
-        child: button,
-      );
+      return Tooltip(message: tooltip!, child: button);
     }
 
     return button;
@@ -339,13 +335,10 @@ class AccessibleListTile extends StatelessWidget {
                 ),
               )
             : null,
-        trailing: trailing ??
+        trailing:
+            trailing ??
             (trailingIcon != null
-                ? AppIcon(
-                    trailingIcon!,
-                    size: 16,
-                    color: Colors.grey,
-                  )
+                ? AppIcon(trailingIcon!, size: 16, color: Colors.grey)
                 : null),
         onTap: isEnabled && onTap != null
             ? () {

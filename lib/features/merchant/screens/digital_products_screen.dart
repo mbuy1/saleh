@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 
 class DigitalProductsScreen extends StatefulWidget {
   const DigitalProductsScreen({super.key});
@@ -102,6 +106,10 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('المنتجات الرقمية'),
           actions: [
             IconButton(
@@ -140,7 +148,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -155,7 +163,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                   Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'إجمالي التحميلات',
@@ -166,7 +174,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
@@ -177,7 +185,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                   Colors.purple,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(child: Container()),
             ],
           ),
@@ -187,7 +195,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
           // Product types
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -195,7 +203,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                     'أنواع المنتجات الرقمية',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
@@ -234,14 +242,14 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
           // Features
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Icon(Icons.auto_awesome, color: Colors.amber[700]),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                       const Text(
                         'مميزات المنتجات الرقمية',
                         style: TextStyle(
@@ -251,7 +259,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   _buildFeatureItem(
                     Icons.delivery_dining,
                     'توصيل فوري',
@@ -287,7 +295,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
         .toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: nonCourseProducts.length,
       itemBuilder: (context, index) {
         final product = nonCourseProducts[index];
@@ -296,9 +304,9 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
           margin: const EdgeInsets.only(bottom: 12),
           child: InkWell(
             onTap: () => _showProductDetails(product),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimensions.borderRadiusM,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Row(
                 children: [
                   Container(
@@ -308,7 +316,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                       color: _getTypeColor(
                         product['digital_type'],
                       ).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppDimensions.borderRadiusM,
                     ),
                     child: Icon(
                       _getTypeIcon(product['digital_type']),
@@ -316,7 +324,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                       size: 28,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,7 +343,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                               _getTypeName(product['digital_type']),
                               _getTypeColor(product['digital_type']),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacing8),
                             if (product['file_size'] != null)
                               Text(
                                 _formatFileSize(product['file_size']),
@@ -346,7 +354,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                               ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacing8),
                         Row(
                           children: [
                             Icon(
@@ -362,7 +370,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: AppDimensions.spacing16),
                             Icon(
                               Icons.verified_user,
                               size: 16,
@@ -405,7 +413,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.school, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد دورات بعد',
               style: TextStyle(color: Colors.grey[600], fontSize: 16),
@@ -422,7 +430,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: courses.length,
       itemBuilder: (context, index) {
         final course = courses[index];
@@ -449,7 +457,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -460,26 +468,26 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     Row(
                       children: [
                         _buildCourseInfo(
                           Icons.play_lesson,
                           '${course['lessons_count']} درس',
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: AppDimensions.spacing16),
                         _buildCourseInfo(
                           Icons.timer,
                           _formatDuration(course['total_duration']),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: AppDimensions.spacing16),
                         _buildCourseInfo(
                           Icons.people,
                           '${course['enrolled_count']} طالب',
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacing12),
                     Row(
                       children: [
                         if (course['certificate_enabled'] == true)
@@ -490,7 +498,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                             ),
                             decoration: BoxDecoration(
                               color: Colors.green[100],
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppDimensions.borderRadiusM,
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -540,12 +548,12 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Text(
               value,
               style: TextStyle(
@@ -580,14 +588,14 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: AppDimensions.paddingXS,
             decoration: BoxDecoration(
               color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimensions.borderRadiusS,
             ),
             child: Icon(icon, color: Colors.blue[700], size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,7 +621,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppDimensions.borderRadiusS,
       ),
       child: Text(
         label,
@@ -747,11 +755,11 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                 ],
                 onChanged: (value) {},
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               const TextField(
                 decoration: InputDecoration(labelText: 'اسم المنتج'),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               OutlinedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.upload_file),
@@ -789,7 +797,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(decoration: InputDecoration(labelText: 'عنوان الدورة')),
-              SizedBox(height: 16),
+              SizedBox(height: AppDimensions.spacing16),
               TextField(
                 decoration: InputDecoration(labelText: 'وصف الدورة'),
                 maxLines: 3,
@@ -867,7 +875,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                 ),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextFormField(
                 initialValue: _settings['default_download_expiry_days']
                     ?.toString(),
@@ -876,7 +884,7 @@ class _DigitalProductsScreenState extends State<DigitalProductsScreen>
                 ),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               SwitchListTile(
                 title: const Text('تسليم تلقائي'),
                 subtitle: const Text('إرسال الملف فور الدفع'),

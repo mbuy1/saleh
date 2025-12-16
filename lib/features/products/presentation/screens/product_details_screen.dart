@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import '../../../../shared/widgets/exports.dart';
@@ -289,10 +290,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconS,
-                color: AppTheme.primaryColor,
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -329,10 +334,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: AppDimensions.iconS,
-                color: AppTheme.primaryColor,
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -355,10 +364,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   color: AppTheme.infoColor.withValues(alpha: 0.1),
                   borderRadius: AppDimensions.borderRadiusS,
                 ),
-                child: Icon(
-                  Icons.edit,
-                  size: AppDimensions.iconS,
-                  color: AppTheme.infoColor,
+                child: SvgPicture.asset(
+                  AppIcons.edit,
+                  width: AppDimensions.iconS,
+                  height: AppDimensions.iconS,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.infoColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -371,10 +384,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   color: AppTheme.errorColor.withValues(alpha: 0.1),
                   borderRadius: AppDimensions.borderRadiusS,
                 ),
-                child: Icon(
-                  Icons.delete,
-                  size: AppDimensions.iconS,
-                  color: AppTheme.errorColor,
+                child: SvgPicture.asset(
+                  AppIcons.delete,
+                  width: AppDimensions.iconS,
+                  height: AppDimensions.iconS,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.errorColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -423,10 +440,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     children: [
-                      const Icon(
-                        Icons.monetization_on,
-                        color: AppTheme.successColor,
-                        size: AppDimensions.iconL,
+                      SvgPicture.asset(
+                        AppIcons.monetization,
+                        width: AppDimensions.iconL,
+                        height: AppDimensions.iconL,
+                        colorFilter: const ColorFilter.mode(
+                          AppTheme.successColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       const SizedBox(height: AppDimensions.spacing8),
                       Text(
@@ -454,12 +475,16 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   padding: const EdgeInsets.all(AppDimensions.spacing16),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.inventory,
-                        color: product.stock > 0
-                            ? AppTheme.infoColor
-                            : AppTheme.errorColor,
-                        size: AppDimensions.iconL,
+                      SvgPicture.asset(
+                        AppIcons.inventory,
+                        width: AppDimensions.iconL,
+                        height: AppDimensions.iconL,
+                        colorFilter: ColorFilter.mode(
+                          product.stock > 0
+                              ? AppTheme.infoColor
+                              : AppTheme.errorColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       const SizedBox(height: AppDimensions.spacing8),
                       Text(
@@ -490,12 +515,18 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             padding: const EdgeInsets.all(AppDimensions.spacing12),
             child: Row(
               children: [
-                Icon(
-                  product.isActive ? Icons.check_circle : Icons.visibility_off,
-                  color: product.isActive
-                      ? AppTheme.successColor
-                      : AppTheme.textHintColor,
-                  size: AppDimensions.iconM,
+                SvgPicture.asset(
+                  product.isActive
+                      ? AppIcons.checkCircle
+                      : AppIcons.visibilityOff,
+                  width: AppDimensions.iconM,
+                  height: AppDimensions.iconM,
+                  colorFilter: ColorFilter.mode(
+                    product.isActive
+                        ? AppTheme.successColor
+                        : AppTheme.textHintColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
@@ -559,9 +590,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           MbuyInputField(
             controller: _nameController,
             label: 'اسم المنتج *',
-            prefixIcon: const Icon(
-              Icons.inventory_2,
-              color: AppTheme.textSecondaryColor,
+            prefixIcon: SvgPicture.asset(
+              AppIcons.inventory2,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textSecondaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -580,9 +616,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           MbuyInputField(
             controller: _descriptionController,
             label: 'الوصف',
-            prefixIcon: const Icon(
-              Icons.description,
-              color: AppTheme.textSecondaryColor,
+            prefixIcon: SvgPicture.asset(
+              AppIcons.description,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textSecondaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             maxLines: 3,
             textInputAction: TextInputAction.next,
@@ -593,9 +634,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           MbuyInputField(
             controller: _priceController,
             label: 'السعر (ر.س) *',
-            prefixIcon: const Icon(
-              Icons.monetization_on,
-              color: AppTheme.textSecondaryColor,
+            prefixIcon: SvgPicture.asset(
+              AppIcons.monetization,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textSecondaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
@@ -619,9 +665,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           MbuyInputField(
             controller: _stockController,
             label: 'المخزون *',
-            prefixIcon: const Icon(
-              Icons.inventory,
-              color: AppTheme.textSecondaryColor,
+            prefixIcon: SvgPicture.asset(
+              AppIcons.inventory,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textSecondaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -643,9 +694,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           MbuyInputField(
             controller: _imageUrlController,
             label: 'رابط الصورة',
-            prefixIcon: const Icon(
-              Icons.image,
-              color: AppTheme.textSecondaryColor,
+            prefixIcon: SvgPicture.asset(
+              AppIcons.image,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.textSecondaryColor,
+                BlendMode.srcIn,
+              ),
             ),
             keyboardType: TextInputType.url,
             textInputAction: TextInputAction.done,
@@ -710,10 +766,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           color: AppTheme.surfaceColor,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
-        child: const Icon(
-          Icons.image_not_supported,
-          size: AppDimensions.iconDisplay,
-          color: AppTheme.textHintColor,
+        child: SvgPicture.asset(
+          AppIcons.imageNotSupported,
+          width: AppDimensions.iconDisplay,
+          height: AppDimensions.iconDisplay,
+          colorFilter: const ColorFilter.mode(
+            AppTheme.textHintColor,
+            BlendMode.srcIn,
+          ),
         ),
       );
     }
@@ -763,10 +823,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: AppTheme.surfaceColor,
-                        child: const Icon(
-                          Icons.broken_image,
-                          size: AppDimensions.iconDisplay,
-                          color: AppTheme.textHintColor,
+                        child: SvgPicture.asset(
+                          AppIcons.brokenImage,
+                          width: AppDimensions.iconDisplay,
+                          height: AppDimensions.iconDisplay,
+                          colorFilter: const ColorFilter.mode(
+                            AppTheme.textHintColor,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       );
                     },
@@ -813,10 +877,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: isVideo && _currentImageIndex == index
-                      ? const Icon(
-                          Icons.play_arrow,
-                          size: 6,
-                          color: Colors.white,
+                      ? SvgPicture.asset(
+                          AppIcons.playArrow,
+                          width: 6,
+                          height: 6,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
                         )
                       : null,
                 ),
@@ -883,12 +951,16 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 color: Colors.black.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: SvgPicture.asset(
                 _videoController!.value.isPlaying
-                    ? Icons.pause
-                    : Icons.play_arrow,
-                color: Colors.white,
-                size: 40,
+                    ? AppIcons.pause
+                    : AppIcons.playArrow,
+                width: 40,
+                height: 40,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -923,10 +995,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   color: Colors.black.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.fullscreen,
-                  color: Colors.white,
-                  size: 24,
+                child: SvgPicture.asset(
+                  AppIcons.fullscreen,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

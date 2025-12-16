@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة حزم التوفير - حزم شاملة تجمع أدوات AI والخدمات بأسعار مخفضة
@@ -44,7 +46,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
             'قوالب أساسية',
           ],
           color: AppTheme.slate600,
-          icon: Icons.rocket_launch_outlined,
+          iconPath: AppIcons.rocketLaunch,
           isFree: true,
         ),
         PackageModel(
@@ -64,7 +66,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
             'قوالب احترافية',
           ],
           color: AppTheme.primaryColor,
-          icon: Icons.workspace_premium_outlined,
+          iconPath: AppIcons.workspacePremium,
           isPopular: true,
           discount: 50,
         ),
@@ -86,7 +88,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
             'أولوية في الدعم',
           ],
           color: AppTheme.accentColor,
-          icon: Icons.business_center_outlined,
+          iconPath: AppIcons.businessCenter,
           discount: 50,
         ),
         PackageModel(
@@ -107,7 +109,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
             'عقود سنوية مرنة',
           ],
           color: AppTheme.successColor,
-          icon: Icons.apartment_outlined,
+          iconPath: AppIcons.apartment,
         ),
       ];
       _isLoading = false;
@@ -183,10 +185,14 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              icon: const Icon(
-                Icons.check_circle,
-                color: AppTheme.successColor,
-                size: 64,
+              icon: SvgPicture.asset(
+                AppIcons.checkCircle,
+                width: 64,
+                height: 64,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.successColor,
+                  BlendMode.srcIn,
+                ),
               ),
               title: const Text('تم الاشتراك بنجاح!'),
               content: Column(
@@ -234,25 +240,41 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('تواصل معنا'),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('للحصول على عرض مخصص لمؤسستك:'),
-            SizedBox(height: 16),
+            const Text('للحصول على عرض مخصص لمؤسستك:'),
+            const SizedBox(height: 16),
             Row(
               children: [
-                Icon(Icons.email, color: AppTheme.primaryColor),
-                SizedBox(width: 8),
-                Text('enterprise@mbuy.app'),
+                SvgPicture.asset(
+                  AppIcons.email,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('enterprise@mbuy.app'),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.phone, color: AppTheme.primaryColor),
-                SizedBox(width: 8),
-                Text('+966 50 123 4567'),
+                SvgPicture.asset(
+                  AppIcons.phone,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('+966 50 123 4567'),
               ],
             ),
           ],
@@ -278,7 +300,15 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -337,10 +367,18 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.local_offer, color: Colors.white, size: 16),
+                    SvgPicture.asset(
+                      AppIcons.localOffer,
+                      width: 16,
+                      height: 16,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     SizedBox(width: 4),
                     Text(
                       'خصم 50%',
@@ -429,7 +467,15 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                       color: package.color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(package.icon, color: package.color, size: 24),
+                    child: SvgPicture.asset(
+                      package.iconPath,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        package.color,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   // Name
@@ -722,7 +768,7 @@ class PackageModel {
   final String description;
   final List<String> features;
   final Color color;
-  final IconData icon;
+  final String iconPath;
   final bool isFree;
   final bool isPopular;
   final int? discount;
@@ -736,7 +782,7 @@ class PackageModel {
     required this.description,
     required this.features,
     required this.color,
-    required this.icon,
+    required this.iconPath,
     this.isFree = false,
     this.isPopular = false,
     this.discount,

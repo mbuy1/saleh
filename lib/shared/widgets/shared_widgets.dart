@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_icons.dart';
 import '../../core/theme/app_theme.dart';
 
 /// ============================================================================
@@ -47,10 +49,14 @@ class MbuyAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBackButton
           ? (leading ??
                 IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_rounded,
-                    size: AppDimensions.iconM,
-                    color: AppTheme.primaryColor, // Blue icon
+                  icon: SvgPicture.asset(
+                    AppIcons.arrowBack,
+                    width: AppDimensions.iconM,
+                    height: AppDimensions.iconM,
+                    colorFilter: const ColorFilter.mode(
+                      AppTheme.primaryColor,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ))
@@ -677,10 +683,14 @@ class MbuyListItem extends StatelessWidget {
                 ),
               ),
               trailing ??
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    size: AppDimensions.iconXS,
-                    color: AppTheme.textHintColor,
+                  SvgPicture.asset(
+                    AppIcons.chevronRight,
+                    width: AppDimensions.iconXS,
+                    height: AppDimensions.iconXS,
+                    colorFilter: const ColorFilter.mode(
+                      AppTheme.textHintColor,
+                      BlendMode.srcIn,
+                    ),
                   ),
             ],
           ),

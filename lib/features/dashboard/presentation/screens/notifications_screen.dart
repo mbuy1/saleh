@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
@@ -41,22 +43,22 @@ class NotificationItem {
     );
   }
 
-  IconData get icon {
+  String get icon {
     switch (type) {
       case 'order':
-        return Icons.shopping_bag;
+        return AppIcons.shoppingBag;
       case 'product':
-        return Icons.inventory_2;
+        return AppIcons.inventory2;
       case 'payment':
-        return Icons.payment;
+        return AppIcons.payment;
       case 'promotion':
-        return Icons.campaign;
+        return AppIcons.campaign;
       case 'system':
-        return Icons.settings;
+        return AppIcons.settings;
       case 'chat':
-        return Icons.chat;
+        return AppIcons.chat;
       default:
-        return Icons.notifications;
+        return AppIcons.notifications;
     }
   }
 
@@ -278,10 +280,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(
+                  child: SvgPicture.asset(
                     notification.icon,
-                    color: notification.color,
-                    size: 28,
+                    width: 28,
+                    height: 28,
+                    colorFilter: ColorFilter.mode(
+                      notification.color,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -300,10 +306,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: AppTheme.textHintColor,
+                          SvgPicture.asset(
+                            AppIcons.time,
+                            width: 14,
+                            height: 14,
+                            colorFilter: const ColorFilter.mode(
+                              AppTheme.textHintColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -409,15 +419,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ],
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_rounded),
-            color: AppTheme.primaryColor,
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.primaryColor,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: () => context.pop(),
           ),
           actions: [
             if (_unreadCount > 0)
               TextButton.icon(
                 onPressed: _markAllAsRead,
-                icon: const Icon(Icons.done_all, size: 18),
+                icon: SvgPicture.asset(
+                  AppIcons.doneAll,
+                  width: 18,
+                  height: 18,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.primaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
                 label: const Text('قراءة الكل'),
                 style: TextButton.styleFrom(
                   foregroundColor: AppTheme.primaryColor,
@@ -478,10 +503,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   color: AppTheme.errorColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: AppTheme.errorColor,
+                child: SvgPicture.asset(
+                  AppIcons.error,
+                  width: 64,
+                  height: 64,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.errorColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -497,7 +526,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _loadNotifications,
-                icon: const Icon(Icons.refresh),
+                icon: SvgPicture.asset(
+                  AppIcons.refresh,
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
                 label: const Text('إعادة المحاولة'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
@@ -541,10 +578,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   color: AppTheme.primaryColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.notifications_none,
-                  size: 64,
-                  color: AppTheme.textSecondaryColor,
+                child: SvgPicture.asset(
+                  AppIcons.notifications,
+                  width: 64,
+                  height: 64,
+                  colorFilter: ColorFilter.mode(
+                    AppTheme.textSecondaryColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -603,10 +644,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 gradient: AppTheme.subtleGradient,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.settings_outlined,
-                size: 64,
-                color: AppTheme.textSecondaryColor,
+              child: SvgPicture.asset(
+                AppIcons.settings,
+                width: 64,
+                height: 64,
+                colorFilter: ColorFilter.mode(
+                  AppTheme.textSecondaryColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -690,10 +735,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     ),
                   ],
                 ),
-                child: Icon(
+                child: SvgPicture.asset(
                   notification.icon,
-                  color: notification.color,
-                  size: 24,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    notification.color,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(width: AppTheme.spacingMedium),
@@ -752,10 +801,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 12,
-                          color: AppTheme.textHintColor,
+                        SvgPicture.asset(
+                          AppIcons.time,
+                          width: 12,
+                          height: 12,
+                          colorFilter: const ColorFilter.mode(
+                            AppTheme.textHintColor,
+                            BlendMode.srcIn,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(

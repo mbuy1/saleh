@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductBundlesScreen extends StatefulWidget {
   const ProductBundlesScreen({super.key});
@@ -108,6 +112,10 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('باقات المنتجات'),
           actions: [
             IconButton(icon: const Icon(Icons.refresh), onPressed: _loadData),
@@ -142,7 +150,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -157,7 +165,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                   Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'باقات نشطة',
@@ -168,7 +176,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
@@ -179,7 +187,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                   Colors.purple,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'إجمالي التوفير',
@@ -196,14 +204,14 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
           // Benefits
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Icon(Icons.auto_awesome, color: Colors.amber[700]),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                       const Text(
                         'مزايا الباقات',
                         style: TextStyle(
@@ -213,7 +221,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   _buildBenefitItem(
                     Icons.trending_up,
                     'زيادة المبيعات',
@@ -246,7 +254,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
             'الباقات المميزة',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           ..._bundles
               .where((b) => b['featured'] == true)
               .map((bundle) => _buildFeaturedBundleCard(bundle)),
@@ -257,7 +265,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
 
   Widget _buildBundlesTab() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _bundles.length,
       itemBuilder: (context, index) {
         final bundle = _bundles[index];
@@ -271,9 +279,9 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
           margin: const EdgeInsets.only(bottom: 12),
           child: InkWell(
             onTap: () => _showBundleDetails(bundle),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimensions.borderRadiusM,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -292,7 +300,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppDimensions.spacing8),
                                 if (bundle['featured'] == true)
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -352,7 +360,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                                     color: Colors.green,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppDimensions.spacing8),
                                 Text(
                                   '${originalPrice.toStringAsFixed(0)} ر.س',
                                   style: TextStyle(
@@ -373,7 +381,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppDimensions.borderRadiusXL,
                         ),
                         child: Text(
                           'وفر $savingsPercent%',
@@ -385,14 +393,14 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacing12),
                   Row(
                     children: [
                       _buildBundleInfo(
                         Icons.inventory_2,
                         '${bundle['items_count']} منتج',
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppDimensions.spacing16),
                       _buildBundleInfo(
                         Icons.shopping_cart,
                         '${bundle['order_count']} طلب',
@@ -410,7 +418,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
 
   Widget _buildCategoriesTab() {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       children: [
         // Add category button
         OutlinedButton.icon(
@@ -418,7 +426,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
           icon: const Icon(Icons.add),
           label: const Text('إضافة فئة جديدة'),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         ..._categories.map(
           (category) => Card(
@@ -455,12 +463,12 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Text(
               value,
               style: TextStyle(
@@ -487,14 +495,14 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: AppDimensions.paddingXS,
             decoration: BoxDecoration(
               color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimensions.borderRadiusS,
             ),
             child: Icon(icon, color: Colors.blue[700], size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,7 +535,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
           height: 50,
           decoration: BoxDecoration(
             color: Colors.amber[100],
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimensions.borderRadiusS,
           ),
           child: Icon(Icons.star, color: Colors.amber[700]),
         ),
@@ -542,7 +550,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: Colors.green[100],
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimensions.borderRadiusM,
           ),
           child: Text(
             'وفر ${(originalPrice - bundlePrice).toStringAsFixed(0)}',
@@ -583,7 +591,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
@@ -628,13 +636,13 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                   hintText: 'مثال: باقة العيد',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextField(
                 controller: descController,
                 decoration: const InputDecoration(labelText: 'الوصف'),
                 maxLines: 2,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               DropdownButtonFormField<String>(
                 initialValue: bundleType,
                 decoration: const InputDecoration(labelText: 'نوع التسعير'),
@@ -653,7 +661,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                   bundleType = value!;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextField(
                 controller: priceController,
                 decoration: InputDecoration(
@@ -699,7 +707,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: AppDimensions.paddingL,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -721,7 +729,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacing8),
                 Text(
                   bundle['description'] ?? '',
                   style: TextStyle(color: Colors.grey[600]),
@@ -731,7 +739,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                   'منتجات الباقة',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacing12),
                 const Text('لم يتم إضافة منتجات بعد'),
                 const SizedBox(height: 24),
                 Row(
@@ -745,7 +753,7 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
                         label: const Text('إضافة منتج'),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacing12),
                     Expanded(
                       child: FilledButton.icon(
                         onPressed: () {

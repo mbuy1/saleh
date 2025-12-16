@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 
 class CodSettingsScreen extends StatefulWidget {
   const CodSettingsScreen({super.key});
@@ -29,6 +34,10 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('الدفع عند الاستلام'),
           bottom: TabBar(
             controller: _tabController,
@@ -56,7 +65,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,7 +99,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
           // Financial Summary
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -98,7 +107,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'الملخص المالي',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   _buildFinancialRow(
                     'المبالغ قيد التحصيل',
                     '0 ر.س',
@@ -126,12 +135,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Customer Trust Levels
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -139,7 +148,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'مستويات ثقة العملاء',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   _buildTrustLevelRow(
                     'عملاء موثوقون',
                     '0',
@@ -168,12 +177,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Quick Actions
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -181,7 +190,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'إجراءات سريعة',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
                       Expanded(
@@ -191,7 +200,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                           label: const Text('تصدير التقرير'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: AppDimensions.spacing12),
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () {},
@@ -218,12 +227,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               value,
               style: TextStyle(
@@ -266,17 +275,17 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
     IconData icon,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(width: 8),
+          SizedBox(width: AppDimensions.spacing8),
           Expanded(child: Text(label)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppDimensions.borderRadiusM,
             ),
             child: Text(
               count,
@@ -323,7 +332,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(
             'لا توجد طلبات',
             style: TextStyle(color: Colors.grey[600], fontSize: 18),
@@ -335,7 +344,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
 
   Widget _buildBlacklistTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // Add to Blacklist
@@ -353,17 +362,17 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Info Card
           Card(
             color: Colors.red[50],
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Row(
                 children: [
                   Icon(Icons.info_outline, color: Colors.red[700]),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: Text(
                       'العملاء في القائمة السوداء لن يتمكنوا من استخدام خيار الدفع عند الاستلام',
@@ -374,15 +383,15 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Blacklist Items (Empty State)
           Center(
             child: Column(
               children: [
-                const SizedBox(height: 40),
+                SizedBox(height: AppDimensions.spacing40),
                 Icon(Icons.block, size: 64, color: Colors.grey[400]),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimensions.spacing16),
                 Text(
                   'لا يوجد عملاء في القائمة السوداء',
                   style: TextStyle(color: Colors.grey[600], fontSize: 18),
@@ -397,13 +406,13 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
 
   Widget _buildSettingsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         children: [
           // General Settings
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -411,7 +420,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'الإعدادات العامة',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('تفعيل الدفع عند الاستلام'),
                     subtitle: const Text(
@@ -428,7 +437,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     ),
                     initialValue: '50',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'الحد الأقصى للطلب',
@@ -441,12 +450,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // COD Fees
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -454,7 +463,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'رسوم COD',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'نوع الرسوم',
@@ -473,7 +482,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     ],
                     onChanged: (v) {},
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'قيمة الرسوم',
@@ -486,12 +495,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Verification Settings
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -499,7 +508,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'إعدادات التحقق',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   SwitchListTile(
                     title: const Text('التحقق من رقم الجوال'),
                     subtitle: const Text('إرسال رمز تحقق للعميل'),
@@ -522,12 +531,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Trust Score Settings
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -535,7 +544,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     'نظام الثقة',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'حد درجة الثقة للـ COD',
@@ -545,7 +554,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     ),
                     initialValue: '50',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'الحد الأقصى للتوصيلات الفاشلة',
@@ -555,7 +564,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                     ),
                     initialValue: '3',
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   SwitchListTile(
                     title: const Text('الإضافة التلقائية للقائمة السوداء'),
                     subtitle: const Text(
@@ -568,12 +577,12 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
 
           // Excluded Zones
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -594,7 +603,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -610,7 +619,7 @@ class _CodSettingsScreenState extends State<CodSettingsScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(

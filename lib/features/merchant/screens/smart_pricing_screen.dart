@@ -1,4 +1,9 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -140,6 +145,15 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('التسعير الذكي'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
@@ -172,9 +186,9 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('إعادة المحاولة'),
@@ -199,7 +213,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       onRefresh: _loadData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -216,7 +230,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     'التنبيهات',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -224,7 +238,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppDimensions.borderRadiusM,
                     ),
                     child: Text(
                       '${_alerts.length}',
@@ -233,7 +247,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               ..._alerts.take(5).map((alert) => _buildAlertCard(alert)),
             ],
 
@@ -245,7 +259,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 'اقتراحات تسعير',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacing12),
               ..._suggestions.take(3).map((s) => _buildSuggestionCard(s)),
             ],
 
@@ -267,14 +281,14 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 const Icon(Icons.settings, color: AppTheme.primaryColor),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'إعدادات التسعير',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -323,7 +337,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             size: 18,
             color: enabled ? Colors.green : Colors.grey,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacing8),
           Text(label),
         ],
       ),
@@ -399,7 +413,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: AppDimensions.paddingS,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -407,7 +421,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
               children: [
                 if (product?['image_url'] != null)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimensions.borderRadiusS,
                     child: Image.network(
                       product!['image_url'],
                       width: 50,
@@ -427,11 +441,11 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     height: 50,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppDimensions.borderRadiusS,
                     ),
                     child: const Icon(Icons.inventory),
                   ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,7 +466,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Expanded(
@@ -494,7 +508,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             Row(
               children: [
                 Container(
@@ -518,7 +532,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   ),
                 ),
                 if (suggestion['confidence_score'] != null) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacing8),
                   Text(
                     'ثقة: ${((suggestion['confidence_score'] ?? 0) * 100).toStringAsFixed(0)}%',
                     style: TextStyle(fontSize: 11, color: Colors.grey[600]),
@@ -545,9 +559,9 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.rule, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spacing16),
                   Text('لا توجد قواعد تسعير'),
-                  SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أنشئ قاعدة جديدة لأتمتة التسعير',
                     style: TextStyle(color: Colors.grey),
@@ -556,7 +570,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               itemCount: _rules.length,
               itemBuilder: (context, index) {
                 final rule = _rules[index];
@@ -613,9 +627,9 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.lightbulb_outline, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text('لا توجد اقتراحات حالياً'),
-            SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               'سيتم تحليل الأسعار وتقديم اقتراحات',
               style: TextStyle(color: Colors.grey),
@@ -626,7 +640,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _suggestions.length,
       itemBuilder: (context, index) {
         return _buildSuggestionCard(_suggestions[index]);
@@ -641,7 +655,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.history, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             Text('لا يوجد سجل تغييرات'),
           ],
         ),
@@ -649,7 +663,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _history.length,
       itemBuilder: (context, index) {
         final item = _history[index];
@@ -701,21 +715,21 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     return Card(
       color: Colors.blue.withAlpha(25),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.lightbulb, color: Colors.amber[700]),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacing8),
                 const Text(
                   'نصائح التسعير',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacing12),
             _buildTipItem('راقب أسعار المنافسين بانتظام'),
             _buildTipItem('احرص على هامش ربح لا يقل عن 15%'),
             _buildTipItem('استخدم الأسعار النفسية (99 بدل 100)'),
@@ -892,7 +906,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
                     onSaved: (v) => ruleName = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: ruleType,
                     decoration: const InputDecoration(
@@ -923,7 +937,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     ],
                     onChanged: (v) => setDialogState(() => ruleType = v!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'الوصف (اختياري)',
@@ -932,7 +946,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     maxLines: 2,
                     onSaved: (v) => description = v ?? '',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
                       Expanded(
@@ -952,7 +966,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   SwitchListTile(
                     title: const Text('تفعيل فوري'),
                     value: isActive,

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductVariantsScreen extends StatefulWidget {
   const ProductVariantsScreen({super.key});
@@ -126,6 +130,10 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
+            onPressed: () => context.pop(),
+          ),
           title: const Text('المنتجات المتغيرة'),
           actions: [
             IconButton(icon: const Icon(Icons.refresh), onPressed: _loadData),
@@ -159,7 +167,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -174,7 +182,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'متغيرات نشطة',
@@ -185,7 +193,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           Row(
             children: [
               Expanded(
@@ -196,7 +204,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   Colors.orange,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
                   'نفاد المخزون',
@@ -213,14 +221,14 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
           // How it works
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Icon(Icons.lightbulb, color: Colors.amber[700]),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                       const Text(
                         'كيف تعمل المتغيرات؟',
                         style: TextStyle(
@@ -230,7 +238,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing16),
                   _buildHowItWorksStep(
                     '1',
                     'إنشاء خيارات',
@@ -267,7 +275,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
             'إجراءات سريعة',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -284,7 +292,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
 
   Widget _buildOptionsTab() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       itemCount: _variantOptions.length,
       itemBuilder: (context, index) {
         final option = _variantOptions[index];
@@ -318,7 +326,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
             ),
             children: [
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -326,7 +334,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                       'القيم المتاحة:',
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacing8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -353,7 +361,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                         return Chip(label: Text(v['label']));
                       }).toList(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacing16),
                     OutlinedButton.icon(
                       onPressed: () => _showAddValueDialog(option),
                       icon: const Icon(Icons.add),
@@ -371,17 +379,17 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
 
   Widget _buildPriceRulesTab() {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       children: [
         // Info card
         Card(
           color: Colors.blue[50],
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppDimensions.paddingM,
             child: Row(
               children: [
                 Icon(Icons.info, color: Colors.blue[700]),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacing12),
                 const Expanded(
                   child: Text(
                     'قواعد التسعير تُطبق تلقائياً على المتغيرات حسب الشروط المحددة',
@@ -393,7 +401,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         ..._priceRules.map(
           (rule) => Card(
@@ -458,7 +466,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         OutlinedButton.icon(
           onPressed: _showAddPriceRuleDialog,
@@ -477,7 +485,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
   ) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppDimensions.paddingM,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -492,7 +500,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimensions.borderRadiusS,
                   ),
                   child: Text(
                     value,
@@ -505,7 +513,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacing8),
             Text(
               title,
               style: TextStyle(color: Colors.grey[600], fontSize: 13),
@@ -544,7 +552,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +560,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                 Row(
                   children: [
                     Icon(icon, size: 18, color: Colors.grey[600]),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacing8),
                     Text(
                       title,
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -649,7 +657,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   hintText: 'مثال: color',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextField(
                 controller: displayNameController,
                 decoration: const InputDecoration(
@@ -657,7 +665,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   hintText: 'مثال: اللون',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               DropdownButtonFormField<String>(
                 initialValue: selectedType,
                 decoration: const InputDecoration(labelText: 'نوع الخيار'),
@@ -719,7 +727,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                 hintText: 'مثال: green',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing16),
             TextField(
               controller: labelController,
               decoration: const InputDecoration(
@@ -766,7 +774,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                 controller: nameController,
                 decoration: const InputDecoration(labelText: 'اسم القاعدة'),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               DropdownButtonFormField<String>(
                 initialValue: ruleType,
                 decoration: const InputDecoration(labelText: 'نوع القاعدة'),
@@ -781,7 +789,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   ruleType = value!;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               DropdownButtonFormField<String>(
                 initialValue: adjustmentType,
                 decoration: const InputDecoration(labelText: 'نوع التعديل'),
@@ -793,7 +801,7 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
                   adjustmentType = value!;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing16),
               TextField(
                 controller: valueController,
                 decoration: InputDecoration(

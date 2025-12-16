@@ -36,6 +36,61 @@ class AppDimensions {
   );
 
   // ============================================================================
+  // Standardized Padding EdgeInsets - Use these instead of hardcoded values
+  // ============================================================================
+  /// Padding 8px all sides - for small compact items
+  static const EdgeInsets paddingXS = EdgeInsets.all(spacing8);
+
+  /// Padding 12px all sides - for cards and list items
+  static const EdgeInsets paddingS = EdgeInsets.all(spacing12);
+
+  /// Padding 16px all sides - standard screen/section padding
+  static const EdgeInsets paddingM = EdgeInsets.all(spacing16);
+
+  /// Padding 20px all sides - for emphasized sections
+  static const EdgeInsets paddingL = EdgeInsets.all(spacing20);
+
+  /// Padding 24px all sides - for large sections and dialogs
+  static const EdgeInsets paddingXL = EdgeInsets.all(spacing24);
+
+  /// Padding 32px all sides - for hero/empty state sections
+  static const EdgeInsets paddingXXL = EdgeInsets.all(spacing32);
+
+  // Horizontal only padding
+  static const EdgeInsets paddingHorizontalXS = EdgeInsets.symmetric(
+    horizontal: spacing8,
+  );
+  static const EdgeInsets paddingHorizontalS = EdgeInsets.symmetric(
+    horizontal: spacing12,
+  );
+  static const EdgeInsets paddingHorizontalM = EdgeInsets.symmetric(
+    horizontal: spacing16,
+  );
+  static const EdgeInsets paddingHorizontalL = EdgeInsets.symmetric(
+    horizontal: spacing20,
+  );
+  static const EdgeInsets paddingHorizontalXL = EdgeInsets.symmetric(
+    horizontal: spacing24,
+  );
+
+  // Vertical only padding
+  static const EdgeInsets paddingVerticalXS = EdgeInsets.symmetric(
+    vertical: spacing8,
+  );
+  static const EdgeInsets paddingVerticalS = EdgeInsets.symmetric(
+    vertical: spacing12,
+  );
+  static const EdgeInsets paddingVerticalM = EdgeInsets.symmetric(
+    vertical: spacing16,
+  );
+  static const EdgeInsets paddingVerticalL = EdgeInsets.symmetric(
+    vertical: spacing20,
+  );
+  static const EdgeInsets paddingVerticalXL = EdgeInsets.symmetric(
+    vertical: spacing24,
+  );
+
+  // ============================================================================
   // Border Radius - Rounded Corners (Modern Standard)
   // ============================================================================
   static const double radiusXS = 4.0;

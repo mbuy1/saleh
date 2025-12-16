@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// شاشة محفظة التاجر
@@ -11,6 +14,18 @@ class WalletScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            AppIcons.arrowBack,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(
+              AppTheme.primaryColor,
+              BlendMode.srcIn,
+            ),
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: const Text(
           'محفظة التاجر',
           style: TextStyle(
@@ -35,10 +50,14 @@ class WalletScreen extends StatelessWidget {
                 color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(100),
               ),
-              child: const Icon(
-                Icons.account_balance_wallet,
-                size: 64,
-                color: Colors.green,
+              child: SvgPicture.asset(
+                AppIcons.wallet,
+                width: 64,
+                height: 64,
+                colorFilter: const ColorFilter.mode(
+                  Colors.green,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -62,10 +81,14 @@ class WalletScreen extends StatelessWidget {
                       color: AppTheme.primaryColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: AppDimensions.iconDisplay,
-                      color: AppTheme.primaryColor,
+                    child: SvgPicture.asset(
+                      AppIcons.wallet,
+                      width: AppDimensions.iconDisplay,
+                      height: AppDimensions.iconDisplay,
+                      colorFilter: const ColorFilter.mode(
+                        AppTheme.primaryColor,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),

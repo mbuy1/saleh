@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/api_service.dart';
@@ -349,6 +350,10 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
         iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
+          onPressed: () => context.pop(),
+        ),
         title: const Text(
           'طلبات التوريد',
           style: TextStyle(
