@@ -15,5 +15,9 @@ export 'loading_states.dart';
 export 'mbuy_button.dart';
 export 'mbuy_card.dart';
 
+// Base Screen & Error Handling
+export 'base_screen.dart';
+export 'error_boundary.dart';
+
 // Utils
 export '../utils/dialog_helper.dart';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'shared/app_shell.dart';
+import 'shared/widgets/error_boundary.dart';
 
 /// MBUY Application
 /// Clean Architecture - Worker-Only Backend
@@ -13,6 +14,9 @@ import 'shared/app_shell.dart';
 /// يتم تحديد التطبيق عبر RootController
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // تهيئة معالج الأخطاء العام
+  GlobalErrorHandler().initialize();
 
   // Lock orientation to portrait mode
   await SystemChrome.setPreferredOrientations([
