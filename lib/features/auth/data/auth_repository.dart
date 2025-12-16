@@ -61,6 +61,87 @@ class AuthRepository {
        _tokenStorage = tokenStorage;
 
   // ==========================================================================
+  // تسجيل حساب جديد
+  // ==========================================================================
+
+  /// تسجيل حساب جديد باستخدام Supabase Auth
+  ///
+  /// [email] البريد الإلكتروني
+  /// [password] كلمة المرور
+  /// [fullName] الاسم الكامل (اختياري)
+  /// [role] الدور: merchant أو customer
+  ///
+  /// يرمي [Exception] إذا فشل التسجيل
+  Future<Map<String, dynamic>> signUp({
+    required String email,
+    required String password,
+    String? fullName,
+    String role = 'merchant',
+  }) async {
+    try {
+      final response = await _apiService.post(
+        '/auth/supabase/register',
+        body: {
+          'email': email.trim().toLowerCase(),
+          'password': password,
+          'full_name': fullName?.trim(),
+          'role': role,
+        },
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+        if (data['access_token'] != null && data['user'] != null) {
+          final accessToken = data['access_token'] as String;
+          final refreshToken = data['refresh_token'] as String?;
+          final user = data['user'] as Map<String, dynamic>;
+          final profile = data['profile'] as Map<String, dynamic>?;
+
+          final userRole = user['role'] as String? ?? profile?['role'] as String? ?? role;
+
+          // حفظ التوكن ومعلومات المستخدم
+          await _tokenStorage.saveToken(
+            accessToken: accessToken,
+            userId: user['id'] as String,
+            userRole: userRole,
+            userEmail: user['email'] as String?,
+          );
+
+          if (refreshToken != null) {
+            await _tokenStorage.saveRefreshToken(refreshToken);
+          }
+
+          return data;
+        }
+      }
+
+      // معالجة حالة الفشل
+      Map<String, dynamic>? errorData;
+      try {
+        errorData = jsonDecode(response.body) as Map<String, dynamic>?;
+      } catch (_) {
+        errorData = null;
+      }
+
+      final errorMessage = errorData?['message'] ?? errorData?['error'];
+
+      // ترجمة رسائل الخطأ الشائعة
+      if (errorMessage?.toString().contains('already') == true ||
+          errorMessage?.toString().contains('exists') == true) {
+        throw Exception('البريد الإلكتروني مسجل مسبقاً');
+      }
+
+      throw Exception(errorMessage ?? 'فشل إنشاء الحساب');
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('حدث خطأ أثناء إنشاء الحساب: ${e.toString()}');
+    }
+  }
+
+  // ==========================================================================
   // تسجيل الدخول
   // ==========================================================================
 
@@ -145,6 +226,42 @@ class AuthRepository {
         rethrow;
       }
       throw Exception('حدث خطأ أثناء تسجيل الدخول: ${e.toString()}');
+    }
+  }
+
+  // ==========================================================================
+  // نسيت كلمة المرور
+  // ==========================================================================
+
+  /// إرسال رابط إعادة تعيين كلمة المرور
+  ///
+  /// [email] البريد الإلكتروني
+  ///
+  /// يرمي [Exception] إذا فشل الإرسال
+  Future<void> forgotPassword({required String email}) async {
+    try {
+      final response = await _apiService.post(
+        '/auth/supabase/forgot-password',
+        body: {'email': email.trim().toLowerCase()},
+      );
+
+      if (response.statusCode == 200) {
+        return; // نجاح
+      }
+
+      Map<String, dynamic>? errorData;
+      try {
+        errorData = jsonDecode(response.body) as Map<String, dynamic>?;
+      } catch (_) {
+        errorData = null;
+      }
+
+      throw Exception(errorData?['message'] ?? 'فشل إرسال رابط إعادة التعيين');
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('حدث خطأ أثناء إرسال الرابط');
     }
   }
 

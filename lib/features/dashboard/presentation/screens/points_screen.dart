@@ -357,6 +357,35 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          // زر شراء نقاط
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _showBuyPointsSheet,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: SvgPicture.asset(
+                AppIcons.addCircle,
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  Colors.orange,
+                  BlendMode.srcIn,
+                ),
+              ),
+              label: const Text(
+                'شراء نقاط',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           // شريط التقدم للمستوى التالي
           Column(
             children: [
@@ -386,6 +415,141 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBuyPointsSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _BuyPointsSheet(
+        onPurchase: (package) {
+          Navigator.pop(context);
+          _showPaymentDialog(package);
+        },
+      ),
+    );
+  }
+
+  void _showPaymentDialog(PointsPackage package) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            SvgPicture.asset(
+              AppIcons.creditCard,
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppTheme.primaryColor,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text('تأكيد الشراء'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    AppIcons.star,
+                    width: 32,
+                    height: 32,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.orange,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${package.points} نقطة',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      if (package.bonus > 0)
+                        Text(
+                          '+ ${package.bonus} نقطة هدية',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${package.price} ر.س',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'سيتم إضافة النقاط فوراً إلى حسابك بعد إتمام الدفع.',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // محاكاة عملية الشراء
+              setState(() {
+                _currentPoints += package.points + package.bonus;
+                _lifetimePoints += package.points + package.bonus;
+                _transactions.insert(
+                  0,
+                  PointTransaction(
+                    id: DateTime.now().toString(),
+                    type: PointTransactionType.bonus,
+                    amount: package.points + package.bonus,
+                    description: 'شراء ${package.points} نقطة',
+                    date: DateTime.now(),
+                  ),
+                );
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('تم إضافة ${package.points + package.bonus} نقطة!'),
+                  backgroundColor: AppTheme.successColor,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+            ),
+            child: const Text('تأكيد الدفع'),
           ),
         ],
       ),
@@ -730,7 +894,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 title: 'دعوة أصدقاء',
                 description: '500 نقطة عن كل صديق يسجل',
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               _HelpItem(
                 iconPath: AppIcons.star,
                 title: 'التقييمات',
@@ -834,4 +998,277 @@ class PointReward {
     required this.iconPath,
     required this.color,
   });
+}
+
+// ============================================================================
+// شراء النقاط
+// ============================================================================
+
+class PointsPackage {
+  final String id;
+  final int points;
+  final int bonus;
+  final double price;
+  final bool isPopular;
+
+  const PointsPackage({
+    required this.id,
+    required this.points,
+    required this.bonus,
+    required this.price,
+    this.isPopular = false,
+  });
+
+  int get totalPoints => points + bonus;
+  double get pricePerPoint => price / totalPoints;
+}
+
+class _BuyPointsSheet extends StatelessWidget {
+  final Function(PointsPackage) onPurchase;
+
+  const _BuyPointsSheet({required this.onPurchase});
+
+  static const List<PointsPackage> packages = [
+    PointsPackage(id: '1', points: 100, bonus: 0, price: 10),
+    PointsPackage(id: '2', points: 500, bonus: 50, price: 45),
+    PointsPackage(id: '3', points: 1000, bonus: 150, price: 80, isPopular: true),
+    PointsPackage(id: '4', points: 2500, bonus: 500, price: 180),
+    PointsPackage(id: '5', points: 5000, bonus: 1500, price: 300),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SvgPicture.asset(
+                    AppIcons.star,
+                    width: 28,
+                    height: 28,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.orange,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'شراء نقاط',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'اختر الباقة المناسبة لك',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Packages List
+          SizedBox(
+            height: 350,
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: packages.length,
+              itemBuilder: (context, index) {
+                final package = packages[index];
+                return _buildPackageCard(context, package);
+              },
+            ),
+          ),
+
+          // Footer
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  AppIcons.shield,
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    Colors.grey[600]!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'دفع آمن ومشفر',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPackageCard(BuildContext context, PointsPackage package) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: package.isPopular
+            ? Colors.orange.withValues(alpha: 0.05)
+            : Colors.grey.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: package.isPopular
+              ? Colors.orange.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.2),
+          width: package.isPopular ? 2 : 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onPurchase(package),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Points Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            '${package.points}',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Text(
+                            ' نقطة',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          if (package.isPopular) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                'الأكثر مبيعاً',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (package.bonus > 0)
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppIcons.gift,
+                              width: 14,
+                              height: 14,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.green,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '+${package.bonus} نقطة هدية',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+
+                // Price
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${package.price.toInt()} ر.س',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: package.isPopular
+                            ? Colors.orange
+                            : AppTheme.primaryColor,
+                      ),
+                    ),
+                    Text(
+                      '${package.pricePerPoint.toStringAsFixed(2)} ر.س/نقطة',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

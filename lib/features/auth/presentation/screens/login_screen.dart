@@ -209,7 +209,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: AppDimensions.spacing32),
+                  const SizedBox(height: AppDimensions.spacing12),
+
+                  // نسيت كلمة المرور
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () => context.push('/forgot-password'),
+                      child: const Text(
+                        'نسيت كلمة المرور؟',
+                        style: TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontSize: AppDimensions.fontBody2,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacing16),
 
                   // Error Message
                   if (authState.errorMessage != null) ...[
@@ -253,6 +271,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing24),
+
+                  // رابط إنشاء حساب جديد
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ليس لديك حساب؟',
+                        style: TextStyle(
+                          color: AppTheme.mutedSlate,
+                          fontSize: AppDimensions.fontBody,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => context.push('/register'),
+                        child: const Text(
+                          'إنشاء حساب',
+                          style: TextStyle(
+                            color: AppTheme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppDimensions.fontBody,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppDimensions.spacing16),
 
                   // Demo Info
                   _buildDemoInfo(),

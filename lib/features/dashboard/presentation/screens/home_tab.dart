@@ -856,48 +856,47 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 padding: EdgeInsets.zero,
                 children: [
                   _buildDrawerItem(
-                    iconPath: AppIcons.lock,
-                    title: 'تغيير كلمة السر',
+                    iconPath: AppIcons.settings,
+                    title: 'إعدادات الحساب',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('تغيير كلمة السر')}',
-                      );
+                      context.push('/settings');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.edit,
-                    title: 'تعديل معلومات الحساب',
+                    iconPath: AppIcons.supportAgent,
+                    title: 'الدعم والمساعدة',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('تعديل معلومات الحساب')}',
-                      );
+                      context.push('/support');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.bulb,
-                    title: 'الاقتراحات',
+                    iconPath: AppIcons.info,
+                    title: 'عن التطبيق',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('الاقتراحات')}',
-                      );
+                      context.push('/about');
+                    },
+                  ),
+                  const Divider(height: 32),
+                  _buildDrawerItem(
+                    iconPath: AppIcons.document,
+                    title: 'سياسة الخصوصية',
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/privacy-policy');
                     },
                   ),
                   _buildDrawerItem(
-                    iconPath: AppIcons.delete,
-                    title: 'حذف المتجر',
+                    iconPath: AppIcons.document,
+                    title: 'شروط الاستخدام',
                     onTap: () {
                       Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('حذف المتجر')}',
-                      );
+                      context.push('/terms');
                     },
-                    textColor: Colors.red,
-                    iconColor: Colors.red,
                   ),
-                  const Divider(),
+                  const Divider(height: 32),
                   _buildDrawerItem(
                     iconPath: AppIcons.share,
                     title: 'شارك التطبيق',
@@ -911,37 +910,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       );
                     },
                   ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.document,
-                    title: 'الشروط و الأحكام',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('الشروط و الأحكام')}',
-                      );
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.cardMembership,
-                    title: 'باقة المتجر',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('باقة المتجر')}',
-                      );
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.supportAgent,
-                    title: 'اتصل بنا',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push(
-                        '/dashboard/feature/${Uri.encodeComponent('اتصل بنا')}',
-                      );
-                    },
-                  ),
-                  const Divider(),
+                  const Divider(height: 32),
                   _buildDrawerItem(
                     iconPath: AppIcons.logout,
                     title: 'تسجيل الخروج',

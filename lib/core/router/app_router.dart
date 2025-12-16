@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../shared/screens/login_screen.dart';
 import '../../features/auth/data/auth_controller.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/dashboard/presentation/screens/boost_sales_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_shell.dart';
@@ -41,6 +43,11 @@ import '../../features/merchant/screens/loyalty_program_screen.dart';
 import '../../features/merchant/screens/customer_segments_screen.dart';
 import '../../features/merchant/screens/custom_messages_screen.dart';
 import '../../features/merchant/screens/smart_pricing_screen.dart';
+import '../../features/settings/presentation/screens/account_settings_screen.dart';
+import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
+import '../../features/settings/presentation/screens/terms_screen.dart';
+import '../../features/settings/presentation/screens/support_screen.dart';
+import '../../features/settings/presentation/screens/about_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 /// App Router - Manages navigation throughout the application
@@ -101,6 +108,45 @@ class AppRouter {
           path: '/login',
           name: 'login',
           builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/register',
+          name: 'register',
+          builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/forgot-password',
+          name: 'forgot-password',
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+
+        // ========================================================================
+        // Settings Routes - صفحات الإعدادات (خارج Dashboard)
+        // ========================================================================
+        GoRoute(
+          path: '/settings',
+          name: 'settings',
+          builder: (context, state) => const AccountSettingsScreen(),
+        ),
+        GoRoute(
+          path: '/privacy-policy',
+          name: 'privacy-policy',
+          builder: (context, state) => const PrivacyPolicyScreen(),
+        ),
+        GoRoute(
+          path: '/terms',
+          name: 'terms',
+          builder: (context, state) => const TermsScreen(),
+        ),
+        GoRoute(
+          path: '/support',
+          name: 'support',
+          builder: (context, state) => const SupportScreen(),
+        ),
+        GoRoute(
+          path: '/about',
+          name: 'about',
+          builder: (context, state) => const AboutScreen(),
         ),
 
         // ========================================================================

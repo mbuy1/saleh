@@ -69,6 +69,58 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  /// تسجيل حساب جديد
+  ///
+  /// [email] البريد الإلكتروني
+  /// [password] كلمة المرور
+  /// [fullName] الاسم الكامل
+  /// [role] الدور: merchant أو customer
+  Future<void> register({
+    required String email,
+    required String password,
+    String? fullName,
+    String role = 'merchant',
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      final result = await _authRepository.signUp(
+        email: email,
+        password: password,
+        fullName: fullName,
+        role: role,
+      );
+
+      final user = result['user'] as Map<String, dynamic>;
+      final profile = result['profile'] as Map<String, dynamic>?;
+
+      final userRole = user['role'] as String? ?? profile?['role'] as String? ?? role;
+
+      state = state.copyWith(
+        isLoading: false,
+        isAuthenticated: true,
+        errorMessage: null,
+        userRole: userRole,
+        userId: user['id'] as String?,
+        userEmail: user['email'] as String?,
+      );
+    } on Exception catch (e) {
+      String errorMsg = e.toString().replaceFirst('Exception: ', '');
+
+      state = state.copyWith(
+        isLoading: false,
+        isAuthenticated: false,
+        errorMessage: errorMsg,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isAuthenticated: false,
+        errorMessage: 'حدث خطأ غير متوقع',
+      );
+    }
+  }
+
   /// تسجيل الدخول
   ///
   /// [identifier] الإيميل
