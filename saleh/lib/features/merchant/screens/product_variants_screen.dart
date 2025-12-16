@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 
 class ProductVariantsScreen extends StatefulWidget {
@@ -129,7 +131,11 @@ class _ProductVariantsScreenState extends State<ProductVariantsScreen>
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 24,
+              height: 24,
+            ),
             onPressed: () => context.pop(),
           ),
           title: const Text('المنتجات المتغيرة'),

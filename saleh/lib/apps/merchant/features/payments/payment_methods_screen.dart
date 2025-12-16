@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
   const PaymentMethodsScreen({super.key});
@@ -33,7 +35,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen>
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 24,
+              height: 24,
+            ),
             onPressed: () => context.pop(),
           ),
           title: const Text('طرق الدفع'),

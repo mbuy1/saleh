@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/auth_token_storage.dart';
 import '../../../products/data/categories_repository.dart';
@@ -308,7 +310,11 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
           foregroundColor: Colors.black87,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: SvgPicture.asset(
+              AppIcons.arrowBack,
+              width: 24,
+              height: 24,
+            ),
             onPressed: () => context.pop(),
           ),
           title: const Text(
