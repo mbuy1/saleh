@@ -13,7 +13,8 @@ class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
 
   @override
-  ConsumerState<AccountSettingsScreen> createState() => _AccountSettingsScreenState();
+  ConsumerState<AccountSettingsScreen> createState() =>
+      _AccountSettingsScreenState();
 }
 
 class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
@@ -133,7 +134,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   setState(() => _selectedLanguage = value);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('سيتم تطبيق اللغة عند إعادة تشغيل التطبيق'),
+                      content: const Text(
+                        'سيتم تطبيق اللغة عند إعادة تشغيل التطبيق',
+                      ),
                       backgroundColor: AppTheme.infoColor,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
@@ -192,18 +195,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               children: [
                 Text(
                   'Mbuy v1.0.0',
-                  style: TextStyle(
-                    color: AppTheme.mutedSlate,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: AppTheme.mutedSlate, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '© 2025 Mbuy. جميع الحقوق محفوظة',
-                  style: TextStyle(
-                    color: AppTheme.mutedSlate,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: AppTheme.mutedSlate, fontSize: 11),
                 ),
               ],
             ),
@@ -265,10 +262,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 14,
-          color: AppTheme.mutedSlate,
-        ),
+        style: const TextStyle(fontSize: 14, color: AppTheme.mutedSlate),
       ),
       subtitle: Text(
         subtitle,
@@ -296,7 +290,11 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-          child: AppIcon(icon, size: 20, color: titleColor ?? AppTheme.primaryColor),
+          child: AppIcon(
+            icon,
+            size: 20,
+            color: titleColor ?? AppTheme.primaryColor,
+          ),
         ),
       ),
       title: Text(
@@ -344,10 +342,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: AppTheme.mutedSlate,
-        ),
+        style: TextStyle(fontSize: 12, color: AppTheme.mutedSlate),
       ),
       trailing: Switch(
         value: value,
@@ -441,7 +436,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (newPasswordController.text != confirmPasswordController.text) {
+              if (newPasswordController.text !=
+                  confirmPasswordController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('كلمة المرور غير متطابقة'),
@@ -516,7 +512,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('تم إرسال طلب حذف الحساب. سيتم التواصل معك خلال 24 ساعة.'),
+                  content: Text(
+                    'تم إرسال طلب حذف الحساب. سيتم التواصل معك خلال 24 ساعة.',
+                  ),
                   backgroundColor: AppTheme.infoColor,
                 ),
               );

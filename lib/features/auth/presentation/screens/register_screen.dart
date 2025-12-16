@@ -62,7 +62,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     HapticFeedback.lightImpact();
 
     try {
-      await ref.read(authControllerProvider.notifier).register(
+      await ref
+          .read(authControllerProvider.notifier)
+          .register(
             fullName: _nameController.text.trim(),
             email: _emailController.text.trim(),
             password: _passwordController.text,
@@ -150,7 +152,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ],
                     ),
                     child: Center(
-                      child: AppIcon(AppIcons.store, size: 40, color: Colors.white),
+                      child: AppIcon(
+                        AppIcons.store,
+                        size: 40,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -172,10 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 Text(
                   'انضم إلى Mbuy وابدأ رحلتك التجارية',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.mutedSlate,
-                  ),
+                  style: TextStyle(fontSize: 14, color: AppTheme.mutedSlate),
                   textAlign: TextAlign.center,
                 ),
 
@@ -191,7 +194,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: 'أدخل اسمك',
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: AppIcon(AppIcons.person, size: 22, color: AppTheme.mutedSlate),
+                      child: AppIcon(
+                        AppIcons.person,
+                        size: 22,
+                        color: AppTheme.mutedSlate,
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
@@ -202,7 +209,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
-                      borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                        width: 2,
+                      ),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -230,7 +240,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: 'example@email.com',
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: AppIcon(AppIcons.email, size: 22, color: AppTheme.mutedSlate),
+                      child: AppIcon(
+                        AppIcons.email,
+                        size: 22,
+                        color: AppTheme.mutedSlate,
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
@@ -241,7 +255,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
-                      borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                        width: 2,
+                      ),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -270,12 +287,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: '••••••••',
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: AppIcon(AppIcons.lock, size: 22, color: AppTheme.mutedSlate),
+                      child: AppIcon(
+                        AppIcons.lock,
+                        size: 22,
+                        color: AppTheme.mutedSlate,
+                      ),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                       icon: AppIcon(
-                        _obscurePassword ? AppIcons.visibility : AppIcons.visibilityOff,
+                        _obscurePassword
+                            ? AppIcons.visibility
+                            : AppIcons.visibilityOff,
                         size: 22,
                         color: AppTheme.mutedSlate,
                       ),
@@ -289,7 +313,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
-                      borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                        width: 2,
+                      ),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -318,13 +345,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     hintText: '••••••••',
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: AppIcon(AppIcons.lock, size: 22, color: AppTheme.mutedSlate),
+                      child: AppIcon(
+                        AppIcons.lock,
+                        size: 22,
+                        color: AppTheme.mutedSlate,
+                      ),
                     ),
                     suffixIcon: IconButton(
-                      onPressed: () =>
-                          setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      onPressed: () => setState(
+                        () =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword,
+                      ),
                       icon: AppIcon(
-                        _obscureConfirmPassword ? AppIcons.visibility : AppIcons.visibilityOff,
+                        _obscureConfirmPassword
+                            ? AppIcons.visibility
+                            : AppIcons.visibilityOff,
                         size: 22,
                         color: AppTheme.mutedSlate,
                       ),
@@ -338,7 +373,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: AppDimensions.borderRadiusM,
-                      borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                        width: 2,
+                      ),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -361,7 +399,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Checkbox(
                       value: _acceptTerms,
-                      onChanged: (value) => setState(() => _acceptTerms = value ?? false),
+                      onChanged: (value) =>
+                          setState(() => _acceptTerms = value ?? false),
                       activeColor: AppTheme.primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
@@ -369,7 +408,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _acceptTerms = !_acceptTerms),
+                        onTap: () =>
+                            setState(() => _acceptTerms = !_acceptTerms),
                         child: RichText(
                           text: TextSpan(
                             style: TextStyle(

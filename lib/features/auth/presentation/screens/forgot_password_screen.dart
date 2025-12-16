@@ -14,7 +14,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -91,7 +92,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             alignment: Alignment.centerRight,
             child: IconButton(
               onPressed: () => context.pop(),
-              icon: AppIcon(AppIcons.arrowForward, color: AppTheme.primaryColor),
+              icon: AppIcon(
+                AppIcons.arrowForward,
+                color: AppTheme.primaryColor,
+              ),
             ),
           ),
 
@@ -107,7 +111,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Center(
-                child: AppIcon(AppIcons.lock, size: 48, color: AppTheme.primaryColor),
+                child: AppIcon(
+                  AppIcons.lock,
+                  size: 48,
+                  color: AppTheme.primaryColor,
+                ),
               ),
             ),
           ),
@@ -150,7 +158,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               hintText: 'example@email.com',
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(12),
-                child: AppIcon(AppIcons.email, size: 22, color: AppTheme.mutedSlate),
+                child: AppIcon(
+                  AppIcons.email,
+                  size: 22,
+                  color: AppTheme.mutedSlate,
+                ),
               ),
               border: OutlineInputBorder(
                 borderRadius: AppDimensions.borderRadiusM,
@@ -161,7 +173,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: AppDimensions.borderRadiusM,
-                borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                borderSide: const BorderSide(
+                  color: AppTheme.primaryColor,
+                  width: 2,
+                ),
               ),
               filled: true,
               fillColor: Colors.white,
@@ -254,7 +269,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               borderRadius: BorderRadius.circular(30),
             ),
             child: Center(
-              child: AppIcon(AppIcons.checkCircle, size: 64, color: AppTheme.successColor),
+              child: AppIcon(
+                AppIcons.checkCircle,
+                size: 64,
+                color: AppTheme.successColor,
+              ),
             ),
           ),
         ),
@@ -292,7 +311,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           decoration: BoxDecoration(
             color: AppTheme.infoColor.withValues(alpha: 0.1),
             borderRadius: AppDimensions.borderRadiusM,
-            border: Border.all(color: AppTheme.infoColor.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: AppTheme.infoColor.withValues(alpha: 0.3),
+            ),
           ),
           child: Column(
             children: [
@@ -341,10 +362,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
             child: const Text(
               'العودة لتسجيل الدخول',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
         ),

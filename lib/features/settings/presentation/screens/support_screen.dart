@@ -230,9 +230,7 @@ class SupportScreen extends StatelessWidget {
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: AppIcon(icon, size: 24, color: color),
-                  ),
+                  child: Center(child: AppIcon(icon, size: 24, color: color)),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -334,10 +332,7 @@ class SupportScreen extends StatelessWidget {
         leading: AppIcon(icon, size: 22, color: AppTheme.primaryColor),
         title: Text(
           title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         trailing: AppIcon(AppIcons.chevronLeft, size: 16, color: Colors.grey),
         onTap: () {
@@ -349,7 +344,9 @@ class SupportScreen extends StatelessWidget {
   }
 
   Future<void> _launchWhatsApp(BuildContext context) async {
-    final url = Uri.parse('https://wa.me/966500000000?text=مرحباً، أحتاج مساعدة');
+    final url = Uri.parse(
+      'https://wa.me/966500000000?text=مرحباً، أحتاج مساعدة',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {

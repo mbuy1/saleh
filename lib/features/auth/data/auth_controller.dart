@@ -94,7 +94,8 @@ class AuthController extends StateNotifier<AuthState> {
       final user = result['user'] as Map<String, dynamic>;
       final profile = result['profile'] as Map<String, dynamic>?;
 
-      final userRole = user['role'] as String? ?? profile?['role'] as String? ?? role;
+      final userRole =
+          user['role'] as String? ?? profile?['role'] as String? ?? role;
 
       state = state.copyWith(
         isLoading: false,

@@ -44,7 +44,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AppIcon(AppIcons.calendar, size: 16, color: AppTheme.infoColor),
+                  AppIcon(
+                    AppIcons.calendar,
+                    size: 16,
+                    color: AppTheme.infoColor,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'آخر تحديث: ديسمبر 2025',

@@ -98,7 +98,8 @@ class AuthRepository {
           final user = data['user'] as Map<String, dynamic>;
           final profile = data['profile'] as Map<String, dynamic>?;
 
-          final userRole = user['role'] as String? ?? profile?['role'] as String? ?? role;
+          final userRole =
+              user['role'] as String? ?? profile?['role'] as String? ?? role;
 
           // حفظ التوكن ومعلومات المستخدم
           await _tokenStorage.saveToken(

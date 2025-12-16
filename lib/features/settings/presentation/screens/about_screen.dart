@@ -74,10 +74,7 @@ class AboutScreen extends StatelessWidget {
             // الوصف القصير
             Text(
               'منصة التجارة الإلكترونية الذكية',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppTheme.mutedSlate,
-              ),
+              style: TextStyle(fontSize: 16, color: AppTheme.mutedSlate),
             ),
 
             const SizedBox(height: 8),
@@ -198,20 +195,14 @@ class AboutScreen extends StatelessWidget {
             // حقوق النشر
             Text(
               '© 2025 Mbuy. جميع الحقوق محفوظة.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.mutedSlate,
-              ),
+              style: TextStyle(fontSize: 12, color: AppTheme.mutedSlate),
             ),
 
             const SizedBox(height: 8),
 
             Text(
               'صنع بـ ❤️ في المملكة العربية السعودية',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.mutedSlate,
-              ),
+              style: TextStyle(fontSize: 12, color: AppTheme.mutedSlate),
             ),
 
             const SizedBox(height: 40),
@@ -277,9 +268,7 @@ class AboutScreen extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: AppIcon(icon, size: 24, color: color),
-            ),
+            child: Center(child: AppIcon(icon, size: 24, color: color)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -297,10 +286,7 @@ class AboutScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.mutedSlate,
-                  ),
+                  style: TextStyle(fontSize: 13, color: AppTheme.mutedSlate),
                 ),
               ],
             ),
@@ -340,10 +326,7 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.mutedSlate,
-              ),
+              style: TextStyle(fontSize: 11, color: AppTheme.mutedSlate),
             ),
           ],
         ),
