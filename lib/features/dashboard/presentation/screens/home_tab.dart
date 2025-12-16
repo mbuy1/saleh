@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
+import '../../../../shared/widgets/app_search_delegate.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
 import '../../../auth/data/auth_controller.dart';
@@ -48,6 +52,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
+  void _openSearch(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showSearch(
+      context: context,
+      delegate: AppSearchDelegate(),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -84,10 +96,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ? const SkeletonHomeDashboard()
               : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
+                  padding: AppDimensions.paddingS,
                   child: Column(
                     children: [
                       // 1. بار رابط متجري
@@ -96,16 +105,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         storeName: store?.name ?? 'متجري',
                         isLoading: storeState.isLoading,
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppDimensions.spacing12),
                       // 2. الإحصائيات الأربعة
                       _buildStatsGrid(context, store: store),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppDimensions.spacing12),
                       // 3. شبكة الأيقونات (4 أيقونات)
                       _buildIconsGrid(context),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppDimensions.spacing12),
                       // 4. زر تجربة العميل (تمت إزالته)
                       // _buildCustomerModeButton(context),
-                      const SizedBox(height: 8),
+                      SizedBox(height: AppDimensions.spacing8),
                     ],
                   ),
                 ),
@@ -124,10 +133,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final storeUrl = 'tabayu.com/$storeSlug';
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         gradient: AppTheme.cardGradient,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppDimensions.borderRadiusXL,
         border: Border.all(
           color: AppTheme.borderColor, // Metallic edge
           width: 1,
@@ -152,16 +161,20 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   height: 56,
                   decoration: BoxDecoration(
                     color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: AppDimensions.borderRadiusM,
                   ),
-                  child: const Icon(
-                    Icons.store,
-                    color: AppTheme.darkSlate, // Dark Slate for icons
-                    size: 32,
+                  child: SvgPicture.asset(
+                    AppIcons.store,
+                    width: AppDimensions.iconXL,
+                    height: AppDimensions.iconXL,
+                    colorFilter: ColorFilter.mode(
+                      AppTheme.darkSlate,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,10 +204,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.visibility_outlined,
-                            size: 16,
-                            color: AppTheme.mutedSlate,
+                          SvgPicture.asset(
+                            AppIcons.eye,
+                            width: AppDimensions.iconXS,
+                            height: AppDimensions.iconXS,
+                            colorFilter: ColorFilter.mode(
+                              AppTheme.mutedSlate,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -212,35 +229,59 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ],
                 ),
               ),
+              // زر البحث
+              Semantics(
+                label: 'البحث في التطبيق',
+                button: true,
+                child: IconButton(
+                  icon: SvgPicture.asset(
+                    AppIcons.search,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      AppTheme.darkSlate,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: () => _openSearch(context),
+                ),
+              ),
               // زر الإشعارات
               Semantics(
                 label: 'الإشعارات',
                 button: true,
                 child: IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
+                  icon: SvgPicture.asset(
+                    AppIcons.notifications,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      AppTheme.darkSlate,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   onPressed: () {
                     context.push('/dashboard/notifications');
                   },
-                  color: AppTheme.darkSlate, // Dark Slate for icons
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           // أزرار إدارة المتجر
           Row(
             children: [
               Expanded(
                 child: _buildLinkActionButton(
-                  icon: Icons.settings_outlined,
+                  iconPath: AppIcons.settings,
                   label: 'إدارة المتجر',
                   onTap: () => context.push('/dashboard/store-management'),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildLinkActionButton(
-                  icon: Icons.storefront_outlined,
+                  iconPath: AppIcons.storefront,
                   label: 'تخصيص المتجر',
                   onTap: () => context.push('/dashboard/store-on-jock'),
                 ),
@@ -248,14 +289,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               // تم نقل زر عرض متجري للأعلى
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           // رابط المتجر مع زر نسخ - Recessed Metal Look
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               gradient: AppTheme.recessedMetalGradient,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimensions.borderRadiusS,
               border: Border.all(
                 color: AppTheme.slate300.withValues(alpha: 0.5),
                 width: 1,
@@ -270,10 +311,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.link,
-                  size: 16,
-                  color: AppTheme.darkSlate, // Dark Slate for icons
+                SvgPicture.asset(
+                  AppIcons.link,
+                  width: AppDimensions.iconXS,
+                  height: AppDimensions.iconXS,
+                  colorFilter: ColorFilter.mode(
+                    AppTheme.darkSlate,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -288,7 +333,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: AppDimensions.spacing8),
                 // زر النسخ
                 Semantics(
                   label: 'نسخ رابط المتجر',
@@ -314,10 +359,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         color: AppTheme.primaryColor,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
+                      child: Text(
                         'نسخ',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontLabel,
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
@@ -325,7 +370,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: AppDimensions.spacing8),
                 // زر المشاركة
                 Semantics(
                   label: 'مشاركة رابط المتجر',
@@ -349,10 +394,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         color: AppTheme.primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(
-                        Icons.share_outlined,
-                        size: 16,
-                        color: AppTheme.primaryColor,
+                      child: SvgPicture.asset(
+                        AppIcons.share,
+                        width: AppDimensions.iconXS,
+                        height: AppDimensions.iconXS,
+                        colorFilter: ColorFilter.mode(
+                          AppTheme.primaryColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
@@ -366,7 +415,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   Widget _buildLinkActionButton({
-    required IconData icon,
+    required String iconPath,
     required String label,
     required VoidCallback onTap,
   }) {
@@ -375,30 +424,33 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       label: label,
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimensions.borderRadiusM,
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               gradient: AppTheme.cardGradient,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppDimensions.borderRadiusM,
               border: Border.all(color: AppTheme.borderColor, width: 1),
             ),
             child: Column(
               children: [
-                Icon(
-                  icon,
-                  size: 20,
-                  color: AppTheme
-                      .darkSlate, // Dark Slate (#0F172A) for icons from image
+                SvgPicture.asset(
+                  iconPath,
+                  width: AppDimensions.iconS,
+                  height: AppDimensions.iconS,
+                  colorFilter: ColorFilter.mode(
+                    AppTheme.darkSlate,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppDimensions.fontLabel,
                     color: AppTheme
                         .mutedSlate, // Muted Slate (#64748B) for labels from image
                     fontWeight: FontWeight.w500,
@@ -421,7 +473,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           children: [
             Expanded(
               child: _buildStatCard(
-                icon: Icons.account_balance_wallet_outlined,
+                iconPath: AppIcons.wallet,
                 title: 'الرصيد',
                 value: '0.00',
                 suffix: 'ر.س',
@@ -429,10 +481,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 onTap: () => context.push('/dashboard/wallet'),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppDimensions.spacing12),
             Expanded(
               child: _buildStatCard(
-                icon: Icons.stars_outlined,
+                iconPath: AppIcons.points,
                 title: 'النقاط',
                 value: '0',
                 suffix: 'نقطة',
@@ -442,13 +494,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: AppDimensions.spacing12),
         // الصف الثاني: العملاء + المبيعات
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
-                icon: Icons.people_outline,
+                iconPath: AppIcons.users,
                 title: 'العملاء',
                 value: '${store?.followersCount ?? 0}',
                 suffix: 'متابع',
@@ -456,10 +508,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 onTap: () => context.push('/dashboard/customers'),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppDimensions.spacing12),
             Expanded(
               child: _buildStatCard(
-                icon: Icons.star_outline,
+                iconPath: AppIcons.star,
                 title: 'المبيعات',
                 value: '0',
                 suffix: ' ',
@@ -474,7 +526,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   Widget _buildStatCard({
-    required IconData icon,
+    required String iconPath,
     required String title,
     required String value,
     required String suffix,
@@ -483,15 +535,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }) {
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppDimensions.borderRadiusL,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             gradient: AppTheme.cardGradient,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppDimensions.borderRadiusL,
             border: Border.all(
               color: AppTheme.borderColor, // Metallic edge
               width: 1,
@@ -515,7 +567,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     child: Text(
                       value,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: AppDimensions.fontDisplay3,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.darkSlate, // Dark Slate for headings
                       ),
@@ -526,7 +578,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   Text(
                     suffix,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       color: AppTheme.mutedSlate, // Muted Slate for body
                     ),
                   ),
@@ -561,25 +613,25 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.bolt_outlined,
+                  iconPath: AppIcons.flash,
                   label: 'اختصاراتي',
                   screen: 'Shortcuts',
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.description_outlined,
+                  iconPath: AppIcons.document,
                   label: 'السجلات والتقارير',
                   screen: 'Reports',
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.campaign_outlined,
+                  iconPath: AppIcons.megaphone,
                   label: 'التسويق',
                   screen: 'Marketing',
                 ),
@@ -587,7 +639,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: AppDimensions.spacing12),
         // الصف الثاني: أدوات AI، توليد AI، حزم التوفير
         SizedBox(
           height: 110,
@@ -596,25 +648,25 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.build_outlined,
+                  iconPath: AppIcons.tools,
                   label: 'أدوات AI',
                   screen: 'MbuyTools',
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.auto_awesome_outlined,
+                  iconPath: AppIcons.sparkle,
                   label: 'توليد AI',
                   screen: 'MbuyStudio',
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  icon: Icons.card_giftcard_outlined,
+                  iconPath: AppIcons.gift,
                   label: 'حزم التوفير',
                   screen: 'MbuyPackage',
                 ),
@@ -628,7 +680,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   Widget _buildBottomCard({
     required BuildContext context,
-    required IconData icon,
+    required String iconPath,
     required String label,
     required String screen,
   }) {
@@ -678,11 +730,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       ),
                     ),
                     child: Center(
-                      child: Icon(
-                        icon,
-                        size: 36,
-                        color: AppTheme
-                            .darkSlate, // Dark Slate for feature icons from image
+                      child: SvgPicture.asset(
+                        iconPath,
+                        width: 36,
+                        height: 36,
+                        colorFilter: ColorFilter.mode(
+                          AppTheme.darkSlate,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
@@ -692,7 +747,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontLabel,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.darkSlate, // Dark Slate for headings
                     ),
@@ -770,10 +825,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       color: AppTheme.primaryColor,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 40,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        AppIcons.person,
+                        width: 40,
+                        height: 40,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -790,7 +851,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 padding: EdgeInsets.zero,
                 children: [
                   _buildDrawerItem(
-                    icon: Icons.lock_outline,
+                    iconPath: AppIcons.lock,
                     title: 'تغيير كلمة السر',
                     onTap: () {
                       Navigator.pop(context);
@@ -800,7 +861,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.edit_outlined,
+                    iconPath: AppIcons.edit,
                     title: 'تعديل معلومات الحساب',
                     onTap: () {
                       Navigator.pop(context);
@@ -810,7 +871,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.lightbulb_outline,
+                    iconPath: AppIcons.bulb,
                     title: 'الاقتراحات',
                     onTap: () {
                       Navigator.pop(context);
@@ -820,7 +881,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.delete_outline,
+                    iconPath: AppIcons.delete,
                     title: 'حذف المتجر',
                     onTap: () {
                       Navigator.pop(context);
@@ -833,7 +894,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ),
                   const Divider(),
                   _buildDrawerItem(
-                    icon: Icons.share_outlined,
+                    iconPath: AppIcons.share,
                     title: 'شارك التطبيق',
                     onTap: () {
                       Navigator.pop(context);
@@ -846,7 +907,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.description_outlined,
+                    iconPath: AppIcons.document,
                     title: 'الشروط و الأحكام',
                     onTap: () {
                       Navigator.pop(context);
@@ -856,7 +917,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.card_membership_outlined,
+                    iconPath: AppIcons.cardMembership,
                     title: 'باقة المتجر',
                     onTap: () {
                       Navigator.pop(context);
@@ -866,7 +927,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.support_agent_outlined,
+                    iconPath: AppIcons.supportAgent,
                     title: 'اتصل بنا',
                     onTap: () {
                       Navigator.pop(context);
@@ -877,7 +938,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ),
                   const Divider(),
                   _buildDrawerItem(
-                    icon: Icons.logout,
+                    iconPath: AppIcons.logout,
                     title: 'تسجيل الخروج',
                     onTap: () {
                       Navigator.pop(context);
@@ -896,16 +957,21 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   Widget _buildDrawerItem({
-    required IconData icon,
+    required String iconPath,
     required String title,
     required VoidCallback onTap,
     Color? textColor,
     Color? iconColor,
   }) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: iconColor ?? AppTheme.darkSlate, // Dark Slate for icons
+      leading: SvgPicture.asset(
+        iconPath,
+        width: 24,
+        height: 24,
+        colorFilter: ColorFilter.mode(
+          iconColor ?? AppTheme.darkSlate,
+          BlendMode.srcIn,
+        ),
       ),
       title: Text(
         title,
@@ -915,10 +981,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         ),
       ),
       onTap: onTap,
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-        color: AppTheme.mutedSlate, // Muted Slate for inactive elements
+      trailing: SvgPicture.asset(
+        AppIcons.chevronRight,
+        width: 16,
+        height: 16,
+        colorFilter: ColorFilter.mode(AppTheme.mutedSlate, BlendMode.srcIn),
       ),
     );
   }
