@@ -96,8 +96,7 @@ class MbuyBottomSheet extends StatelessWidget {
             ),
           ),
 
-        if (title != null || showCloseButton)
-          const Divider(height: 1),
+        if (title != null || showCloseButton) const Divider(height: 1),
 
         // Content
         if (isExpanded)
@@ -118,15 +117,18 @@ class MbuyBottomSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(AppDimensions.spacing16),
             child: Row(
-              children: actions!
-                  .map((action) => Expanded(child: action))
-                  .toList()
-                  .expand((widget) => [
-                        widget,
-                        const SizedBox(width: AppDimensions.spacing12),
-                      ])
-                  .toList()
-                ..removeLast(),
+              children:
+                  actions!
+                      .map((action) => Expanded(child: action))
+                      .toList()
+                      .expand(
+                        (widget) => [
+                          widget,
+                          const SizedBox(width: AppDimensions.spacing12),
+                        ],
+                      )
+                      .toList()
+                    ..removeLast(),
             ),
           ),
 
@@ -295,18 +297,18 @@ class MbuyActionSheet extends StatelessWidget {
                   : (action.color ?? AppTheme.textPrimaryColor),
             )
           : action.svgIcon != null
-              ? SvgPicture.asset(
-                  action.svgIcon!,
-                  width: AppDimensions.iconM,
-                  height: AppDimensions.iconM,
-                  colorFilter: ColorFilter.mode(
-                    action.isDestructive
-                        ? AppTheme.errorColor
-                        : (action.color ?? AppTheme.textPrimaryColor),
-                    BlendMode.srcIn,
-                  ),
-                )
-              : null,
+          ? SvgPicture.asset(
+              action.svgIcon!,
+              width: AppDimensions.iconM,
+              height: AppDimensions.iconM,
+              colorFilter: ColorFilter.mode(
+                action.isDestructive
+                    ? AppTheme.errorColor
+                    : (action.color ?? AppTheme.textPrimaryColor),
+                BlendMode.srcIn,
+              ),
+            )
+          : null,
       title: Text(
         action.label,
         style: TextStyle(

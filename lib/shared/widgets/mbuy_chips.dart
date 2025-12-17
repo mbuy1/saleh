@@ -64,10 +64,10 @@ class MbuyChip extends StatelessWidget {
     this.onTap,
     this.disabled = false,
     this.color,
-  })  : type = MbuyChipType.filter,
-        deleteIcon = null,
-        onDeleted = null,
-        textColor = null;
+  }) : type = MbuyChipType.filter,
+       deleteIcon = null,
+       onDeleted = null,
+       textColor = null;
 
   /// شريحة إدخال (قابلة للحذف)
   const MbuyChip.input({
@@ -77,11 +77,11 @@ class MbuyChip extends StatelessWidget {
     this.onDeleted,
     this.disabled = false,
     this.color,
-  })  : type = MbuyChipType.input,
-        selected = false,
-        onTap = null,
-        deleteIcon = Icons.close,
-        textColor = null;
+  }) : type = MbuyChipType.input,
+       selected = false,
+       onTap = null,
+       deleteIcon = Icons.close,
+       textColor = null;
 
   /// شريحة حالة
   factory MbuyChip.status({
@@ -109,17 +109,23 @@ class MbuyChip extends StatelessWidget {
           avatar: icon != null ? Icon(icon, size: 18) : null,
           selected: selected,
           onSelected: disabled ? null : (_) => onTap?.call(),
-          selectedColor: (color ?? AppTheme.primaryColor).withValues(alpha: 0.2),
+          selectedColor: (color ?? AppTheme.primaryColor).withValues(
+            alpha: 0.2,
+          ),
           checkmarkColor: color ?? AppTheme.primaryColor,
           labelStyle: TextStyle(
-            color: selected ? (color ?? AppTheme.primaryColor) : AppTheme.textPrimaryColor,
+            color: selected
+                ? (color ?? AppTheme.primaryColor)
+                : AppTheme.textPrimaryColor,
             fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
           backgroundColor: AppTheme.surfaceColor,
           shape: RoundedRectangleBorder(
             borderRadius: AppDimensions.borderRadiusXL,
             side: BorderSide(
-              color: selected ? (color ?? AppTheme.primaryColor) : AppTheme.borderColor,
+              color: selected
+                  ? (color ?? AppTheme.primaryColor)
+                  : AppTheme.borderColor,
             ),
           ),
         );
@@ -130,16 +136,14 @@ class MbuyChip extends StatelessWidget {
           avatar: icon != null
               ? Icon(icon, size: 18, color: AppTheme.textSecondaryColor)
               : null,
-          deleteIcon: deleteIcon != null
-              ? Icon(deleteIcon, size: 18)
-              : null,
+          deleteIcon: deleteIcon != null ? Icon(deleteIcon, size: 18) : null,
           onDeleted: disabled ? null : onDeleted,
           onPressed: onTap,
-          backgroundColor: (color ?? AppTheme.primaryColor).withValues(alpha: 0.1),
-          deleteIconColor: AppTheme.textSecondaryColor,
-          labelStyle: TextStyle(
-            color: color ?? AppTheme.textPrimaryColor,
+          backgroundColor: (color ?? AppTheme.primaryColor).withValues(
+            alpha: 0.1,
           ),
+          deleteIconColor: AppTheme.textSecondaryColor,
+          labelStyle: TextStyle(color: color ?? AppTheme.textPrimaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: AppDimensions.borderRadiusXL,
           ),
@@ -153,9 +157,7 @@ class MbuyChip extends StatelessWidget {
               : null,
           onPressed: disabled ? null : onTap,
           backgroundColor: Colors.transparent,
-          labelStyle: TextStyle(
-            color: color ?? AppTheme.primaryColor,
-          ),
+          labelStyle: TextStyle(color: color ?? AppTheme.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: AppDimensions.borderRadiusXL,
             side: BorderSide(color: color ?? AppTheme.primaryColor),
@@ -236,21 +238,19 @@ class MbuyChipGroup<T> extends StatelessWidget {
     }).toList();
 
     if (wrap) {
-      return Wrap(
-        spacing: spacing,
-        runSpacing: spacing,
-        children: chips,
-      );
+      return Wrap(spacing: spacing, runSpacing: spacing, children: chips);
     }
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: chips
-            .map((chip) => Padding(
-                  padding: EdgeInsets.only(right: spacing),
-                  child: chip,
-                ))
+            .map(
+              (chip) => Padding(
+                padding: EdgeInsets.only(right: spacing),
+                child: chip,
+              ),
+            )
             .toList(),
       ),
     );

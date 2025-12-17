@@ -73,11 +73,11 @@ class MbuyAvatar extends StatelessWidget {
     this.borderColor,
     this.onTap,
     this.badge,
-  })  : name = null,
-        icon = null,
-        svgPath = null,
-        backgroundColor = null,
-        foregroundColor = null;
+  }) : name = null,
+       icon = null,
+       svgPath = null,
+       backgroundColor = null,
+       foregroundColor = null;
 
   /// أفاتار من الاسم (حروف أولى)
   const MbuyAvatar.initials({
@@ -91,9 +91,9 @@ class MbuyAvatar extends StatelessWidget {
     this.borderColor,
     this.onTap,
     this.badge,
-  })  : imageUrl = null,
-        icon = null,
-        svgPath = null;
+  }) : imageUrl = null,
+       icon = null,
+       svgPath = null;
 
   /// أفاتار من أيقونة
   const MbuyAvatar.icon({
@@ -105,11 +105,11 @@ class MbuyAvatar extends StatelessWidget {
     this.isCircular = true,
     this.onTap,
     this.badge,
-  })  : imageUrl = null,
-        name = null,
-        svgPath = null,
-        borderWidth = null,
-        borderColor = null;
+  }) : imageUrl = null,
+       name = null,
+       svgPath = null,
+       borderWidth = null,
+       borderColor = null;
 
   /// أفاتار متجر
   factory MbuyAvatar.store({
@@ -182,20 +182,13 @@ class MbuyAvatar extends StatelessWidget {
       avatar = Stack(
         children: [
           avatar,
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: badge!,
-          ),
+          Positioned(bottom: 0, right: 0, child: badge!),
         ],
       );
     }
 
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: avatar,
-      );
+      return GestureDetector(onTap: onTap, child: avatar);
     }
 
     return avatar;
@@ -319,11 +312,7 @@ class MbuyOnlineBadge extends StatelessWidget {
   final bool isOnline;
   final double size;
 
-  const MbuyOnlineBadge({
-    super.key,
-    this.isOnline = true,
-    this.size = 12,
-  });
+  const MbuyOnlineBadge({super.key, this.isOnline = true, this.size = 12});
 
   @override
   Widget build(BuildContext context) {

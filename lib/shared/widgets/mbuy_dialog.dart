@@ -166,7 +166,8 @@ class MbuyDialog extends StatelessWidget {
     return MbuyDialog(
       key: key,
       title: title,
-      content: content ?? 'هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.',
+      content:
+          content ?? 'هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.',
       confirmText: confirmText,
       cancelText: cancelText,
       onConfirm: onConfirm,
@@ -180,9 +181,7 @@ class MbuyDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: AppDimensions.borderRadiusL,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: AppDimensions.borderRadiusL),
       contentPadding: const EdgeInsets.all(AppDimensions.spacing24),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -193,7 +192,9 @@ class MbuyDialog extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: (iconColor ?? AppTheme.primaryColor).withValues(alpha: 0.1),
+                color: (iconColor ?? AppTheme.primaryColor).withValues(
+                  alpha: 0.1,
+                ),
                 shape: BoxShape.circle,
               ),
               child: svgIcon != null
@@ -270,7 +271,9 @@ class MbuyDialog extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppTheme.textSecondaryColor,
                 side: BorderSide(color: AppTheme.borderColor),
-                padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacing12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppDimensions.borderRadiusM,
                 ),
@@ -290,7 +293,9 @@ class MbuyDialog extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: confirmColor ?? AppTheme.primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacing12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppDimensions.borderRadiusM,
                 ),

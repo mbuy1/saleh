@@ -29,6 +29,13 @@ import '../../../features/finance/presentation/screens/sales_screen.dart';
 // Marketing
 import '../../../features/marketing/presentation/screens/coupons_screen.dart';
 import '../../../features/marketing/presentation/screens/flash_sales_screen.dart';
+// Dropshipping
+import '../../../features/dropshipping/presentation/screens/dropshipping_screen.dart';
+// Reports & Packages
+import '../../../features/dashboard/presentation/screens/reports_screen.dart';
+import '../../../features/dashboard/presentation/screens/mbuy_packages_screen.dart';
+// Store Tools
+import '../../../features/store/presentation/screens/store_tools_tab.dart';
 // Merchant
 import '../../../features/merchant/screens/abandoned_cart_screen.dart';
 import '../../../features/merchant/screens/referral_screen.dart';
@@ -296,6 +303,31 @@ class MerchantRouter {
                   path: 'qrcode-generator',
                   name: 'qrcode-generator',
                   builder: (context, state) => const QrCodeScreen(),
+                ),
+                // ====== المسارات المفقودة ======
+                // دروب شوبينق
+                GoRoute(
+                  path: 'dropshipping',
+                  name: 'dropshipping',
+                  builder: (context, state) => const DropshippingScreen(),
+                ),
+                // التقارير والسجلات
+                GoRoute(
+                  path: 'reports',
+                  name: 'reports',
+                  builder: (context, state) => const ReportsScreen(),
+                ),
+                // حزم التوفير
+                GoRoute(
+                  path: 'packages',
+                  name: 'packages',
+                  builder: (context, state) => const MbuyPackagesScreen(),
+                ),
+                // أدوات المتجر (تسويق + AI)
+                GoRoute(
+                  path: 'store-tools',
+                  name: 'store-tools',
+                  builder: (context, state) => const StoreToolsTab(),
                 ),
                 // ====== نهاية الميزات الجديدة ======
                 GoRoute(

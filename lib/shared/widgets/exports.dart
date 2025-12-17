@@ -1,12 +1,12 @@
 /// ============================================================================
 /// Shared Exports - المكونات المشتركة الموحدة
 /// ============================================================================
-/// 
+///
 /// استيراد هذا الملف للحصول على جميع المكونات المشتركة:
 /// ```dart
 /// import 'package:saleh/shared/widgets/exports.dart';
 /// ```
-/// 
+///
 /// المكونات المتاحة:
 /// - Theme & Dimensions: ألوان وأبعاد التطبيق
 /// - Buttons: MbuyButton (primary, secondary, outline, text, gradient)
@@ -17,7 +17,7 @@
 /// - Avatar: MbuyAvatar
 /// - States: MbuyEmptyState, MbuyLoadingIndicator, SkeletonLoading
 /// - Layout: SubPageScaffold, MbuyScaffold
-/// 
+///
 library;
 
 // ============================================================================

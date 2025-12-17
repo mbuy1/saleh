@@ -121,20 +121,17 @@ class MbuyDropdown<T> extends StatelessWidget {
   /// إنشاء عناصر من قائمة strings
   static List<DropdownMenuItem<String>> fromStrings(List<String> items) {
     return items
-        .map((item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(item),
-            ))
+        .map((item) => DropdownMenuItem<String>(value: item, child: Text(item)))
         .toList();
   }
 
   /// إنشاء عناصر من Map
   static List<DropdownMenuItem<T>> fromMap<T>(Map<T, String> items) {
     return items.entries
-        .map((entry) => DropdownMenuItem<T>(
-              value: entry.key,
-              child: Text(entry.value),
-            ))
+        .map(
+          (entry) =>
+              DropdownMenuItem<T>(value: entry.key, child: Text(entry.value)),
+        )
         .toList();
   }
 }
@@ -195,9 +192,7 @@ class MbuySelectField<T> extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.surfaceColor,
           borderRadius: AppDimensions.borderRadiusM,
-          border: Border.all(
-            color: Colors.grey.withValues(alpha: 0.2),
-          ),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [
@@ -345,7 +340,9 @@ class MbuyBottomSheetSelect<T> extends StatelessWidget {
                   title: Text(
                     option.label,
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                       color: isSelected
                           ? AppTheme.primaryColor
                           : AppTheme.textPrimaryColor,

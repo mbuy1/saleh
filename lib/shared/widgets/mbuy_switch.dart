@@ -39,7 +39,9 @@ class MbuySwitch extends StatelessWidget {
       onChanged: disabled ? null : onChanged,
       // ignore: deprecated_member_use
       activeColor: activeColor ?? AppTheme.primaryColor,
-      activeTrackColor: (activeColor ?? AppTheme.primaryColor).withValues(alpha: 0.5),
+      activeTrackColor: (activeColor ?? AppTheme.primaryColor).withValues(
+        alpha: 0.5,
+      ),
       inactiveThumbColor: inactiveColor ?? Colors.grey.shade400,
       inactiveTrackColor: Colors.grey.shade300,
     );
@@ -122,7 +124,9 @@ class MbuySwitchTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: AppDimensions.fontBody,
                     fontWeight: FontWeight.w500,
-                    color: disabled ? AppTheme.textHintColor : AppTheme.textPrimaryColor,
+                    color: disabled
+                        ? AppTheme.textHintColor
+                        : AppTheme.textPrimaryColor,
                   ),
                 ),
                 if (subtitle != null) ...[
@@ -185,11 +189,15 @@ class MbuyCheckbox extends StatelessWidget {
       value: value,
       onChanged: disabled ? null : onChanged,
       activeColor: activeColor ?? AppTheme.primaryColor,
-      shape: isCircular ? const CircleBorder() : RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
-      ),
+      shape: isCircular
+          ? const CircleBorder()
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
+            ),
       side: BorderSide(
-        color: value ? (activeColor ?? AppTheme.primaryColor) : Colors.grey.shade400,
+        color: value
+            ? (activeColor ?? AppTheme.primaryColor)
+            : Colors.grey.shade400,
         width: 1.5,
       ),
     );
@@ -240,7 +248,9 @@ class MbuyCheckboxTile extends StatelessWidget {
           vertical: AppDimensions.spacing12,
         ),
         decoration: BoxDecoration(
-          color: value ? AppTheme.primaryColor.withValues(alpha: 0.05) : AppTheme.surfaceColor,
+          color: value
+              ? AppTheme.primaryColor.withValues(alpha: 0.05)
+              : AppTheme.surfaceColor,
           borderRadius: AppDimensions.borderRadiusM,
           border: Border.all(
             color: value ? AppTheme.primaryColor : AppTheme.borderColor,
@@ -264,7 +274,9 @@ class MbuyCheckboxTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppDimensions.fontBody,
                       fontWeight: value ? FontWeight.w600 : FontWeight.w500,
-                      color: disabled ? AppTheme.textHintColor : AppTheme.textPrimaryColor,
+                      color: disabled
+                          ? AppTheme.textHintColor
+                          : AppTheme.textPrimaryColor,
                     ),
                   ),
                   if (subtitle != null) ...[
@@ -379,7 +391,9 @@ class MbuyRadioTile<T> extends StatelessWidget {
           vertical: AppDimensions.spacing12,
         ),
         decoration: BoxDecoration(
-          color: _selected ? AppTheme.primaryColor.withValues(alpha: 0.05) : AppTheme.surfaceColor,
+          color: _selected
+              ? AppTheme.primaryColor.withValues(alpha: 0.05)
+              : AppTheme.surfaceColor,
           borderRadius: AppDimensions.borderRadiusM,
           border: Border.all(
             color: _selected ? AppTheme.primaryColor : AppTheme.borderColor,
@@ -404,7 +418,9 @@ class MbuyRadioTile<T> extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppDimensions.fontBody,
                       fontWeight: _selected ? FontWeight.w600 : FontWeight.w500,
-                      color: disabled ? AppTheme.textHintColor : AppTheme.textPrimaryColor,
+                      color: disabled
+                          ? AppTheme.textHintColor
+                          : AppTheme.textPrimaryColor,
                     ),
                   ),
                   if (subtitle != null) ...[
