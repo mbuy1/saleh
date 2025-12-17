@@ -18,7 +18,7 @@ class StoreToolsTab extends StatefulWidget {
 
 class _StoreToolsTabState extends State<StoreToolsTab> {
   bool _isLoading = false;
-  String _searchQuery = '';
+  String _searchQuery = ''; // Used in search functionality
 
   Future<void> _refreshData() async {
     HapticFeedback.lightImpact();

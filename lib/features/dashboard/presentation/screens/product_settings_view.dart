@@ -18,7 +18,7 @@ class ProductSettingsView extends ConsumerStatefulWidget {
 
 class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
+  String _searchQuery = ''; // Used in search functionality
 
   @override
   void dispose() {
