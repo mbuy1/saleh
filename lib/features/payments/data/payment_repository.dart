@@ -131,7 +131,7 @@ class PointsPackage {
       points: json['points'] as int,
       bonus: json['bonus'] as int,
       totalPoints: json['totalPoints'] as int,
-      price: (json['price'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'SAR',
       pricePerPoint: json['pricePerPoint'] as String? ?? '0.00',
     );
@@ -165,7 +165,7 @@ class PaymentIntent {
       paymentId: json['payment_id'] as String,
       invoiceId: json['invoice_id'] as String,
       invoiceUrl: json['invoice_url'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'SAR',
       points: package?['points'] as int? ?? 0,
       bonus: package?['bonus'] as int? ?? 0,
@@ -197,7 +197,7 @@ class PaymentStatus {
     return PaymentStatus(
       id: json['id'] as String,
       status: json['status'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'SAR',
       points: json['points'] as int?,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -237,7 +237,7 @@ class PaymentRecord {
     return PaymentRecord(
       id: json['id'] as String,
       status: json['status'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'SAR',
       points: json['points'] as int?,
       description: json['description'] as String? ?? '',

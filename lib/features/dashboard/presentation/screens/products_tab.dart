@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
+import '../../../../shared/widgets/app_icon.dart';
 import '../../../products/data/products_controller.dart';
 import 'product_settings_view.dart';
 
@@ -122,7 +122,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                     context,
                     title: 'إدارة المخزون',
                     subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
-                    icon: Icons.inventory_2_outlined,
+                    icon: AppIcons.inventory2,
                     buttonText: 'فتح إدارة المخزون',
                     onPressed: () => context.push('/dashboard/inventory'),
                   ),
@@ -131,7 +131,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                     context,
                     title: 'سجلات النظام',
                     subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
-                    icon: Icons.history_outlined,
+                    icon: AppIcons.history,
                     buttonText: 'فتح السجلات',
                     onPressed: () => context.push('/dashboard/audit-logs'),
                   ),
@@ -146,9 +146,9 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showProductTypeSelection(context),
         backgroundColor: AppTheme.accentColor,
-        foregroundColor: Colors.white,
+        foregroundColor: AppTheme.surfaceColor,
         elevation: 4,
-        icon: const Icon(Icons.add, size: AppDimensions.iconM),
+        icon: const AppIcon(AppIcons.add, color: AppTheme.surfaceColor),
         label: const Text(
           'إضافة منتج',
           style: TextStyle(
@@ -165,24 +165,13 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
       padding: const EdgeInsets.all(AppDimensions.spacing16),
       child: Row(
         children: [
-          GestureDetector(
+          AppIcon.button(
+            AppIcons.arrowBack,
             onTap: () => context.pop(),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimensions.spacing8),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-              child: SvgPicture.asset(
-                AppIcons.arrowBack,
-                width: AppDimensions.iconS,
-                height: AppDimensions.iconS,
-                colorFilter: const ColorFilter.mode(
-                  AppTheme.primaryColor,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
+            size: AppDimensions.iconS,
+            color: AppTheme.primaryColor,
+            backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
+            padding: const EdgeInsets.all(AppDimensions.spacing8),
           ),
           const Spacer(),
           const Text(
@@ -205,7 +194,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceColor,
           borderRadius: AppDimensions.borderRadiusM,
           border: Border.all(color: AppTheme.dividerColor),
         ),
@@ -216,7 +205,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
           decoration: InputDecoration(
             hintText: 'البحث في المنتجات...',
             hintStyle: TextStyle(color: AppTheme.textHintColor),
-            prefixIcon: Icon(Icons.search, color: AppTheme.textHintColor),
+            prefixIcon: AppIcon(AppIcons.search, color: AppTheme.textHintColor),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppDimensions.spacing16,
@@ -282,37 +271,33 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                   _buildProductTypeOption(
                     context,
                     'منتج ملموس',
-                    Icons.inventory_2,
+                    AppIcons.inventory2,
                   ),
                   _buildProductTypeOption(
                     context,
                     'خدمة حسب الطلب',
-                    Icons.design_services,
+                    AppIcons.edit,
                   ),
                   _buildProductTypeOption(
                     context,
                     'أكل ومشروبات',
-                    Icons.restaurant,
+                    AppIcons.store, // أو أيقونة مناسبة
                   ),
                   _buildProductTypeOption(
                     context,
                     'منتج رقمي',
-                    Icons.cloud_download,
+                    AppIcons.downloadCloud,
                   ),
                   _buildProductTypeOption(
                     context,
                     'مجموعة منتجات',
-                    Icons.layers,
+                    AppIcons.layers,
                   ),
-                  _buildProductTypeOption(
-                    context,
-                    'حجوزات',
-                    Icons.calendar_month,
-                  ),
+                  _buildProductTypeOption(context, 'حجوزات', AppIcons.calendar),
                   _buildProductTypeOption(
                     context,
                     'دروب شوبينق',
-                    Icons.import_export,
+                    AppIcons.importExport,
                   ),
                 ],
               ),
@@ -326,10 +311,10 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
   Widget _buildProductTypeOption(
     BuildContext context,
     String title,
-    IconData icon,
+    String icon,
   ) {
     return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryColor),
+      leading: AppIcon(icon, color: AppTheme.primaryColor),
       title: Text(title),
       onTap: () {
         Navigator.pop(context);
@@ -354,14 +339,10 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                 color: AppTheme.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: SvgPicture.asset(
+              child: AppIcon(
                 AppIcons.delete,
-                width: 64,
-                height: 64,
-                colorFilter: ColorFilter.mode(
-                  AppTheme.errorColor.withValues(alpha: 0.5),
-                  BlendMode.srcIn,
-                ),
+                size: 64,
+                color: AppTheme.errorColor.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
@@ -395,14 +376,10 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
               ),
               child: Row(
                 children: [
-                  SvgPicture.asset(
+                  const AppIcon(
                     AppIcons.info,
-                    width: AppDimensions.iconS,
-                    height: AppDimensions.iconS,
-                    colorFilter: const ColorFilter.mode(
-                      AppTheme.infoColor,
-                      BlendMode.srcIn,
-                    ),
+                    size: AppDimensions.iconS,
+                    color: AppTheme.infoColor,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -434,10 +411,10 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: AppTheme.slate200,
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: Icon(Icons.image, color: Colors.grey[400]),
+              child: AppIcon(AppIcons.image, color: AppTheme.slate400),
             ),
             title: Text(product['name'] ?? ''),
             subtitle: Text('محذوف منذ ${product['deletedAt'] ?? ''}'),
@@ -445,7 +422,10 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.restore, color: AppTheme.successColor),
+                  icon: const AppIcon(
+                    AppIcons.refresh,
+                    color: AppTheme.successColor,
+                  ),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -457,8 +437,8 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                   tooltip: 'استعادة',
                 ),
                 IconButton(
-                  icon: const Icon(
-                    Icons.delete_forever,
+                  icon: const AppIcon(
+                    AppIcons.delete,
                     color: AppTheme.errorColor,
                   ),
                   onPressed: () {
@@ -508,7 +488,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
             ),
             child: const Text(
               'حذف نهائي',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.surfaceColor),
             ),
           ),
         ],
@@ -521,7 +501,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String icon,
     required String buttonText,
     required VoidCallback onPressed,
   }) {
@@ -537,7 +517,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 64, color: AppTheme.primaryColor),
+              child: AppIcon(icon, size: 64, color: AppTheme.primaryColor),
             ),
             const SizedBox(height: 24),
             Text(
@@ -560,11 +540,11 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: onPressed,
-              icon: const Icon(Icons.open_in_new),
+              icon: const AppIcon(AppIcons.link, color: AppTheme.surfaceColor),
               label: Text(buttonText),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.surfaceColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -595,8 +575,8 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                 color: AppTheme.primaryColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.inventory_2_outlined,
+              child: AppIcon(
+                AppIcons.inventory2,
                 size: AppDimensions.iconDisplay,
                 color: AppTheme.primaryColor.withValues(alpha: 0.5),
               ),
@@ -625,7 +605,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                 onPressed: () => context.push('/dashboard/products/add'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.accentColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppTheme.surfaceColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: AppDimensions.borderRadiusM,
                   ),
@@ -633,7 +613,11 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                     horizontal: AppDimensions.spacing24,
                   ),
                 ),
-                icon: const Icon(Icons.add, size: AppDimensions.iconS),
+                icon: const AppIcon(
+                  AppIcons.add,
+                  size: AppDimensions.iconS,
+                  color: AppTheme.surfaceColor,
+                ),
                 label: const Text(
                   'إضافة منتج',
                   style: TextStyle(
@@ -666,7 +650,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
             borderRadius: AppDimensions.borderRadiusM,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: AppTheme.darkSlate.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -724,13 +708,13 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                           decoration: BoxDecoration(
                             color: product.isActive
                                 ? AppTheme.successColor.withValues(alpha: 0.1)
-                                : Colors.grey.withValues(alpha: 0.1),
+                                : AppTheme.slate200,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
+                          child: AppIcon(
                             product.isActive
-                                ? Icons.check_circle
-                                : Icons.visibility_off,
+                                ? AppIcons.checkCircle
+                                : AppIcons.visibilityOff,
                             color: product.isActive
                                 ? AppTheme.successColor
                                 : AppTheme.textHintColor,
@@ -738,8 +722,8 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                           ),
                         ),
                         PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
+                          icon: const AppIcon(
+                            AppIcons.moreVert,
                             color: AppTheme.textSecondaryColor,
                           ),
                           onSelected: (value) =>
@@ -748,37 +732,37 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                               <PopupMenuEntry<String>>[
                                 _buildMenuItem(
                                   'edit',
-                                  Icons.edit,
+                                  AppIcons.edit,
                                   'تعديل معلومات المنتج',
                                 ),
                                 _buildMenuItem(
                                   'duplicate',
-                                  Icons.copy,
+                                  AppIcons.copy,
                                   'تكرار المنتج',
                                 ),
                                 _buildMenuItem(
                                   'edit_stock',
-                                  Icons.inventory,
+                                  AppIcons.inventory,
                                   'تعديل المخزون',
                                 ),
                                 _buildMenuItem(
                                   'hide',
-                                  Icons.visibility_off,
+                                  AppIcons.visibilityOff,
                                   'إخفاء المنتج',
                                 ),
                                 _buildMenuItem(
                                   'share',
-                                  Icons.share,
+                                  AppIcons.share,
                                   'مشاركة المنتج',
                                 ),
                                 _buildMenuItem(
                                   'copy_link',
-                                  Icons.link,
+                                  AppIcons.link,
                                   'نسخ رابط المنتج',
                                 ),
                                 _buildMenuItem(
                                   'marketing',
-                                  Icons.campaign,
+                                  AppIcons.campaign,
                                   'أدوات التسويق',
                                 ),
                                 const PopupMenuDivider(),
@@ -786,8 +770,8 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                                   value: 'delete',
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.delete,
+                                      AppIcon(
+                                        AppIcons.delete,
                                         color: AppTheme.errorColor,
                                         size: 20,
                                       ),
@@ -816,16 +800,12 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
     );
   }
 
-  PopupMenuItem<String> _buildMenuItem(
-    String value,
-    IconData icon,
-    String text,
-  ) {
+  PopupMenuItem<String> _buildMenuItem(String value, String icon, String text) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppTheme.textPrimaryColor),
+          AppIcon(icon, size: 20, color: AppTheme.textPrimaryColor),
           const SizedBox(width: 8),
           Text(text),
         ],
@@ -946,14 +926,14 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
                 ),
               ),
               const SizedBox(height: 20),
-              _buildMarketingOption(context, 'تثبيت المنتج', Icons.push_pin),
+              _buildMarketingOption(context, 'تثبيت المنتج', AppIcons.pin),
               _buildMarketingOption(
                 context,
                 'دعم ظهور المنتج',
-                Icons.trending_up,
+                AppIcons.trendingUp,
               ),
-              _buildMarketingOption(context, 'دعم ظهور المتجر', Icons.store),
-              _buildMarketingOption(context, 'تثبيت المتجر', Icons.star),
+              _buildMarketingOption(context, 'دعم ظهور المتجر', AppIcons.store),
+              _buildMarketingOption(context, 'تثبيت المتجر', AppIcons.star),
             ],
           ),
         );
@@ -964,14 +944,14 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
   Widget _buildMarketingOption(
     BuildContext context,
     String title,
-    IconData icon,
+    String icon,
   ) {
     return Column(
       children: [
         ListTile(
-          leading: Icon(icon, color: AppTheme.primaryColor),
+          leading: AppIcon(icon, color: AppTheme.primaryColor),
           title: Text(title),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          trailing: const AppIcon(AppIcons.chevronRight, size: 16),
           onTap: () {
             // Show duration slider
             Navigator.pop(context);
@@ -1127,13 +1107,13 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: AppTheme.darkSlate.withValues(alpha: 0.3),
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_circle_fill,
-                  color: Colors.white,
+              child: Center(
+                child: AppIcon(
+                  AppIcons.playCircle,
+                  color: AppTheme.surfaceColor,
                   size: AppDimensions.iconM,
                 ),
               ),
@@ -1151,8 +1131,8 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
         color: AppTheme.primaryColor.withValues(alpha: 0.08),
         borderRadius: AppDimensions.borderRadiusS,
       ),
-      child: Icon(
-        Icons.inventory_2,
+      child: AppIcon(
+        AppIcons.inventory2,
         color: AppTheme.primaryColor.withValues(alpha: 0.4),
         size: AppDimensions.iconXL,
       ),

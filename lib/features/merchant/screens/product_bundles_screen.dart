@@ -270,8 +270,8 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
       itemBuilder: (context, index) {
         final bundle = _bundles[index];
         final status = bundle['status'] as String;
-        final originalPrice = (bundle['original_price'] as num).toDouble();
-        final bundlePrice = (bundle['bundle_price'] as num).toDouble();
+        final originalPrice = (bundle['original_price'] as num?)?.toDouble() ?? 0.0;
+        final bundlePrice = (bundle['bundle_price'] as num?)?.toDouble() ?? 0.0;
         final savings = originalPrice - bundlePrice;
         final savingsPercent = (savings / originalPrice * 100).round();
 
@@ -524,8 +524,8 @@ class _ProductBundlesScreenState extends State<ProductBundlesScreen>
   }
 
   Widget _buildFeaturedBundleCard(Map<String, dynamic> bundle) {
-    final originalPrice = (bundle['original_price'] as num).toDouble();
-    final bundlePrice = (bundle['bundle_price'] as num).toDouble();
+    final originalPrice = (bundle['original_price'] as num?)?.toDouble() ?? 0.0;
+    final bundlePrice = (bundle['bundle_price'] as num?)?.toDouble() ?? 0.0;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

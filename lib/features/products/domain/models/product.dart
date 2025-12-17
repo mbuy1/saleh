@@ -156,9 +156,7 @@ class Product {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      price: (json['price'] is int)
-          ? (json['price'] as int).toDouble()
-          : (json['price'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       stock: json['stock'] as int? ?? 0,
       imageUrl: mainImage,
       categoryId: json['category_id'] as String?,
@@ -173,11 +171,7 @@ class Product {
       media: mediaList,
       extraData: json['extra_data'] as Map<String, dynamic>?,
       subCategoryId: json['sub_category_id'] as String?,
-      weight: json['weight'] != null
-          ? (json['weight'] is int
-                ? (json['weight'] as int).toDouble()
-                : (json['weight'] as num).toDouble())
-          : null,
+      weight: (json['weight'] as num?)?.toDouble(),
       preparationTime: json['preparation_time'] as int?,
       seoKeywords: json['seo_keywords'] != null
           ? List<String>.from(json['seo_keywords'])

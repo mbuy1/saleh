@@ -599,7 +599,7 @@ class _SmartAnalyticsScreenState extends State<SmartAnalyticsScreen> {
                       x: entry.key,
                       barRods: [
                         BarChartRodData(
-                          toY: (entry.value['revenue'] as num).toDouble(),
+                          toY: (entry.value['revenue'] as num?)?.toDouble() ?? 0.0,
                           color: theme.colorScheme.primary,
                           width: 16,
                           borderRadius: const BorderRadius.vertical(

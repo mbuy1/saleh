@@ -5,6 +5,8 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
+const String _lastUpdatedDate = 'ديسمبر 2025';
+
 /// شاشة سياسة الخصوصية
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -51,7 +53,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'آخر تحديث: ديسمبر 2025',
+                    'آخر تحديث: $_lastUpdatedDate',
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.infoColor,
