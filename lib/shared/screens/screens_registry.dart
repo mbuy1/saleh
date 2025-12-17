@@ -783,7 +783,7 @@ class ScreensRegistry {
   static const support = ScreenInfo(
     nameAr: 'الدعم الفني',
     nameEn: 'support_screen',
-    route: '/settings/support',
+    route: '/support',
     filePath: 'lib/features/settings/presentation/screens/support_screen.dart',
     description: 'التواصل مع الدعم الفني',
     status: ScreenStatus.complete,
@@ -793,7 +793,7 @@ class ScreensRegistry {
   static const privacyPolicy = ScreenInfo(
     nameAr: 'سياسة الخصوصية',
     nameEn: 'privacy_policy_screen',
-    route: '/settings/privacy',
+    route: '/privacy-policy',
     filePath:
         'lib/features/settings/presentation/screens/privacy_policy_screen.dart',
     description: 'سياسة الخصوصية',
@@ -804,7 +804,7 @@ class ScreensRegistry {
   static const about = ScreenInfo(
     nameAr: 'حول التطبيق',
     nameEn: 'about_screen',
-    route: '/settings/about',
+    route: '/about',
     filePath: 'lib/features/settings/presentation/screens/about_screen.dart',
     description: 'معلومات عن التطبيق',
     status: ScreenStatus.complete,
@@ -814,7 +814,7 @@ class ScreensRegistry {
   static const terms = ScreenInfo(
     nameAr: 'الشروط والأحكام',
     nameEn: 'terms_screen',
-    route: '/settings/terms',
+    route: '/terms',
     filePath: 'lib/features/settings/presentation/screens/terms_screen.dart',
     description: 'شروط وأحكام الاستخدام',
     status: ScreenStatus.complete,

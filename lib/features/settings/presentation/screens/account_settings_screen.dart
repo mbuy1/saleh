@@ -81,6 +81,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           // الإشعارات
           _buildSectionTitle('الإشعارات'),
           _buildSettingsCard([
+            _buildActionTile(
+              icon: AppIcons.notifications,
+              title: 'إعدادات الإشعارات المتقدمة',
+              onTap: () => context.push('/notification-settings'),
+            ),
+            const Divider(height: 1),
             _buildSwitchTile(
               icon: AppIcons.notifications,
               title: 'إشعارات التطبيق',
@@ -120,6 +126,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           // اللغة والمظهر
           _buildSectionTitle('اللغة والمظهر'),
           _buildSettingsCard([
+            _buildActionTile(
+              icon: AppIcons.sun,
+              title: 'إعدادات المظهر',
+              onTap: () => context.push('/appearance-settings'),
+            ),
+            const Divider(height: 1),
             _buildDropdownTile(
               icon: AppIcons.globe,
               title: 'اللغة',
