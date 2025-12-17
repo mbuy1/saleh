@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/constants/app_icons.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// شاشة معاينة متجر التاجر
 class ViewMyStoreScreen extends ConsumerStatefulWidget {
@@ -115,13 +116,13 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
         children: [
           SvgPicture.asset(
             AppIcons.errorOutline,
-            width: 64,
-            height: 64,
+            width: AppDimensions.iconDisplay,
+            height: AppDimensions.iconDisplay,
             colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(_error!, style: const TextStyle(color: Colors.red)),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           ElevatedButton(
             onPressed: _loadStoreData,
             child: const Text('إعادة المحاولة'),
@@ -216,11 +217,11 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                     children: [
                       // Logo
                       Container(
-                        width: 80,
-                        height: 80,
+                        width: AppDimensions.avatarProfile,
+                        height: AppDimensions.avatarProfile,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppDimensions.borderRadiusM,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.2),
@@ -230,7 +231,7 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                         ),
                         child: _store?['logo_url'] != null
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: AppDimensions.borderRadiusM,
                                 child: Image.network(
                                   _store!['logo_url'],
                                   fit: BoxFit.cover,
@@ -238,15 +239,15 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                               )
                             : SvgPicture.asset(
                                 AppIcons.store,
-                                width: 40,
-                                height: 40,
+                                width: AppDimensions.iconXXL,
+                                height: AppDimensions.iconXXL,
                                 colorFilter: const ColorFilter.mode(
                                   AppTheme.primaryColor,
                                   BlendMode.srcIn,
                                 ),
                               ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: AppDimensions.spacing16),
                       // Store Name & Stats
                       Expanded(
                         child: Column(
@@ -255,20 +256,20 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                           children: [
                             Text(
                               _store?['name'] ?? 'متجري',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 22,
+                                fontSize: AppDimensions.fontDisplay2,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: AppDimensions.spacing4),
                             Row(
                               children: [
                                 _buildStatChip(
                                   AppIcons.shoppingBag,
                                   '${_products.length}',
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: AppDimensions.spacing8),
                                 _buildStatChip(
                                   AppIcons.visibility,
                                   '${_store?['views_count'] ?? 0}',
@@ -290,20 +291,23 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
         if (_store?['description'] != null)
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
+              margin: AppDimensions.paddingM,
+              padding: AppDimensions.paddingM,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppDimensions.borderRadiusM,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'عن المتجر',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppDimensions.fontTitle,
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     _store!['description'],
                     style: const TextStyle(
@@ -319,15 +323,20 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
         // Products Section Title
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            padding: EdgeInsets.fromLTRB(
+              AppDimensions.spacing16,
+              AppDimensions.spacing8,
+              AppDimensions.spacing16,
+              AppDimensions.spacing12,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'المنتجات (${_products.length})',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: AppDimensions.fontHeadline,
                   ),
                 ),
                 TextButton(
@@ -343,40 +352,40 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
         _products.isEmpty
             ? SliverToBoxAdapter(
                 child: Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(32),
+                  margin: AppDimensions.paddingM,
+                  padding: AppDimensions.paddingXXL,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppDimensions.borderRadiusM,
                   ),
                   child: Column(
                     children: [
                       SvgPicture.asset(
                         AppIcons.inventory2,
-                        width: 64,
-                        height: 64,
+                        width: AppDimensions.iconDisplay,
+                        height: AppDimensions.iconDisplay,
                         colorFilter: ColorFilter.mode(
                           Colors.grey[400]!,
                           BlendMode.srcIn,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: AppDimensions.spacing16),
+                      Text(
                         'لا توجد منتجات',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: AppDimensions.fontTitle,
                           fontWeight: FontWeight.w500,
                           color: AppTheme.textSecondaryColor,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: AppDimensions.spacing16),
                       ElevatedButton.icon(
                         onPressed: () =>
                             context.push('/dashboard/products/add'),
                         icon: SvgPicture.asset(
                           AppIcons.add,
-                          width: 20,
-                          height: 20,
+                          width: AppDimensions.iconS,
+                          height: AppDimensions.iconS,
                           colorFilter: const ColorFilter.mode(
                             Colors.white,
                             BlendMode.srcIn,
@@ -393,12 +402,14 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                 ),
               )
             : SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing16,
+                ),
                 sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
+                    mainAxisSpacing: AppDimensions.spacing12,
+                    crossAxisSpacing: AppDimensions.spacing12,
                     childAspectRatio: 0.75,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
@@ -416,26 +427,29 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
 
   Widget _buildStatChip(String iconPath, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing8,
+        vertical: AppDimensions.spacing4,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SvgPicture.asset(
             iconPath,
-            width: 14,
-            height: 14,
+            width: AppDimensions.fontBody,
+            height: AppDimensions.fontBody,
             colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: AppDimensions.spacing4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: AppDimensions.fontLabel,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -448,7 +462,7 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -464,8 +478,8 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
           Expanded(
             flex: 3,
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppDimensions.radiusM),
               ),
               child: Container(
                 width: double.infinity,
@@ -477,8 +491,8 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                       )
                     : SvgPicture.asset(
                         AppIcons.image,
-                        width: 40,
-                        height: 40,
+                        width: AppDimensions.iconXXL,
+                        height: AppDimensions.iconXXL,
                         colorFilter: ColorFilter.mode(
                           Colors.grey[400]!,
                           BlendMode.srcIn,
@@ -491,7 +505,7 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: AppDimensions.paddingS,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -499,18 +513,18 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
                     product['name'] ?? '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 13,
+                      fontSize: AppDimensions.fontBody2,
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${(product['price'] ?? 0).toStringAsFixed(2)} ر.س',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                     ),
                   ),
                 ],

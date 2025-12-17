@@ -4,6 +4,10 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
+
+// ignore_for_file: unused_field
 
 // ============================================================================
 // Models
@@ -45,6 +49,35 @@ class GeneratedReport {
     this.sentAt,
     required this.createdAt,
   });
+
+  factory GeneratedReport.fromJson(Map<String, dynamic> json) {
+    return GeneratedReport(
+      id: json['id'] ?? '',
+      reportType: json['report_type'] ?? 'daily',
+      periodStart: json['period_start'] != null
+          ? DateTime.parse(json['period_start'])
+          : DateTime.now(),
+      periodEnd: json['period_end'] != null
+          ? DateTime.parse(json['period_end'])
+          : DateTime.now(),
+      title: json['title'] ?? '',
+      totalRevenue: (json['total_revenue'] ?? 0).toDouble(),
+      totalOrders: json['total_orders'] ?? 0,
+      totalCustomers: json['total_customers'] ?? 0,
+      avgOrderValue: (json['avg_order_value'] ?? 0).toDouble(),
+      revenueChange: json['revenue_change']?.toDouble(),
+      ordersChange: json['orders_change']?.toDouble(),
+      executiveSummary: json['executive_summary'],
+      topProducts: (json['top_products'] as List? ?? [])
+          .map((p) => TopProduct.fromJson(p))
+          .toList(),
+      isSent: json['is_sent'] ?? false,
+      sentAt: json['sent_at'] != null ? DateTime.parse(json['sent_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+    );
+  }
 
   String get reportTypeText {
     switch (reportType) {
@@ -98,6 +131,15 @@ class TopProduct {
     required this.quantity,
     required this.revenue,
   });
+
+  factory TopProduct.fromJson(Map<String, dynamic> json) {
+    return TopProduct(
+      productId: json['product_id'] ?? '',
+      name: json['name'] ?? '',
+      quantity: json['quantity'] ?? 0,
+      revenue: (json['revenue'] ?? 0).toDouble(),
+    );
+  }
 }
 
 class ReportSettings {
@@ -134,6 +176,26 @@ class ReportSettings {
     required this.includeCharts,
     required this.includeRecommendations,
   });
+
+  factory ReportSettings.fromJson(Map<String, dynamic> json) {
+    return ReportSettings(
+      isEnabled: json['is_enabled'] ?? true,
+      dailyEnabled: json['daily_report_enabled'] ?? true,
+      dailyTime: json['daily_report_time'] ?? '08:00',
+      weeklyEnabled: json['weekly_report_enabled'] ?? true,
+      weeklyDay: json['weekly_report_day'] ?? 0,
+      weeklyTime: json['weekly_report_time'] ?? '09:00',
+      monthlyEnabled: json['monthly_report_enabled'] ?? true,
+      monthlyDay: json['monthly_report_day'] ?? 1,
+      monthlyTime: json['monthly_report_time'] ?? '10:00',
+      sendEmail: json['send_email'] ?? true,
+      sendPush: json['send_push'] ?? true,
+      reportEmail: json['report_email'],
+      reportFormat: json['report_format'] ?? 'detailed',
+      includeCharts: json['include_charts'] ?? true,
+      includeRecommendations: json['include_recommendations'] ?? true,
+    );
+  }
 }
 
 // ============================================================================
@@ -150,7 +212,9 @@ class AutoReportsScreen extends StatefulWidget {
 class _AutoReportsScreenState extends State<AutoReportsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ApiService _api = ApiService();
   bool _isLoading = true;
+  String? _error;
   List<GeneratedReport> _reports = [];
   ReportSettings? _settings;
   String _selectedFilter = 'all';
@@ -169,134 +233,44 @@ class _AutoReportsScreenState extends State<AutoReportsScreen>
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-
     setState(() {
-      _settings = ReportSettings(
-        isEnabled: true,
-        dailyEnabled: true,
-        dailyTime: '08:00',
-        weeklyEnabled: true,
-        weeklyDay: 0,
-        weeklyTime: '09:00',
-        monthlyEnabled: true,
-        monthlyDay: 1,
-        monthlyTime: '10:00',
-        sendEmail: true,
-        sendPush: true,
-        reportEmail: 'merchant@example.com',
-        reportFormat: 'detailed',
-        includeCharts: true,
-        includeRecommendations: true,
-      );
-
-      _reports = [
-        GeneratedReport(
-          id: '1',
-          reportType: 'daily',
-          periodStart: DateTime.now().subtract(const Duration(days: 1)),
-          periodEnd: DateTime.now().subtract(const Duration(days: 1)),
-          title:
-              'التقرير اليومي - ${_formatDate(DateTime.now().subtract(const Duration(days: 1)))}',
-          totalRevenue: 4580,
-          totalOrders: 23,
-          totalCustomers: 18,
-          avgOrderValue: 199.13,
-          revenueChange: 12.5,
-          ordersChange: 8.3,
-          executiveSummary:
-              'أداء جيد! ارتفعت المبيعات بنسبة 12.5% مقارنة باليوم السابق.',
-          topProducts: [
-            TopProduct(
-              productId: '1',
-              name: 'قميص أبيض',
-              quantity: 8,
-              revenue: 1200,
-            ),
-            TopProduct(
-              productId: '2',
-              name: 'بنطلون جينز',
-              quantity: 5,
-              revenue: 950,
-            ),
-          ],
-          isSent: true,
-          sentAt: DateTime.now().subtract(const Duration(hours: 2)),
-          createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        ),
-        GeneratedReport(
-          id: '2',
-          reportType: 'weekly',
-          periodStart: DateTime.now().subtract(const Duration(days: 7)),
-          periodEnd: DateTime.now().subtract(const Duration(days: 1)),
-          title: 'التقرير الأسبوعي',
-          totalRevenue: 32450,
-          totalOrders: 156,
-          totalCustomers: 89,
-          avgOrderValue: 208.01,
-          revenueChange: 18.2,
-          ordersChange: 15.1,
-          executiveSummary: 'أسبوع ممتاز! نمو قوي في المبيعات والعملاء الجدد.',
-          topProducts: [
-            TopProduct(
-              productId: '1',
-              name: 'قميص أبيض',
-              quantity: 45,
-              revenue: 6750,
-            ),
-            TopProduct(
-              productId: '2',
-              name: 'بنطلون جينز',
-              quantity: 32,
-              revenue: 6080,
-            ),
-            TopProduct(
-              productId: '3',
-              name: 'حذاء رياضي',
-              quantity: 28,
-              revenue: 5600,
-            ),
-          ],
-          isSent: true,
-          sentAt: DateTime.now().subtract(const Duration(days: 1)),
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        GeneratedReport(
-          id: '3',
-          reportType: 'monthly',
-          periodStart: DateTime(2025, 11, 1),
-          periodEnd: DateTime(2025, 11, 30),
-          title: 'التقرير الشهري - نوفمبر 2025',
-          totalRevenue: 125800,
-          totalOrders: 612,
-          totalCustomers: 324,
-          avgOrderValue: 205.56,
-          revenueChange: 22.7,
-          ordersChange: 19.4,
-          executiveSummary: 'شهر رائع! تحقيق أهداف المبيعات بنسبة 115%.',
-          topProducts: [
-            TopProduct(
-              productId: '1',
-              name: 'قميص أبيض',
-              quantity: 180,
-              revenue: 27000,
-            ),
-            TopProduct(
-              productId: '2',
-              name: 'بنطلون جينز',
-              quantity: 145,
-              revenue: 27550,
-            ),
-          ],
-          isSent: true,
-          sentAt: DateTime(2025, 12, 1),
-          createdAt: DateTime(2025, 12, 1),
-        ),
-      ];
-
-      _isLoading = false;
+      _isLoading = true;
+      _error = null;
     });
+
+    try {
+      // جلب البيانات من API بشكل متوازي
+      final results = await Future.wait([
+        _api.get('/secure/reports/settings'),
+        _api.get('/secure/reports'),
+      ]);
+
+      final settingsResponse = json.decode(results[0].body);
+      final reportsResponse = json.decode(results[1].body);
+
+      setState(() {
+        // تحويل الإعدادات
+        if (settingsResponse['ok'] == true &&
+            settingsResponse['data'] != null) {
+          _settings = ReportSettings.fromJson(settingsResponse['data']);
+        }
+
+        // تحويل التقارير
+        if (reportsResponse['ok'] == true && reportsResponse['data'] != null) {
+          final reportsData = reportsResponse['data'] as List? ?? [];
+          _reports = reportsData
+              .map((j) => GeneratedReport.fromJson(j))
+              .toList();
+        }
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'حدث خطأ في تحميل البيانات: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -644,9 +618,7 @@ class _AutoReportsScreenState extends State<AutoReportsScreen>
             ),
             child: SwitchListTile(
               value: _settings!.isEnabled,
-              onChanged: (v) {
-                // TODO: Update settings
-              },
+              onChanged: (v) => _updateSettings({'is_enabled': v}),
               title: const Text('تفعيل التقارير التلقائية'),
               subtitle: const Text('إرسال تقارير دورية تلقائياً'),
               secondary: const Icon(CupertinoIcons.doc_chart),
@@ -1041,15 +1013,78 @@ class _AutoReportsScreenState extends State<AutoReportsScreen>
     );
   }
 
-  void _generateReport(String type) {
-    // TODO: Call API to generate report
+  Future<void> _generateReport(String type) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('جاري إنشاء التقرير...'),
         backgroundColor: Colors.blue,
       ),
     );
-    _loadData();
+
+    try {
+      final res = await _api.post(
+        '/secure/reports/generate',
+        body: {'report_type': type},
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['ok'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إنشاء التقرير بنجاح'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['error'] ?? 'فشل إنشاء التقرير'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateSettings(Map<String, dynamic> updates) async {
+    try {
+      final res = await _api.put('/secure/reports/settings', body: updates);
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['ok'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم حفظ الإعدادات'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['error'] ?? 'فشل حفظ الإعدادات'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   void _showReportDetails(GeneratedReport report) {

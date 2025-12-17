@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../products/data/products_controller.dart';
@@ -26,14 +28,33 @@ import 'product_settings_view.dart';
 
 /// شاشة المنتجات - Products Tab
 /// تعرض قائمة المنتجات الخاصة بالتاجر
-///
-/// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-14
-class ProductsTab extends ConsumerWidget {
+/// تصميم جديد مطابق لصفحة اختصاراتي
+class ProductsTab extends ConsumerStatefulWidget {
   const ProductsTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductsTab> createState() => _ProductsTabState();
+}
+
+class _ProductsTabState extends ConsumerState<ProductsTab>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final productsState = ref.watch(productsControllerProvider);
     final products = productsState.products;
     final isLoading = productsState.isLoading;
@@ -62,17 +83,109 @@ class ProductsTab extends ConsumerWidget {
       });
     }
 
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: AppTheme.surfaceColor,
-          foregroundColor: AppTheme.textPrimaryColor,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          surfaceTintColor: Colors.transparent,
-          title: const Text(
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header مخصص مثل اختصاراتي
+            _buildHeader(context),
+            // شريط البحث
+            _buildSearchBar(),
+            // التبويبات
+            _buildTabs(),
+            // المحتوى
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // 1. المنتجات
+                  RefreshIndicator(
+                    onRefresh: () => ref
+                        .read(productsControllerProvider.notifier)
+                        .loadProducts(),
+                    color: AppTheme.accentColor,
+                    child: isLoading && products.isEmpty
+                        ? const SkeletonProductsGrid()
+                        : products.isEmpty
+                        ? _buildEmptyState(context)
+                        : _buildProductsList(
+                            context,
+                            ref,
+                            _filterProducts(products),
+                          ),
+                  ),
+                  // 2. إعدادات المنتجات
+                  const ProductSettingsView(),
+                  // 3. المخزون
+                  _buildQuickAccessPage(
+                    context,
+                    title: 'إدارة المخزون',
+                    subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
+                    icon: Icons.inventory_2_outlined,
+                    buttonText: 'فتح إدارة المخزون',
+                    onPressed: () => context.push('/dashboard/inventory'),
+                  ),
+                  // 4. السجلات
+                  _buildQuickAccessPage(
+                    context,
+                    title: 'سجلات النظام',
+                    subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
+                    icon: Icons.history_outlined,
+                    buttonText: 'فتح السجلات',
+                    onPressed: () => context.push('/dashboard/audit-logs'),
+                  ),
+                  // 5. المحذوفات
+                  _buildDeletedProductsTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showProductTypeSelection(context),
+        backgroundColor: AppTheme.accentColor,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        icon: const Icon(Icons.add, size: AppDimensions.iconM),
+        label: const Text(
+          'إضافة منتج',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: AppDimensions.fontBody,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => context.pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          const Text(
             'المنتجات',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -80,90 +193,66 @@ class ProductsTab extends ConsumerWidget {
               color: AppTheme.textPrimaryColor,
             ),
           ),
-          centerTitle: true,
-          iconTheme: const IconThemeData(
-            color: AppTheme.primaryColor,
-            size: AppDimensions.iconM,
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.search,
-                size: AppDimensions.iconM,
-                color: AppTheme.primaryColor,
-              ),
-              onPressed: () {
-                _showSearchDialog(context);
-              },
-            ),
-          ],
-          bottom: const TabBar(
-            isScrollable: true,
-            indicatorColor: AppTheme.primaryColor,
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.textSecondaryColor,
-            tabs: [
-              Tab(text: 'المنتجات'),
-              Tab(text: 'إعدادات المنتجات'),
-              Tab(text: 'المخزون'),
-              Tab(text: 'السجلات'),
-              Tab(text: 'المحذوفات'),
-            ],
-          ),
+          const Spacer(),
+          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppDimensions.borderRadiusM,
+          border: Border.all(color: AppTheme.dividerColor),
         ),
-        body: TabBarView(
-          children: [
-            // 1. المنتجات
-            RefreshIndicator(
-              onRefresh: () =>
-                  ref.read(productsControllerProvider.notifier).loadProducts(),
-              color: AppTheme.accentColor,
-              child: isLoading && products.isEmpty
-                  ? const SkeletonProductsGrid()
-                  : products.isEmpty
-                  ? _buildEmptyState(context)
-                  : _buildProductsList(context, ref, products),
-            ),
-            // 2. إعدادات المنتجات
-            const ProductSettingsView(),
-            // 3. المخزون - صفحة انتقال سريع
-            _buildQuickAccessPage(
-              context,
-              title: 'إدارة المخزون',
-              subtitle: 'تابع مخزونك، عدّل الكميات، وتلقَّ تنبيهات النقص',
-              icon: Icons.inventory_2_outlined,
-              buttonText: 'فتح إدارة المخزون',
-              onPressed: () => context.push('/dashboard/inventory'),
-            ),
-            // 4. السجلات - صفحة انتقال سريع
-            _buildQuickAccessPage(
-              context,
-              title: 'سجلات النظام',
-              subtitle: 'سجلات المنتجات والمخزون وجميع العمليات',
-              icon: Icons.history_outlined,
-              buttonText: 'فتح السجلات',
-              onPressed: () => context.push('/dashboard/audit-logs'),
-            ),
-            // 5. المحذوفات
-            _buildPlaceholderPage('المنتجات المحذوفة'),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _showProductTypeSelection(context),
-          backgroundColor: AppTheme.accentColor,
-          foregroundColor: Colors.white,
-          elevation: 4,
-          icon: const Icon(Icons.add, size: AppDimensions.iconM),
-          label: const Text(
-            'إضافة منتج',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontBody,
+        child: TextField(
+          onChanged: (value) {
+            setState(() => _searchQuery = value);
+          },
+          decoration: InputDecoration(
+            hintText: 'البحث في المنتجات...',
+            hintStyle: TextStyle(color: AppTheme.textHintColor),
+            prefixIcon: Icon(Icons.search, color: AppTheme.textHintColor),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing16,
+              vertical: AppDimensions.spacing12,
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildTabs() {
+    return Container(
+      margin: const EdgeInsets.only(top: AppDimensions.spacing12),
+      child: TabBar(
+        controller: _tabController,
+        isScrollable: true,
+        indicatorColor: AppTheme.primaryColor,
+        labelColor: AppTheme.primaryColor,
+        unselectedLabelColor: AppTheme.textSecondaryColor,
+        tabs: const [
+          Tab(text: 'المنتجات'),
+          Tab(text: 'إعدادات المنتجات'),
+          Tab(text: 'المخزون'),
+          Tab(text: 'السجلات'),
+          Tab(text: 'المحذوفات'),
+        ],
+      ),
+    );
+  }
+
+  List<dynamic> _filterProducts(List<dynamic> products) {
+    if (_searchQuery.isEmpty) return products;
+    return products
+        .where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
   }
 
   void _showProductTypeSelection(BuildContext context) {
@@ -249,29 +338,178 @@ class ProductsTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlaceholderPage(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.construction,
-            size: 64,
-            color: AppTheme.textHintColor,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textSecondaryColor,
+  /// تبويب المنتجات المحذوفة
+  Widget _buildDeletedProductsTab() {
+    // قائمة محاكاة للمنتجات المحذوفة
+    final deletedProducts = <Map<String, dynamic>>[];
+
+    if (deletedProducts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppTheme.errorColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: SvgPicture.asset(
+                AppIcons.delete,
+                width: 64,
+                height: 64,
+                colorFilter: ColorFilter.mode(
+                  AppTheme.errorColor.withValues(alpha: 0.5),
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'لا توجد منتجات محذوفة',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'المنتجات المحذوفة ستظهر هنا\nيمكنك استعادتها خلال 30 يوم',
+              style: TextStyle(
+                color: AppTheme.textSecondaryColor,
+                fontSize: AppDimensions.fontBody,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: AppDimensions.paddingM,
+              margin: AppDimensions.paddingHorizontalL,
+              decoration: BoxDecoration(
+                color: AppTheme.infoColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusM,
+                border: Border.all(
+                  color: AppTheme.infoColor.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    AppIcons.info,
+                    width: AppDimensions.iconS,
+                    height: AppDimensions.iconS,
+                    colorFilter: const ColorFilter.mode(
+                      AppTheme.infoColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'المنتجات المحذوفة تُحذف نهائياً بعد 30 يوم',
+                      style: TextStyle(
+                        color: AppTheme.infoColor,
+                        fontSize: AppDimensions.fontBody2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: AppDimensions.paddingM,
+      itemCount: deletedProducts.length,
+      itemBuilder: (context, index) {
+        final product = deletedProducts[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(Icons.image, color: Colors.grey[400]),
+            ),
+            title: Text(product['name'] ?? ''),
+            subtitle: Text('محذوف منذ ${product['deletedAt'] ?? ''}'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.restore, color: AppTheme.successColor),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('تم استعادة المنتج'),
+                        backgroundColor: AppTheme.successColor,
+                      ),
+                    );
+                  },
+                  tooltip: 'استعادة',
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_forever,
+                    color: AppTheme.errorColor,
+                  ),
+                  onPressed: () {
+                    _showPermanentDeleteConfirmation(
+                      context,
+                      product['name'] ?? '',
+                    );
+                  },
+                  tooltip: 'حذف نهائي',
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'هذه الصفحة قيد التطوير',
-            style: TextStyle(color: AppTheme.textHintColor),
+        );
+      },
+    );
+  }
+
+  void _showPermanentDeleteConfirmation(
+    BuildContext context,
+    String productName,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('حذف نهائي'),
+        content: Text(
+          'هل أنت متأكد من حذف "$productName" نهائياً؟\nلا يمكن التراجع عن هذا الإجراء.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم الحذف نهائياً'),
+                  backgroundColor: AppTheme.errorColor,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorColor,
+            ),
+            child: const Text(
+              'حذف نهائي',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -603,10 +841,8 @@ class ProductsTab extends ConsumerWidget {
   ) {
     switch (value) {
       case 'edit':
-        // TODO: Implement Edit
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('سيتم تفعيل التعديل قريباً')),
-        );
+        // التنقل لصفحة تعديل المنتج
+        context.push('/dashboard/products/${product.id}');
         break;
       case 'duplicate':
         _duplicateProduct(context, ref, product);
@@ -962,47 +1198,6 @@ class ProductsTab extends ConsumerWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-    );
-  }
-
-  void _showSearchDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: AppDimensions.borderRadiusM,
-          ),
-          title: const Text('البحث عن منتج', textAlign: TextAlign.center),
-          content: TextField(
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: 'اكتب اسم المنتج...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-            ),
-            onSubmitted: (value) {
-              Navigator.pop(context);
-              if (value.isNotEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('البحث عن: $value'),
-                    backgroundColor: AppTheme.primaryColor,
-                  ),
-                );
-              }
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

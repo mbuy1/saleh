@@ -5,6 +5,10 @@ import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
+
+// ignore_for_file: unused_field
 
 // ============================================================================
 // Models
@@ -32,6 +36,20 @@ class DashboardStats {
     required this.ordersChange,
     required this.customersChange,
   });
+
+  factory DashboardStats.fromJson(Map<String, dynamic> json) {
+    return DashboardStats(
+      revenue: (json['revenue'] ?? json['total_revenue'] ?? 0).toDouble(),
+      orders: json['orders'] ?? json['total_orders'] ?? 0,
+      customers: json['customers'] ?? json['total_customers'] ?? 0,
+      avgOrderValue: (json['avg_order_value'] ?? 0).toDouble(),
+      pageViews: json['page_views'] ?? 0,
+      visitors: json['visitors'] ?? 0,
+      revenueChange: (json['revenue_change'] ?? 0).toDouble(),
+      ordersChange: (json['orders_change'] ?? 0).toDouble(),
+      customersChange: (json['customers_change'] ?? 0).toDouble(),
+    );
+  }
 }
 
 class SmartInsight {
@@ -58,6 +76,23 @@ class SmartInsight {
     required this.isRead,
     required this.createdAt,
   });
+
+  factory SmartInsight.fromJson(Map<String, dynamic> json) {
+    return SmartInsight(
+      id: json['id'] ?? '',
+      type: json['type'] ?? 'general',
+      priority: json['priority'] ?? 'medium',
+      title: json['title'] ?? '',
+      description: json['description'],
+      recommendation: json['recommendation'],
+      metricValue: json['metric_value']?.toDouble(),
+      metricChange: json['metric_change']?.toDouble(),
+      isRead: json['is_read'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+    );
+  }
 
   IconData get icon {
     switch (type) {
@@ -111,6 +146,24 @@ class StoreGoal {
     required this.endDate,
   });
 
+  factory StoreGoal.fromJson(Map<String, dynamic> json) {
+    return StoreGoal(
+      id: json['id'] ?? '',
+      goalType: json['goal_type'] ?? 'revenue',
+      period: json['period'] ?? 'monthly',
+      targetValue: (json['target_value'] ?? 0).toDouble(),
+      currentValue: (json['current_value'] ?? 0).toDouble(),
+      progress: (json['progress'] ?? 0).toDouble(),
+      status: json['status'] ?? 'in_progress',
+      startDate: json['start_date'] != null
+          ? DateTime.parse(json['start_date'])
+          : DateTime.now(),
+      endDate: json['end_date'] != null
+          ? DateTime.parse(json['end_date'])
+          : DateTime.now(),
+    );
+  }
+
   String get goalTypeText {
     switch (goalType) {
       case 'revenue':
@@ -154,7 +207,9 @@ class SmartAnalyticsScreen extends StatefulWidget {
 }
 
 class _SmartAnalyticsScreenState extends State<SmartAnalyticsScreen> {
+  final ApiService _api = ApiService();
   bool _isLoading = true;
+  String? _error;
   String _selectedPeriod = '7d';
   DashboardStats? _stats;
   List<SmartInsight> _insights = [];
@@ -169,103 +224,80 @@ class _SmartAnalyticsScreenState extends State<SmartAnalyticsScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-
     setState(() {
-      _stats = DashboardStats(
-        revenue: 45750,
-        orders: 156,
-        customers: 89,
-        avgOrderValue: 293.27,
-        pageViews: 12500,
-        visitors: 3200,
-        revenueChange: 12.5,
-        ordersChange: 8.3,
-        customersChange: 15.2,
-      );
-
-      _chartData = [
-        {'day': 'السبت', 'revenue': 5200, 'orders': 18},
-        {'day': 'الأحد', 'revenue': 6800, 'orders': 24},
-        {'day': 'الإثنين', 'revenue': 7200, 'orders': 28},
-        {'day': 'الثلاثاء', 'revenue': 5900, 'orders': 20},
-        {'day': 'الأربعاء', 'revenue': 8100, 'orders': 32},
-        {'day': 'الخميس', 'revenue': 6300, 'orders': 22},
-        {'day': 'الجمعة', 'revenue': 6250, 'orders': 12},
-      ];
-
-      _customerSegments = {
-        'new': 45,
-        'active': 28,
-        'loyal': 12,
-        'vip': 4,
-        'at_risk': 8,
-        'churned': 3,
-      };
-
-      _insights = [
-        SmartInsight(
-          id: '1',
-          type: 'sales_trend',
-          priority: 'high',
-          title: 'ارتفاع المبيعات بنسبة 25%',
-          description: 'مبيعات هذا الأسبوع أعلى من المعتاد',
-          recommendation: 'استمر في الترويج للمنتجات الأكثر مبيعاً',
-          metricValue: 25,
-          metricChange: 25,
-          isRead: false,
-          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-        ),
-        SmartInsight(
-          id: '2',
-          type: 'product_opportunity',
-          priority: 'medium',
-          title: 'منتج قد ينفد قريباً',
-          description: 'المخزون المتبقي من "قميص أبيض" قليل',
-          recommendation: 'أعد تزويد المخزون قبل نفاده',
-          isRead: false,
-          createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-        ),
-        SmartInsight(
-          id: '3',
-          type: 'customer_risk',
-          priority: 'critical',
-          title: '5 عملاء VIP لم يشتروا منذ 30 يوم',
-          description: 'عملاء مميزون قد يحتاجون تواصل',
-          recommendation: 'أرسل لهم عرض خاص أو كوبون',
-          isRead: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ];
-
-      _goals = [
-        StoreGoal(
-          id: '1',
-          goalType: 'revenue',
-          period: 'monthly',
-          targetValue: 100000,
-          currentValue: 67500,
-          progress: 67.5,
-          status: 'in_progress',
-          startDate: DateTime(2025, 12, 1),
-          endDate: DateTime(2025, 12, 31),
-        ),
-        StoreGoal(
-          id: '2',
-          goalType: 'orders',
-          period: 'monthly',
-          targetValue: 300,
-          currentValue: 189,
-          progress: 63,
-          status: 'in_progress',
-          startDate: DateTime(2025, 12, 1),
-          endDate: DateTime(2025, 12, 31),
-        ),
-      ];
-
-      _isLoading = false;
+      _isLoading = true;
+      _error = null;
     });
+
+    try {
+      // جلب البيانات من API بشكل متوازي
+      final results = await Future.wait([
+        _api.get(
+          '/secure/analytics/dashboard',
+          queryParams: {'period': _selectedPeriod},
+        ),
+        _api.get('/secure/analytics/insights'),
+        _api.get('/secure/analytics/goals'),
+        _api.get('/secure/analytics/segments'),
+        _api.get(
+          '/secure/analytics/hourly',
+          queryParams: {'period': _selectedPeriod},
+        ),
+      ]);
+
+      final dashboardResponse = json.decode(results[0].body);
+      final insightsResponse = json.decode(results[1].body);
+      final goalsResponse = json.decode(results[2].body);
+      final segmentsResponse = json.decode(results[3].body);
+      final hourlyResponse = json.decode(results[4].body);
+
+      setState(() {
+        // تحويل إحصائيات لوحة التحكم
+        if (dashboardResponse['ok'] == true &&
+            dashboardResponse['data'] != null) {
+          _stats = DashboardStats.fromJson(dashboardResponse['data']);
+        }
+
+        // تحويل الرؤى الذكية
+        if (insightsResponse['ok'] == true &&
+            insightsResponse['data'] != null) {
+          final insightsData = insightsResponse['data'] as List? ?? [];
+          _insights = insightsData
+              .map((j) => SmartInsight.fromJson(j))
+              .toList();
+        }
+
+        // تحويل الأهداف
+        if (goalsResponse['ok'] == true && goalsResponse['data'] != null) {
+          final goalsData = goalsResponse['data'] as List? ?? [];
+          _goals = goalsData.map((j) => StoreGoal.fromJson(j)).toList();
+        }
+
+        // تحويل شرائح العملاء
+        if (segmentsResponse['ok'] == true &&
+            segmentsResponse['data'] != null) {
+          final segmentsData =
+              segmentsResponse['data'] as Map<String, dynamic>? ?? {};
+          _customerSegments = segmentsData.map(
+            (key, value) => MapEntry(key, value as int),
+          );
+        }
+
+        // تحويل بيانات الرسم البياني
+        if (hourlyResponse['ok'] == true && hourlyResponse['data'] != null) {
+          _chartData = (hourlyResponse['data'] as List? ?? [])
+              .map((item) => item as Map<String, dynamic>)
+              .toList();
+        }
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'حدث خطأ في تحميل البيانات: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override

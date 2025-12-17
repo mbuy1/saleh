@@ -665,14 +665,66 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'قريباً...',
+              'تخصيص الإشعارات التي تريد استلامها',
               style: TextStyle(
                 color: AppTheme.textSecondaryColor,
                 fontSize: 14,
               ),
             ),
+            const SizedBox(height: 24),
+            _buildNotificationSettingsContent(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationSettingsContent() {
+    return Column(
+      children: [
+        _buildSettingSwitch('إشعارات الطلبات الجديدة', true, (value) {}),
+        _buildSettingSwitch('إشعارات الدفع', true, (value) {}),
+        _buildSettingSwitch('تحديثات المنتجات', false, (value) {}),
+        _buildSettingSwitch('رسائل العملاء', true, (value) {}),
+        _buildSettingSwitch('التقارير الأسبوعية', false, (value) {}),
+        _buildSettingSwitch('العروض والتخفيضات', true, (value) {}),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم حفظ الإعدادات'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text('حفظ الإعدادات'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingSwitch(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 14)),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: AppTheme.primaryColor.withValues(alpha: 0.5),
+            activeThumbColor: AppTheme.primaryColor,
+          ),
+        ],
       ),
     );
   }

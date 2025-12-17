@@ -39,14 +39,13 @@ class DashboardShell extends StatefulWidget {
 
 class _DashboardShellState extends State<DashboardShell> {
   /// الحصول على الـ index الحالي بناءً على المسار
-  /// الترتيب: الرئيسية(0)، الطلبات(1)، +(2)، المحادثات(3)، دروب شوبينقنا(4)
-  /// 🔒 LOCKED - تم التثبيت بعد التبديل بين دروب شوبينقنا واختصاراتي
+  /// الترتيب: الرئيسية(0)، الطلبات(1)، +(2) إضافة منتج، المحادثات(3)، دروب شوبينقنا(4)
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
 
     if (location.startsWith('/dashboard/orders')) return 1;
-    if (location.startsWith('/dashboard/products')) {
-      return 2; // زر + يظهر عند صفحة المنتجات
+    if (location.startsWith('/dashboard/products/add')) {
+      return 2; // زر + يظهر عند صفحة إضافة المنتجات
     }
     if (location.startsWith('/dashboard/conversations')) return 3;
     if (location.startsWith('/dashboard/dropshipping')) {
@@ -64,14 +63,14 @@ class _DashboardShellState extends State<DashboardShell> {
         context.go('/dashboard/orders');
         break;
       case 2:
-        // زر + يفتح صفحة المنتجات
-        context.go('/dashboard/products');
+        // زر + يفتح صفحة إضافة منتج مباشرة
+        context.push('/dashboard/products/add');
         break;
       case 3:
         context.go('/dashboard/conversations');
         break;
       case 4:
-        // دروب شوبينقنا في البار السفلي (تم التبديل مع اختصاراتي)
+        // دروب شوبينقنا في البار السفلي
         context.go('/dashboard/dropshipping');
         break;
     }

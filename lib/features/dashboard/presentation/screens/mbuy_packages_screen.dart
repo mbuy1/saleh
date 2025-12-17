@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -311,11 +312,11 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'حزم التوفير',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: AppDimensions.fontHeadline,
             color: AppTheme.textPrimaryColor,
           ),
         ),
@@ -348,10 +349,10 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: AppDimensions.paddingL,
       decoration: BoxDecoration(
         gradient: AppTheme.headerBannerGradient,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppDimensions.borderRadiusXL,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,13 +360,13 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing12,
+                  vertical: AppDimensions.spacing6,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppDimensions.borderRadiusXL,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -393,18 +394,21 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'اختر الباقة المناسبة لك',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: AppDimensions.fontDisplay2,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'وفر أكثر مع حزم التوفير الشاملة',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: AppDimensions.fontBody,
+            ),
           ),
         ],
       ),
@@ -440,7 +444,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
           color: isSelected
               ? package.color.withValues(alpha: 0.1)
               : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppDimensions.borderRadiusL,
           border: Border.all(
             color: isSelected ? package.color : AppTheme.borderColor,
             width: isSelected ? 2 : 1,
@@ -456,16 +460,16 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppDimensions.paddingM,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Icon
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(AppDimensions.spacing10),
                     decoration: BoxDecoration(
                       color: package.color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppDimensions.borderRadiusM,
                     ),
                     child: SvgPicture.asset(
                       package.iconPath,
@@ -481,35 +485,38 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                   // Name
                   Text(
                     package.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: AppDimensions.fontTitle,
                     ),
                   ),
                   const SizedBox(height: 4),
                   // Description
                   Text(
                     package.description,
-                    style: TextStyle(color: AppTheme.slate600, fontSize: 12),
+                    style: TextStyle(
+                      color: AppTheme.slate600,
+                      fontSize: AppDimensions.fontLabel,
+                    ),
                   ),
                   const Spacer(),
                   // Price
                   if (package.isFree)
-                    const Text(
+                    Text(
                       'مجاناً',
                       style: TextStyle(
                         color: AppTheme.successColor,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: AppDimensions.fontDisplay3,
                       ),
                     )
                   else if (package.price == -1)
-                    const Text(
+                    Text(
                       'اتصل بنا',
                       style: TextStyle(
                         color: AppTheme.primaryColor,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontTitle,
                       ),
                     )
                   else
@@ -522,7 +529,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                             style: TextStyle(
                               color: AppTheme.slate600,
                               decoration: TextDecoration.lineThrough,
-                              fontSize: 12,
+                              fontSize: AppDimensions.fontLabel,
                             ),
                           ),
                         Row(
@@ -532,14 +539,14 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                               style: TextStyle(
                                 color: package.color,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 24,
+                                fontSize: AppDimensions.fontDisplay2,
                               ),
                             ),
-                            const Text(
+                            Text(
                               ' ر.س/شهر',
                               style: TextStyle(
                                 color: AppTheme.slate600,
-                                fontSize: 12,
+                                fontSize: AppDimensions.fontLabel,
                               ),
                             ),
                           ],
@@ -557,9 +564,11 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                             ? AppTheme.slate600
                             : package.color,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: EdgeInsets.symmetric(
+                          vertical: AppDimensions.spacing10,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: AppDimensions.borderRadiusS,
                         ),
                       ),
                       child: Text(
@@ -568,9 +577,9 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                             : package.price == -1
                             ? 'تواصل معنا'
                             : 'اشترك',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: AppDimensions.fontBody,
                         ),
                       ),
                     ),
@@ -599,7 +608,7 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                     'الأكثر طلباً',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: AppDimensions.fontCaption - 1,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -611,19 +620,19 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
                 top: 8,
                 left: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing6,
+                    vertical: AppDimensions.spacing2,
                   ),
                   decoration: BoxDecoration(
                     color: AppTheme.errorColor,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: AppDimensions.borderRadiusXS,
                   ),
                   child: Text(
                     '-${package.discount}%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: AppDimensions.fontCaption - 1,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -637,10 +646,10 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
 
   Widget _buildFeaturesComparison() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: AppDimensions.paddingL,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -651,9 +660,12 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ماذا تحتوي الحزم؟',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+            ),
           ),
           const SizedBox(height: 16),
           _buildFeatureRow('إنشاء متجر', ['✓', '✓', '✓', '✓']),
@@ -703,10 +715,10 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
 
   Widget _buildFAQ() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: AppDimensions.paddingL,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimensions.borderRadiusL,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -717,9 +729,12 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'أسئلة شائعة',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+            ),
           ),
           const SizedBox(height: 16),
           _buildFAQItem(
@@ -743,14 +758,20 @@ class _MbuyPackagesScreenState extends ConsumerState<MbuyPackagesScreen> {
     return ExpansionTile(
       title: Text(
         question,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: AppDimensions.fontBody,
+        ),
       ),
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Text(
             answer,
-            style: TextStyle(color: AppTheme.slate600, fontSize: 14),
+            style: TextStyle(
+              color: AppTheme.slate600,
+              fontSize: AppDimensions.fontBody,
+            ),
           ),
         ),
       ],

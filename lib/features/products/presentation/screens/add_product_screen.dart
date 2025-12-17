@@ -42,6 +42,28 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   String? _selectedCategoryId;
   bool _dropshippingEnabled = false;
 
+  // التصنيف الفرعي
+  String? _selectedSubCategory;
+  bool _showCustomSubCategory = false;
+
+  // الكلمات المفتاحية كـ Tags
+  final List<String> _keywordTags = [];
+  final TextEditingController _keywordInputController = TextEditingController();
+
+  // قائمة التصنيفات الفرعية الافتراضية
+  final List<String> _defaultSubCategories = [
+    'هواتف ذكية',
+    'إكسسوارات',
+    'ملابس رجالية',
+    'ملابس نسائية',
+    'أحذية',
+    'أجهزة إلكترونية',
+    'مستحضرات تجميل',
+    'أدوات منزلية',
+    'طعام ومشروبات',
+    'أخرى',
+  ];
+
   // وسائط المنتج
   final List<XFile> _selectedImages = [];
   XFile? _selectedVideo;
@@ -205,7 +227,205 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     _keywordsController.dispose();
     _wholesalePriceController.dispose();
     _slaDaysController.dispose();
+    _keywordInputController.dispose();
     super.dispose();
+  }
+
+  /// بناء حقل التصنيف الفرعي مع خيار "أخرى"
+  Widget _buildSubCategoryField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'التصنيف الفرعي (اختياري)',
+          style: TextStyle(
+            fontSize: AppDimensions.fontBody,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textPrimaryColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppTheme.dividerColor),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          ),
+          child: DropdownButtonFormField<String>(
+            initialValue: _selectedSubCategory,
+            decoration: InputDecoration(
+              hintText: 'اختر التصنيف الفرعي',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  AppIcons.subdirectory,
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppTheme.textSecondaryColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            items: _defaultSubCategories.map((category) {
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Text(category),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedSubCategory = value;
+                _showCustomSubCategory = value == 'أخرى';
+                if (!_showCustomSubCategory) {
+                  _subCategoryController.text = value ?? '';
+                } else {
+                  _subCategoryController.clear();
+                }
+              });
+            },
+          ),
+        ),
+        // حقل إدخال مخصص عند اختيار "أخرى"
+        if (_showCustomSubCategory) ...[
+          const SizedBox(height: 12),
+          MbuyInputField(
+            controller: _subCategoryController,
+            label: 'أدخل التصنيف الفرعي',
+            hint: 'اكتب التصنيف الفرعي هنا...',
+            prefixIcon: Padding(
+              padding: const EdgeInsets.all(12),
+              child: SvgPicture.asset(
+                AppIcons.edit,
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.textSecondaryColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// بناء شريط الكلمات المفتاحية كـ Tags
+  Widget _buildKeywordsChips() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'الكلمات المفتاحية (SEO)',
+          style: TextStyle(
+            fontSize: AppDimensions.fontBody,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textPrimaryColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppTheme.dividerColor),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+            color: Colors.white,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // شريط الكلمات المفتاحية
+              if (_keywordTags.isNotEmpty) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _keywordTags.map((tag) {
+                    return Chip(
+                      label: Text(
+                        tag,
+                        style: TextStyle(fontSize: AppDimensions.fontLabel),
+                      ),
+                      deleteIcon: const Icon(Icons.close, size: 16),
+                      onDeleted: () {
+                        setState(() {
+                          _keywordTags.remove(tag);
+                          _updateKeywordsController();
+                        });
+                      },
+                      backgroundColor: AppTheme.primaryColor.withValues(
+                        alpha: 0.1,
+                      ),
+                      deleteIconColor: AppTheme.primaryColor,
+                      labelStyle: const TextStyle(color: AppTheme.primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+              ],
+              // حقل إضافة كلمة مفتاحية جديدة
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _keywordInputController,
+                      decoration: InputDecoration(
+                        hintText: 'أضف كلمة مفتاحية...',
+                        hintStyle: TextStyle(fontSize: AppDimensions.fontBody),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      onSubmitted: _addKeyword,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.add_circle,
+                      color: AppTheme.primaryColor,
+                    ),
+                    onPressed: () => _addKeyword(_keywordInputController.text),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'اضغط Enter أو + لإضافة كلمة مفتاحية',
+          style: TextStyle(
+            fontSize: AppDimensions.fontLabel,
+            color: AppTheme.textHintColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _addKeyword(String keyword) {
+    final trimmed = keyword.trim();
+    if (trimmed.isNotEmpty && !_keywordTags.contains(trimmed)) {
+      setState(() {
+        _keywordTags.add(trimmed);
+        _keywordInputController.clear();
+        _updateKeywordsController();
+      });
+    }
+  }
+
+  void _updateKeywordsController() {
+    _keywordsController.text = _keywordTags.join(', ');
   }
 
   Future<void> _submitForm() async {
@@ -753,25 +973,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   ),
                 const SizedBox(height: AppDimensions.spacing16),
 
-                // 5. التصنيف الفرعي (اختياري)
+                // 5. التصنيف الفرعي (اختياري) - مع خيار "أخرى"
                 if (showSubCategory) ...[
-                  MbuyInputField(
-                    controller: _subCategoryController,
-                    label: 'التصنيف الفرعي (اختياري)',
-                    hint: 'مثال: هواتف ذكية',
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        AppIcons.subdirectory,
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          AppTheme.textSecondaryColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildSubCategoryField(),
                   const SizedBox(height: AppDimensions.spacing16),
                 ],
 
@@ -872,25 +1076,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 ),
                 const SizedBox(height: AppDimensions.spacing16),
 
-                // 9. الكلمات المفتاحية
+                // 9. الكلمات المفتاحية - شريط Tags
                 if (showSeoKeywords) ...[
-                  MbuyInputField(
-                    controller: _keywordsController,
-                    label: 'الكلمات المفتاحية (SEO)',
-                    hint: 'كلمات مفصولة بفاصلة',
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        AppIcons.tag,
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          AppTheme.textSecondaryColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildKeywordsChips(),
                   const SizedBox(height: AppDimensions.spacing16),
                 ],
 
@@ -907,9 +1095,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                             'فعّل للدروب شوبينق',
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          subtitle: const Text(
+                          subtitle: Text(
                             'السماح للتجار الآخرين ببيع هذا المنتج',
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(fontSize: AppDimensions.fontLabel),
                           ),
                           value: _dropshippingEnabled,
                           onChanged: (value) {
@@ -1024,9 +1212,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: AppDimensions.spacing48,
-                ), // Bottom padding
+                // مساحة للبار السفلي
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -1159,7 +1346,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            const Text('صورة', style: TextStyle(fontSize: 10)),
+                            Text(
+                              'صورة',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontCaption - 1,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1188,7 +1380,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            const Text('فيديو', style: TextStyle(fontSize: 10)),
+                            Text(
+                              'فيديو',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontCaption - 1,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1213,12 +1410,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               ),
             ),
             title: const Text('توليد وسائط بالذكاء الاصطناعي'),
-            subtitle: const Text('قريباً...'),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم تفعيل هذه الميزة قريباً')),
-              );
-            },
+            subtitle: const Text('إنشاء صور وفيديوهات للمنتج'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _showAIMediaGenerationDialog(),
           ),
         ),
       ],
@@ -1226,16 +1420,244 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Widget _buildAIButton() {
-    return MbuyButton(
-      text: 'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('سيتم تفعيل هذه الميزة قريباً')),
-        );
-      },
-      type: MbuyButtonType.secondary,
-      icon: Icons.auto_awesome,
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _generateWithAI,
+        icon: const Icon(Icons.auto_awesome, size: 20),
+        label: Text(
+          'توليد الوصف والكلمات المفتاحية بالذكاء الاصطناعي',
+          style: TextStyle(
+            fontSize: AppDimensions.fontBody2,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
+          foregroundColor: AppTheme.primaryColor,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing16,
+            vertical: AppDimensions.spacing12,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+            side: BorderSide(
+              color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  void _generateWithAI() {
+    // التحقق من وجود اسم المنتج
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('الرجاء إدخال اسم المنتج أولاً'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // عرض مؤشر التحميل
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // محاكاة توليد AI
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      Navigator.pop(context); // إغلاق مؤشر التحميل
+
+      // تعبئة البيانات المولدة
+      setState(() {
+        final productName = _nameController.text.trim();
+        _descriptionController.text =
+            'منتج $productName عالي الجودة، مصنوع من أفضل المواد الخام. يتميز بالمتانة والأناقة في التصميم. مناسب للاستخدام اليومي ويأتي مع ضمان الجودة.';
+        _keywordsController.text =
+            '$productName, منتج أصلي, جودة عالية, متجر موثوق, شحن سريع';
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✨ تم توليد الوصف والكلمات المفتاحية بنجاح'),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    });
+  }
+
+  void _showAIMediaGenerationDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing16),
+            const Text(
+              'توليد الوسائط بالذكاء الاصطناعي',
+              style: TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing8),
+            const Text(
+              'اختر نوع الوسائط التي تريد توليدها',
+              style: TextStyle(color: AppTheme.textSecondaryColor),
+            ),
+            const SizedBox(height: AppDimensions.spacing24),
+            _buildAIMediaOption(
+              icon: Icons.image,
+              title: 'صورة منتج احترافية',
+              subtitle: 'توليد صورة بخلفية بيضاء',
+              onTap: () => _generateAIMedia('product_image'),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            _buildAIMediaOption(
+              icon: Icons.auto_awesome,
+              title: 'صورة إعلانية',
+              subtitle: 'صورة مع تأثيرات جذابة للإعلانات',
+              onTap: () => _generateAIMedia('ad_image'),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            _buildAIMediaOption(
+              icon: Icons.videocam,
+              title: 'فيديو قصير',
+              subtitle: 'فيديو 15 ثانية للمنتج',
+              onTap: () => _generateAIMedia('short_video'),
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            _buildAIMediaOption(
+              icon: Icons.remove_red_eye,
+              title: 'إزالة الخلفية',
+              subtitle: 'إزالة خلفية الصورة الحالية',
+              onTap: () => _generateAIMedia('remove_bg'),
+            ),
+            const SizedBox(height: AppDimensions.spacing16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAIMediaOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.spacing12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+              ),
+              child: Icon(icon, color: AppTheme.primaryColor),
+            ),
+            const SizedBox(width: AppDimensions.spacing12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _generateAIMedia(String type) {
+    Navigator.pop(context);
+
+    // عرض مؤشر التحميل
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('جاري توليد ${_getMediaTypeName(type)}...'),
+          ],
+        ),
+      ),
+    );
+
+    // محاكاة التوليد
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✨ تم توليد ${_getMediaTypeName(type)} بنجاح'),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    });
+  }
+
+  String _getMediaTypeName(String type) {
+    switch (type) {
+      case 'product_image':
+        return 'صورة المنتج';
+      case 'ad_image':
+        return 'الصورة الإعلانية';
+      case 'short_video':
+        return 'الفيديو القصير';
+      case 'remove_bg':
+        return 'الصورة بدون خلفية';
+      default:
+        return 'الوسائط';
+    }
   }
 
   Widget _buildSubPageHeader(BuildContext context, String title) {

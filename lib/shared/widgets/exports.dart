@@ -26,6 +26,7 @@ export 'accessible_button.dart';
 // Base Screen & Error Handling
 export 'base_screen.dart';
 export 'error_boundary.dart';
+export 'sub_page_scaffold.dart';
 
 // Utils
 export '../utils/dialog_helper.dart';

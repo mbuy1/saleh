@@ -45,10 +45,10 @@ class SalesScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: AppDimensions.paddingXL,
               decoration: BoxDecoration(
                 color: Colors.amber.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(100),
+                shape: BoxShape.circle,
               ),
               child: SvgPicture.asset(
                 AppIcons.chart,
@@ -60,17 +60,23 @@ class SalesScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: AppDimensions.spacing24),
+            Text(
               'إجمالي المبيعات',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                color: Colors.grey,
+              ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: AppDimensions.spacing8),
+            Text(
               '0 طلب',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: AppDimensions.fontHero,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: AppDimensions.spacing32),
             Container(
               padding: const EdgeInsets.all(AppDimensions.spacing24),
               child: Column(
@@ -92,19 +98,19 @@ class SalesScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
-                  const Text(
+                  Text(
                     'لا توجد مبيعات حتى الآن',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimaryColor,
                     ),
                   ),
-                  const SizedBox(height: AppDimensions.spacing8),
+                  SizedBox(height: AppDimensions.spacing8),
                   Text(
                     'أضف منتجاتك وابدأ البيع الآن',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       color: AppTheme.textSecondaryColor,
                     ),
                     textAlign: TextAlign.center,

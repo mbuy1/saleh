@@ -436,38 +436,44 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
       padding: AppDimensions.paddingXL,
       child: Column(
         children: [
-          const SizedBox(height: 40),
+          SizedBox(height: AppDimensions.spacing40),
           Container(
             padding: AppDimensions.paddingXL,
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withAlpha(25),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.smart_toy,
-              size: 64,
+              size: AppDimensions.iconDisplay,
               color: AppTheme.primaryColor,
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: AppDimensions.spacing24),
+          Text(
             'مرحباً! أنا مساعدك الذكي',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: AppDimensions.fontDisplay2,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: AppDimensions.spacing8),
           Text(
             'يمكنني مساعدتك في إدارة متجرك',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: AppDimensions.fontTitle,
+              color: Colors.grey[600],
+            ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: AppDimensions.spacing32),
           const Text(
             'جرب أن تسألني عن:',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppDimensions.spacing16),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: AppDimensions.spacing8,
+            runSpacing: AppDimensions.spacing8,
             alignment: WrapAlignment.center,
             children: [
               _buildSuggestionChip('اكتب وصف لمنتج جديد'),
@@ -477,7 +483,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               _buildSuggestionChip('اقتراح أسعار منافسة'),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: AppDimensions.spacing32),
           const Text(
             'الأوامر السريعة',
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -501,14 +507,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
   Widget _buildQuickCommandCard(Map<String, dynamic> command) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: AppDimensions.spacing8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppTheme.primaryColor.withAlpha(25),
-          child: const Icon(
+          child: Icon(
             Icons.flash_on,
             color: AppTheme.primaryColor,
-            size: 20,
+            size: AppDimensions.iconS,
           ),
         ),
         title: Text(command['title'] ?? ''),
@@ -529,7 +535,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: AppDimensions.spacing12),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
@@ -543,8 +549,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               decoration: BoxDecoration(
                 color: isUser ? AppTheme.primaryColor : Colors.white,
                 borderRadius: AppDimensions.borderRadiusL.copyWith(
-                  bottomRight: isUser ? const Radius.circular(4) : null,
-                  bottomLeft: !isUser ? const Radius.circular(4) : null,
+                  bottomRight: isUser
+                      ? Radius.circular(AppDimensions.radiusXS)
+                      : null,
+                  bottomLeft: !isUser
+                      ? Radius.circular(AppDimensions.radiusXS)
+                      : null,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -569,7 +579,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.copy, size: 16),
+                      icon: Icon(Icons.copy, size: AppDimensions.iconXS),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () {
@@ -583,7 +593,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.thumb_up_outlined,
-                        size: 16,
+                        size: AppDimensions.iconXS,
                         color: message['rating'] == 5
                             ? Colors.green
                             : Colors.grey,
@@ -595,7 +605,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.thumb_down_outlined,
-                        size: 16,
+                        size: AppDimensions.iconXS,
                         color: message['rating'] == 1
                             ? Colors.red
                             : Colors.grey,
@@ -617,7 +627,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: AppDimensions.spacing12),
         padding: AppDimensions.paddingM,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -627,9 +637,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildDot(0),
-            const SizedBox(width: 4),
+            SizedBox(width: AppDimensions.spacing4),
             _buildDot(1),
-            const SizedBox(width: 4),
+            SizedBox(width: AppDimensions.spacing4),
             _buildDot(2),
           ],
         ),
@@ -682,14 +692,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 decoration: InputDecoration(
                   hintText: 'اكتب رسالتك...',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: AppDimensions.borderRadiusXXL,
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
                   fillColor: Colors.grey[100],
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing16,
+                    vertical: AppDimensions.spacing12,
                   ),
                 ),
                 maxLines: null,
@@ -702,10 +712,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               backgroundColor: AppTheme.primaryColor,
               child: IconButton(
                 icon: _isSending
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
+                    ? SizedBox(
+                        width: AppDimensions.iconS,
+                        height: AppDimensions.iconS,
+                        child: const CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
@@ -739,8 +749,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusL),
+        ),
       ),
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.6,
@@ -762,9 +774,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
-                  const Text(
+                  Text(
                     'الأوامر السريعة',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontHeadline,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -772,12 +787,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             Expanded(
               child: ListView.builder(
                 controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing16,
+                ),
                 itemCount: _quickCommands.length,
                 itemBuilder: (context, index) {
                   final cmd = _quickCommands[index];
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
+                    margin: EdgeInsets.only(bottom: AppDimensions.spacing8),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: _getCategoryColor(
@@ -786,7 +803,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                         child: Icon(
                           _getCategoryIcon(cmd['category']),
                           color: _getCategoryColor(cmd['category']),
-                          size: 20,
+                          size: AppDimensions.iconS,
                         ),
                       ),
                       title: Text(cmd['title'] ?? ''),

@@ -85,7 +85,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: AppDimensions.spacing20),
 
           // زر العودة
           Align(
@@ -99,53 +99,53 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: AppDimensions.spacing40),
 
           // الأيقونة
           Center(
             child: Container(
-              width: 100,
-              height: 100,
+              width: AppDimensions.avatarProfile,
+              height: AppDimensions.avatarProfile,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: AppDimensions.borderRadiusXXL,
               ),
               child: Center(
                 child: AppIcon(
                   AppIcons.lock,
-                  size: 48,
+                  size: AppDimensions.iconHero,
                   color: AppTheme.primaryColor,
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacing32),
 
           // العنوان
           const Text(
             'نسيت كلمة المرور؟',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: AppDimensions.fontDisplay1,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimaryColor,
             ),
             textAlign: TextAlign.center,
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
 
           Text(
             'أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: AppDimensions.fontBody,
               color: AppTheme.mutedSlate,
               height: 1.5,
             ),
             textAlign: TextAlign.center,
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: AppDimensions.spacing40),
 
           // حقل الإيميل
           TextFormField(
@@ -157,10 +157,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               labelText: 'البريد الإلكتروني',
               hintText: 'example@email.com',
               prefixIcon: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: AppDimensions.paddingS,
                 child: AppIcon(
                   AppIcons.email,
-                  size: 22,
+                  size: AppDimensions.iconS,
                   color: AppTheme.mutedSlate,
                 ),
               ),
@@ -193,11 +193,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             },
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacing32),
 
           // زر الإرسال
           SizedBox(
-            height: 56,
+            height: AppDimensions.buttonHeightXL,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _handleSubmit,
               style: ElevatedButton.styleFrom(
@@ -209,10 +209,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 elevation: 0,
               ),
               child: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
+                  ? SizedBox(
+                      width: AppDimensions.iconM,
+                      height: AppDimensions.iconM,
+                      child: const CircularProgressIndicator(
                         color: Colors.white,
                         strokeWidth: 2,
                       ),
@@ -220,31 +220,35 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'إرسال رابط إعادة التعيين',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: AppDimensions.fontTitle,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        AppIcon(AppIcons.email, size: 20, color: Colors.white),
+                        const SizedBox(width: AppDimensions.spacing8),
+                        AppIcon(
+                          AppIcons.email,
+                          size: AppDimensions.iconS,
+                          color: Colors.white,
+                        ),
                       ],
                     ),
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacing24),
 
           // رابط العودة لتسجيل الدخول
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text(
+            child: Text(
               'العودة لتسجيل الدخول',
               style: TextStyle(
                 color: AppTheme.primaryColor,
                 fontWeight: FontWeight.w600,
-                fontSize: 14,
+                fontSize: AppDimensions.fontBody,
               ),
             ),
           ),
@@ -257,7 +261,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 80),
+        SizedBox(height: AppDimensions.spacing64 + AppDimensions.spacing16),
 
         // أيقونة النجاح
         Center(
@@ -266,44 +270,44 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             height: 120,
             decoration: BoxDecoration(
               color: AppTheme.successColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXXL + 6),
             ),
             child: Center(
               child: AppIcon(
                 AppIcons.checkCircle,
-                size: 64,
+                size: AppDimensions.iconDisplay,
                 color: AppTheme.successColor,
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacing32),
 
         // رسالة النجاح
-        const Text(
+        Text(
           'تم إرسال الرابط!',
           style: TextStyle(
-            fontSize: 28,
+            fontSize: AppDimensions.fontDisplay1,
             fontWeight: FontWeight.bold,
             color: AppTheme.textPrimaryColor,
           ),
           textAlign: TextAlign.center,
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         Text(
           'تم إرسال رابط إعادة تعيين كلمة المرور إلى\n${_emailController.text}',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: AppDimensions.fontBody,
             color: AppTheme.mutedSlate,
             height: 1.5,
           ),
           textAlign: TextAlign.center,
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         // تعليمات
         Container(
@@ -319,8 +323,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             children: [
               Row(
                 children: [
-                  AppIcon(AppIcons.info, size: 20, color: AppTheme.infoColor),
-                  const SizedBox(width: 8),
+                  AppIcon(
+                    AppIcons.info,
+                    size: AppDimensions.iconS,
+                    color: AppTheme.infoColor,
+                  ),
+                  const SizedBox(width: AppDimensions.spacing8),
                   const Text(
                     'تعليمات:',
                     style: TextStyle(
@@ -330,13 +338,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacing8),
               Text(
                 '• تحقق من صندوق الوارد في بريدك الإلكتروني\n'
                 '• قد يصل الرابط إلى مجلد الرسائل غير المرغوب فيها\n'
                 '• الرابط صالح لمدة 24 ساعة',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppDimensions.fontBody2,
                   color: AppTheme.infoColor.withValues(alpha: 0.9),
                   height: 1.6,
                 ),
@@ -345,11 +353,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           ),
         ),
 
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacing32),
 
         // زر العودة
         SizedBox(
-          height: 56,
+          height: AppDimensions.buttonHeightXL,
           child: ElevatedButton(
             onPressed: () => context.go('/login'),
             style: ElevatedButton.styleFrom(
@@ -360,26 +368,29 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ),
               elevation: 0,
             ),
-            child: const Text(
+            child: Text(
               'العودة لتسجيل الدخول',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing16),
 
         // إعادة الإرسال
         TextButton(
           onPressed: () {
             setState(() => _emailSent = false);
           },
-          child: const Text(
+          child: Text(
             'لم تستلم الرابط؟ إعادة الإرسال',
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.w600,
-              fontSize: 14,
+              fontSize: AppDimensions.fontBody,
             ),
           ),
         ),

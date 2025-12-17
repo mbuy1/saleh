@@ -7,7 +7,7 @@ class PaymentRepository {
   final ApiService _apiService;
 
   PaymentRepository({ApiService? apiService})
-      : _apiService = apiService ?? ApiService();
+    : _apiService = apiService ?? ApiService();
 
   /// الحصول على باقات النقاط
   Future<List<PointsPackage>> getPackages() async {

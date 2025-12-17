@@ -239,7 +239,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                 // ملاحظة
                 if (!_isEditMode)
                   Container(
-                    padding: const EdgeInsets.all(AppDimensions.spacing12),
+                    padding: AppDimensions.paddingS,
                     decoration: BoxDecoration(
                       color: AppTheme.infoColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
@@ -279,13 +279,13 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
 
   Widget _buildSubPageHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppDimensions.spacing16),
+      padding: EdgeInsets.only(bottom: AppDimensions.spacing16),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              padding: AppDimensions.paddingXS,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 borderRadius: AppDimensions.borderRadiusS,

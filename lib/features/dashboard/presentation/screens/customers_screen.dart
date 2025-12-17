@@ -338,7 +338,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
           ),
           Text(
             label,
-            style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: AppDimensions.fontCaption,
+              color: Colors.grey[600],
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -354,8 +357,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
           children: [
             SvgPicture.asset(
               AppIcons.peopleOutline,
-              width: 64,
-              height: 64,
+              width: AppDimensions.iconDisplay,
+              height: AppDimensions.iconDisplay,
               colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
             ),
             SizedBox(height: AppDimensions.spacing16),
@@ -420,9 +423,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                           customer.name.isNotEmpty
                               ? customer.name[0].toUpperCase()
                               : '?',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: AppDimensions.fontDisplay3,
                             color: AppTheme.primaryColor,
                           ),
                         )
@@ -439,9 +442,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                           Expanded(
                             child: Text(
                               customer.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                fontSize: AppDimensions.fontSubtitle,
                               ),
                             ),
                           ),
@@ -471,7 +474,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                                   Text(
                                     'متابع',
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: AppDimensions.fontCaption,
                                       color: Colors.red,
                                     ),
                                   ),
@@ -485,7 +488,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                         Text(
                           customer.phone!,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: AppDimensions.fontBody2,
                             color: Colors.grey[600],
                           ),
                         ),
@@ -550,8 +553,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXL),
+        ),
       ),
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.6,
@@ -560,22 +565,22 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
         expand: false,
         builder: (context, scrollController) => SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.all(24),
+          padding: AppDimensions.paddingXL,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
               Center(
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: AppDimensions.iconXXL,
+                  height: AppDimensions.spacing4,
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.spacing2),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimensions.spacing24),
               // Avatar & Name
               Row(
                 children: [
@@ -592,24 +597,24 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                             customer.name.isNotEmpty
                                 ? customer.name[0].toUpperCase()
                                 : '?',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 28,
+                              fontSize: AppDimensions.fontDisplay1,
                               color: AppTheme.primaryColor,
                             ),
                           )
                         : null,
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: AppDimensions.spacing16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           customer.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: AppDimensions.fontDisplay3,
                           ),
                         ),
                         if (customer.isFollower)
@@ -617,14 +622,14 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                             children: [
                               SvgPicture.asset(
                                 AppIcons.favorite,
-                                width: 14,
-                                height: 14,
+                                width: AppDimensions.fontBody,
+                                height: AppDimensions.fontBody,
                                 colorFilter: const ColorFilter.mode(
                                   Colors.red,
                                   BlendMode.srcIn,
                                 ),
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: AppDimensions.spacing4),
                               const Text(
                                 'متابع للمتجر',
                                 style: TextStyle(color: Colors.red),
@@ -636,14 +641,17 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimensions.spacing24),
               // Contact Info
               if (customer.phone != null || customer.email != null) ...[
-                const Text(
+                Text(
                   'معلومات التواصل',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppDimensions.fontTitle,
+                  ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spacing12),
                 if (customer.phone != null)
                   _buildContactRow(
                     AppIcons.phone,
@@ -668,14 +676,17 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                       );
                     },
                   ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppDimensions.spacing24),
               ],
               // Stats
-              const Text(
+              Text(
                 'إحصائيات العميل',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontTitle,
+                ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacing12),
               Row(
                 children: [
                   Expanded(
@@ -686,7 +697,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                       Colors.blue,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: AppDimensions.spacing12),
                   Expanded(
                     child: _buildDetailStat(
                       'إجمالي المشتريات',
@@ -698,7 +709,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                 ],
               ),
               if (customer.lastOrderDate != null) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spacing12),
                 _buildDetailStat(
                   'آخر طلب',
                   DateFormat('dd/MM/yyyy').format(customer.lastOrderDate!),
@@ -707,7 +718,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                   fullWidth: true,
                 ),
               ],
-              const SizedBox(height: 24),
+              SizedBox(height: AppDimensions.spacing24),
               // Actions
               Row(
                 children: [
@@ -722,8 +733,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                       },
                       icon: SvgPicture.asset(
                         AppIcons.shoppingBagOutlined,
-                        width: 20,
-                        height: 20,
+                        width: AppDimensions.iconS,
+                        height: AppDimensions.iconS,
                         colorFilter: ColorFilter.mode(
                           AppTheme.primaryColor,
                           BlendMode.srcIn,
@@ -731,13 +742,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                       ),
                       label: const Text('عرض الطلبات'),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          vertical: AppDimensions.spacing12,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: AppDimensions.spacing32),
             ],
           ),
         ),
@@ -749,22 +762,22 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
         child: Row(
           children: [
             SvgPicture.asset(
               iconPath,
-              width: 20,
-              height: 20,
+              width: AppDimensions.iconS,
+              height: AppDimensions.iconS,
               colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppDimensions.spacing12),
             Expanded(child: Text(text)),
             if (onTap != null)
               SvgPicture.asset(
                 AppIcons.copy,
-                width: 16,
-                height: 16,
+                width: AppDimensions.iconXS,
+                height: AppDimensions.iconXS,
                 colorFilter: ColorFilter.mode(
                   Colors.grey[400]!,
                   BlendMode.srcIn,
@@ -784,33 +797,36 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
     bool fullWidth = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimensions.paddingM,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimensions.borderRadiusM,
       ),
       child: Row(
         children: [
           SvgPicture.asset(
             iconPath,
-            width: 24,
-            height: 24,
+            width: AppDimensions.iconM,
+            height: AppDimensions.iconM,
             colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppDimensions.spacing12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontLabel,
+                    color: Colors.grey[600],
+                  ),
                 ),
                 Text(
                   value,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: AppDimensions.fontTitle,
                     color: color,
                   ),
                 ),

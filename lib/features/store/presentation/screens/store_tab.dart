@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// صفحة المتجر - Store Tab
@@ -10,31 +11,34 @@ class StoreTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         foregroundColor: AppTheme.textPrimaryColor,
         elevation: 0,
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           'المتجر',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: AppDimensions.fontHeadline,
             color: AppTheme.textPrimaryColor,
           ),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: AppTheme.primaryColor, size: 24),
+        iconTheme: const IconThemeData(
+          color: AppTheme.primaryColor,
+          size: AppDimensions.iconM,
+        ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           children: [
             // قسم إعدادات المتجر
             _buildSectionTitle('إعدادات المتجر'),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacing12),
             // معلومات المتجر
             _buildStoreOptionCard(
               context: context,
@@ -43,7 +47,7 @@ class StoreTab extends StatelessWidget {
               subtitle: 'تعديل اسم ووصف المتجر',
               onTap: () => context.push('/dashboard/store/create-store'),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacing12),
             // متجرك على جوك
             _buildStoreOptionCard(
               context: context,
@@ -52,10 +56,10 @@ class StoreTab extends StatelessWidget {
               subtitle: 'تخصيص مظهر وإعدادات المتجر',
               onTap: () => context.push('/dashboard/store-on-jock'),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             // قسم خيارات إضافية
             _buildSectionTitle('خيارات إضافية'),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacing12),
             // سجل تجاري
             _buildStoreOptionCard(
               context: context,
@@ -66,7 +70,7 @@ class StoreTab extends StatelessWidget {
                 '/dashboard/feature/${Uri.encodeComponent('سجل تجاري')}',
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacing12),
             // الدعم الفني
             _buildStoreOptionCard(
               context: context,
@@ -87,7 +91,7 @@ class StoreTab extends StatelessWidget {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 14,
+        fontSize: AppDimensions.fontBody,
         fontWeight: FontWeight.bold,
         color: Colors.grey[700],
       ),
@@ -104,14 +108,14 @@ class StoreTab extends StatelessWidget {
   }) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: AppDimensions.borderRadiusM,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimensions.borderRadiusM,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimensions.paddingM,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: AppDimensions.borderRadiusM,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -123,15 +127,19 @@ class StoreTab extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: AppDimensions.avatarM,
+                height: AppDimensions.avatarM,
                 decoration: BoxDecoration(
                   color: AppTheme.primaryColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppDimensions.borderRadiusM,
                 ),
-                child: Icon(icon, size: 24, color: AppTheme.primaryColor),
+                child: Icon(
+                  icon,
+                  size: AppDimensions.iconM,
+                  color: AppTheme.primaryColor,
+                ),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: AppDimensions.spacing14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,27 +149,27 @@ class StoreTab extends StatelessWidget {
                         Text(
                           title,
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: AppDimensions.fontSubtitle,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey[800],
                           ),
                         ),
                         if (badge != null) ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppDimensions.spacing8),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.spacing6,
+                              vertical: AppDimensions.spacing2,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.red,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: AppDimensions.borderRadiusXS,
                             ),
                             child: Text(
                               badge,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 9,
+                                fontSize: AppDimensions.fontCaption - 2,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -169,15 +177,22 @@ class StoreTab extends StatelessWidget {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: AppDimensions.spacing2),
                     Text(
                       subtitle,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLabel,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: AppDimensions.iconXS,
+                color: Colors.grey[400],
+              ),
             ],
           ),
         ),

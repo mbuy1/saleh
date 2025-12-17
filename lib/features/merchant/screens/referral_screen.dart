@@ -5,6 +5,10 @@ import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
+
+// ignore_for_file: unused_field
 
 // ============================================================================
 // Models
@@ -199,7 +203,9 @@ class ReferralScreen extends StatefulWidget {
 class _ReferralScreenState extends State<ReferralScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ApiService _api = ApiService();
   bool _isLoading = true;
+  String? _error;
   ReferralSettings? _settings;
   List<ReferralCode> _codes = [];
   List<Referral> _referrals = [];
@@ -219,116 +225,58 @@ class _ReferralScreenState extends State<ReferralScreen>
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    // TODO: Load from API
-    await Future.delayed(const Duration(seconds: 1));
-
     setState(() {
-      _settings = ReferralSettings(
-        id: '1',
-        storeId: 'store1',
-        isEnabled: true,
-        referrerRewardType: 'percentage',
-        referrerRewardValue: 10,
-        referrerRewardMax: 50,
-        refereeRewardType: 'fixed',
-        refereeRewardValue: 20,
-        refereeMinOrder: 100,
-        requireFirstPurchase: true,
-        minOrderAmount: 100,
-        maxReferralsPerUser: 50,
-        rewardValidityDays: 30,
-        totalReferrals: 156,
-        successfulReferrals: 89,
-        totalRewardsGiven: 4500,
-      );
-
-      _stats = {
-        'total_referrals': 156,
-        'successful_referrals': 89,
-        'conversion_rate': 57,
-        'total_rewards_given': 4500,
-        'active_codes': 45,
-        'pending_referrals': 12,
-      };
-
-      _codes = [
-        ReferralCode(
-          id: '1',
-          userId: 'user1',
-          code: 'REF123ABC',
-          totalUses: 25,
-          successfulUses: 18,
-          totalEarnings: 850,
-          isActive: true,
-          userName: 'أحمد محمد',
-        ),
-        ReferralCode(
-          id: '2',
-          userId: 'user2',
-          code: 'REFXYZ789',
-          totalUses: 15,
-          successfulUses: 12,
-          totalEarnings: 600,
-          isActive: true,
-          userName: 'فاطمة علي',
-        ),
-        ReferralCode(
-          id: '3',
-          userId: 'user3',
-          code: 'REF456DEF',
-          totalUses: 8,
-          successfulUses: 5,
-          totalEarnings: 250,
-          isActive: false,
-          userName: 'خالد سعيد',
-        ),
-      ];
-
-      _referrals = [
-        Referral(
-          id: '1',
-          referrerId: 'user1',
-          refereeId: 'user4',
-          status: 'completed',
-          orderId: 'ORD-001',
-          orderAmount: 350,
-          referrerRewardType: 'percentage',
-          referrerRewardValue: 35,
-          refereeRewardType: 'fixed',
-          refereeRewardValue: 20,
-          completedAt: DateTime.now().subtract(const Duration(hours: 2)),
-          createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        ),
-        Referral(
-          id: '2',
-          referrerId: 'user2',
-          refereeId: 'user5',
-          status: 'pending',
-          referrerRewardType: 'percentage',
-          referrerRewardValue: 0,
-          refereeRewardType: 'fixed',
-          refereeRewardValue: 20,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        Referral(
-          id: '3',
-          referrerId: 'user1',
-          refereeId: 'user6',
-          status: 'completed',
-          orderId: 'ORD-002',
-          orderAmount: 500,
-          referrerRewardType: 'percentage',
-          referrerRewardValue: 50,
-          refereeRewardType: 'fixed',
-          refereeRewardValue: 20,
-          completedAt: DateTime.now().subtract(const Duration(days: 2)),
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-      ];
-
-      _isLoading = false;
+      _isLoading = true;
+      _error = null;
     });
+
+    try {
+      // جلب البيانات من API بشكل متوازي
+      final results = await Future.wait([
+        _api.get('/secure/referral/settings'),
+        _api.get('/secure/referral/stats'),
+        _api.get('/secure/referral/codes'),
+        _api.get('/secure/referral'),
+      ]);
+
+      final settingsResponse = json.decode(results[0].body);
+      final statsResponse = json.decode(results[1].body);
+      final codesResponse = json.decode(results[2].body);
+      final referralsResponse = json.decode(results[3].body);
+
+      setState(() {
+        // تحويل الإعدادات
+        if (settingsResponse['ok'] == true &&
+            settingsResponse['data'] != null) {
+          _settings = ReferralSettings.fromJson(settingsResponse['data']);
+        }
+
+        // تحويل الإحصائيات
+        if (statsResponse['ok'] == true && statsResponse['data'] != null) {
+          _stats = statsResponse['data'] as Map<String, dynamic>;
+        }
+
+        // تحويل الأكواد
+        if (codesResponse['ok'] == true && codesResponse['data'] != null) {
+          final codesData = codesResponse['data'] as List? ?? [];
+          _codes = codesData.map((j) => ReferralCode.fromJson(j)).toList();
+        }
+
+        // تحويل الإحالات
+        if (referralsResponse['ok'] == true &&
+            referralsResponse['data'] != null) {
+          final referralsData = referralsResponse['data'] as List? ?? [];
+          _referrals = referralsData.map((j) => Referral.fromJson(j)).toList();
+        }
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'حدث خطأ في تحميل البيانات: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -1225,6 +1173,7 @@ class _ReferralScreenState extends State<ReferralScreen>
   // ============================================================================
 
   Future<void> _toggleProgram(bool enabled) async {
+    // تحديث واجهة المستخدم فوراً
     setState(() {
       _settings = ReferralSettings(
         id: _settings!.id,
@@ -1245,25 +1194,91 @@ class _ReferralScreenState extends State<ReferralScreen>
         totalRewardsGiven: _settings!.totalRewardsGiven,
       );
     });
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(enabled ? 'تم تفعيل البرنامج' : 'تم إيقاف البرنامج'),
-        backgroundColor: enabled ? Colors.green : Colors.orange,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+
+    try {
+      final res = await _api.patch(
+        '/secure/referral/settings',
+        body: {'is_enabled': enabled},
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['ok'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                enabled ? 'تم تفعيل البرنامج' : 'تم إيقاف البرنامج',
+              ),
+              backgroundColor: enabled ? Colors.green : Colors.orange,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else {
+          // إرجاع الحالة السابقة
+          _loadData();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['error'] ?? 'فشل تحديث الإعدادات'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _loadData();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _toggleCode(ReferralCode code) async {
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(code.isActive ? 'تم إيقاف الكود' : 'تم تفعيل الكود'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _loadData();
+    try {
+      final res = await _api.patch(
+        '/secure/referral/codes/${code.id}',
+        body: {'is_active': !code.isActive},
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['ok'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                code.isActive ? 'تم إيقاف الكود' : 'تم تفعيل الكود',
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['error'] ?? 'فشل تحديث الكود'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _copyCode(String code) {
@@ -1284,14 +1299,49 @@ class _ReferralScreenState extends State<ReferralScreen>
     double refereeValue,
     double minOrder,
   ) async {
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم حفظ الإعدادات'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _loadData();
+    try {
+      final res = await _api.patch(
+        '/secure/referral/settings',
+        body: {
+          'referrer_reward_type': referrerType,
+          'referrer_reward_value': referrerValue,
+          'referee_reward_type': refereeType,
+          'referee_reward_value': refereeValue,
+          'min_order_amount': minOrder,
+        },
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['ok'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم حفظ الإعدادات'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['error'] ?? 'فشل حفظ الإعدادات'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }

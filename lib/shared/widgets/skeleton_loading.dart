@@ -520,62 +520,93 @@ class SkeletonProductsGrid extends StatelessWidget {
   }
 }
 
-/// Skeleton for marketing screen
+/// Skeleton for marketing screen (محدث ليتوافق مع التصميم الجديد)
 class SkeletonMarketingScreen extends StatelessWidget {
   const SkeletonMarketingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Stats cards
-          Row(
-            children: [
-              const Expanded(child: SkeletonStatsCard()),
-              const SizedBox(width: 12),
-              const Expanded(child: SkeletonStatsCard()),
-            ],
+          // Quick stats skeleton
+          ShimmerEffect(
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Popular tools section title
+          ShimmerEffect(
+            child: Container(
+              height: 20,
+              width: 120,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              const Expanded(child: SkeletonStatsCard()),
-              const SizedBox(width: 12),
-              const Expanded(child: SkeletonStatsCard()),
-            ],
+
+          // Popular tools horizontal list
+          SizedBox(
+            height: 100,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 3,
+              separatorBuilder: (context, index) => const SizedBox(width: 12),
+              itemBuilder: (context, index) => ShimmerEffect(
+                child: Container(
+                  width: 160,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 24),
 
-          // Section title
-          SkeletonText(width: 150, height: 18),
-          const SizedBox(height: 16),
+          // All tools section title
+          ShimmerEffect(
+            child: Container(
+              height: 20,
+              width: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
 
-          // Tools list
-          ...List.generate(
-            4,
-            (index) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SkeletonCard(
-                height: 80,
-                child: Row(
-                  children: [
-                    const SkeletonCircle(size: 48),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SkeletonText(width: 120, height: 16),
-                          const SizedBox(height: 8),
-                          SkeletonText(width: 200, height: 12),
-                        ],
-                      ),
-                    ),
-                  ],
+          // Tools grid
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.85,
+            children: List.generate(
+              8,
+              (_) => ShimmerEffect(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),

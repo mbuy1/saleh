@@ -5,10 +5,10 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// شاشة محفظة التاجر
+/// شاشة المبيعات
 /// ملاحظة: مطلوب ربطها بالبيانات الحقيقية من API مستقبلاً
-class WalletScreen extends StatelessWidget {
-  const WalletScreen({super.key});
+class SalesScreen extends StatelessWidget {
+  const SalesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class WalletScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'محفظة التاجر',
+          'المبيعات',
           style: TextStyle(
             color: AppTheme.textPrimaryColor,
             fontWeight: FontWeight.bold,
@@ -45,38 +45,32 @@ class WalletScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: AppDimensions.paddingXL,
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: Colors.amber.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(100),
               ),
               child: SvgPicture.asset(
-                AppIcons.wallet,
+                AppIcons.chart,
                 width: 64,
                 height: 64,
                 colorFilter: const ColorFilter.mode(
-                  Colors.green,
+                  Colors.amber,
                   BlendMode.srcIn,
                 ),
               ),
             ),
-            SizedBox(height: AppDimensions.spacing24),
-            Text(
-              'الرصيد الحالي',
-              style: TextStyle(
-                fontSize: AppDimensions.fontTitle,
-                color: Colors.grey,
-              ),
+            const SizedBox(height: 24),
+            const Text(
+              'إجمالي المبيعات',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: AppDimensions.spacing8),
-            Text(
-              '0.00 ر.س',
-              style: TextStyle(
-                fontSize: AppDimensions.fontHero,
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 8),
+            const Text(
+              '0 طلب',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: AppDimensions.spacing32),
+            const SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(AppDimensions.spacing24),
               child: Column(
@@ -84,33 +78,33 @@ class WalletScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.spacing20),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      color: AppTheme.successColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: SvgPicture.asset(
-                      AppIcons.wallet,
+                      AppIcons.analytics,
                       width: AppDimensions.iconDisplay,
                       height: AppDimensions.iconDisplay,
                       colorFilter: const ColorFilter.mode(
-                        AppTheme.primaryColor,
+                        AppTheme.successColor,
                         BlendMode.srcIn,
                       ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
-                  Text(
-                    'لا توجد معاملات حتى الآن',
+                  const Text(
+                    'لا توجد مبيعات حتى الآن',
                     style: TextStyle(
-                      fontSize: AppDimensions.fontTitle,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimaryColor,
                     ),
                   ),
-                  SizedBox(height: AppDimensions.spacing8),
+                  const SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'ابدأ بإضافة منتجات وتحقيق المبيعات',
+                    'أضف منتجاتك وابدأ البيع الآن',
                     style: TextStyle(
-                      fontSize: AppDimensions.fontBody,
+                      fontSize: 14,
                       color: AppTheme.textSecondaryColor,
                     ),
                     textAlign: TextAlign.center,

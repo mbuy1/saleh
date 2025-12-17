@@ -362,7 +362,10 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
                     const Divider(),
                     SelectableText(
                       _generatedContent!,
-                      style: const TextStyle(fontSize: 16, height: 1.5),
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontTitle,
+                        height: 1.5,
+                      ),
                     ),
                   ],
                 ),
@@ -379,7 +382,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
               const SizedBox(height: AppDimensions.spacing8),
               ..._variations.map(
                 (v) => Card(
-                  margin: const EdgeInsets.only(bottom: 8),
+                  margin: EdgeInsets.only(bottom: AppDimensions.spacing8),
                   child: ListTile(
                     title: Text(
                       v,
@@ -414,8 +417,12 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: isSelected ? Colors.white : Colors.grey),
-          const SizedBox(width: 4),
+          Icon(
+            icon,
+            size: AppDimensions.iconXS,
+            color: isSelected ? Colors.white : Colors.grey,
+          ),
+          SizedBox(width: AppDimensions.spacing4),
           Text(label),
         ],
       ),
@@ -432,7 +439,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
       onTap: () => _selectTemplate(template),
       child: Container(
         width: 160,
-        margin: const EdgeInsets.only(right: 12),
+        margin: EdgeInsets.only(right: AppDimensions.spacing12),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primaryColor : Colors.white,
           borderRadius: AppDimensions.borderRadiusM,
@@ -463,7 +470,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
             Text(
               '${template['usage_count'] ?? 0} استخدام',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppDimensions.fontCaption,
                 color: isSelected ? Colors.white70 : Colors.grey,
               ),
             ),
@@ -498,7 +505,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
       itemBuilder: (context, index) {
         final item = _library[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: EdgeInsets.only(bottom: AppDimensions.spacing12),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: AppTheme.primaryColor.withAlpha(25),
@@ -556,7 +563,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
       itemBuilder: (context, index) {
         final item = _history[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: EdgeInsets.only(bottom: AppDimensions.spacing12),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.grey[200],

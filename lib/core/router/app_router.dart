@@ -6,43 +6,55 @@ import '../../features/auth/data/auth_controller.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
-import '../../features/dashboard/presentation/screens/boost_sales_screen.dart';
+// Dashboard
 import '../../features/dashboard/presentation/screens/dashboard_shell.dart';
 import '../../features/dashboard/presentation/screens/home_tab.dart';
 import '../../features/dashboard/presentation/screens/orders_tab.dart';
 import '../../features/dashboard/presentation/screens/products_tab.dart';
-import '../../features/dashboard/presentation/screens/store_tab.dart';
-import '../../shared/widgets/base_screen.dart';
 import '../../features/dashboard/presentation/screens/merchant_services_screen.dart';
 import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
-import '../../features/dashboard/presentation/screens/store_on_jock_screen.dart';
 import '../../features/dashboard/presentation/screens/shortcuts_screen.dart';
-import '../../features/dashboard/presentation/screens/inventory_screen.dart';
 import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
-import '../../features/dashboard/presentation/screens/view_my_store_screen.dart';
 import '../../features/dashboard/presentation/screens/notifications_screen.dart';
 import '../../features/dashboard/presentation/screens/customers_screen.dart';
-import '../../features/dashboard/presentation/screens/wallet_screen.dart';
-import '../../features/dashboard/presentation/screens/points_screen.dart';
-import '../../features/dashboard/presentation/screens/sales_screen.dart';
-import '../../features/dashboard/presentation/screens/dropshipping_screen.dart';
-import '../../features/dashboard/presentation/screens/supplier_orders_screen.dart';
 import '../../features/dashboard/presentation/screens/mbuy_packages_screen.dart';
 import '../../features/dashboard/presentation/screens/reports_screen.dart';
+// Finance
+import '../../features/finance/presentation/screens/wallet_screen.dart';
+import '../../features/finance/presentation/screens/points_screen.dart';
+import '../../features/finance/presentation/screens/sales_screen.dart';
+// Store
+import '../../features/store/presentation/screens/store_tab.dart';
+import '../../features/store/presentation/screens/store_on_jock_screen.dart';
+import '../../features/store/presentation/screens/inventory_screen.dart';
+import '../../features/store/presentation/screens/view_my_store_screen.dart';
+import '../../features/store/presentation/screens/store_tools_tab.dart';
+// Dropshipping
+import '../../features/dropshipping/presentation/screens/dropshipping_screen.dart';
+import '../../features/dropshipping/presentation/screens/supplier_orders_screen.dart';
+// Marketing
+import '../../features/marketing/presentation/screens/marketing_screen.dart';
+import '../../features/marketing/presentation/screens/coupons_screen.dart';
+import '../../features/marketing/presentation/screens/flash_sales_screen.dart';
+import '../../features/marketing/presentation/screens/boost_sales_screen.dart';
+// Other features
+import '../../shared/widgets/base_screen.dart';
 import '../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
 import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
-import '../../features/marketing/presentation/screens/marketing_screen.dart';
-import '../../features/dashboard/presentation/screens/coupons_screen.dart';
-import '../../features/dashboard/presentation/screens/flash_sales_screen.dart';
 import '../../features/merchant/screens/abandoned_cart_screen.dart';
 import '../../features/merchant/screens/referral_screen.dart';
 import '../../features/merchant/screens/loyalty_program_screen.dart';
 import '../../features/merchant/screens/customer_segments_screen.dart';
 import '../../features/merchant/screens/custom_messages_screen.dart';
 import '../../features/merchant/screens/smart_pricing_screen.dart';
+import '../../features/merchant/screens/ai_assistant_screen.dart';
+import '../../features/merchant/screens/content_generator_screen.dart';
+import '../../features/merchant/screens/smart_analytics_screen.dart';
+import '../../features/merchant/screens/auto_reports_screen.dart';
+import '../../features/merchant/screens/heatmap_screen.dart';
 import '../../features/settings/presentation/screens/account_settings_screen.dart';
 import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
 import '../../features/settings/presentation/screens/terms_screen.dart';
@@ -329,6 +341,45 @@ class AppRouter {
                   path: 'smart-pricing',
                   name: 'smart-pricing',
                   builder: (context, state) => const SmartPricingScreen(),
+                ),
+                // صفحة المتجر الجديدة (تسويق + أدوات AI)
+                GoRoute(
+                  path: 'store-tools',
+                  name: 'store-tools',
+                  builder: (context, state) => const StoreToolsTab(),
+                ),
+                // صفحة توليد AI (قديمة - للتوافق)
+                GoRoute(
+                  path: 'ai-generation',
+                  name: 'ai-generation',
+                  builder: (context, state) => const MbuyStudioScreen(),
+                ),
+                // ====== أدوات AI الإضافية ======
+                GoRoute(
+                  path: 'ai-assistant',
+                  name: 'ai-assistant',
+                  builder: (context, state) => const AiAssistantScreen(),
+                ),
+                GoRoute(
+                  path: 'content-generator',
+                  name: 'content-generator',
+                  builder: (context, state) => const ContentGeneratorScreen(),
+                ),
+                // ====== التحليلات المتقدمة ======
+                GoRoute(
+                  path: 'smart-analytics',
+                  name: 'smart-analytics',
+                  builder: (context, state) => const SmartAnalyticsScreen(),
+                ),
+                GoRoute(
+                  path: 'auto-reports',
+                  name: 'auto-reports',
+                  builder: (context, state) => const AutoReportsScreen(),
+                ),
+                GoRoute(
+                  path: 'heatmap',
+                  name: 'heatmap',
+                  builder: (context, state) => const HeatmapScreen(),
                 ),
               ],
             ),

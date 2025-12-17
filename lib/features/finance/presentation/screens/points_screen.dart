@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../payments/data/payment_repository.dart';
@@ -213,8 +212,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         leading: IconButton(
           icon: SvgPicture.asset(
             AppIcons.arrowBack,
-            width: AppDimensions.iconM,
-            height: AppDimensions.iconM,
+            width: 24,
+            height: 24,
             colorFilter: const ColorFilter.mode(
               AppTheme.primaryColor,
               BlendMode.srcIn,
@@ -226,7 +225,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           'نقاطي',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: AppDimensions.fontHeadline,
+            fontSize: 18,
             color: AppTheme.textPrimaryColor,
           ),
         ),
@@ -235,8 +234,8 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           IconButton(
             icon: SvgPicture.asset(
               AppIcons.help,
-              width: AppDimensions.iconM,
-              height: AppDimensions.iconM,
+              width: 24,
+              height: 24,
               colorFilter: const ColorFilter.mode(
                 AppTheme.textPrimaryColor,
                 BlendMode.srcIn,
@@ -253,19 +252,19 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               onRefresh: _loadPointsData,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: AppDimensions.paddingM,
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // رصيد النقاط الرئيسي
                     _buildPointsCard(),
-                    SizedBox(height: AppDimensions.spacing16),
+                    const SizedBox(height: 16),
                     // إحصائيات سريعة
                     _buildStatsRow(),
-                    SizedBox(height: AppDimensions.spacing24),
+                    const SizedBox(height: 24),
                     // المكافآت المتاحة
                     _buildRewardsSection(),
-                    SizedBox(height: AppDimensions.spacing24),
+                    const SizedBox(height: 24),
                     // سجل المعاملات
                     _buildTransactionsSection(),
                     const SizedBox(height: 80),
@@ -278,14 +277,14 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
 
   Widget _buildPointsCard() {
     return Container(
-      padding: AppDimensions.paddingXL,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: AppDimensions.borderRadiusXL,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.orange.withValues(alpha: 0.3),
@@ -301,33 +300,30 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             children: [
               const Text(
                 'رصيد النقاط',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: AppDimensions.fontTitle,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 16),
               ),
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacing12,
-                  vertical: AppDimensions.spacing4,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: AppDimensions.borderRadiusXL,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SvgPicture.asset(
                       AppIcons.star,
-                      width: AppDimensions.iconXS,
-                      height: AppDimensions.iconXS,
+                      width: 16,
+                      height: 16,
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,
                       ),
                     ),
-                    SizedBox(width: AppDimensions.spacing4),
+                    const SizedBox(width: 4),
                     Text(
                       'VIP',
                       style: TextStyle(
@@ -340,32 +336,29 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
             ],
           ),
-          SizedBox(height: AppDimensions.spacing16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 '$_currentPoints',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: AppDimensions.spacing8),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
                 child: Text(
                   ' نقطة',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: AppDimensions.fontHeadline,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 18),
                 ),
               ),
             ],
           ),
-          SizedBox(height: AppDimensions.spacing16),
+          const SizedBox(height: 16),
           // زر شراء نقاط
           SizedBox(
             width: double.infinity,
@@ -374,68 +367,54 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.orange,
-                padding: EdgeInsets.symmetric(
-                  vertical: AppDimensions.spacing12,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: AppDimensions.borderRadiusM,
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               icon: SvgPicture.asset(
                 AppIcons.addCircle,
-                width: AppDimensions.iconS,
-                height: AppDimensions.iconS,
+                width: 20,
+                height: 20,
                 colorFilter: const ColorFilter.mode(
                   Colors.orange,
                   BlendMode.srcIn,
                 ),
               ),
-              label: Text(
+              label: const Text(
                 'شراء نقاط',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppDimensions.fontTitle,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ),
-          SizedBox(height: AppDimensions.spacing16),
+          const SizedBox(height: 16),
           // شريط التقدم للمستوى التالي
           Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'المستوى الذهبي',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: AppDimensions.fontLabel,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   Text(
                     '${((_currentPoints / 2000) * 100).toInt()}%',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: AppDimensions.fontLabel,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ],
               ),
-              SizedBox(height: AppDimensions.spacing8),
+              const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: _currentPoints / 2000,
                 backgroundColor: Colors.white.withValues(alpha: 0.3),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                borderRadius: BorderRadius.circular(AppDimensions.spacing4),
+                borderRadius: BorderRadius.circular(4),
               ),
-              SizedBox(height: AppDimensions.spacing4),
+              const SizedBox(height: 4),
               Text(
                 '${2000 - _currentPoints} نقطة للمستوى التالي',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: AppDimensions.fontCaption,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
@@ -566,7 +545,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             AppTheme.successColor,
           ),
         ),
-        SizedBox(width: AppDimensions.spacing12),
+        const SizedBox(width: 12),
         Expanded(
           child: _buildStatItem(
             'تم استبداله',
@@ -586,10 +565,10 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     Color color,
   ) {
     return Container(
-      padding: AppDimensions.paddingM,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: AppDimensions.borderRadiusL,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -600,35 +579,32 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       child: Row(
         children: [
           Container(
-            padding: AppDimensions.paddingS,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: AppDimensions.borderRadiusS,
+              borderRadius: BorderRadius.circular(8),
             ),
             child: SvgPicture.asset(
               iconPath,
-              width: AppDimensions.iconS,
-              height: AppDimensions.iconS,
+              width: 20,
+              height: 20,
               colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
             ),
           ),
-          SizedBox(width: AppDimensions.spacing12),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontHeadline,
+                style: const TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontCaption,
-                  color: AppTheme.slate600,
-                ),
+                style: TextStyle(fontSize: 11, color: AppTheme.slate600),
               ),
             ],
           ),
@@ -644,12 +620,9 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'المكافآت المتاحة',
-              style: TextStyle(
-                fontSize: AppDimensions.fontHeadline,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
               onPressed: () {
@@ -659,7 +632,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ),
           ],
         ),
-        SizedBox(height: AppDimensions.spacing12),
+        const SizedBox(height: 12),
         SizedBox(
           height: 160,
           child: ListView.builder(
@@ -682,11 +655,11 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       onTap: () => _redeemReward(reward),
       child: Container(
         width: 140,
-        margin: EdgeInsets.only(left: AppDimensions.spacing12),
-        padding: AppDimensions.paddingS,
+        margin: const EdgeInsets.only(left: 12),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: AppDimensions.borderRadiusL,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: canRedeem
                 ? reward.color.withValues(alpha: 0.3)
@@ -703,41 +676,38 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: AppDimensions.paddingS,
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: reward.color.withValues(alpha: 0.1),
-                borderRadius: AppDimensions.borderRadiusM,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: SvgPicture.asset(
                 reward.iconPath,
-                width: AppDimensions.iconL,
-                height: AppDimensions.iconL,
+                width: 28,
+                height: 28,
                 colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
               ),
             ),
-            SizedBox(height: AppDimensions.spacing8),
+            const SizedBox(height: 8),
             Text(
               reward.title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: AppDimensions.fontBody2,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: AppDimensions.spacing4),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   AppIcons.star,
-                  width: AppDimensions.fontBody,
-                  height: AppDimensions.fontBody,
+                  width: 14,
+                  height: 14,
                   colorFilter: const ColorFilter.mode(
                     Colors.orange,
                     BlendMode.srcIn,
                   ),
                 ),
-                SizedBox(width: AppDimensions.spacing4),
+                const SizedBox(width: 4),
                 Text(
                   '${reward.pointsCost}',
                   style: TextStyle(
@@ -775,18 +745,15 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'سجل المعاملات',
-          style: TextStyle(
-            fontSize: AppDimensions.fontHeadline,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: AppDimensions.spacing12),
+        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: AppDimensions.borderRadiusL,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -826,35 +793,32 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
 
     return ListTile(
       leading: Container(
-        padding: AppDimensions.paddingS,
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: AppDimensions.borderRadiusS,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: SvgPicture.asset(
           iconPath,
-          width: AppDimensions.iconS,
-          height: AppDimensions.iconS,
+          width: 20,
+          height: 20,
           colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         ),
       ),
       title: Text(
         transaction.description,
-        style: TextStyle(fontSize: AppDimensions.fontBody),
+        style: const TextStyle(fontSize: 14),
       ),
       subtitle: Text(
         _formatDate(transaction.date),
-        style: TextStyle(
-          fontSize: AppDimensions.fontLabel,
-          color: AppTheme.slate600,
-        ),
+        style: TextStyle(fontSize: 12, color: AppTheme.slate600),
       ),
       trailing: Text(
         '${isPositive ? '+' : '-'}${transaction.amount}',
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: color,
-          fontSize: AppDimensions.fontTitle,
+          fontSize: 16,
         ),
       ),
     );
@@ -1057,22 +1021,22 @@ class _HelpItem extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: AppDimensions.paddingS,
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: AppTheme.primaryColor.withValues(alpha: 0.1),
-            borderRadius: AppDimensions.borderRadiusS,
+            borderRadius: BorderRadius.circular(8),
           ),
           child: SvgPicture.asset(
             iconPath,
-            width: AppDimensions.iconS,
-            height: AppDimensions.iconS,
+            width: 20,
+            height: 20,
             colorFilter: const ColorFilter.mode(
               AppTheme.primaryColor,
               BlendMode.srcIn,
             ),
           ),
         ),
-        SizedBox(width: AppDimensions.spacing12),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1080,10 +1044,7 @@ class _HelpItem extends StatelessWidget {
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
               Text(
                 description,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontLabel,
-                  color: AppTheme.slate600,
-                ),
+                style: TextStyle(fontSize: 12, color: AppTheme.slate600),
               ),
             ],
           ),
@@ -1175,63 +1136,60 @@ class _BuyPointsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: AppDimensions.paddingM,
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: AppDimensions.borderRadiusXXL,
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle
           Container(
-            margin: EdgeInsets.only(top: AppDimensions.spacing12),
-            width: AppDimensions.iconXXL,
-            height: AppDimensions.spacing4,
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(AppDimensions.spacing2),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
 
           // Header
           Padding(
-            padding: AppDimensions.paddingL,
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 Container(
-                  padding: AppDimensions.paddingS,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.orange.withValues(alpha: 0.1),
-                    borderRadius: AppDimensions.borderRadiusM,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: SvgPicture.asset(
                     AppIcons.star,
-                    width: AppDimensions.iconL,
-                    height: AppDimensions.iconL,
+                    width: 28,
+                    height: 28,
                     colorFilter: const ColorFilter.mode(
                       Colors.orange,
                       BlendMode.srcIn,
                     ),
                   ),
                 ),
-                SizedBox(width: AppDimensions.spacing12),
-                Column(
+                const SizedBox(width: 12),
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'شراء نقاط',
                       style: TextStyle(
-                        fontSize: AppDimensions.fontDisplay3,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       'اختر الباقة المناسبة لك',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontBody2,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -1243,9 +1201,7 @@ class _BuyPointsSheet extends StatelessWidget {
           SizedBox(
             height: 350,
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: packages.length,
               itemBuilder: (context, index) {
                 final package = packages[index];
@@ -1256,7 +1212,7 @@ class _BuyPointsSheet extends StatelessWidget {
 
           // Footer
           Padding(
-            padding: AppDimensions.paddingM,
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 SvgPicture.asset(

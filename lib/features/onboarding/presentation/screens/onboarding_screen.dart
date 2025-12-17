@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -114,14 +113,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimensions.paddingM,
                 child: TextButton(
                   onPressed: _skipOnboarding,
-                  child: const Text(
+                  child: Text(
                     'تخطي',
                     style: TextStyle(
                       color: AppTheme.mutedSlate,
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -146,7 +145,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
             // مؤشرات الصفحات
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -158,17 +157,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
             // زر التالي/ابدأ
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              padding: EdgeInsets.fromLTRB(
+                AppDimensions.spacing24,
+                0,
+                AppDimensions.spacing24,
+                AppDimensions.spacing32,
+              ),
               child: SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: AppDimensions.buttonHeightXL,
                 child: ElevatedButton(
                   onPressed: _nextPage,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppDimensions.borderRadiusL,
                     ),
                     elevation: 0,
                   ),
@@ -179,17 +183,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         _currentPage == _pages.length - 1
                             ? 'ابدأ الآن'
                             : 'التالي',
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontTitle,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacing8),
                       AppIcon(
                         _currentPage == _pages.length - 1
                             ? AppIcons.check
                             : AppIcons.arrowForward,
-                        size: 20,
+                        size: AppDimensions.iconS,
                         color: Colors.white,
                       ),
                     ],
@@ -205,7 +209,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Widget _buildPage(OnboardingPage page) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+      padding: EdgeInsets.symmetric(horizontal: AppDimensions.spacing32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -226,40 +230,44 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ],
             ),
             child: Center(
-              child: AppIcon(page.icon, size: 64, color: Colors.white),
+              child: AppIcon(
+                page.icon,
+                size: AppDimensions.iconDisplay,
+                color: Colors.white,
+              ),
             ),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: AppDimensions.spacing48),
 
           // العنوان
           Text(
             page.title,
-            style: const TextStyle(
-              fontSize: 28,
+            style: TextStyle(
+              fontSize: AppDimensions.fontDisplay1,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimaryColor,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacing12),
 
           // العنوان الفرعي
           Text(
             page.subtitle,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: AppDimensions.fontHeadline,
               fontWeight: FontWeight.w500,
               color: AppTheme.primaryColor,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing16),
 
           // الوصف
           Text(
             page.description,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: AppDimensions.fontSubtitle,
               color: AppTheme.mutedSlate,
               height: 1.6,
             ),
@@ -274,12 +282,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final isActive = index == _currentPage;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: isActive ? 24 : 8,
-      height: 8,
+      margin: EdgeInsets.symmetric(horizontal: AppDimensions.spacing4),
+      width: isActive ? AppDimensions.spacing24 : AppDimensions.spacing8,
+      height: AppDimensions.spacing8,
       decoration: BoxDecoration(
         color: isActive ? AppTheme.primaryColor : Colors.grey[300],
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppDimensions.borderRadiusXS,
       ),
     );
   }

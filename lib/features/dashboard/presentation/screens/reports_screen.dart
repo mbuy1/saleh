@@ -600,12 +600,15 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               children: [
                 Text(
                   'نمو المبيعات',
-                  style: TextStyle(color: AppTheme.slate600, fontSize: 14),
+                  style: TextStyle(
+                    color: AppTheme.slate600,
+                    fontSize: AppDimensions.fontBody,
+                  ),
                 ),
                 Text(
                   '${isPositive ? '+' : ''}${growth.toStringAsFixed(1)}%',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: AppDimensions.fontDisplay2,
                     fontWeight: FontWeight.bold,
                     color: isPositive
                         ? AppTheme.successColor
@@ -617,7 +620,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           ),
           Text(
             'مقارنة بالشهر الماضي',
-            style: TextStyle(color: AppTheme.slate600, fontSize: 12),
+            style: TextStyle(
+              color: AppTheme.slate600,
+              fontSize: AppDimensions.fontLabel,
+            ),
           ),
         ],
       ),
@@ -643,7 +649,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         children: [
           const Text(
             'المبيعات الأسبوعية',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontTitle,
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -683,7 +692,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           ),
         ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, color: AppTheme.slate600)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: AppDimensions.fontCaption - 1,
+            color: AppTheme.slate600,
+          ),
+        ),
       ],
     );
   }
@@ -706,9 +721,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'المنتجات الأكثر مبيعاً',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontTitle,
+            ),
           ),
           const SizedBox(height: 16),
           ...products.map(
@@ -764,7 +782,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         children: [
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontTitle,
+            ),
           ),
           const SizedBox(height: 8),
           ...items.map((item) => itemBuilder(item)),
@@ -816,14 +837,20 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 ),
                 Text(
                   log['details'],
-                  style: TextStyle(color: AppTheme.slate600, fontSize: 12),
+                  style: TextStyle(
+                    color: AppTheme.slate600,
+                    fontSize: AppDimensions.fontLabel,
+                  ),
                 ),
               ],
             ),
           ),
           Text(
             timeStr,
-            style: TextStyle(color: AppTheme.slate600, fontSize: 11),
+            style: TextStyle(
+              color: AppTheme.slate600,
+              fontSize: AppDimensions.fontCaption,
+            ),
           ),
         ],
       ),

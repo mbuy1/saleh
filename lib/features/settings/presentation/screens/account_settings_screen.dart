@@ -347,7 +347,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: AppTheme.primaryColor,
+        activeTrackColor: AppTheme.primaryColor.withValues(alpha: 0.5),
+        activeThumbColor: AppTheme.primaryColor,
       ),
     );
   }
@@ -467,21 +468,20 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('تسجيل الخروج'),
         content: const Text('هل أنت متأكد من تسجيل الخروج؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               await ref.read(authControllerProvider.notifier).logout();
-              if (mounted) {
-                context.go('/login');
-              }
+              if (!mounted) return;
+              context.go('/login');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.warningColor,

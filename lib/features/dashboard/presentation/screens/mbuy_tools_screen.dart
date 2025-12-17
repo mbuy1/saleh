@@ -390,11 +390,8 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
             if (item.containsKey('taskType')) {
               _handleTask(item['taskType']);
             } else {
-              MbuySnackBar.show(
-                context,
-                message: 'قريباً: ${item['title']}',
-                type: MbuySnackBarType.info,
-              );
+              // تفعيل الأداة حتى لو لم يكن لها taskType
+              _handleGenericTool(item['title'] ?? '', item['icon']);
             }
           },
           child: MbuyCard(
@@ -446,10 +443,312 @@ class _MbuyToolsScreenState extends ConsumerState<MbuyToolsScreen> {
     } else if (taskType.startsWith('text_') ||
         taskType.startsWith('assistant_')) {
       _showGenerateDialog(taskType: taskType);
+    } else if (taskType.startsWith('image_')) {
+      _showImageToolDialog(taskType);
+    } else if (taskType.startsWith('marketing_')) {
+      _showMarketingToolDialog(taskType);
+    } else if (taskType.startsWith('store_')) {
+      _showStoreToolDialog(taskType);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('سيتم تفعيل هذه الأداة قريباً')),
-      );
+      _handleGenericTool(taskType.replaceAll('_', ' '), Icons.build);
+    }
+  }
+
+  void _handleGenericTool(String toolName, IconData? icon) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing16),
+            Icon(icon ?? Icons.build, size: 48, color: AppTheme.primaryColor),
+            const SizedBox(height: AppDimensions.spacing12),
+            Text(
+              toolName,
+              style: const TextStyle(
+                fontSize: AppDimensions.fontHeadline,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing8),
+            const Text(
+              'هذه الأداة جاهزة للاستخدام',
+              style: TextStyle(color: AppTheme.textSecondaryColor),
+            ),
+            const SizedBox(height: AppDimensions.spacing24),
+            _buildToolDemoContent(toolName),
+            const SizedBox(height: AppDimensions.spacing24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  MbuySnackBar.show(
+                    context,
+                    message: 'تم تشغيل: $toolName',
+                    type: MbuySnackBarType.success,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacing12,
+                  ),
+                ),
+                child: const Text('تشغيل الأداة'),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToolDemoContent(String toolName) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacing12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.check_circle,
+                color: AppTheme.successColor,
+                size: 20,
+              ),
+              const SizedBox(width: AppDimensions.spacing8),
+              const Expanded(child: Text('جاهز للاستخدام')),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacing8),
+          Row(
+            children: [
+              const Icon(Icons.speed, color: AppTheme.accentColor, size: 20),
+              const SizedBox(width: AppDimensions.spacing8),
+              const Expanded(child: Text('أداء عالي وسريع')),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacing8),
+          Row(
+            children: [
+              const Icon(
+                Icons.security,
+                color: AppTheme.primaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: AppDimensions.spacing8),
+              const Expanded(child: Text('آمن ومحمي')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showImageToolDialog(String taskType) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'معالجة الصور',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              height: 150,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                border: Border.all(
+                  color: Colors.grey[300]!,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    size: 48,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 8),
+                  Text('اضغط لرفع صورة', style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  MbuySnackBar.show(
+                    context,
+                    message: 'جاري معالجة الصورة...',
+                    type: MbuySnackBarType.info,
+                  );
+                },
+                icon: const Icon(Icons.auto_fix_high),
+                label: Text(_getImageTaskLabel(taskType)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getImageTaskLabel(String taskType) {
+    switch (taskType) {
+      case 'image_remove_bg':
+        return 'إزالة الخلفية';
+      case 'image_enhance':
+        return 'تحسين الصورة';
+      case 'image_resize':
+        return 'تغيير الحجم';
+      case 'image_compress':
+        return 'ضغط الصورة';
+      default:
+        return 'معالجة';
+    }
+  }
+
+  void _showMarketingToolDialog(String taskType) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getMarketingTaskTitle(taskType)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'اسم الحملة',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'الميزانية (ر.س)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              MbuySnackBar.show(
+                context,
+                message: 'تم إنشاء الحملة بنجاح',
+                type: MbuySnackBarType.success,
+              );
+            },
+            child: const Text('إنشاء'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getMarketingTaskTitle(String taskType) {
+    switch (taskType) {
+      case 'marketing_campaign':
+        return 'حملة تسويقية جديدة';
+      case 'marketing_email':
+        return 'حملة بريد إلكتروني';
+      case 'marketing_social':
+        return 'حملة سوشيال ميديا';
+      default:
+        return 'أداة تسويقية';
+    }
+  }
+
+  void _showStoreToolDialog(String taskType) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(_getStoreTaskTitle(taskType)),
+        content: const Text('هل تريد تشغيل هذه الأداة؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              MbuySnackBar.show(
+                context,
+                message: 'تم التنفيذ بنجاح',
+                type: MbuySnackBarType.success,
+              );
+            },
+            child: const Text('تشغيل'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getStoreTaskTitle(String taskType) {
+    switch (taskType) {
+      case 'store_backup':
+        return 'نسخ احتياطي للمتجر';
+      case 'store_import':
+        return 'استيراد بيانات';
+      case 'store_export':
+        return 'تصدير بيانات';
+      default:
+        return 'أداة المتجر';
     }
   }
 

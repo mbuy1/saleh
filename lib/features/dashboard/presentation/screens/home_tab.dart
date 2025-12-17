@@ -273,7 +273,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ],
           ),
           SizedBox(height: AppDimensions.spacing16),
-          // أزرار إدارة المتجر
+          // أزرار إدارة المتجر - تم تبديل تخصيص المتجر بمظهر المتجر
           Row(
             children: [
               Expanded(
@@ -287,7 +287,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Expanded(
                 child: _buildLinkActionButton(
                   iconPath: AppIcons.storefront,
-                  label: 'تخصيص المتجر',
+                  label: 'مظهر المتجر',
                   onTap: () => context.push('/dashboard/store-on-jock'),
                 ),
               ),
@@ -605,12 +605,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   /// شبكة الأيقونات (6 أيقونات)
-  /// 🔒 LOCKED - تم التثبيت بعد التبديل
-  /// الترتيب: الصف الأول: اختصاراتي، السجلات والتقارير، التسويق | الصف الثاني: أدوات AI (3D)، توليد AI (3D)، حزم التوفير
+  /// تم التحديث: استبدال التسويق وأدوات AI بالمتجر والمنتجات
+  /// الترتيب: الصف الأول: اختصاراتي، السجلات والتقارير، المنتجات | الصف الثاني: المتجر، توليد AI، حزم التوفير
   Widget _buildIconsGrid(BuildContext context) {
     return Column(
       children: [
-        // الصف الأول: دروب شوبينق، السجلات والتقارير، التسويق
+        // الصف الأول: اختصاراتي، السجلات والتقارير، المنتجات
         SizedBox(
           height: 110,
           child: Row(
@@ -636,16 +636,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  iconPath: AppIcons.megaphone,
-                  label: 'التسويق',
-                  screen: 'Marketing',
+                  iconPath: AppIcons.inventory2,
+                  label: 'المنتجات',
+                  screen: 'Products',
                 ),
               ),
             ],
           ),
         ),
         SizedBox(height: AppDimensions.spacing12),
-        // الصف الثاني: أدوات AI، توليد AI، حزم التوفير
+        // الصف الثاني: المتجر (يحتوي التسويق + أدوات AI)، توليد AI، حزم التوفير
         SizedBox(
           height: 110,
           child: Row(
@@ -653,9 +653,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Expanded(
                 child: _buildBottomCard(
                   context: context,
-                  iconPath: AppIcons.tools,
-                  label: 'أدوات AI',
-                  screen: 'MbuyTools',
+                  iconPath: AppIcons.store,
+                  label: 'المتجر',
+                  screen: 'StoreTools',
                 ),
               ),
               SizedBox(width: AppDimensions.spacing12),
@@ -664,7 +664,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   context: context,
                   iconPath: AppIcons.sparkle,
                   label: 'توليد AI',
-                  screen: 'MbuyStudio',
+                  screen: 'AIGeneration',
                 ),
               ),
               SizedBox(width: AppDimensions.spacing12),
@@ -803,6 +803,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       case 'Reports':
         // صفحة التقارير والسجلات
         context.push('/dashboard/reports');
+        break;
+      case 'StoreTools':
+        // صفحة المتجر الجديدة (تسويق + أدوات AI)
+        context.push('/dashboard/store-tools');
+        break;
+      case 'AIGeneration':
+        // صفحة توليد AI - استوديو MBUY
+        context.push('/dashboard/studio');
+        break;
       default:
         context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
     }

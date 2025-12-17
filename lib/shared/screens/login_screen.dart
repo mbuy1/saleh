@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_icons.dart';
@@ -132,7 +133,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   // Password Field
                   _buildPasswordField(),
-                  const SizedBox(height: AppDimensions.spacing32),
+                  const SizedBox(height: AppDimensions.spacing12),
+
+                  // Forgot Password Link
+                  _buildForgotPasswordLink(),
+                  const SizedBox(height: AppDimensions.spacing24),
 
                   // Error Message
                   if (authState.errorMessage != null) ...[
@@ -435,6 +440,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildForgotPasswordLink() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton(
+        onPressed: () => context.push('/forgot-password'),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(
+          'نسيت كلمة المرور؟',
+          style: TextStyle(
+            color: AppTheme.primaryColor,
+            fontSize: AppDimensions.fontBody,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

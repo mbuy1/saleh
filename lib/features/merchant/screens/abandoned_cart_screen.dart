@@ -4,6 +4,10 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
+
+// ignore_for_file: unused_field
 
 // ============================================================================
 // Models
@@ -216,13 +220,13 @@ class AbandonedCartScreen extends StatefulWidget {
 class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final ApiService _api = ApiService();
   bool _isLoading = true;
+  String? _error;
   List<AbandonedCart> _abandonedCarts = [];
   List<AbandonedCart> _convertedCarts = [];
   AbandonedCartStats? _stats;
   RecoverySettings? _settings;
-  // ignore: unused_field
-  final String _selectedFilter = 'all';
 
   @override
   void initState() {
@@ -238,136 +242,63 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    // TODO: Load from API
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock data
     setState(() {
-      _stats = AbandonedCartStats(
-        totalAbandoned: 45,
-        totalRecovered: 12,
-        totalRevenueRecovered: 3500,
-        recoveryRate: 27,
-        pendingCarts: 8,
-        totalPendingValue: 2150,
-      );
-
-      _settings = RecoverySettings(
-        id: '1',
-        storeId: 'store1',
-        autoRemindersEnabled: true,
-        firstReminderDelay: 60,
-        secondReminderDelay: 1440,
-        thirdReminderDelay: 4320,
-        includeDiscount: true,
-        discountPercentage: 10,
-        reminderMessage: 'لا تنسَ سلة التسوق الخاصة بك! 🛒',
-        totalAbandoned: 45,
-        totalRecovered: 12,
-        totalRevenueRecovered: 3500,
-      );
-
-      _abandonedCarts = [
-        AbandonedCart(
-          id: '1',
-          storeId: 'store1',
-          customerName: 'أحمد محمد',
-          customerEmail: 'ahmed@example.com',
-          customerPhone: '+966501234567',
-          cartItems: [
-            CartItem(
-              productId: '1',
-              productName: 'قميص أبيض',
-              price: 150,
-              quantity: 2,
-            ),
-            CartItem(
-              productId: '2',
-              productName: 'بنطلون جينز',
-              price: 250,
-              quantity: 1,
-            ),
-          ],
-          cartTotal: 550,
-          itemsCount: 3,
-          status: 'abandoned',
-          abandonedAt: DateTime.now().subtract(const Duration(hours: 2)),
-          reminderCount: 0,
-        ),
-        AbandonedCart(
-          id: '2',
-          storeId: 'store1',
-          customerName: 'فاطمة علي',
-          customerPhone: '+966509876543',
-          cartItems: [
-            CartItem(
-              productId: '3',
-              productName: 'فستان سهرة',
-              price: 800,
-              quantity: 1,
-            ),
-          ],
-          cartTotal: 800,
-          itemsCount: 1,
-          status: 'abandoned',
-          abandonedAt: DateTime.now().subtract(const Duration(hours: 5)),
-          reminderCount: 1,
-          reminderSentAt: DateTime.now().subtract(const Duration(hours: 4)),
-          lastReminderType: 'push',
-        ),
-        AbandonedCart(
-          id: '3',
-          storeId: 'store1',
-          customerEmail: 'visitor@example.com',
-          cartItems: [
-            CartItem(
-              productId: '4',
-              productName: 'حقيبة يد',
-              price: 350,
-              quantity: 1,
-            ),
-            CartItem(
-              productId: '5',
-              productName: 'محفظة',
-              price: 120,
-              quantity: 1,
-            ),
-          ],
-          cartTotal: 470,
-          itemsCount: 2,
-          status: 'abandoned',
-          abandonedAt: DateTime.now().subtract(const Duration(days: 1)),
-          reminderCount: 2,
-        ),
-      ];
-
-      _convertedCarts = [
-        AbandonedCart(
-          id: '4',
-          storeId: 'store1',
-          customerName: 'خالد سعيد',
-          customerPhone: '+966512345678',
-          cartItems: [
-            CartItem(
-              productId: '6',
-              productName: 'ساعة يد',
-              price: 450,
-              quantity: 1,
-            ),
-          ],
-          cartTotal: 450,
-          itemsCount: 1,
-          status: 'converted',
-          abandonedAt: DateTime.now().subtract(const Duration(days: 2)),
-          reminderCount: 1,
-          convertedOrderId: 'ORD-123',
-          convertedAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ];
-
-      _isLoading = false;
+      _isLoading = true;
+      _error = null;
     });
+
+    try {
+      // جلب البيانات من API بشكل متوازي
+      final results = await Future.wait([
+        _api.get('/secure/abandoned-carts?status=abandoned'),
+        _api.get('/secure/abandoned-carts?status=converted'),
+        _api.get('/secure/abandoned-carts/stats'),
+        _api.get('/secure/abandoned-carts/settings'),
+      ]);
+
+      final abandonedResponse = json.decode(results[0].body);
+      final convertedResponse = json.decode(results[1].body);
+      final statsResponse = json.decode(results[2].body);
+      final settingsResponse = json.decode(results[3].body);
+
+      setState(() {
+        // تحويل السلات المتروكة
+        if (abandonedResponse['success'] == true &&
+            abandonedResponse['data'] != null) {
+          final cartsData = abandonedResponse['data'] as List? ?? [];
+          _abandonedCarts = cartsData
+              .map((json) => AbandonedCart.fromJson(json))
+              .toList();
+        }
+
+        // تحويل السلات المحولة
+        if (convertedResponse['success'] == true &&
+            convertedResponse['data'] != null) {
+          final convertedData = convertedResponse['data'] as List? ?? [];
+          _convertedCarts = convertedData
+              .map((json) => AbandonedCart.fromJson(json))
+              .toList();
+        }
+
+        // تحويل الإحصائيات
+        if (statsResponse['success'] == true && statsResponse['data'] != null) {
+          _stats = AbandonedCartStats.fromJson(statsResponse['data']);
+        }
+
+        // تحويل الإعدادات
+        if (settingsResponse['success'] == true &&
+            settingsResponse['data'] != null) {
+          _settings = RecoverySettings.fromJson(settingsResponse['data']);
+        }
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'حدث خطأ في تحميل البيانات: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -1568,28 +1499,86 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     String type,
     bool includeCoupon,
   ) async {
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم إرسال التذكير لـ ${cart.displayName}'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _loadData();
+    try {
+      final res = await _api.post(
+        '/secure/abandoned-carts/${cart.id}/remind',
+        body: {'type': type, 'include_coupon': includeCoupon},
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('تم إرسال التذكير لـ ${cart.displayName}'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'فشل إرسال التذكير'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _markAsRecovered(AbandonedCart cart) async {
     Navigator.pop(context);
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم تحديث السلة كمستردة'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _loadData();
+    try {
+      final res = await _api.post(
+        '/secure/abandoned-carts/${cart.id}/recover',
+        body: {},
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم تحديث السلة كمستردة'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'فشل تحديث السلة'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _saveSettings(
@@ -1597,14 +1586,47 @@ class _AbandonedCartScreenState extends State<AbandonedCartScreen>
     bool includeDiscount,
     double discount,
   ) async {
-    // TODO: Call API
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم حفظ الإعدادات'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _loadData();
+    try {
+      final res = await _api.patch(
+        '/secure/abandoned-carts/settings',
+        body: {
+          'auto_reminders_enabled': autoEnabled,
+          'include_discount': includeDiscount,
+          'discount_percentage': discount,
+        },
+      );
+      final response = json.decode(res.body);
+
+      if (mounted) {
+        if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم حفظ الإعدادات'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? 'فشل حفظ الإعدادات'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }

@@ -395,9 +395,9 @@ class _MerchantServicesScreenState
       },
       {
         'icon': Icons.palette_outlined,
-        'title': 'مظهر المتجر',
-        'subtitle': 'الألوان، الشعار، البانر',
-        'onTap': () => _showComingSoon('مظهر المتجر'),
+        'title': 'تخصيص المتجر',
+        'subtitle': 'خيارات المنتجات والشحن والدفع',
+        'onTap': () => context.push('/dashboard/store-on-jock'),
       },
       {
         'icon': Icons.local_shipping_outlined,

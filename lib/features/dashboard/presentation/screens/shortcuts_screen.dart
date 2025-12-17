@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_icons.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// صفحة اختصاراتي المُعاد تصميمها
 /// - صفحة فارغة مع نص توضيحي في البداية
 /// - إضافة اختصارات كمربعات أيقونات بنفس مقاس الصفحة الرئيسية
 /// - حفظ التعديلات تلقائياً
 /// - بدون خلفية بيضاء خلف الأيقونات
+/// - إعادة ترتيب الأيقونات بالسحب والإفلات
 class ShortcutsScreen extends StatefulWidget {
   const ShortcutsScreen({super.key});
 
@@ -20,6 +24,7 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
   List<ShortcutItemData> _savedShortcuts = [];
   bool _isLoading = true;
   bool _isEditing = false;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -96,45 +101,24 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'اختصاراتي',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimaryColor,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (_isEditing) {
-                // عند الضغط على "تم" - احفظ وخرج من وضع التعديل
-                _saveShortcuts();
-              }
-              setState(() => _isEditing = !_isEditing);
-            },
-            child: Text(
-              _isEditing ? 'تم' : 'تعديل',
-              style: const TextStyle(
-                color: AppTheme.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header مخصص
+            _buildHeader(context),
+            // شريط البحث
+            _buildSearchBar(),
+            // المحتوى
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _savedShortcuts.isEmpty && !_isEditing
+                  ? _buildEmptyState()
+                  : _buildShortcutsGrid(),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _savedShortcuts.isEmpty && !_isEditing
-          ? _buildEmptyState()
-          : _buildShortcutsGrid(),
       floatingActionButton: _isEditing
           ? FloatingActionButton.extended(
               onPressed: _showAddShortcutSheet,
@@ -149,6 +133,102 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
               ),
             )
           : null,
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => context.pop(),
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacing8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: AppDimensions.iconS,
+                height: AppDimensions.iconS,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          const Text(
+            'اختصاراتي',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: AppDimensions.fontHeadline,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const Spacer(),
+          // زر التعديل
+          GestureDetector(
+            onTap: () {
+              if (_isEditing) {
+                _saveShortcuts();
+              }
+              setState(() => _isEditing = !_isEditing);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing12,
+                vertical: AppDimensions.spacing8,
+              ),
+              decoration: BoxDecoration(
+                color: _isEditing
+                    ? AppTheme.accentColor
+                    : AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Text(
+                _isEditing ? 'تم' : 'تعديل',
+                style: TextStyle(
+                  color: _isEditing ? Colors.white : AppTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontBody,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppDimensions.borderRadiusM,
+          border: Border.all(color: AppTheme.dividerColor),
+        ),
+        child: TextField(
+          onChanged: (value) {
+            setState(() => _searchQuery = value);
+          },
+          decoration: InputDecoration(
+            hintText: 'البحث في الاختصارات...',
+            hintStyle: TextStyle(color: AppTheme.textHintColor),
+            prefixIcon: Icon(Icons.search, color: AppTheme.textHintColor),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing16,
+              vertical: AppDimensions.spacing12,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -173,10 +253,10 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
+            Text(
               'لا توجد اختصارات',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: AppDimensions.fontDisplay2,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimaryColor,
               ),
@@ -186,7 +266,7 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
               'أضف اختصاراتك المفضلة للوصول السريع\nإلى أهم الصفحات والأدوات',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppDimensions.fontTitle,
                 color: Colors.grey[600],
                 height: 1.5,
               ),
@@ -218,6 +298,17 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
   }
 
   Widget _buildShortcutsGrid() {
+    // فلترة الاختصارات حسب البحث
+    final filteredShortcuts = _searchQuery.isEmpty
+        ? _savedShortcuts
+        : _savedShortcuts
+              .where(
+                (s) =>
+                    s.title.contains(_searchQuery) ||
+                    s.key.contains(_searchQuery),
+              )
+              .toList();
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -226,25 +317,76 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
           if (_isEditing)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                'اضغط على الاختصار لحذفه أو أضف اختصارات جديدة',
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: AppTheme.primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'اسحب الاختصار لتغيير مكانه، أو اضغط عليه لحذفه',
+                        style: TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontSize: AppDimensions.fontBody2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // 3 أعمدة مثل الصفحة الرئيسية
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.95, // نفس نسبة الصفحة الرئيسية
-              ),
-              itemCount: _savedShortcuts.length,
-              itemBuilder: (context, index) {
-                final shortcut = _savedShortcuts[index];
-                return _buildShortcutItem(shortcut);
-              },
-            ),
+            child: _isEditing
+                ? ReorderableGridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.95,
+                        ),
+                    itemCount: filteredShortcuts.length,
+                    itemBuilder: (context, index) {
+                      final shortcut = filteredShortcuts[index];
+                      return _buildShortcutItem(
+                        shortcut,
+                        key: ValueKey(shortcut.key),
+                      );
+                    },
+                    onReorder: (oldIndex, newIndex) {
+                      setState(() {
+                        if (newIndex > oldIndex) {
+                          newIndex -= 1;
+                        }
+                        final item = _savedShortcuts.removeAt(oldIndex);
+                        _savedShortcuts.insert(newIndex, item);
+                      });
+                      _saveShortcuts();
+                    },
+                  )
+                : GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.95,
+                        ),
+                    itemCount: filteredShortcuts.length,
+                    itemBuilder: (context, index) {
+                      final shortcut = filteredShortcuts[index];
+                      return _buildShortcutItem(shortcut);
+                    },
+                  ),
           ),
         ],
       ),
@@ -252,8 +394,9 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
   }
 
   /// بناء عنصر الاختصار - بنفس تصميم الصفحة الرئيسية بدون خلفية بيضاء
-  Widget _buildShortcutItem(ShortcutItemData shortcut) {
+  Widget _buildShortcutItem(ShortcutItemData shortcut, {Key? key}) {
     return GestureDetector(
+      key: key,
       onTap: _isEditing
           ? () => _showDeleteDialog(shortcut)
           : () => _navigateToShortcut(shortcut),
@@ -311,8 +454,8 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontLabel,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.darkSlate,
                     ),
@@ -395,7 +538,10 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
                   padding: EdgeInsets.all(16),
                   child: Text(
                     'اختر اختصاراً',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontDisplay3,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -429,7 +575,7 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
           child: Text(
             category.title,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: AppDimensions.fontTitle,
               fontWeight: FontWeight.bold,
               color: Colors.grey[700],
             ),
@@ -475,7 +621,7 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: AppDimensions.fontCaption - 1,
                         fontWeight: FontWeight.w500,
                         color: isAdded
                             ? AppTheme.accentColor
@@ -532,22 +678,8 @@ class ShortcutCategory {
 }
 
 // جميع الاختصارات المتاحة
+// ملاحظة: تم إزالة صفحات البار السفلي (الرئيسية، الطلبات، المحادثات، دروب شيب)
 final List<ShortcutItemData> _availableShortcuts = [
-  // الرئيسية
-  const ShortcutItemData(
-    key: 'home',
-    title: 'الرئيسية',
-    route: '/dashboard',
-    icon: Icons.home_outlined,
-    color: Color(0xFF2563EB),
-  ),
-  const ShortcutItemData(
-    key: 'orders',
-    title: 'الطلبات',
-    route: '/dashboard/orders',
-    icon: Icons.receipt_long_outlined,
-    color: Color(0xFFF59E0B),
-  ),
   const ShortcutItemData(
     key: 'products',
     title: 'المنتجات',
@@ -597,14 +729,7 @@ final List<ShortcutItemData> _availableShortcuts = [
     icon: Icons.local_offer_outlined,
     color: Color(0xFFF97316),
   ),
-  const ShortcutItemData(
-    key: 'conversations',
-    title: 'المحادثات',
-    route: '/dashboard/conversations',
-    icon: Icons.chat_bubble_outline,
-    color: Color(0xFF3B82F6),
-  ),
-  // المتجر
+  // المتجر (تمت إزالة المحادثات - موجودة في البار السفلي)
   const ShortcutItemData(
     key: 'store_settings',
     title: 'إعدادات المتجر',
@@ -802,14 +927,13 @@ final List<ShortcutItemData> _availableShortcuts = [
 ];
 
 // تصنيفات الاختصارات
+// ملاحظة: تم إزالة صفحات البار السفلي من التصنيفات
 final List<ShortcutCategory> _shortcutCategories = [
   ShortcutCategory(
     title: 'الأساسية',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
-            'home',
-            'orders',
             'products',
             'add_product',
             'inventory',
@@ -844,7 +968,6 @@ final List<ShortcutCategory> _shortcutCategories = [
             'webstore',
             'whatsapp',
             'qrcode',
-            'conversations',
           ].contains(s.key),
         )
         .toList(),
@@ -903,3 +1026,80 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
 ];
+
+// =============================================================================
+// ReorderableGridView Widget
+// =============================================================================
+
+/// عنصر GridView قابل لإعادة الترتيب
+class ReorderableGridView extends StatefulWidget {
+  final SliverGridDelegate gridDelegate;
+  final int itemCount;
+  final Widget Function(BuildContext, int) itemBuilder;
+  final void Function(int oldIndex, int newIndex) onReorder;
+
+  const ReorderableGridView.builder({
+    super.key,
+    required this.gridDelegate,
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.onReorder,
+  });
+
+  @override
+  State<ReorderableGridView> createState() => _ReorderableGridViewState();
+}
+
+class _ReorderableGridViewState extends State<ReorderableGridView> {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: widget.gridDelegate,
+      itemCount: widget.itemCount,
+      itemBuilder: (context, index) {
+        return LongPressDraggable<int>(
+          data: index,
+          feedback: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(18),
+            child: SizedBox(
+              width: 100,
+              height: 100,
+              child: Opacity(
+                opacity: 0.8,
+                child: widget.itemBuilder(context, index),
+              ),
+            ),
+          ),
+          childWhenDragging: Opacity(
+            opacity: 0.3,
+            child: widget.itemBuilder(context, index),
+          ),
+          onDragStarted: () {
+            HapticFeedback.mediumImpact();
+          },
+          child: DragTarget<int>(
+            onWillAcceptWithDetails: (details) => details.data != index,
+            onAcceptWithDetails: (details) {
+              widget.onReorder(details.data, index);
+              HapticFeedback.lightImpact();
+            },
+            builder: (context, candidateData, rejectedData) {
+              final isTarget = candidateData.isNotEmpty;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: isTarget
+                      ? Border.all(color: AppTheme.primaryColor, width: 2)
+                      : null,
+                ),
+                child: widget.itemBuilder(context, index),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
