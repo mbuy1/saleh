@@ -18,7 +18,6 @@ class ProductSettingsView extends ConsumerStatefulWidget {
 
 class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = ''; // Used in search functionality
 
   @override
   void dispose() {
@@ -237,7 +236,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
       ),
       child: TextField(
         controller: _searchController,
-        onChanged: (value) => setState(() => _searchQuery = value),
+        onChanged: (value) {},
         decoration: InputDecoration(
           hintText: 'البحث في الإعدادات...',
           hintStyle: TextStyle(color: AppTheme.textHintColor),
@@ -422,7 +421,7 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
           ),
           Switch(
             value: settings[key] ?? defaultValue,
-            activeColor: AppTheme.accentColor,
+            activeThumbColor: AppTheme.accentColor,
             onChanged: (value) => _updateSetting(key, value),
           ),
         ],

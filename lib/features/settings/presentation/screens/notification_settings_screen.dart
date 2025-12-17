@@ -334,7 +334,7 @@ class _NotificationSettingsScreenState
                 HapticFeedback.lightImpact();
                 _updateSetting(_settings.copyWith(enabled: v));
               },
-              activeColor: AppTheme.surfaceColor,
+              activeThumbColor: AppTheme.surfaceColor,
               activeTrackColor: AppTheme.surfaceColor.withValues(alpha: 0.3),
             ),
           ),
@@ -457,7 +457,7 @@ class _NotificationSettingsScreenState
                     onChanged(v);
                   }
                 : null,
-            activeColor: AppTheme.accentColor,
+            activeThumbColor: AppTheme.accentColor,
           ),
         ],
       ),
@@ -532,7 +532,7 @@ class _NotificationSettingsScreenState
                             _updateSetting(_settings.copyWith(quietMode: v));
                           }
                         : null,
-                    activeColor: AppTheme.purpleColor,
+                    activeThumbColor: AppTheme.purpleColor,
                   ),
                 ],
               ),

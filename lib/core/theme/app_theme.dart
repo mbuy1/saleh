@@ -702,8 +702,6 @@ class AppTheme {
         onError: Colors.white,
         outline: borderColorDark,
         outlineVariant: dividerColorDark,
-        background: backgroundColorDark,
-        onBackground: textPrimaryColorDark,
       ),
 
       // Scaffold
@@ -726,26 +724,27 @@ class AppTheme {
       ),
 
       // Text Theme
-      textTheme: TextTheme(
-        displayLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
-        displayMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
-        displaySmall: GoogleFonts.cairo(color: textPrimaryColorDark),
-        headlineLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
-        headlineMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
-        headlineSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
-        titleLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
-        titleMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
-        titleSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
-        bodyLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
-        bodyMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
-        bodySmall: GoogleFonts.cairo(color: textSecondaryColorDark),
-        labelLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
-        labelMedium: GoogleFonts.cairo(color: textSecondaryColorDark),
-        labelSmall: GoogleFonts.cairo(color: textSecondaryColorDark),
-      ).apply(
-        bodyColor: textPrimaryColorDark,
-        displayColor: textPrimaryColorDark,
-      ),
+      textTheme:
+          TextTheme(
+            displayLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            displayMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            displaySmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            headlineSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            titleSmall: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodyLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodyMedium: GoogleFonts.cairo(color: textPrimaryColorDark),
+            bodySmall: GoogleFonts.cairo(color: textSecondaryColorDark),
+            labelLarge: GoogleFonts.cairo(color: textPrimaryColorDark),
+            labelMedium: GoogleFonts.cairo(color: textSecondaryColorDark),
+            labelSmall: GoogleFonts.cairo(color: textSecondaryColorDark),
+          ).apply(
+            bodyColor: textPrimaryColorDark,
+            displayColor: textPrimaryColorDark,
+          ),
 
       // Elevated Button
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -794,8 +793,10 @@ class AppTheme {
           borderSide: const BorderSide(color: errorColor, width: 2),
         ),
         hintStyle: GoogleFonts.cairo(color: textHintColorDark, fontSize: 14),
-        labelStyle:
-            GoogleFonts.cairo(color: textSecondaryColorDark, fontSize: 14),
+        labelStyle: GoogleFonts.cairo(
+          color: textSecondaryColorDark,
+          fontSize: 14,
+        ),
         prefixIconColor: textSecondaryColorDark,
         suffixIconColor: textSecondaryColorDark,
       ),
@@ -853,8 +854,7 @@ class AppTheme {
 
       // Other components
       dialogTheme: DialogThemeData(backgroundColor: surfaceColorDark),
-      bottomSheetTheme:
-          BottomSheetThemeData(backgroundColor: surfaceColorDark),
+      bottomSheetTheme: BottomSheetThemeData(backgroundColor: surfaceColorDark),
       popupMenuTheme: PopupMenuThemeData(color: surfaceColorDark),
       snackBarTheme: SnackBarThemeData(backgroundColor: surfaceColorDark),
     );

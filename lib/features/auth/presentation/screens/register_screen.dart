@@ -313,7 +313,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 text: 'شروط الاستخدام',
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    context.push('/settings/terms');
+                                    context.push('/terms');
                                   },
                                 style: TextStyle(
                                   color: AppTheme.primaryColor,
@@ -326,7 +326,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 text: 'سياسة الخصوصية',
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    context.push('/settings/privacy');
+                                    context.push('/privacy-policy');
                                   },
                                 style: TextStyle(
                                   color: AppTheme.primaryColor,

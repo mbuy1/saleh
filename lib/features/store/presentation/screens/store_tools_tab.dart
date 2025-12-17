@@ -18,7 +18,6 @@ class StoreToolsTab extends StatefulWidget {
 
 class _StoreToolsTabState extends State<StoreToolsTab> {
   bool _isLoading = false;
-  String _searchQuery = ''; // Used in search functionality
 
   Future<void> _refreshData() async {
     HapticFeedback.lightImpact();
@@ -167,7 +166,7 @@ class _StoreToolsTabState extends State<StoreToolsTab> {
               padding: const EdgeInsets.all(16),
               child: TextField(
                 autofocus: true,
-                onChanged: (value) => setState(() => _searchQuery = value),
+                onChanged: (value) {},
                 decoration: InputDecoration(
                   hintText: 'ابحث عن أداة...',
                   prefixIcon: const Icon(Icons.search),
@@ -524,7 +523,7 @@ class _StoreToolsTabState extends State<StoreToolsTab> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: tools.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final tool = tools[index];
           return _buildToolCard(tool);

@@ -63,6 +63,8 @@ import '../../features/settings/presentation/screens/privacy_policy_screen.dart'
 import '../../features/settings/presentation/screens/terms_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/settings/presentation/screens/about_screen.dart';
+import '../../features/settings/presentation/screens/notification_settings_screen.dart';
+import '../../features/settings/presentation/screens/appearance_settings_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 /// App Router - Manages navigation throughout the application
@@ -162,6 +164,16 @@ class AppRouter {
           path: '/about',
           name: 'about',
           builder: (context, state) => const AboutScreen(),
+        ),
+        GoRoute(
+          path: '/notification-settings',
+          name: 'notification-settings',
+          builder: (context, state) => const NotificationSettingsScreen(),
+        ),
+        GoRoute(
+          path: '/appearance-settings',
+          name: 'appearance-settings',
+          builder: (context, state) => const AppearanceSettingsScreen(),
         ),
 
         // ========================================================================

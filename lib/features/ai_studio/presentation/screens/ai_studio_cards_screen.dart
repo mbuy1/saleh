@@ -203,7 +203,7 @@ class _AiStudioCardsScreenState extends ConsumerState<AiStudioCardsScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
-        separatorBuilder: (_, __) =>
+        separatorBuilder: (context, index) =>
             const SizedBox(width: AppDimensions.spacing12),
         itemBuilder: (context, index) {
           final card = cards[index];

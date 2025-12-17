@@ -94,7 +94,7 @@ class _ThemeOptionCard extends StatelessWidget {
       child: Card(
         elevation: isSelected ? 4 : 1,
         shadowColor: isSelected
-            ? AppTheme.primaryColor.withOpacity(0.3)
+            ? AppTheme.primaryColor.withValues(alpha: 0.3)
             : Theme.of(context).shadowColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
