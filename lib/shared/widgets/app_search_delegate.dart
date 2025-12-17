@@ -248,12 +248,12 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       keywords: ['packages', 'حزم', 'باقات', 'اشتراك'],
     ),
     SearchItem(
-      title: 'متجرك على جوك',
-      subtitle: 'إعدادات متجر جوك',
+      title: 'متجرك الإلكتروني',
+      subtitle: 'تصميم وتخصيص المتجر',
       icon: AppIcons.storeLocation,
-      route: '/dashboard/store-on-jock',
+      route: '/dashboard/webstore',
       category: 'المتجر',
-      keywords: ['jock', 'جوك', 'متجر'],
+      keywords: ['webstore', 'متجر', 'تصميم', 'ثيم'],
     ),
 
     // الإجراءات

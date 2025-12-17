@@ -6,6 +6,8 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 
+/// شاشة إعدادات المنتجات - تصميم محسن
+/// تم إعادة تصميمها بتقسيم واضح للأقسام مع بطاقات مميزة
 class ProductSettingsView extends ConsumerStatefulWidget {
   const ProductSettingsView({super.key});
 
@@ -16,6 +18,7 @@ class ProductSettingsView extends ConsumerStatefulWidget {
 
 class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
   final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void dispose() {
@@ -38,56 +41,32 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      children: [
-        // A) عناصر عامة - شريط البحث
-        Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacing16),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'البحث عن منتج...',
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12),
-                child: SvgPicture.asset(
-                  AppIcons.search,
-                  width: 20,
-                  height: 20,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.grey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: AppDimensions.borderRadiusM,
-              ),
-              filled: true,
-              fillColor: AppTheme.surfaceColor,
-            ),
-          ),
-        ),
+    return SingleChildScrollView(
+      padding: AppDimensions.paddingM,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // شريط البحث
+          _buildSearchBar(),
+          SizedBox(height: AppDimensions.spacing16),
 
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacing16,
-            ),
+          // === قسم الإعدادات العامة ===
+          _buildSettingsCard(
+            title: 'الإعدادات العامة',
+            icon: Icons.settings_outlined,
             children: [
-              // تمت إزالة قسم "متجرك على جوك" من هنا حسب الطلب
-              _buildSectionHeader('الإعدادات العامة'),
-              _buildListTileAction('تخصيص التصنيفات', AppIcons.category, () {}),
               _buildSwitchTile(
                 'تكرار المنتج',
                 'allow_duplicate_product',
                 settings,
                 defaultValue: true,
+                description: 'السماح بإضافة منتجات بنفس الاسم',
               ),
               _buildSwitchTile(
                 'عرض عدد مرات الشراء',
                 'show_purchase_count',
                 settings,
-                subtitle: 'يمكن تخصيصه لمنتجات محددة',
+                description: 'يظهر للعملاء عدد مرات شراء المنتج',
               ),
               _buildSwitchTile(
                 'عرض المنتجات النافدة أسفل الصفحة',
@@ -99,39 +78,15 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
                 'show_read_more_button',
                 settings,
               ),
-              _buildExpansionOption(
-                'منتجات قد تعجبك',
-                'you_might_like',
-                settings,
-                options: ['عشوائي', 'نفس التصنيف', 'نفس العلامة', 'نفس الوسم'],
-              ),
-              _buildSwitchTile(
-                'منتج عرض مجاني تلقائي',
-                'auto_free_product',
-                settings,
-              ),
-              _buildSwitchTile(
-                'عرض الوزن',
-                'show_weight',
-                settings,
-                subtitle: 'في صفحة المنتج، السلة، والفاتورة',
-              ),
-              _buildSwitchTile(
-                'عرض السعر شامل الضريبة',
-                'show_price_with_tax',
-                settings,
-              ),
-              _buildTextFieldTile(
-                'الوزن الافتراضي للشحن',
-                'default_shipping_weight',
-                settings,
-                suffix: 'كجم',
-              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spacing16),
 
-              const SizedBox(height: AppDimensions.spacing24),
-
-              // C) عرض المنتجات
-              _buildSectionHeader('عرض المنتجات'),
+          // === قسم عرض المنتجات ===
+          _buildSettingsCard(
+            title: 'عرض المنتجات',
+            icon: Icons.grid_view_outlined,
+            children: [
               _buildSwitchTile(
                 'عرض المنتجات النافدة',
                 'show_out_of_stock_products',
@@ -150,182 +105,272 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
                 options: ['إخفاء', 'أقل من 5', 'دائماً'],
                 defaultValue: 'دائماً',
               ),
-
-              const SizedBox(height: AppDimensions.spacing24),
-
-              // D) خيارات متقدمة (Collapsed)
-              ExpansionTile(
-                title: const Text(
-                  'الخيارات المتقدمة',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppDimensions.fontBody,
-                  ),
-                ),
-                collapsedBackgroundColor: AppTheme.surfaceColor,
-                backgroundColor: AppTheme.surfaceColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  side: BorderSide(color: AppTheme.dividerColor),
-                ),
-                collapsedShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  side: BorderSide(color: AppTheme.dividerColor),
-                ),
-                children: [
-                  _buildSwitchTile(
-                    'تخصيص الطلب',
-                    'enable_order_customization',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'تخصيص الدفع',
-                    'enable_payment_customization',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'تخصيص الشحن',
-                    'enable_shipping_customization',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'تخصيص الإشعارات',
-                    'enable_notification_customization',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'حماية المنتج الرقمي (PDF)',
-                    'digital_product_protection',
-                    settings,
-                  ),
-                  _buildSwitchTile('عرض SKU', 'show_sku', settings),
-                  _buildSwitchTile(
-                    'إشعار "أعلمني عند التوفر"',
-                    'notify_when_available',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'التسوق حسب العلامة التجارية',
-                    'shop_by_brand',
-                    settings,
-                    subtitle: 'مع عرض الوصف',
-                  ),
-                  _buildSwitchTile(
-                    'عرض الصور بجودة كاملة',
-                    'full_quality_images',
-                    settings,
-                    subtitle: 'قد يؤثر على سرعة التحميل (UX)',
-                  ),
-                  _buildSwitchTile(
-                    'سعر الجملة في صفحة المنتج',
-                    'show_wholesale_price',
-                    settings,
-                    subtitle: 'يظهر للعملاء المؤهلين',
-                  ),
-                  _buildSwitchTile(
-                    'توليد الوصف و SEO بالذكاء الاصطناعي',
-                    'ai_description_seo',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'فلترة الإعلان بالذكاء الاصطناعي',
-                    'ai_ad_filtering',
-                    settings,
-                  ),
-                  _buildExpansionOption(
-                    'تخصيص الشحن المجاني',
-                    'free_shipping_rules',
-                    settings,
-                    options: ['لمدينة محددة', 'لكمية محددة', 'لسعر محدد'],
-                    isMultiSelect: true,
-                  ),
-                  _buildSwitchTile(
-                    'إخفاء الدفع عند الاستلام لعملاء سابقين',
-                    'hide_cod_previous_customers',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'تفعيل الكاش باك',
-                    'enable_cashback',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'مجموعة كوبونات',
-                    'coupon_bundles',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'عرض المنتج بعدة تصنيفات',
-                    'multi_category_display',
-                    settings,
-                  ),
-                  _buildListTileAction(
-                    'استيراد/تصدير المنتجات',
-                    AppIcons.importExport,
-                    () {},
-                  ),
-                  _buildSwitchTile(
-                    'إشعار التوفر + عدد العملاء',
-                    'availability_notification_count',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'شراء مسبق + عدد العملاء',
-                    'pre_order_count',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'إرسال رابط تقييم بعد التسليم',
-                    'send_review_link',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'عدم الاسترجاع',
-                    'no_return_policy',
-                    settings,
-                    subtitle: 'مع رابط وزارة التجارة',
-                  ),
-                  _buildSwitchTile(
-                    'علامة نفذت الكمية',
-                    'sold_out_badge',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'مواصفات + خدمات بعد البيع + نظرة عامة',
-                    'extended_product_details',
-                    settings,
-                  ),
-                  _buildSwitchTile(
-                    'منتجات مماثلة',
-                    'similar_products',
-                    settings,
-                  ),
-                  _buildListTileAction(
-                    'صفحة المنتجات المحذوفة',
-                    AppIcons.delete,
-                    () {},
-                  ),
-                ],
+              _buildSwitchTile(
+                'عرض الوزن',
+                'show_weight',
+                settings,
+                description: 'في صفحة المنتج، السلة، والفاتورة',
               ),
-
-              const SizedBox(height: AppDimensions.spacing48),
             ],
           ),
-        ),
-      ],
+          SizedBox(height: AppDimensions.spacing16),
+
+          // === قسم الأسعار والضرائب ===
+          _buildSettingsCard(
+            title: 'الأسعار والضرائب',
+            icon: Icons.attach_money_outlined,
+            color: Colors.green,
+            children: [
+              _buildSwitchTile(
+                'عرض السعر شامل الضريبة',
+                'show_price_with_tax',
+                settings,
+              ),
+              _buildSwitchTile(
+                'سعر الجملة في صفحة المنتج',
+                'show_wholesale_price',
+                settings,
+                description: 'يظهر للعملاء المؤهلين فقط',
+              ),
+              _buildTextFieldTile(
+                'الوزن الافتراضي للشحن',
+                'default_shipping_weight',
+                settings,
+                suffix: 'كجم',
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spacing16),
+
+          // === قسم الذكاء الاصطناعي ===
+          _buildSettingsCard(
+            title: 'الذكاء الاصطناعي',
+            icon: Icons.auto_awesome_outlined,
+            color: Colors.purple,
+            children: [
+              _buildSwitchTile(
+                'توليد الوصف بالذكاء الاصطناعي',
+                'ai_description_seo',
+                settings,
+                description: 'توليد وصف ومحتوى SEO تلقائياً',
+              ),
+              _buildSwitchTile(
+                'فلترة الإعلان بالذكاء الاصطناعي',
+                'ai_ad_filtering',
+                settings,
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spacing16),
+
+          // === الخيارات المتقدمة ===
+          _buildExpandableCard(
+            title: 'الخيارات المتقدمة',
+            icon: Icons.tune_outlined,
+            color: Colors.blueGrey,
+            children: [
+              _buildSwitchTile(
+                'حماية المنتج الرقمي (PDF)',
+                'digital_product_protection',
+                settings,
+              ),
+              _buildSwitchTile('عرض SKU', 'show_sku', settings),
+              _buildSwitchTile(
+                'إشعار "أعلمني عند التوفر"',
+                'notify_when_available',
+                settings,
+              ),
+              _buildSwitchTile(
+                'التسوق حسب العلامة التجارية',
+                'shop_by_brand',
+                settings,
+                description: 'مع عرض الوصف',
+              ),
+              _buildSwitchTile(
+                'عرض الصور بجودة كاملة',
+                'full_quality_images',
+                settings,
+                description: 'قد يؤثر على سرعة التحميل',
+              ),
+              _buildSwitchTile('علامة نفذت الكمية', 'sold_out_badge', settings),
+              _buildSwitchTile('منتجات مماثلة', 'similar_products', settings),
+              _buildSwitchTile(
+                'عرض المنتج بعدة تصنيفات',
+                'multi_category_display',
+                settings,
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spacing16),
+
+          // === إجراءات سريعة ===
+          _buildSettingsCard(
+            title: 'إجراءات سريعة',
+            icon: Icons.flash_on_outlined,
+            color: Colors.orange,
+            children: [
+              _buildActionTile('تخصيص التصنيفات', AppIcons.category, () {}),
+              _buildActionTile(
+                'استيراد/تصدير المنتجات',
+                AppIcons.importExport,
+                () {},
+              ),
+              _buildActionTile(
+                'صفحة المنتجات المحذوفة',
+                AppIcons.delete,
+                () {},
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spacing48),
+        ],
+      ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing12),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: AppTheme.primaryColor,
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppDimensions.borderRadiusM,
+        border: Border.all(color: AppTheme.dividerColor),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) => setState(() => _searchQuery = value),
+        decoration: InputDecoration(
+          hintText: 'البحث في الإعدادات...',
+          hintStyle: TextStyle(color: AppTheme.textHintColor),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              AppIcons.search,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                AppTheme.textHintColor,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing16,
+            vertical: AppDimensions.spacing12,
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+    Color color = AppTheme.primaryColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppDimensions.borderRadiusL,
+        border: Border.all(color: AppTheme.dividerColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // عنوان القسم
+          Container(
+            padding: AppDimensions.paddingM,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.05),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppDimensions.radiusL - 1),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: AppDimensions.borderRadiusS,
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                SizedBox(width: AppDimensions.spacing12),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontTitle,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // الإعدادات
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandableCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+    Color color = AppTheme.primaryColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppDimensions.borderRadiusL,
+        border: Border.all(color: AppTheme.dividerColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: AppDimensions.borderRadiusS,
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            SizedBox(width: AppDimensions.spacing12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: AppDimensions.fontTitle,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppDimensions.borderRadiusL,
+        ),
+        collapsedShape: RoundedRectangleBorder(
+          borderRadius: AppDimensions.borderRadiusL,
+        ),
+        children: children,
       ),
     );
   }
@@ -334,86 +379,54 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
     String title,
     String key,
     Map<String, dynamic> settings, {
-    String? subtitle,
+    String? description,
     bool defaultValue = false,
   }) {
-    return SwitchListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            )
-          : null,
-      value: settings[key] ?? defaultValue,
-      activeTrackColor: AppTheme.accentColor,
-      onChanged: (value) => _updateSetting(key, value),
-    );
-  }
-
-  Widget _buildExpansionOption(
-    String title,
-    String key,
-    Map<String, dynamic> settings, {
-    required List<String> options,
-    bool isMultiSelect = false,
-  }) {
-    final bool isEnabled = settings['${key}_enabled'] ?? false;
-    final String? selectedOption = settings['${key}_option'];
-    final List<dynamic> selectedOptions = settings['${key}_options'] ?? [];
-
-    return ExpansionTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      leading: Switch(
-        value: isEnabled,
-        activeTrackColor: AppTheme.accentColor,
-        onChanged: (value) => _updateSetting('${key}_enabled', value),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing16,
+        vertical: AppDimensions.spacing8,
       ),
-      children: options.map((option) {
-        if (isMultiSelect) {
-          final isSelected = selectedOptions.contains(option);
-          return CheckboxListTile(
-            title: Text(option),
-            value: isSelected,
-            onChanged: isEnabled
-                ? (value) {
-                    final newList = List.from(selectedOptions);
-                    if (value == true) {
-                      newList.add(option);
-                    } else {
-                      newList.remove(option);
-                    }
-                    _updateSetting('${key}_options', newList);
-                  }
-                : null,
-          );
-        } else {
-          return InkWell(
-            onTap: isEnabled
-                ? () => _updateSetting('${key}_option', option)
-                : null,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  // ignore: deprecated_member_use
-                  Radio<String>(
-                    value: option,
-                    // ignore: deprecated_member_use
-                    groupValue: selectedOption,
-                    // ignore: deprecated_member_use
-                    onChanged: isEnabled
-                        ? (value) => _updateSetting('${key}_option', value)
-                        : null,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.dividerColor.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimensions.fontBody,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(option)),
+                ),
+                if (description != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontCaption,
+                      color: AppTheme.textHintColor,
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
-          );
-        }
-      }).toList(),
+          ),
+          Switch(
+            value: settings[key] ?? defaultValue,
+            activeColor: AppTheme.accentColor,
+            onChanged: (value) => _updateSetting(key, value),
+          ),
+        ],
+      ),
     );
   }
 
@@ -423,27 +436,57 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
     Map<String, dynamic> settings, {
     String? suffix,
   }) {
-    return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: SizedBox(
-        width: 100,
-        child: TextField(
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            suffixText: suffix,
-            isDense: true,
-            contentPadding: const EdgeInsets.all(8),
-            border: const OutlineInputBorder(),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing16,
+        vertical: AppDimensions.spacing12,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.dividerColor.withValues(alpha: 0.5),
           ),
-          onSubmitted: (value) => _updateSetting(key, value),
-          controller:
-              TextEditingController(text: settings[key]?.toString() ?? '')
-                ..selection = TextSelection.fromPosition(
-                  TextPosition(
-                    offset: (settings[key]?.toString() ?? '').length,
-                  ),
-                ),
         ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: AppDimensions.fontBody,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 100,
+            child: TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                suffixText: suffix,
+                isDense: true,
+                contentPadding: const EdgeInsets.all(10),
+                border: OutlineInputBorder(
+                  borderRadius: AppDimensions.borderRadiusS,
+                  borderSide: BorderSide(color: AppTheme.dividerColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: AppDimensions.borderRadiusS,
+                  borderSide: BorderSide(color: AppTheme.dividerColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: AppDimensions.borderRadiusS,
+                  borderSide: const BorderSide(color: AppTheme.accentColor),
+                ),
+              ),
+              onSubmitted: (value) => _updateSetting(key, value),
+              controller: TextEditingController(
+                text: settings[key]?.toString() ?? '',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -455,42 +498,106 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
     required List<String> options,
     required String defaultValue,
   }) {
-    return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: DropdownButton<String>(
-        value: settings[key] ?? defaultValue,
-        underline: const SizedBox(),
-        items: options.map((String value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (value) => _updateSetting(key, value),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing16,
+        vertical: AppDimensions.spacing12,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.dividerColor.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: AppDimensions.fontBody,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceColor,
+              borderRadius: AppDimensions.borderRadiusS,
+              border: Border.all(color: AppTheme.dividerColor),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: settings[key] ?? defaultValue,
+                isDense: true,
+                items: options.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (value) => _updateSetting(key, value),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildListTileAction(
-    String title,
-    String iconPath,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        iconPath,
-        width: 24,
-        height: 24,
-        colorFilter: const ColorFilter.mode(
-          AppTheme.primaryColor,
-          BlendMode.srcIn,
+  Widget _buildActionTile(String title, String iconPath, VoidCallback onTap) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing16,
+            vertical: AppDimensions.spacing14,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: AppTheme.dividerColor.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                width: 22,
+                height: 22,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+              SizedBox(width: AppDimensions.spacing12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimensions.fontBody,
+                  ),
+                ),
+              ),
+              SvgPicture.asset(
+                AppIcons.chevronRight,
+                width: 16,
+                height: 16,
+                colorFilter: ColorFilter.mode(
+                  AppTheme.textHintColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: SvgPicture.asset(
-        AppIcons.chevronRight,
-        width: 16,
-        height: 16,
-        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
-      ),
-      onTap: onTap,
     );
   }
 }

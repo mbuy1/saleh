@@ -48,13 +48,13 @@ class StoreTab extends StatelessWidget {
               onTap: () => context.push('/dashboard/store/create-store'),
             ),
             SizedBox(height: AppDimensions.spacing12),
-            // متجرك على جوك
+            // متجرك الإلكتروني
             _buildStoreOptionCard(
               context: context,
               icon: Icons.storefront_outlined,
-              title: 'متجرك على جوك',
-              subtitle: 'تخصيص مظهر وإعدادات المتجر',
-              onTap: () => context.push('/dashboard/store-on-jock'),
+              title: 'متجرك الإلكتروني',
+              subtitle: 'تخصيص مظهر وتصميم المتجر',
+              onTap: () => context.push('/dashboard/webstore'),
             ),
             SizedBox(height: AppDimensions.spacing24),
             // قسم خيارات إضافية

@@ -167,7 +167,7 @@ class AppStrings {
   static const String shareStore = 'مشاركة المتجر';
   static const String viewStore = 'عرض المتجر';
   static const String storeSettings = 'إعدادات المتجر';
-  static const String storeOnJock = 'متجرك على جوك';
+  static const String webstore = 'المتجر الإلكتروني';
   static const String linkCopied = 'تم نسخ الرابط';
 
   // =========================================================================

@@ -5,11 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
-import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 
-/// صفحة المتجر الجديدة - تدمج أدوات AI والتسويق
-/// تحل محل تبويب أدوات AI في الصفحة الرئيسية
+/// صفحة المتجر - أدوات وخدمات التاجر
+/// تصميم حديث يعرض أدوات التسويق والذكاء الاصطناعي
 class StoreToolsTab extends StatefulWidget {
   const StoreToolsTab({super.key});
 
@@ -35,39 +34,263 @@ class _StoreToolsTabState extends State<StoreToolsTab> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            _buildHeader(context),
-            // شريط البحث
-            _buildSearchBar(),
-            // المحتوى
-            Expanded(
-              child: RefreshIndicator(
+        child: _isLoading
+            ? const SkeletonMarketingScreen()
+            : RefreshIndicator(
                 onRefresh: _refreshData,
                 color: AppTheme.accentColor,
-                child: _isLoading
-                    ? const SkeletonMarketingScreen()
-                    : SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 100),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // قسم التسويق
-                            _buildSectionTitle('التسويق'),
-                            _buildMarketingGrid(),
-                            const SizedBox(height: AppDimensions.spacing24),
-                            // قسم أدوات AI
-                            _buildSectionTitle('أدوات الذكاء الاصطناعي'),
-                            _buildAIToolsGrid(),
-                            const SizedBox(height: AppDimensions.spacing24),
-                            // قسم التحليلات
-                            _buildSectionTitle('التحليلات والتقارير'),
-                            _buildAnalyticsGrid(),
-                          ],
-                        ),
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    // Header مع تصميم حديث
+                    SliverToBoxAdapter(child: _buildHeader(context)),
+                    // بطاقة الترحيب
+                    SliverToBoxAdapter(child: _buildWelcomeCard()),
+                    // إحصائيات سريعة
+                    SliverToBoxAdapter(child: _buildQuickStats()),
+                    // قسم التسويق
+                    SliverToBoxAdapter(
+                      child: _buildSectionHeader(
+                        '🚀 التسويق',
+                        'أدوات لزيادة مبيعاتك',
                       ),
+                    ),
+                    SliverToBoxAdapter(child: _buildMarketingSection()),
+                    // قسم الذكاء الاصطناعي
+                    SliverToBoxAdapter(
+                      child: _buildSectionHeader(
+                        '✨ الذكاء الاصطناعي',
+                        'قوة AI في متجرك',
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: _buildAISection()),
+                    // قسم التحليلات
+                    SliverToBoxAdapter(
+                      child: _buildSectionHeader(
+                        '📊 التحليلات',
+                        'اتخذ قرارات ذكية',
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: _buildAnalyticsSection()),
+                    // مساحة سفلية
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              context.pop();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SvgPicture.asset(
+                AppIcons.arrowBack,
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  AppTheme.primaryColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+          const Expanded(
+            child: Text(
+              'أدوات المتجر',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+          ),
+          // شريط البحث مصغر
+          GestureDetector(
+            onTap: _showSearchSheet,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.dividerColor),
+              ),
+              child: Icon(
+                Icons.search,
+                size: 20,
+                color: AppTheme.textHintColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSearchSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                autofocus: true,
+                onChanged: (value) => setState(() => _searchQuery = value),
+                decoration: InputDecoration(
+                  hintText: 'ابحث عن أداة...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.dividerColor),
+                  ),
+                ),
+              ),
+            ),
+            // يمكن إضافة نتائج البحث هنا
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF667eea).withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.rocket_launch,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'طوّر متجرك',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'استخدم أدوات التسويق والذكاء الاصطناعي',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickAction(
+                  'كوبون جديد',
+                  Icons.confirmation_number_outlined,
+                  () => context.push('/dashboard/coupons'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildQuickAction(
+                  'عرض جديد',
+                  Icons.flash_on,
+                  () => context.push('/dashboard/flash-sales'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAction(String title, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ],
@@ -76,283 +299,340 @@ class _StoreToolsTabState extends State<StoreToolsTab> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppDimensions.spacing16),
+  Widget _buildQuickStats() {
+    return Container(
+      margin: const EdgeInsets.all(16),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => context.pop(),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimensions.spacing8),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: AppDimensions.borderRadiusS,
-              ),
-              child: SvgPicture.asset(
-                AppIcons.arrowBack,
-                width: AppDimensions.iconS,
-                height: AppDimensions.iconS,
-                colorFilter: const ColorFilter.mode(
-                  AppTheme.primaryColor,
-                  BlendMode.srcIn,
-                ),
-              ),
+          Expanded(
+            child: _buildStatCard(
+              'الزيارات اليوم',
+              '0',
+              Icons.visibility_outlined,
+              Colors.blue,
             ),
           ),
-          const Spacer(),
-          const Text(
-            'المتجر',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontHeadline,
-              color: AppTheme.textPrimaryColor,
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              'معدل التحويل',
+              '0%',
+              Icons.trending_up,
+              Colors.green,
             ),
           ),
-          const Spacer(),
-          const SizedBox(width: AppDimensions.iconM + AppDimensions.spacing16),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              'العروض النشطة',
+              '0',
+              Icons.local_offer_outlined,
+              Colors.orange,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: AppDimensions.borderRadiusM,
-          border: Border.all(color: AppTheme.dividerColor),
-        ),
-        child: TextField(
-          onChanged: (value) {
-            setState(() => _searchQuery = value);
-          },
-          decoration: InputDecoration(
-            hintText: 'البحث في الأدوات...',
-            hintStyle: TextStyle(color: AppTheme.textHintColor),
-            prefixIcon: Icon(Icons.search, color: AppTheme.textHintColor),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacing16,
-              vertical: AppDimensions.spacing12,
-            ),
-          ),
-        ),
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.dividerColor),
       ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing16,
-        vertical: AppDimensions.spacing12,
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: AppDimensions.fontTitle,
-          fontWeight: FontWeight.bold,
-          color: AppTheme.textPrimaryColor,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMarketingGrid() {
-    final items = [
-      _ToolItem(
-        title: 'الكوبونات',
-        iconPath: AppIcons.discount,
-        color: const Color(0xFF4CAF50),
-        route: '/dashboard/coupons',
-      ),
-      _ToolItem(
-        title: 'العروض الخاطفة',
-        iconPath: AppIcons.flash,
-        color: const Color(0xFFEF4444),
-        route: '/dashboard/flash-sales',
-      ),
-      _ToolItem(
-        title: 'السلات المتروكة',
-        iconPath: AppIcons.cart,
-        color: const Color(0xFFE91E63),
-        route: '/dashboard/abandoned-cart',
-      ),
-      _ToolItem(
-        title: 'برنامج الإحالة',
-        iconPath: AppIcons.share,
-        color: const Color(0xFF10B981),
-        route: '/dashboard/referral',
-      ),
-      _ToolItem(
-        title: 'برنامج الولاء',
-        iconPath: AppIcons.loyalty,
-        color: const Color(0xFF00BCD4),
-        route: '/dashboard/loyalty-program',
-      ),
-      _ToolItem(
-        title: 'شرائح العملاء',
-        iconPath: AppIcons.users,
-        color: const Color(0xFF3B82F6),
-        route: '/dashboard/customer-segments',
-      ),
-      _ToolItem(
-        title: 'رسائل مخصصة',
-        iconPath: AppIcons.chat,
-        color: const Color(0xFF22C55E),
-        route: '/dashboard/custom-messages',
-      ),
-      _ToolItem(
-        title: 'التسعير الذكي',
-        iconPath: AppIcons.dollar,
-        color: Colors.orange,
-        route: '/dashboard/smart-pricing',
-      ),
-    ];
-
-    return _buildToolsGrid(items);
-  }
-
-  Widget _buildAIToolsGrid() {
-    final items = [
-      _ToolItem(
-        title: 'توليد AI',
-        iconPath: AppIcons.sparkle,
-        color: const Color(0xFFA855F7),
-        route: '/dashboard/studio',
-        badge: 'AI',
-      ),
-      _ToolItem(
-        title: 'أدوات AI',
-        iconPath: AppIcons.tools,
-        color: const Color(0xFF7C3AED),
-        route: '/dashboard/tools',
-        badge: 'AI',
-      ),
-      _ToolItem(
-        title: 'مساعد AI',
-        iconPath: AppIcons.chat,
-        color: const Color(0xFF06B6D4),
-        route: '/dashboard/ai-assistant',
-        badge: 'AI',
-      ),
-      _ToolItem(
-        title: 'مولد المحتوى',
-        iconPath: AppIcons.document,
-        color: const Color(0xFF0EA5E9),
-        route: '/dashboard/content-generator',
-        badge: 'AI',
-      ),
-    ];
-
-    return _buildToolsGrid(items);
-  }
-
-  Widget _buildAnalyticsGrid() {
-    final items = [
-      _ToolItem(
-        title: 'تحليلات ذكية',
-        iconPath: AppIcons.analytics,
-        color: const Color(0xFF4F46E5),
-        route: '/dashboard/smart-analytics',
-      ),
-      _ToolItem(
-        title: 'تقارير تلقائية',
-        iconPath: AppIcons.document,
-        color: const Color(0xFF14B8A6),
-        route: '/dashboard/auto-reports',
-      ),
-      _ToolItem(
-        title: 'خريطة الحرارة',
-        iconPath: AppIcons.grid,
-        color: const Color(0xFFEC4899),
-        route: '/dashboard/heatmap',
-      ),
-    ];
-
-    return _buildToolsGrid(items);
-  }
-
-  Widget _buildToolsGrid(List<_ToolItem> items) {
-    // فلترة حسب البحث
-    final filteredItems = _searchQuery.isEmpty
-        ? items
-        : items.where((item) => item.title.contains(_searchQuery)).toList();
-
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),
-      mainAxisSpacing: AppDimensions.spacing16,
-      crossAxisSpacing: AppDimensions.spacing16,
-      childAspectRatio: 0.95,
-      children: filteredItems.map((item) {
-        return _buildToolCard(item);
-      }).toList(),
-    );
-  }
-
-  Widget _buildToolCard(_ToolItem item) {
-    return GlassCard.withSvgIcon(
-      iconPath: item.iconPath,
-      iconBackgroundColor: item.color,
-      iconSize: AppDimensions.iconXL,
-      onTap: () => context.push(item.route),
-      child: Stack(
+      child: Column(
         children: [
-          Center(
-            child: Text(
-              item.title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: AppDimensions.fontTitle,
-                color: AppTheme.textPrimaryColor,
-              ),
-              textAlign: TextAlign.center,
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
-          if (item.badge != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppTheme.warningColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  item.badge!,
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(fontSize: 10, color: AppTheme.textHintColor),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, String subtitle) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimaryColor,
                   ),
                 ),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 12, color: AppTheme.textHintColor),
+                ),
+              ],
+            ),
+          ),
+          TextButton(onPressed: () {}, child: const Text('عرض الكل')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarketingSection() {
+    final tools = [
+      _ToolData(
+        'الكوبونات',
+        'إنشاء كوبونات خصم',
+        AppIcons.discount,
+        const Color(0xFF4CAF50),
+        '/dashboard/coupons',
+      ),
+      _ToolData(
+        'العروض الخاطفة',
+        'عروض محدودة الوقت',
+        AppIcons.flash,
+        const Color(0xFFEF4444),
+        '/dashboard/flash-sales',
+      ),
+      _ToolData(
+        'السلات المتروكة',
+        'استرجع عملاءك',
+        AppIcons.cart,
+        const Color(0xFFE91E63),
+        '/dashboard/abandoned-cart',
+      ),
+      _ToolData(
+        'برنامج الإحالة',
+        'عملاء يجلبون عملاء',
+        AppIcons.share,
+        const Color(0xFF10B981),
+        '/dashboard/referral',
+      ),
+      _ToolData(
+        'برنامج الولاء',
+        'كافئ عملاءك',
+        AppIcons.loyalty,
+        const Color(0xFF00BCD4),
+        '/dashboard/loyalty-program',
+      ),
+      _ToolData(
+        'التسعير الذكي',
+        'أسعار ديناميكية',
+        AppIcons.dollar,
+        const Color(0xFFFF9800),
+        '/dashboard/smart-pricing',
+      ),
+    ];
+
+    return _buildToolsHorizontalList(tools);
+  }
+
+  Widget _buildAISection() {
+    final tools = [
+      _ToolData(
+        'استوديو AI',
+        'توليد صور ونصوص',
+        AppIcons.sparkle,
+        const Color(0xFFA855F7),
+        '/dashboard/studio',
+        badge: 'AI',
+      ),
+      _ToolData(
+        'أدوات AI',
+        'أدوات متقدمة',
+        AppIcons.tools,
+        const Color(0xFF7C3AED),
+        '/dashboard/tools',
+        badge: 'AI',
+      ),
+      _ToolData(
+        'مساعد AI',
+        'مساعدك الذكي',
+        AppIcons.chat,
+        const Color(0xFF06B6D4),
+        '/dashboard/ai-assistant',
+        badge: 'AI',
+      ),
+      _ToolData(
+        'مولد المحتوى',
+        'محتوى تسويقي',
+        AppIcons.document,
+        const Color(0xFF0EA5E9),
+        '/dashboard/content-generator',
+        badge: 'AI',
+      ),
+    ];
+
+    return _buildToolsHorizontalList(tools);
+  }
+
+  Widget _buildAnalyticsSection() {
+    final tools = [
+      _ToolData(
+        'تحليلات ذكية',
+        'بيانات مفصلة',
+        AppIcons.analytics,
+        const Color(0xFF4F46E5),
+        '/dashboard/smart-analytics',
+      ),
+      _ToolData(
+        'تقارير تلقائية',
+        'تقارير دورية',
+        AppIcons.document,
+        const Color(0xFF14B8A6),
+        '/dashboard/auto-reports',
+      ),
+      _ToolData(
+        'خريطة الحرارة',
+        'سلوك العملاء',
+        AppIcons.grid,
+        const Color(0xFFEC4899),
+        '/dashboard/heatmap',
+      ),
+    ];
+
+    return _buildToolsHorizontalList(tools);
+  }
+
+  Widget _buildToolsHorizontalList(List<_ToolData> tools) {
+    return SizedBox(
+      height: 160,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: tools.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final tool = tools[index];
+          return _buildToolCard(tool);
+        },
+      ),
+    );
+  }
+
+  Widget _buildToolCard(_ToolData tool) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        context.push(tool.route);
+      },
+      child: Container(
+        width: 130,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.dividerColor),
+          boxShadow: [
+            BoxShadow(
+              color: tool.color.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: tool.color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SvgPicture.asset(
+                    tool.iconPath,
+                    width: 22,
+                    height: 22,
+                    colorFilter: ColorFilter.mode(tool.color, BlendMode.srcIn),
+                  ),
+                ),
+                if (tool.badge != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF7C3AED), Color(0xFFA855F7)],
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      tool.badge!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              tool.title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: AppTheme.textPrimaryColor,
               ),
             ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              tool.subtitle,
+              style: TextStyle(fontSize: 10, color: AppTheme.textHintColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ToolItem {
+class _ToolData {
   final String title;
+  final String subtitle;
   final String iconPath;
   final Color color;
   final String route;
   final String? badge;
 
-  const _ToolItem({
-    required this.title,
-    required this.iconPath,
-    required this.color,
-    required this.route,
+  const _ToolData(
+    this.title,
+    this.subtitle,
+    this.iconPath,
+    this.color,
+    this.route, {
     this.badge,
   });
 }

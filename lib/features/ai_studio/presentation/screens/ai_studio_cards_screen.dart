@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../data/mbuy_studio_service.dart';
 
+/// شاشة أدوات AI - تصميم محسن
+/// تعرض جميع أدوات الذكاء الاصطناعي المتاحة للتاجر
 class AiStudioCardsScreen extends ConsumerStatefulWidget {
   const AiStudioCardsScreen({super.key});
 
@@ -20,86 +24,395 @@ class _AiStudioCardsScreenState extends ConsumerState<AiStudioCardsScreen> {
   @override
   Widget build(BuildContext context) {
     final cards = [
-      _AiCard('توليد نص', Icons.text_fields, _openTextGenerator),
-      _AiCard('توليد صورة', Icons.image, _openImageGenerator),
+      _AiCard(
+        'توليد نص',
+        Icons.text_fields_rounded,
+        _openTextGenerator,
+        'إنشاء نصوص احترافية',
+        const Color(0xFF3B82F6),
+      ),
+      _AiCard(
+        'توليد صورة',
+        Icons.image_rounded,
+        _openImageGenerator,
+        'صور عالية الجودة',
+        const Color(0xFF10B981),
+      ),
       _AiCard(
         'توليد بانر',
-        Icons.photo_size_select_large,
+        Icons.photo_size_select_large_rounded,
         _openBannerGenerator,
+        'بانرات إعلانية جذابة',
+        const Color(0xFFF59E0B),
       ),
-      _AiCard('توليد فيديو', Icons.movie, _openVideoGenerator),
-      _AiCard('توليد صوت', Icons.mic, _openAudioGenerator),
-      _AiCard('وصف منتج', Icons.description, _openDescriptionGenerator),
-      _AiCard('كلمات مفتاحية', Icons.sell, _openKeywordsGenerator),
-      _AiCard('لوقو', Icons.brush, _openLogoGenerator),
+      _AiCard(
+        'توليد فيديو',
+        Icons.movie_rounded,
+        _openVideoGenerator,
+        'فيديوهات تسويقية',
+        const Color(0xFFEF4444),
+      ),
+      _AiCard(
+        'توليد صوت',
+        Icons.mic_rounded,
+        _openAudioGenerator,
+        'تعليق صوتي احترافي',
+        const Color(0xFF8B5CF6),
+      ),
+      _AiCard(
+        'وصف منتج',
+        Icons.description_rounded,
+        _openDescriptionGenerator,
+        'أوصاف جذابة للمنتجات',
+        const Color(0xFF06B6D4),
+      ),
+      _AiCard(
+        'كلمات مفتاحية',
+        Icons.sell_rounded,
+        _openKeywordsGenerator,
+        'تحسين SEO',
+        const Color(0xFFEC4899),
+      ),
+      _AiCard(
+        'لوقو',
+        Icons.brush_rounded,
+        _openLogoGenerator,
+        'شعارات مميزة',
+        const Color(0xFFF97316),
+      ),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('توليد AI'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.library_books_outlined),
-            onPressed: _openLibrary,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(AppDimensions.spacing20),
+      backgroundColor: AppTheme.backgroundColor,
+      body: SafeArea(
         child: Column(
           children: [
-            if (_loading) const LinearProgressIndicator(),
+            _buildHeader(context),
+            if (_loading)
+              LinearProgressIndicator(
+                color: AppTheme.accentColor,
+                backgroundColor: AppTheme.dividerColor,
+              ),
             if (_error != null)
               Padding(
-                padding: const EdgeInsets.only(bottom: AppDimensions.spacing16),
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
                 child: _buildErrorBanner(_error!),
               ),
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: AppDimensions.spacing16,
-                crossAxisSpacing: AppDimensions.spacing16,
-                children: cards
-                    .map(
-                      (c) => Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: c.onTap,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(
-                              AppDimensions.spacing16,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(c.icon, size: 32),
-                                const SizedBox(height: AppDimensions.spacing16),
-                                Text(
-                                  c.title,
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppDimensions.spacing16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // قسم المفضلة
+                    _buildSectionHeader('الأدوات المميزة', Icons.star_rounded),
+                    const SizedBox(height: AppDimensions.spacing12),
+                    _buildFeaturedRow(cards.take(3).toList()),
+                    const SizedBox(height: AppDimensions.spacing24),
+                    // جميع الأدوات
+                    _buildSectionHeader('جميع الأدوات', Icons.apps_rounded),
+                    const SizedBox(height: AppDimensions.spacing12),
+                    _buildToolsGrid(cards),
+                    const SizedBox(height: AppDimensions.spacing24),
+                    // إحصائيات الاستخدام
+                    _buildUsageStats(),
+                  ],
+                ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_rounded,
+                size: 20,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+          ),
+          const Expanded(
+            child: Text(
+              'استوديو AI',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: _openLibrary,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.accentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.photo_library_outlined,
+                size: 20,
+                color: AppTheme.accentColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: AppTheme.primaryColor),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: AppDimensions.fontTitle,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeaturedRow(List<_AiCard> cards) {
+    return SizedBox(
+      height: 140,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: cards.length,
+        separatorBuilder: (_, __) =>
+            const SizedBox(width: AppDimensions.spacing12),
+        itemBuilder: (context, index) {
+          final card = cards[index];
+          return _buildFeaturedCard(card);
+        },
+      ),
+    );
+  }
+
+  Widget _buildFeaturedCard(_AiCard card) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        card.onTap();
+      },
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [card.color, card.color.withValues(alpha: 0.8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: AppDimensions.borderRadiusL,
+          boxShadow: [
+            BoxShadow(
+              color: card.color.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(card.icon, color: Colors.white, size: 24),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  card.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  card.subtitle,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToolsGrid(List<_AiCard> cards) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: AppDimensions.spacing12,
+      crossAxisSpacing: AppDimensions.spacing12,
+      childAspectRatio: 1.3,
+      children: cards.map((c) => _buildToolCard(c)).toList(),
+    );
+  }
+
+  Widget _buildToolCard(_AiCard card) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        card.onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.spacing16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppDimensions.borderRadiusL,
+          border: Border.all(color: AppTheme.dividerColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: card.color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(card.icon, color: card.color, size: 20),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'AI',
+                    style: TextStyle(
+                      color: AppTheme.accentColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacing12),
+            Text(
+              card.title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: AppTheme.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              card.subtitle,
+              style: TextStyle(fontSize: 11, color: AppTheme.textHintColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsageStats() {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacing16),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withValues(alpha: 0.05),
+        borderRadius: AppDimensions.borderRadiusL,
+        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                const Text(
+                  '0',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+                Text(
+                  'عمليات اليوم',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textHintColor),
+                ),
+              ],
+            ),
+          ),
+          Container(width: 1, height: 40, color: AppTheme.dividerColor),
+          Expanded(
+            child: Column(
+              children: [
+                const Text(
+                  '50',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.accentColor,
+                  ),
+                ),
+                Text(
+                  'المتبقي',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textHintColor),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -385,8 +698,10 @@ class _AiCard {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
+  final String subtitle;
+  final Color color;
 
-  _AiCard(this.title, this.icon, this.onTap);
+  _AiCard(this.title, this.icon, this.onTap, this.subtitle, this.color);
 }
 
 class _SheetField {

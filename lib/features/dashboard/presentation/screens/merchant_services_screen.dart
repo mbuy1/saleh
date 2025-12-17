@@ -392,30 +392,35 @@ class _MerchantServicesScreenState
         'title': 'معلومات المتجر',
         'subtitle': 'الاسم، الوصف، المدينة',
         'onTap': () => _editStoreInfo(context),
+        'enabled': true,
       },
       {
         'icon': Icons.palette_outlined,
         'title': 'تخصيص المتجر',
-        'subtitle': 'خيارات المنتجات والشحن والدفع',
-        'onTap': () => context.push('/dashboard/store-on-jock'),
+        'subtitle': 'الثيمات والصفحات والبانرات',
+        'onTap': () => context.push('/dashboard/webstore'),
+        'enabled': true,
       },
       {
         'icon': Icons.local_shipping_outlined,
         'title': 'إعدادات الشحن',
         'subtitle': 'المناطق، الأسعار، الشركات',
-        'onTap': () => _showComingSoon('إعدادات الشحن'),
+        'onTap': () => context.push('/dashboard/shipping'),
+        'enabled': true,
       },
       {
         'icon': Icons.payment_outlined,
         'title': 'طرق الدفع',
         'subtitle': 'البطاقات، التحويل، الدفع عند الاستلام',
-        'onTap': () => _showComingSoon('طرق الدفع'),
+        'onTap': () => context.push('/dashboard/payment-methods'),
+        'enabled': true,
       },
       {
         'icon': Icons.notifications_outlined,
         'title': 'الإشعارات',
         'subtitle': 'تنبيهات الطلبات والرسائل',
-        'onTap': () => _showComingSoon('الإشعارات'),
+        'onTap': () => context.push('/dashboard/notifications'),
+        'enabled': true,
       },
     ];
 
@@ -503,21 +508,25 @@ class _MerchantServicesScreenState
         'icon': Icons.account_balance_outlined,
         'title': 'التمويل',
         'color': const Color(0xFF4CAF50),
+        'route': '/dashboard/wallet',
       },
       {
         'icon': Icons.support_agent_outlined,
         'title': 'الدعم',
         'color': const Color(0xFF2196F3),
+        'route': '/dashboard/support',
       },
       {
         'icon': Icons.analytics_outlined,
         'title': 'التحليلات',
         'color': const Color(0xFF9C27B0),
+        'route': '/dashboard/reports',
       },
       {
         'icon': Icons.school_outlined,
         'title': 'التدريب',
         'color': const Color(0xFFFF9800),
+        'route': null, // قريباً
       },
     ];
 
@@ -533,10 +542,15 @@ class _MerchantServicesScreenState
       itemCount: services.length,
       itemBuilder: (context, index) {
         final service = services[index];
+        final route = service['route'] as String?;
         return GestureDetector(
           onTap: () {
             HapticFeedback.lightImpact();
-            _showComingSoon(service['title'] as String);
+            if (route != null) {
+              context.push(route);
+            } else {
+              _showComingSoon(service['title'] as String);
+            }
           },
           child: Container(
             decoration: BoxDecoration(

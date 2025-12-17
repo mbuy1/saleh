@@ -135,6 +135,43 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen> {
   Widget _buildStorePreview() {
     return CustomScrollView(
       slivers: [
+        // Preview Banner
+        SliverToBoxAdapter(
+          child: Container(
+            margin: const EdgeInsets.all(AppDimensions.spacing16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing16,
+              vertical: AppDimensions.spacing12,
+            ),
+            decoration: BoxDecoration(
+              color: AppTheme.warningColor.withValues(alpha: 0.1),
+              borderRadius: AppDimensions.borderRadiusM,
+              border: Border.all(
+                color: AppTheme.warningColor.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.visibility_outlined,
+                  color: AppTheme.warningColor,
+                  size: 20,
+                ),
+                const SizedBox(width: AppDimensions.spacing12),
+                const Expanded(
+                  child: Text(
+                    'هذه معاينة لمتجرك كما يراه العملاء',
+                    style: TextStyle(
+                      color: AppTheme.warningColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         // Store Header
         SliverAppBar(
           expandedHeight: 200,

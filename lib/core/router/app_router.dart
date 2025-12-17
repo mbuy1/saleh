@@ -25,10 +25,13 @@ import '../../features/finance/presentation/screens/points_screen.dart';
 import '../../features/finance/presentation/screens/sales_screen.dart';
 // Store
 import '../../features/store/presentation/screens/store_tab.dart';
-import '../../features/store/presentation/screens/store_on_jock_screen.dart';
 import '../../features/store/presentation/screens/inventory_screen.dart';
 import '../../features/store/presentation/screens/view_my_store_screen.dart';
 import '../../features/store/presentation/screens/store_tools_tab.dart';
+// Webstore & Settings
+import '../../apps/merchant/features/webstore/webstore_screen.dart';
+import '../../apps/merchant/features/shipping/shipping_screen.dart';
+import '../../apps/merchant/features/payments/payment_methods_screen.dart';
 // Dropshipping
 import '../../features/dropshipping/presentation/screens/dropshipping_screen.dart';
 import '../../features/dropshipping/presentation/screens/supplier_orders_screen.dart';
@@ -209,9 +212,19 @@ class AppRouter {
                   builder: (context, state) => const BoostSalesScreen(),
                 ),
                 GoRoute(
-                  path: 'store-on-jock',
-                  name: 'store-on-jock',
-                  builder: (context, state) => const StoreOnJockScreen(),
+                  path: 'webstore',
+                  name: 'webstore',
+                  builder: (context, state) => const WebstoreScreen(),
+                ),
+                GoRoute(
+                  path: 'shipping',
+                  name: 'shipping',
+                  builder: (context, state) => const ShippingScreen(),
+                ),
+                GoRoute(
+                  path: 'payment-methods',
+                  name: 'payment-methods',
+                  builder: (context, state) => const PaymentMethodsScreen(),
                 ),
                 GoRoute(
                   path: 'feature/:name',

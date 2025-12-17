@@ -42,86 +42,44 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    // محاكاة تحميل البيانات (سيتم استبدالها بـ API calls)
+    // ⚠️ بيانات تجريبية للعرض - سيتم ربطها بـ API لاحقاً
     await Future.delayed(const Duration(milliseconds: 800));
 
     setState(() {
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _salesData = {
-        'total': 15420.50,
-        'thisMonth': 3200.00,
-        'lastMonth': 2800.00,
-        'growth': 14.3,
-        'orders': 45,
-        'avgOrderValue': 342.67,
-        'topProducts': [
-          {'name': 'منتج 1', 'sales': 12, 'revenue': 1200},
-          {'name': 'منتج 2', 'sales': 8, 'revenue': 960},
-          {'name': 'منتج 3', 'sales': 5, 'revenue': 500},
-        ],
-        'chartData': [2100, 2400, 1800, 2800, 3200, 2900, 3500],
+        'total': 0.0,
+        'thisMonth': 0.0,
+        'lastMonth': 0.0,
+        'growth': 0.0,
+        'orders': 0,
+        'avgOrderValue': 0.0,
+        'topProducts': <Map<String, dynamic>>[],
+        'chartData': <int>[],
+        'isDemo': true, // علامة البيانات الوهمية
       };
 
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _productsData = {
-        'total': 28,
-        'active': 24,
-        'outOfStock': 4,
-        'lowStock': 3,
-        'topViewed': [
-          {'name': 'منتج A', 'views': 450},
-          {'name': 'منتج B', 'views': 320},
-          {'name': 'منتج C', 'views': 280},
-        ],
+        'total': 0,
+        'active': 0,
+        'outOfStock': 0,
+        'lowStock': 0,
+        'topViewed': <Map<String, dynamic>>[],
+        'isDemo': true,
       };
 
+      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
       _customersData = {
-        'total': 156,
-        'newThisMonth': 23,
-        'returning': 89,
-        'avgLifetimeValue': 523.40,
-        'topCustomers': [
-          {'name': 'عميل 1', 'orders': 12, 'spent': 2400},
-          {'name': 'عميل 2', 'orders': 8, 'spent': 1800},
-          {'name': 'عميل 3', 'orders': 6, 'spent': 1200},
-        ],
+        'total': 0,
+        'newThisMonth': 0,
+        'returning': 0,
+        'avgLifetimeValue': 0.0,
+        'topCustomers': <Map<String, dynamic>>[],
+        'isDemo': true,
       };
 
-      _activityLogs = [
-        {
-          'action': 'طلب جديد',
-          'details': 'طلب #1234 بقيمة 350 ر.س',
-          'time': DateTime.now().subtract(const Duration(minutes: 15)),
-          'iconPath': AppIcons.cart,
-          'color': AppTheme.successColor,
-        },
-        {
-          'action': 'منتج جديد',
-          'details': 'تم إضافة "قميص أزرق"',
-          'time': DateTime.now().subtract(const Duration(hours: 2)),
-          'iconPath': AppIcons.add,
-          'color': AppTheme.primaryColor,
-        },
-        {
-          'action': 'تعديل سعر',
-          'details': 'تم تعديل سعر "حذاء رياضي"',
-          'time': DateTime.now().subtract(const Duration(hours: 5)),
-          'iconPath': AppIcons.edit,
-          'color': AppTheme.warningColor,
-        },
-        {
-          'action': 'عميل جديد',
-          'details': 'تسجيل عميل جديد: أحمد',
-          'time': DateTime.now().subtract(const Duration(days: 1)),
-          'iconPath': AppIcons.person,
-          'color': AppTheme.infoColor,
-        },
-        {
-          'action': 'مخزون منخفض',
-          'details': 'تنبيه: "ساعة ذكية" أقل من 5 قطع',
-          'time': DateTime.now().subtract(const Duration(days: 1)),
-          'iconPath': AppIcons.warning,
-          'color': AppTheme.errorColor,
-        },
-      ];
+      _activityLogs = <Map<String, dynamic>>[];
 
       _isLoading = false;
     });
@@ -201,13 +159,51 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
+          : Column(
               children: [
-                _buildSalesTab(),
-                _buildProductsTab(),
-                _buildCustomersTab(),
-                _buildActivityTab(),
+                // تنبيه البيانات قيد التطوير
+                Container(
+                  width: double.infinity,
+                  margin: AppDimensions.paddingS,
+                  padding: AppDimensions.paddingM,
+                  decoration: BoxDecoration(
+                    color: AppTheme.warningColor.withValues(alpha: 0.1),
+                    borderRadius: AppDimensions.borderRadiusM,
+                    border: Border.all(
+                      color: AppTheme.warningColor.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: AppTheme.warningColor,
+                        size: AppDimensions.iconS,
+                      ),
+                      SizedBox(width: AppDimensions.spacing12),
+                      Expanded(
+                        child: Text(
+                          'التقارير قيد التطوير - سيتم ربطها بالبيانات الفعلية قريباً',
+                          style: TextStyle(
+                            color: AppTheme.warningColor,
+                            fontSize: AppDimensions.fontBody2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildSalesTab(),
+                      _buildProductsTab(),
+                      _buildCustomersTab(),
+                      _buildActivityTab(),
+                    ],
+                  ),
+                ),
               ],
             ),
     );

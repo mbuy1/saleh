@@ -19,7 +19,6 @@ import '../../../features/dashboard/presentation/screens/notifications_screen.da
 import '../../../features/dashboard/presentation/screens/customers_screen.dart';
 // Store
 import '../../../features/store/presentation/screens/store_tab.dart';
-import '../../../features/store/presentation/screens/store_on_jock_screen.dart';
 import '../../../features/store/presentation/screens/inventory_screen.dart';
 import '../../../features/store/presentation/screens/view_my_store_screen.dart';
 // Finance
@@ -129,9 +128,19 @@ class MerchantRouter {
                   redirect: (context, state) => '/dashboard',
                 ),
                 GoRoute(
-                  path: 'store-on-jock',
-                  name: 'store-on-jock',
-                  builder: (context, state) => const StoreOnJockScreen(),
+                  path: 'webstore',
+                  name: 'webstore',
+                  builder: (context, state) => const WebstoreScreen(),
+                ),
+                GoRoute(
+                  path: 'shipping',
+                  name: 'shipping',
+                  builder: (context, state) => const ShippingScreen(),
+                ),
+                GoRoute(
+                  path: 'payment-methods',
+                  name: 'payment-methods',
+                  builder: (context, state) => const PaymentMethodsScreen(),
                 ),
                 // الشاشات الجديدة v2.0
                 GoRoute(

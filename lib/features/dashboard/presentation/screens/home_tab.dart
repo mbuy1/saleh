@@ -288,7 +288,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 child: _buildLinkActionButton(
                   iconPath: AppIcons.storefront,
                   label: 'مظهر المتجر',
-                  onTap: () => context.push('/dashboard/store-on-jock'),
+                  onTap: () => context.push('/dashboard/webstore'),
                 ),
               ),
               // تم نقل زر عرض متجري للأعلى

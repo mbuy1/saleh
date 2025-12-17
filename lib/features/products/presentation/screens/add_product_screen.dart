@@ -1694,10 +1694,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             ),
           ),
           const Spacer(),
-          // زر التعديل (يفتح متجرك على جوك)
+          // زر التعديل (يفتح إعدادات المتجر)
           GestureDetector(
             onTap: () {
-              context.push('/dashboard/store-on-jock');
+              context.push('/dashboard/webstore');
             },
             child: Container(
               padding: const EdgeInsets.all(AppDimensions.spacing8),

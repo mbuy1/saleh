@@ -633,16 +633,23 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 160,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _availableRewards.length,
-            itemBuilder: (context, index) {
-              final reward = _availableRewards[index];
-              return _buildRewardCard(reward);
-            },
+        // تم إصلاح المقاس - استخدام GridView بدلاً من ListView الأفقي
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.65, // تم تعديل النسبة لتناسب المحتوى
           ),
+          itemCount: _availableRewards.length > 4
+              ? 4
+              : _availableRewards.length,
+          itemBuilder: (context, index) {
+            final reward = _availableRewards[index];
+            return _buildRewardCard(reward);
+          },
         ),
       ],
     );
@@ -654,9 +661,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     return GestureDetector(
       onTap: () => _redeemReward(reward),
       child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(left: 12),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -664,6 +669,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             color: canRedeem
                 ? reward.color.withValues(alpha: 0.3)
                 : AppTheme.borderColor,
+            width: canRedeem ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -676,32 +682,42 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: reward.color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: SvgPicture.asset(
                 reward.iconPath,
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               reward.title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
+            Text(
+              reward.description,
+              style: TextStyle(fontSize: 11, color: AppTheme.slate600),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   AppIcons.star,
-                  width: 14,
-                  height: 14,
+                  width: 16,
+                  height: 16,
                   colorFilter: const ColorFilter.mode(
                     Colors.orange,
                     BlendMode.srcIn,
@@ -712,25 +728,28 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   '${reward.pointsCost}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    fontSize: 15,
                     color: canRedeem ? Colors.orange : AppTheme.slate600,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: canRedeem
                     ? AppTheme.primaryColor
-                    : AppTheme.slate600.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(20),
+                    : AppTheme.slate600.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 canRedeem ? 'استبدال' : 'غير كافٍ',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: canRedeem ? Colors.white : AppTheme.slate600,
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
