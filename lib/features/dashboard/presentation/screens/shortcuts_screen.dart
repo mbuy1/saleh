@@ -1199,17 +1199,12 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   final TextEditingController _promptController = TextEditingController();
   String _result = '';
   bool _isLoading = false;
-  String? _generatedImageUrl;
-  String? _lastGeneratedType; // 'logo', 'banner', 'image'
   String _selectedTool = 'text'; // الأداة المحددة حالياً
 
   // إعدادات إضافية لكل أداة
   String _textTone = 'marketing'; // تسويقي / رسمي / مختصر
   String _textLength = 'medium'; // قصير / متوسط / طويل
   String _productTone = 'friendly'; // ودية / احترافية
-  String _imageStyle = 'realistic'; // واقعي / نظيف / فني
-  String _logoStyle = 'modern'; // عصري / كلاسيكي / بسيط
-  String _logoColors = ''; // ألوان الشعار
 
   @override
   void dispose() {
@@ -1274,95 +1269,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     }
   }
 
-  Future<void> _testGenerateImage() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(
-        () => _result =
-            '⚠️ أدخل وصف الصورة بالإنجليزية\n(مثال: luxury watch on white background)',
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result =
-          '⏳ جاري توليد الصورة...\n💡 ملاحظة: يفضل الوصف بالإنجليزية للحصول على نتائج أفضل';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'image';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-
-      final response = await service.generateImage(
-        _promptController.text,
-        style: _imageStyle,
-      );
-
-      final imageUrl =
-          response['image_url'] ?? response['url'] ?? response['image'];
-      setState(() {
-        if (imageUrl != null) {
-          _generatedImageUrl = imageUrl;
-          _result = '✅ تم توليد الصورة بنجاح!\nاضغط على الصورة للتكبير';
-        } else {
-          _result = '✅ Response: $response';
-        }
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _testGenerateBanner() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(
-        () => _result =
-            '⚠️ أدخل وصف البانر بالإنجليزية\n(مثال: 50% sale on all products)',
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result = '⏳ جاري توليد البانر...\n💡 ملاحظة: يفضل الوصف بالإنجليزية';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'banner';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateBanner(
-        _promptController.text,
-        placement: 'instagram',
-        sizePreset: 'square',
-      );
-
-      final bannerUrl =
-          response['banner_url'] ?? response['url'] ?? response['image'];
-      setState(() {
-        if (bannerUrl != null) {
-          _generatedImageUrl = bannerUrl;
-          _result = '✅ تم توليد البانر بنجاح!\nاضغط على الصورة للتكبير';
-        } else {
-          _result = '✅ Response: $response';
-        }
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
   Future<void> _testGenerateProductDescription() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
@@ -1376,8 +1282,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     setState(() {
       _isLoading = true;
       _result = '⏳ جاري توليد وصف المنتج...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'description';
     });
 
     try {
@@ -1417,8 +1321,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     setState(() {
       _isLoading = true;
       _result = '⏳ جاري توليد الكلمات المفتاحية...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'keywords';
     });
 
     try {
@@ -1444,77 +1346,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-
-  Future<void> _testGenerateLogo() async {
-    if (!_checkAuth()) return;
-    if (_promptController.text.isEmpty) {
-      setState(
-        () => _result = '⚠️ أدخل اسم العلامة بالإنجليزية\n(مثال: Sarah Store)',
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _result = '⏳ جاري توليد الشعار...\n💡 ملاحظة: يفضل الاسم بالإنجليزية';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'logo';
-    });
-
-    try {
-      final service = widget.ref.read(mbuyStudioServiceProvider);
-      final response = await service.generateLogo(
-        brandName: _promptController.text,
-        style: _logoStyle,
-        colors: _logoColors.isNotEmpty ? _logoColors : null,
-      );
-
-      final logoUrl =
-          response['logo_url'] ?? response['url'] ?? response['image'];
-      setState(() {
-        if (logoUrl != null) {
-          _generatedImageUrl = logoUrl;
-          _result = '✅ تم توليد الشعار بنجاح!\nاضغط على الصورة للتكبير';
-        } else {
-          _result = '✅ Response: $response';
-        }
-      });
-    } catch (e) {
-      setState(() {
-        _result = '❌ فشل: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _showSaveOptions() async {
-    if (_generatedImageUrl == null) return;
-
-    // الحصول على معرف المتجر
-    String? storeId;
-    try {
-      final merchantRepo = widget.ref.read(merchantRepositoryProvider);
-      final store = await merchantRepo.getMerchantStore();
-      storeId = store?.id;
-    } catch (_) {}
-
-    if (!mounted) return;
-
-    showAiResultActions(
-      context: context,
-      imageUrl: _generatedImageUrl!,
-      type: _lastGeneratedType ?? 'image',
-      ref: widget.ref,
-      prompt: _promptController.text,
-      storeId: storeId,
-      onApplied: () {
-        setState(() {
-          _result = '✅ تم التطبيق بنجاح!';
-        });
-      },
-    );
   }
 
   @override
@@ -1586,8 +1417,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 Icons.text_fields,
                 Colors.blue,
               ),
-              _buildToolChip('image', 'توليد صورة', Icons.image, Colors.purple),
-              _buildToolChip('banner', 'بانر', Icons.panorama, Colors.orange),
               _buildToolChip(
                 'description',
                 'وصف منتج',
@@ -1600,7 +1429,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 Icons.key,
                 Colors.indigo,
               ),
-              _buildToolChip('logo', 'شعار', Icons.brush, Colors.pink),
             ],
           ),
           const SizedBox(height: 16),
@@ -1683,130 +1511,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                if (_generatedImageUrl != null) ...[
-                  // الصورة قابلة للضغط للمعاينة
-                  GestureDetector(
-                    onTap: () => _showImagePreview(_generatedImageUrl!),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            _generatedImageUrl!,
-                            height: 250,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                height: 250,
-                                color: Colors.grey[200],
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  color: Colors.red[50],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.red[200]!),
-                                ),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.broken_image,
-                                        color: Colors.red[400],
-                                        size: 40,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'فشل تحميل الصورة',
-                                        style: TextStyle(
-                                          color: Colors.red[700],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        // أيقونة تكبير
-                        Positioned(
-                          bottom: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.fullscreen,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // أزرار الإجراءات
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _showSaveOptions(),
-                          icon: const Icon(Icons.save_alt, size: 18),
-                          label: const Text('حفظ'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () =>
-                              _showImagePreview(_generatedImageUrl!),
-                          icon: const Icon(Icons.zoom_in, size: 18),
-                          label: const Text('معاينة'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                ],
                 SelectableText(
                   _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
                   style: TextStyle(
@@ -1827,126 +1531,15 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     );
   }
 
-  // معاينة الصورة بالحجم الكامل
-  void _showImagePreview(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // شريط العنوان
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    _lastGeneratedType == 'logo'
-                        ? 'الشعار'
-                        : _lastGeneratedType == 'banner'
-                        ? 'البانر'
-                        : 'الصورة',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-            // الصورة
-            Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
-              ),
-              decoration: const BoxDecoration(color: Colors.white),
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 300,
-                      width: 300,
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                ),
-              ),
-            ),
-            // أزرار الإجراءات
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(16),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _showSaveOptions();
-                    },
-                    icon: const Icon(Icons.save_alt, color: Colors.white),
-                    label: const Text(
-                      'حفظ',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    label: const Text(
-                      'إغلاق',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   // دوال مساعدة للأداة المختارة
   String _getInputLabel() {
     switch (_selectedTool) {
       case 'text':
         return 'موضوع النص (عربي)';
-      case 'image':
-        return 'وصف الصورة (English)';
-      case 'banner':
-        return 'وصف البانر (English)';
       case 'description':
         return 'اسم المنتج ومميزاته (عربي)';
       case 'keywords':
         return 'اسم المنتج/الفئة (عربي)';
-      case 'logo':
-        return 'اسم العلامة (English)';
       default:
         return 'الإدخال';
     }
@@ -1956,16 +1549,10 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     switch (_selectedTool) {
       case 'text':
         return 'مثال: منشور ترحيبي بالعملاء الجدد';
-      case 'image':
-        return 'Example: luxury watch on white background';
-      case 'banner':
-        return 'Example: 50% off summer sale';
       case 'description':
         return 'مثال: ساعة ذكية - مقاومة للماء - شاشة AMOLED';
       case 'keywords':
         return 'مثال: حقيبة جلد نسائية';
-      case 'logo':
-        return 'Example: Sarah Store';
       default:
         return '';
     }
@@ -1975,16 +1562,10 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     switch (_selectedTool) {
       case 'text':
         return Colors.blue;
-      case 'image':
-        return Colors.purple;
-      case 'banner':
-        return Colors.orange;
       case 'description':
         return Colors.teal;
       case 'keywords':
         return Colors.indigo;
-      case 'logo':
-        return Colors.pink;
       default:
         return Colors.blue;
     }
@@ -1995,20 +1576,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       case 'text':
         _testGenerateText();
         break;
-      case 'image':
-        _testGenerateImage();
-        break;
-      case 'banner':
-        _testGenerateBanner();
-        break;
       case 'description':
         _testGenerateProductDescription();
         break;
       case 'keywords':
         _testGenerateKeywords();
-        break;
-      case 'logo':
-        _testGenerateLogo();
         break;
     }
   }
@@ -2025,7 +1597,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       onSelected: (_) => setState(() {
         _selectedTool = value;
         _result = '';
-        _generatedImageUrl = null;
       }),
       avatar: Icon(icon, size: 18, color: isSelected ? Colors.white : color),
       label: Text(label),
@@ -2094,37 +1665,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             ),
           ],
         );
-      case 'image':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'أسلوب الصورة:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text('واقعي'),
-                  selected: _imageStyle == 'realistic',
-                  onSelected: (_) => setState(() => _imageStyle = 'realistic'),
-                ),
-                ChoiceChip(
-                  label: const Text('نظيف'),
-                  selected: _imageStyle == 'clean',
-                  onSelected: (_) => setState(() => _imageStyle = 'clean'),
-                ),
-                ChoiceChip(
-                  label: const Text('فني'),
-                  selected: _imageStyle == 'artistic',
-                  onSelected: (_) => setState(() => _imageStyle = 'artistic'),
-                ),
-              ],
-            ),
-          ],
-        );
       case 'description':
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2157,70 +1697,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             ),
           ],
         );
-      case 'logo':
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'أسلوب الشعار:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text('عصري'),
-                  selected: _logoStyle == 'modern',
-                  onSelected: (_) => setState(() => _logoStyle = 'modern'),
-                ),
-                ChoiceChip(
-                  label: const Text('كلاسيكي'),
-                  selected: _logoStyle == 'classic',
-                  onSelected: (_) => setState(() => _logoStyle = 'classic'),
-                ),
-                ChoiceChip(
-                  label: const Text('بسيط'),
-                  selected: _logoStyle == 'minimal',
-                  onSelected: (_) => setState(() => _logoStyle = 'minimal'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'ألوان مفضلة (اختياري)',
-                hintText: 'مثال: أزرق وذهبي',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                isDense: true,
-              ),
-              onChanged: (v) => _logoColors = v,
-            ),
-          ],
-        );
       default:
         return const SizedBox.shrink();
     }
-  }
-
-  Widget _buildToolButton(
-    String label,
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
-    return ElevatedButton.icon(
-      onPressed: _isLoading ? null : onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 }
