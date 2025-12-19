@@ -182,7 +182,7 @@ class SupportScreen extends StatelessWidget {
           _buildLinkTile(
             icon: AppIcons.info,
             title: 'عن التطبيق',
-            onTap: () => context.push('/about'),
+            onTap: () => context.push('/dashboard/about'),
           ),
 
           const SizedBox(height: 40),

@@ -10,6 +10,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../data/mbuy_studio_service.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
+import '../../../auth/data/auth_controller.dart';
 
 class MbuyStudioScreen extends ConsumerStatefulWidget {
   const MbuyStudioScreen({super.key});
@@ -26,6 +27,42 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   String _statusMessage = '';
   String? _generatedImageUrl;
   String? _selectedDesignType; // للتصنيف المحدد في Pro/Premium
+
+  /// التحقق من تسجيل الدخول قبل استخدام أدوات AI
+  bool _checkAuth() {
+    final isAuthenticated = ref.read(isAuthenticatedProvider);
+    if (!isAuthenticated) {
+      _showLoginRequiredDialog();
+      return false;
+    }
+    return true;
+  }
+
+  /// عرض dialog يطلب تسجيل الدخول
+  void _showLoginRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تسجيل الدخول مطلوب'),
+        content: const Text(
+          'يرجى تسجيل الدخول أولاً لاستخدام أدوات الذكاء الاصطناعي',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.push('/login');
+            },
+            child: const Text('تسجيل الدخول'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -1838,6 +1875,9 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   }
 
   Future<void> _startProGeneration() async {
+    // التحقق من تسجيل الدخول أولاً
+    if (!_checkAuth()) return;
+
     if (_promptController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1903,6 +1943,9 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   }
 
   Future<void> _startPremiumGeneration() async {
+    // التحقق من تسجيل الدخول أولاً
+    if (!_checkAuth()) return;
+
     if (_promptController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -2116,6 +2159,9 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   }
 
   Future<void> _startBulkImprove(String mode) async {
+    // التحقق من تسجيل الدخول أولاً
+    if (!_checkAuth()) return;
+
     try {
       // Get store ID
       final store = ref.read(merchantStoreProvider);

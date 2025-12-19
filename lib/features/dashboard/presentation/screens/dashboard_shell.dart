@@ -203,7 +203,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
   }
 
-  /// الهيدر العلوي الثابت - شفاف
+  /// الهيدر العلوي الثابت - خلفية شفافة
   Widget _buildPersistentHeader(BuildContext context, String storeName) {
     final topPadding = MediaQuery.of(context).padding.top;
 
@@ -215,7 +215,15 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         left: 12,
         right: 12,
       ),
-      color: AppTheme.backgroundColor,
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withValues(alpha: 0.08),
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

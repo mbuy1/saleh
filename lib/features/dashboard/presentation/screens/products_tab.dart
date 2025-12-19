@@ -184,22 +184,19 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
   }
 
   Widget _buildTabs() {
-    return Container(
-      margin: const EdgeInsets.only(top: AppDimensions.spacing12),
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        indicatorColor: AppTheme.primaryColor,
-        labelColor: AppTheme.primaryColor,
-        unselectedLabelColor: AppTheme.textSecondaryColor,
-        tabs: const [
-          Tab(text: 'المنتجات'),
-          Tab(text: 'إعدادات المنتجات'),
-          Tab(text: 'المخزون'),
-          Tab(text: 'السجلات'),
-          Tab(text: 'المحذوفات'),
-        ],
-      ),
+    return TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      indicatorColor: AppTheme.primaryColor,
+      labelColor: AppTheme.primaryColor,
+      unselectedLabelColor: AppTheme.textSecondaryColor,
+      tabs: const [
+        Tab(text: 'المنتجات'),
+        Tab(text: 'إعدادات المنتجات'),
+        Tab(text: 'المخزون'),
+        Tab(text: 'السجلات'),
+        Tab(text: 'المحذوفات'),
+      ],
     );
   }
 

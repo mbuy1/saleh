@@ -627,6 +627,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   }
 
   Widget _buildChartPlaceholder() {
+    final chartData = _salesData['chartData'] as List? ?? [];
+    final dayLabels = ['س', 'أ', 'ث', 'أ', 'خ', 'ج', 'س'];
+
     return Container(
       height: 200,
       padding: const EdgeInsets.all(16),
@@ -658,8 +661,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               children: [
                 for (var i = 0; i < 7; i++)
                   _buildChartBar(
-                    (_salesData['chartData'] as List?)?[i]?.toDouble() ?? 0,
-                    ['س', 'أ', 'ث', 'أ', 'خ', 'ج', 'س'][i],
+                    i < chartData.length ? (chartData[i]?.toDouble() ?? 0) : 0,
+                    dayLabels[i],
                     i == 6,
                   ),
               ],

@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_service.dart';
 
 final mbuyStudioServiceProvider = Provider<MbuyStudioService>((ref) {
-  return MbuyStudioService(ApiService());
+  final apiService = ref.watch(apiServiceProvider);
+  return MbuyStudioService(apiService);
 });
 
 class MbuyStudioService {
@@ -14,12 +15,19 @@ class MbuyStudioService {
 
   Future<Map<String, dynamic>> _post(
     String path,
-    Map<String, dynamic> body,
-  ) async {
-    debugPrint('[MbuyStudioService] POST $path');
+    Map<String, dynamic> body, {
+    Duration timeout = const Duration(seconds: 60),
+  }) async {
+    debugPrint(
+      '[MbuyStudioService] POST $path (timeout: ${timeout.inSeconds}s)',
+    );
     debugPrint('[MbuyStudioService] Body: $body');
 
-    final response = await _api.post(path, body: body);
+    // Debug: Check if we have valid tokens
+    final hasTokens = await _api.hasValidTokens();
+    debugPrint('[MbuyStudioService] Has valid tokens: $hasTokens');
+
+    final response = await _api.post(path, body: body, timeout: timeout);
     debugPrint('[MbuyStudioService] Status: ${response.statusCode}');
     debugPrint('[MbuyStudioService] Response: ${response.body}');
 
@@ -28,14 +36,33 @@ class MbuyStudioService {
       return data is Map<String, dynamic> ? data : {'data': data};
     }
 
-    // Better error handling
-    String errorMessage = 'Request failed';
-    if (data is Map) {
-      errorMessage =
-          data['detail'] ??
-          data['error'] ??
-          data['message'] ??
-          'Request failed';
+    // Better error handling with Arabic messages
+    String errorMessage = 'فشل الطلب';
+    if (response.statusCode == 401) {
+      errorMessage = 'يرجى تسجيل الدخول أولاً لاستخدام أدوات AI';
+    } else if (response.statusCode == 403) {
+      errorMessage = 'ليس لديك صلاحية للوصول لهذه الميزة';
+    } else if (response.statusCode == 500) {
+      // Show server error details for debugging
+      if (data is Map) {
+        final detail = data['detail'] ?? data['error'] ?? data['message'];
+        errorMessage = 'خطأ في الخادم: ${detail ?? response.body}';
+      } else {
+        errorMessage = 'خطأ في الخادم: ${response.body}';
+      }
+    } else if (data is Map) {
+      final msg = data['detail'] ?? data['error'] ?? data['message'];
+      if (msg != null) {
+        // Translate common error messages
+        if (msg.toString().contains('unauthorized') ||
+            msg.toString().contains('Missing authentication')) {
+          errorMessage = 'يرجى تسجيل الدخول أولاً لاستخدام أدوات AI';
+        } else if (msg.toString().contains('prompt is required')) {
+          errorMessage = 'يرجى إدخال وصف للمحتوى المطلوب';
+        } else {
+          errorMessage = msg.toString();
+        }
+      }
     }
     throw Exception(errorMessage);
   }
@@ -140,7 +167,7 @@ class MbuyStudioService {
     if (style != null) 'style': style,
     if (colors != null) 'colors': colors,
     if (prompt != null) 'prompt': prompt,
-  });
+  }, timeout: const Duration(seconds: 120)); // 3 صور تحتاج وقت أطول
 
   Future<Map<String, dynamic>> getLibrary(String type) =>
       _get('/secure/ai/library', query: {'type': type});

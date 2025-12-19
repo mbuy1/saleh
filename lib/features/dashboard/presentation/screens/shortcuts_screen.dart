@@ -3,9 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../ai_studio/data/mbuy_studio_service.dart';
+import '../../../ai_studio/data/ai_results_service.dart';
+import '../../../auth/data/auth_controller.dart';
+import '../../../merchant/data/merchant_repository.dart';
 
 /// صفحة اختصاراتي المُعاد تصميمها
 /// - صفحة فارغة مع نص توضيحي في البداية
@@ -13,23 +18,34 @@ import '../../../../core/constants/app_dimensions.dart';
 /// - حفظ التعديلات تلقائياً
 /// - بدون خلفية بيضاء خلف الأيقونات
 /// - إعادة ترتيب الأيقونات بالسحب والإفلات
-class ShortcutsScreen extends StatefulWidget {
+class ShortcutsScreen extends ConsumerStatefulWidget {
   const ShortcutsScreen({super.key});
 
   @override
-  State<ShortcutsScreen> createState() => _ShortcutsScreenState();
+  ConsumerState<ShortcutsScreen> createState() => _ShortcutsScreenState();
 }
 
-class _ShortcutsScreenState extends State<ShortcutsScreen> {
+class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
+    with SingleTickerProviderStateMixin {
   List<ShortcutItemData> _savedShortcuts = [];
   bool _isLoading = true;
   bool _isEditing = false;
   String _searchQuery = '';
 
+  // Tab controller
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _loadShortcuts();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadShortcuts() async {
@@ -106,20 +122,24 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
           children: [
             // Header مخصص
             _buildHeader(context),
-            // شريط البحث
-            _buildSearchBar(),
+            // TabBar
+            _buildTabBar(),
             // المحتوى
             Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _savedShortcuts.isEmpty && !_isEditing
-                  ? _buildEmptyState()
-                  : _buildShortcutsGrid(),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // تبويب اختصاراتي
+                  _buildShortcutsTab(),
+                  // تبويب أدوات AI
+                  _buildAiToolsTab(),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: _isEditing
+      floatingActionButton: _tabController.index == 0 && _isEditing
           ? FloatingActionButton.extended(
               onPressed: _showAddShortcutSheet,
               backgroundColor: AppTheme.primaryColor,
@@ -202,6 +222,64 @@ class _ShortcutsScreenState extends State<ShortcutsScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing16,
+        vertical: AppDimensions.spacing8,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        onTap: (_) => setState(() {}),
+        indicator: BoxDecoration(
+          color: AppTheme.primaryColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor: AppTheme.textSecondaryColor,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        tabs: const [
+          Tab(text: 'اختصاراتي'),
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.auto_awesome, size: 18),
+                SizedBox(width: 4),
+                Text('أدوات AI'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShortcutsTab() {
+    return Column(
+      children: [
+        _buildSearchBar(),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _savedShortcuts.isEmpty && !_isEditing
+              ? _buildEmptyState()
+              : _buildShortcutsGrid(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAiToolsTab() {
+    return _AiToolsTestTab(ref: ref);
   }
 
   Widget _buildSearchBar() {
@@ -1100,6 +1178,504 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
           ),
         );
       },
+    );
+  }
+}
+
+// =============================================================================
+// AI Tools Test Tab - تبويب اختبار أدوات الذكاء الاصطناعي
+// =============================================================================
+
+class _AiToolsTestTab extends StatefulWidget {
+  final WidgetRef ref;
+
+  const _AiToolsTestTab({required this.ref});
+
+  @override
+  State<_AiToolsTestTab> createState() => _AiToolsTestTabState();
+}
+
+class _AiToolsTestTabState extends State<_AiToolsTestTab> {
+  final TextEditingController _promptController = TextEditingController();
+  String _result = '';
+  bool _isLoading = false;
+  String? _generatedImageUrl;
+  String? _lastGeneratedType; // 'logo', 'banner', 'image'
+
+  @override
+  void dispose() {
+    _promptController.dispose();
+    super.dispose();
+  }
+
+  bool _checkAuth() {
+    final isAuthenticated = widget.ref.read(isAuthenticatedProvider);
+    if (!isAuthenticated) {
+      setState(() {
+        _result = '❌ يجب تسجيل الدخول أولاً لاستخدام أدوات AI';
+      });
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _testGenerateText() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل نص أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد النص...';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateText(_promptController.text);
+      setState(() {
+        _result =
+            '✅ نجح!\n\n${response['text'] ?? response['data'] ?? response}';
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _testGenerateImage() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل وصف الصورة أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد الصورة...';
+      _generatedImageUrl = null;
+      _lastGeneratedType = 'image';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateImage(_promptController.text);
+
+      final imageUrl =
+          response['image_url'] ?? response['url'] ?? response['image'];
+      setState(() {
+        if (imageUrl != null) {
+          _generatedImageUrl = imageUrl;
+          _result = '✅ تم توليد الصورة بنجاح!';
+        } else {
+          _result = '✅ Response: $response';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _testGenerateBanner() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل وصف البانر أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد البانر...';
+      _generatedImageUrl = null;
+      _lastGeneratedType = 'banner';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateBanner(_promptController.text);
+
+      final bannerUrl =
+          response['banner_url'] ?? response['url'] ?? response['image'];
+      setState(() {
+        if (bannerUrl != null) {
+          _generatedImageUrl = bannerUrl;
+          _result = '✅ تم توليد البانر بنجاح!';
+        } else {
+          _result = '✅ Response: $response';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _testGenerateProductDescription() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل اسم المنتج أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد وصف المنتج...';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateProductDescription(
+        prompt: _promptController.text,
+      );
+      setState(() {
+        _result =
+            '✅ نجح!\n\n${response['description'] ?? response['text'] ?? response['data'] ?? response}';
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _testGenerateKeywords() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل اسم/وصف المنتج أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد الكلمات المفتاحية...';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateKeywords(
+        prompt: _promptController.text,
+      );
+      setState(() {
+        _result =
+            '✅ نجح!\n\n${response['keywords'] ?? response['data'] ?? response}';
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _testGenerateLogo() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(() => _result = '⚠️ أدخل اسم العلامة التجارية أولاً');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد الشعار...';
+      _generatedImageUrl = null;
+      _lastGeneratedType = 'logo';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.generateLogo(
+        brandName: _promptController.text,
+      );
+
+      final logoUrl =
+          response['logo_url'] ?? response['url'] ?? response['image'];
+      setState(() {
+        if (logoUrl != null) {
+          _generatedImageUrl = logoUrl;
+          _result = '✅ تم توليد الشعار بنجاح!';
+        } else {
+          _result = '✅ Response: $response';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _showSaveOptions() async {
+    if (_generatedImageUrl == null) return;
+
+    // الحصول على معرف المتجر
+    String? storeId;
+    try {
+      final merchantRepo = widget.ref.read(merchantRepositoryProvider);
+      final store = await merchantRepo.getMerchantStore();
+      storeId = store?.id;
+    } catch (_) {}
+
+    if (!mounted) return;
+
+    showAiResultActions(
+      context: context,
+      imageUrl: _generatedImageUrl!,
+      type: _lastGeneratedType ?? 'image',
+      ref: widget.ref,
+      prompt: _promptController.text,
+      storeId: storeId,
+      onApplied: () {
+        setState(() {
+          _result = '✅ تم التطبيق بنجاح!';
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // حالة تسجيل الدخول
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.ref.watch(isAuthenticatedProvider)
+                  ? Colors.green[50]
+                  : Colors.red[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: widget.ref.watch(isAuthenticatedProvider)
+                    ? Colors.green
+                    : Colors.red,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  widget.ref.watch(isAuthenticatedProvider)
+                      ? Icons.check_circle
+                      : Icons.error,
+                  color: widget.ref.watch(isAuthenticatedProvider)
+                      ? Colors.green
+                      : Colors.red,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  widget.ref.watch(isAuthenticatedProvider)
+                      ? 'تم تسجيل الدخول ✓'
+                      : 'غير مسجل الدخول - سجل دخولك لاستخدام أدوات AI',
+                  style: TextStyle(
+                    color: widget.ref.watch(isAuthenticatedProvider)
+                        ? Colors.green[800]
+                        : Colors.red[800],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // حقل الإدخال
+          TextField(
+            controller: _promptController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelText: 'النص / الوصف',
+              hintText: 'أدخل نص أو وصف للتجربة...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // أزرار الأدوات
+          Text(
+            'أدوات التوليد:',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _buildToolButton(
+                'توليد نص',
+                Icons.text_fields,
+                Colors.blue,
+                _testGenerateText,
+              ),
+              _buildToolButton(
+                'توليد صورة',
+                Icons.image,
+                Colors.purple,
+                _testGenerateImage,
+              ),
+              _buildToolButton(
+                'توليد بانر',
+                Icons.panorama,
+                Colors.orange,
+                _testGenerateBanner,
+              ),
+              _buildToolButton(
+                'وصف منتج',
+                Icons.description,
+                Colors.teal,
+                _testGenerateProductDescription,
+              ),
+              _buildToolButton(
+                'كلمات مفتاحية',
+                Icons.key,
+                Colors.indigo,
+                _testGenerateKeywords,
+              ),
+              _buildToolButton(
+                'شعار',
+                Icons.brush,
+                Colors.pink,
+                _testGenerateLogo,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // نتيجة
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'النتيجة:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (_isLoading)
+                      const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (_generatedImageUrl != null) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      _generatedImageUrl!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 100,
+                          color: Colors.red[100],
+                          child: Center(
+                            child: Text('فشل تحميل الصورة: $error'),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // زر خيارات الحفظ
+                  ElevatedButton.icon(
+                    onPressed: () => _showSaveOptions(),
+                    icon: const Icon(Icons.save_alt, size: 18),
+                    label: const Text('حفظ / تطبيق'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    'URL: $_generatedImageUrl',
+                    style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                SelectableText(
+                  _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: _result.contains('❌')
+                        ? Colors.red[800]
+                        : _result.contains('✅')
+                        ? Colors.green[800]
+                        : Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolButton(
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
+    return ElevatedButton.icon(
+      onPressed: _isLoading ? null : onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 }

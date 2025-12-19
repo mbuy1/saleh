@@ -426,7 +426,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               child: _buildFeatureCard(
                 icon: Icons.info_outline,
                 label: 'من نحن',
-                onTap: () => context.push('/about'),
+                onTap: () => context.push('/dashboard/about'),
               ),
             ),
             const SizedBox(width: 12),

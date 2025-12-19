@@ -1,6 +1,16 @@
 # Add sample products to Supabase
-$serviceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpcnFpZG9mdXZwaHFjeHFjaHljIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDY3NTAxMCwiZXhwIjoyMDgwMjUxMDEwfQ.B1PRMsrqMSQ9KIC9-jnZbbxRVRb37uwGQy47CMKjWjI"
+# ⚠️ يجب تعيين متغير البيئة قبل التشغيل:
+# $env:SUPABASE_SERVICE_KEY = "your-service-key-here"
+
+$serviceKey = $env:SUPABASE_SERVICE_KEY
 $baseUrl = "https://sirqidofuvphqcxqchyc.supabase.co/rest/v1"
+
+# التحقق من وجود المفتاح
+if ([string]::IsNullOrWhiteSpace($serviceKey)) {
+    Write-Host "❌ Error: SUPABASE_SERVICE_KEY environment variable is not set!" -ForegroundColor Red
+    Write-Host "   Set it using: `$env:SUPABASE_SERVICE_KEY = 'your-key-here'" -ForegroundColor Yellow
+    exit 1
+}
 
 $headers = @{
     "apikey" = $serviceKey

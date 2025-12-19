@@ -54,6 +54,7 @@ class ApiService {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    Duration timeout = const Duration(seconds: 30),
   }) async {
     final uri = _buildUri(path, null);
     final mergedHeaders = await _withAuthHeaders(headers);
@@ -65,7 +66,7 @@ class ApiService {
         headers: mergedHeaders,
         body: body != null ? jsonEncode(body) : null,
       );
-    });
+    }, timeout: timeout);
   }
 
   /// PUT request
@@ -157,17 +158,16 @@ class ApiService {
 
   /// Make HTTP request with retry logic
   Future<http.Response> _makeRequest(
-    Future<http.Response> Function() requestFunction,
-  ) async {
+    Future<http.Response> Function() requestFunction, {
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
     int attempts = 0;
 
     while (attempts < maxRetries) {
       attempts++;
 
       try {
-        final response = await requestFunction().timeout(
-          const Duration(seconds: 30),
-        );
+        final response = await requestFunction().timeout(timeout);
 
         // Handle 401 Unauthorized - attempt token refresh
         if (response.statusCode == 401 && attempts == 1) {
