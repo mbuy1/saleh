@@ -1277,25 +1277,23 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   Future<void> _testGenerateImage() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل وصف المنتج/الصورة المطلوبة');
+      setState(
+        () => _result =
+            '⚠️ أدخل وصف الصورة بالإنجليزية\n(مثال: luxury watch on white background)',
+      );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد الصورة...';
+      _result =
+          '⏳ جاري توليد الصورة...\n💡 ملاحظة: يفضل الوصف بالإنجليزية للحصول على نتائج أفضل';
       _generatedImageUrl = null;
       _lastGeneratedType = 'image';
     });
 
     try {
       final service = widget.ref.read(mbuyStudioServiceProvider);
-      // بناء وصف صورة تجارية واضح
-      final styleMap = {
-        'realistic': 'photorealistic product photo',
-        'clean': 'clean minimal product shot',
-        'artistic': 'artistic stylized product image',
-      };
 
       final response = await service.generateImage(
         _promptController.text,
@@ -1325,15 +1323,15 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
       setState(
-        () =>
-            _result = '⚠️ أدخل نص/عرض البانر (مثال: خصم 50% على جميع المنتجات)',
+        () => _result =
+            '⚠️ أدخل وصف البانر بالإنجليزية\n(مثال: 50% sale on all products)',
       );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد البانر...';
+      _result = '⏳ جاري توليد البانر...\n💡 ملاحظة: يفضل الوصف بالإنجليزية';
       _generatedImageUrl = null;
       _lastGeneratedType = 'banner';
     });
@@ -1342,7 +1340,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       final service = widget.ref.read(mbuyStudioServiceProvider);
       final response = await service.generateBanner(
         _promptController.text,
-        placement: 'instagram', // أو 'app', 'website'
+        placement: 'instagram',
         sizePreset: 'square',
       );
 
@@ -1452,15 +1450,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
       setState(
-        () => _result =
-            '⚠️ أدخل اسم العلامة التجارية\n(مثال: متجر سارة - أزياء نسائية)',
+        () => _result = '⚠️ أدخل اسم العلامة بالإنجليزية\n(مثال: Sarah Store)',
       );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد الشعار...';
+      _result = '⏳ جاري توليد الشعار...\n💡 ملاحظة: يفضل الاسم بالإنجليزية';
       _generatedImageUrl = null;
       _lastGeneratedType = 'logo';
     });
@@ -1939,17 +1936,17 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   String _getInputLabel() {
     switch (_selectedTool) {
       case 'text':
-        return 'موضوع النص';
+        return 'موضوع النص (عربي)';
       case 'image':
-        return 'وصف الصورة';
+        return 'وصف الصورة (English)';
       case 'banner':
-        return 'نص العرض/البانر';
+        return 'وصف البانر (English)';
       case 'description':
-        return 'اسم المنتج ومميزاته';
+        return 'اسم المنتج ومميزاته (عربي)';
       case 'keywords':
-        return 'اسم المنتج/الفئة';
+        return 'اسم المنتج/الفئة (عربي)';
       case 'logo':
-        return 'اسم العلامة التجارية';
+        return 'اسم العلامة (English)';
       default:
         return 'الإدخال';
     }
@@ -1960,15 +1957,15 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       case 'text':
         return 'مثال: منشور ترحيبي بالعملاء الجدد';
       case 'image':
-        return 'مثال: ساعة ذكية أنيقة على خلفية بيضاء';
+        return 'Example: luxury watch on white background';
       case 'banner':
-        return 'مثال: خصم 50% على جميع المنتجات';
+        return 'Example: 50% off summer sale';
       case 'description':
         return 'مثال: ساعة ذكية - مقاومة للماء - شاشة AMOLED';
       case 'keywords':
         return 'مثال: حقيبة جلد نسائية';
       case 'logo':
-        return 'مثال: متجر سارة - أزياء نسائية';
+        return 'Example: Sarah Store';
       default:
         return '';
     }
