@@ -87,8 +87,6 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
       backgroundColor: AppTheme.backgroundColor,
       body: Column(
         children: [
-          // شريط البحث
-          _buildSearchBar(),
           // التبويبات
           _buildTabs(),
           // المحتوى
@@ -156,6 +154,7 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
     );
   }
 
+  // ignore: unused_element
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing16),

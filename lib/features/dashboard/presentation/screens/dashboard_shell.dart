@@ -180,12 +180,12 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     final storeState = ref.watch(merchantStoreControllerProvider);
     final store = storeState.store;
 
-    // جعل أيقونات شريط الحالة بيضاء
+    // جعل أيقونات شريط الحالة داكنة
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light, // أيقونات بيضاء
-        statusBarBrightness: Brightness.dark, // للـ iOS
+        statusBarIconBrightness: Brightness.dark, // أيقونات داكنة
+        statusBarBrightness: Brightness.light, // للـ iOS
       ),
     );
 
@@ -203,25 +203,19 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
   }
 
-  /// الهيدر العلوي الثابت - Oxford Blue
+  /// الهيدر العلوي الثابت - شفاف
   Widget _buildPersistentHeader(BuildContext context, String storeName) {
-    const oxfordBlue = Color(0xFF00214A);
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.only(
         top: topPadding + 8,
-        bottom: 16,
-        left: 16,
-        right: 16,
+        bottom: 12,
+        left: 12,
+        right: 12,
       ),
-      decoration: BoxDecoration(
-        color: oxfordBlue,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
-        ),
-      ),
+      color: AppTheme.backgroundColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -229,17 +223,18 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
           Row(
             children: [
               _buildHeaderButton(Icons.search, () => _openSearch(context)),
-              const SizedBox(width: 8),
+              _buildHeaderButton(
+                Icons.smart_toy_outlined,
+                () => context.push('/dashboard/ai-assistant'),
+              ),
               _buildHeaderButton(
                 Icons.notifications_outlined,
                 () => context.push('/notification-settings'),
               ),
-              const SizedBox(width: 8),
               _buildHeaderButton(
                 Icons.bolt,
                 () => context.push('/dashboard/shortcuts'),
               ),
-              const SizedBox(width: 8),
               _buildHeaderButton(
                 Icons.add,
                 () => _showProductTypeSelection(context),
@@ -255,9 +250,9 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                   Text(
                     storeName,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.textPrimaryColor,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -269,23 +264,23 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                         Text(
                           'عرض متجري',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue.shade200,
+                            fontSize: 11,
+                            color: AppTheme.primaryColor,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(width: 4),
                         Icon(
                           Icons.visibility,
-                          size: 14,
-                          color: Colors.blue.shade200,
+                          size: 12,
+                          color: AppTheme.primaryColor,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               // أيقونة المتجر - قابلة للضغط
               GestureDetector(
                 onTap: () {
@@ -293,19 +288,16 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                   context.push('/dashboard/store-management');
                 },
                 child: Container(
-                  width: 44,
-                  height: 44,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.25),
-                    ),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.storefront,
-                    color: Colors.white,
-                    size: 24,
+                    color: AppTheme.primaryColor,
+                    size: 20,
                   ),
                 ),
               ),
@@ -322,15 +314,9 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         HapticFeedback.lightImpact();
         onTap();
       },
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Icon(icon, color: Colors.white, size: 22),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Icon(icon, color: AppTheme.primaryColor, size: 22),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
@@ -171,22 +172,63 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       ),
       child: Row(
         children: [
-          // أيقونة المشاركة
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: _HomeColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: _HomeColors.primary.withValues(alpha: 0.05),
+          // أزرار المشاركة والنسخ
+          Row(
+            children: [
+              // زر المشاركة
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  SharePlus.instance.share(
+                    ShareParams(text: 'تسوق من متجري: https://$storeUrl'),
+                  );
+                },
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: _HomeColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.share,
+                    size: 18,
+                    color: _HomeColors.primary,
+                  ),
+                ),
               ),
-            ),
-            child: const Icon(
-              Icons.share,
-              size: 20,
-              color: _HomeColors.primary,
-            ),
+              const SizedBox(width: 8),
+              // زر النسخ
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  Clipboard.setData(ClipboardData(text: storeUrl));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('تم نسخ الرابط'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: _HomeColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.copy,
+                    size: 18,
+                    color: _HomeColors.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 12),
           // الرابط
@@ -215,45 +257,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   textDirection: TextDirection.ltr,
                 ),
               ],
-            ),
-          ),
-          // زر النسخ
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              Clipboard.setData(ClipboardData(text: storeUrl));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('تم نسخ الرابط'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: _HomeColors.primary,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: _HomeColors.primary.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Text(
-                'نسخ',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
             ),
           ),
         ],

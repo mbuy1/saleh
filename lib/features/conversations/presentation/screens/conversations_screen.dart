@@ -90,26 +90,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   Widget build(BuildContext context) {
     return MbuyScaffold(
       title: 'المحادثات',
+      showAppBar: false,
       showBackButton: false,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.search, size: AppDimensions.iconM),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            _showSearchDialog();
-          },
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.add_comment_outlined,
-            size: AppDimensions.iconM,
-          ),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            _showNewConversationDialog();
-          },
-        ),
-      ],
       body: RefreshIndicator(
         onRefresh: _refreshConversations,
         color: AppTheme.accentColor,
@@ -290,6 +272,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     );
   }
 
+  // ignore: unused_element
   void _showSearchDialog() {
     showDialog(
       context: context,
@@ -318,6 +301,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     );
   }
 
+  // ignore: unused_element
   void _showNewConversationDialog() {
     showModalBottomSheet(
       context: context,
