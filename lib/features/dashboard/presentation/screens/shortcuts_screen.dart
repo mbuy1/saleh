@@ -1598,46 +1598,115 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 ),
                 const SizedBox(height: 12),
                 if (_generatedImageUrl != null) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      _generatedImageUrl!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 100,
-                          color: Colors.red[100],
-                          child: Center(
-                            child: Text('فشل تحميل الصورة: $error'),
+                  // الصورة قابلة للضغط للمعاينة
+                  GestureDetector(
+                    onTap: () => _showImagePreview(_generatedImageUrl!),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            _generatedImageUrl!,
+                            height: 250,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                height: 250,
+                                color: Colors.grey[200],
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  color: Colors.red[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.red[200]!),
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.broken_image, color: Colors.red[400], size: 40),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'فشل تحميل الصورة',
+                                        style: TextStyle(color: Colors.red[700]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                        // أيقونة تكبير
+                        Positioned(
+                          bottom: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.fullscreen,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // زر خيارات الحفظ
-                  ElevatedButton.icon(
-                    onPressed: () => _showSaveOptions(),
-                    icon: const Icon(Icons.save_alt, size: 18),
-                    label: const Text('حفظ / تطبيق'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
+                  // أزرار الإجراءات
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showSaveOptions(),
+                          icon: const Icon(Icons.save_alt, size: 18),
+                          label: const Text('حفظ'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showImagePreview(_generatedImageUrl!),
+                          icon: const Icon(Icons.zoom_in, size: 18),
+                          label: const Text('معاينة'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SelectableText(
-                    'URL: $_generatedImageUrl',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                    ],
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -1645,6 +1714,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                   _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.6,
                     color: _result.contains('❌')
                         ? Colors.red[800]
                         : _result.contains('✅')
@@ -1656,6 +1726,102 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // معاينة الصورة بالحجم الكامل
+  void _showImagePreview(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // شريط العنوان
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    _lastGeneratedType == 'logo' ? 'الشعار' : 
+                    _lastGeneratedType == 'banner' ? 'البانر' : 'الصورة',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+            // الصورة
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 300,
+                      width: 300,
+                      color: Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                ),
+              ),
+            ),
+            // أزرار الإجراءات
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showSaveOptions();
+                    },
+                    icon: const Icon(Icons.save_alt, color: Colors.white),
+                    label: const Text('حفظ', style: TextStyle(color: Colors.white)),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    label: const Text('إغلاق', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
