@@ -96,62 +96,37 @@ class _OrdersTabState extends State<OrdersTab> {
       length: 3,
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: AppTheme.surfaceColor,
-          foregroundColor: AppTheme.textPrimaryColor,
-          elevation: 0,
-          scrolledUnderElevation: 1,
-          surfaceTintColor: Colors.transparent,
-          title: const Text(
-            'الطلبات',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontHeadline,
-              color: AppTheme.textPrimaryColor,
-            ),
-          ),
-          centerTitle: true,
-          iconTheme: const IconThemeData(
-            color: AppTheme.primaryColor,
-            size: AppDimensions.iconM,
-          ),
-          actions: [
-            IconButton(
-              icon: SvgPicture.asset(
-                AppIcons.filter,
-                width: AppDimensions.iconM,
-                height: AppDimensions.iconM,
-                colorFilter: const ColorFilter.mode(
-                  AppTheme.primaryColor,
-                  BlendMode.srcIn,
-                ),
-              ),
-              onPressed: () {
-                _showFilterBottomSheet(context);
-              },
-            ),
-          ],
-          bottom: const TabBar(
-            isScrollable: true,
-            indicatorColor: AppTheme.primaryColor,
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.textSecondaryColor,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold),
-            tabs: [
-              Tab(text: 'إدارة الطلبات'),
-              Tab(text: 'إعدادات الطلبات'),
-              Tab(text: 'تخصيص الفاتورة'),
-            ],
-          ),
-        ),
-        body: TabBarView(
+        body: Column(
           children: [
-            // 1) إدارة الطلبات (المحتوى الأصلي)
-            _buildOrdersContent(),
-            // 2) إعدادات الطلبات
-            _buildPlaceholder('إعدادات الطلبات'),
-            // 3) تخصيص الفاتورة
-            _buildPlaceholder('تخصيص الفاتورة'),
+            // التبويبات ملتصقة بالبار العلوي
+            Container(
+              color: AppTheme.surfaceColor,
+              child: TabBar(
+                isScrollable: true,
+                indicatorColor: AppTheme.primaryColor,
+                labelColor: AppTheme.primaryColor,
+                unselectedLabelColor: AppTheme.textSecondaryColor,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                tabs: const [
+                  Tab(text: 'إدارة الطلبات'),
+                  Tab(text: 'إعدادات الطلبات'),
+                  Tab(text: 'تخصيص الفاتورة'),
+                ],
+              ),
+            ),
+            // المحتوى
+            Expanded(
+              child: TabBarView(
+                children: [
+                  // 1) إدارة الطلبات (المحتوى الأصلي)
+                  _buildOrdersContent(),
+                  // 2) إعدادات الطلبات
+                  _buildPlaceholder('إعدادات الطلبات'),
+                  // 3) تخصيص الفاتورة
+                  _buildPlaceholder('تخصيص الفاتورة'),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -885,188 +860,6 @@ class _OrdersTabState extends State<OrdersTab> {
             backgroundColor: AppTheme.primaryColor,
           ),
         );
-      },
-    );
-  }
-
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppDimensions.radiusXL),
-        ),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(AppDimensions.spacing16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: AppDimensions.spacing40,
-                    height: AppDimensions.spacing4,
-                    margin: const EdgeInsets.only(
-                      bottom: AppDimensions.spacing16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: AppDimensions.borderRadiusXS,
-                    ),
-                  ),
-                  const Text(
-                    'تصفية الطلبات',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontHeadline,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacing16),
-                  // فلترة بالحالة
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'حسب الحالة',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textSecondaryColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildFilterOption(
-                    context,
-                    'جميع الطلبات',
-                    AppIcons.orders,
-                    'all',
-                  ),
-                  _buildFilterOption(
-                    context,
-                    'طلبات جديدة',
-                    AppIcons.notifications,
-                    'new',
-                  ),
-                  _buildFilterOption(
-                    context,
-                    'قيد التنفيذ',
-                    AppIcons.time,
-                    'processing',
-                  ),
-                  _buildFilterOption(
-                    context,
-                    'مكتملة',
-                    AppIcons.checkCircle,
-                    'completed',
-                  ),
-                  _buildFilterOption(
-                    context,
-                    'ملغاة',
-                    AppIcons.close,
-                    'cancelled',
-                  ),
-                  const Divider(height: 24),
-                  // فلترة بالتاريخ
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'حسب التاريخ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textSecondaryColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.calendar_today,
-                      color: AppTheme.primaryColor,
-                    ),
-                    title: Text(
-                      _selectedDateRange == null
-                          ? 'اختر نطاق التاريخ'
-                          : '${_formatDate(_selectedDateRange!.start)} - ${_formatDate(_selectedDateRange!.end)}',
-                    ),
-                    trailing: _selectedDateRange != null
-                        ? IconButton(
-                            icon: const Icon(Icons.close, size: 18),
-                            onPressed: () {
-                              setState(() => _selectedDateRange = null);
-                              setModalState(() {});
-                            },
-                          )
-                        : const Icon(Icons.chevron_left),
-                    onTap: () async {
-                      final range = await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime.now().subtract(
-                          const Duration(days: 365),
-                        ),
-                        lastDate: DateTime.now(),
-                        locale: const Locale('ar'),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: Theme.of(context).colorScheme
-                                  .copyWith(primary: AppTheme.primaryColor),
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (range != null) {
-                        setState(() => _selectedDateRange = range);
-                        setModalState(() {});
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppDimensions.spacing16),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterOption(
-    BuildContext context,
-    String label,
-    String iconPath,
-    String filterValue,
-  ) {
-    final isSelected = _selectedFilter == filterValue;
-    return ListTile(
-      leading: SvgPicture.asset(
-        iconPath,
-        width: AppDimensions.iconM,
-        height: AppDimensions.iconM,
-        colorFilter: ColorFilter.mode(
-          isSelected ? AppTheme.accentColor : AppTheme.primaryColor,
-          BlendMode.srcIn,
-        ),
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? AppTheme.accentColor : AppTheme.textPrimaryColor,
-        ),
-      ),
-      trailing: isSelected
-          ? const Icon(Icons.check_circle, color: AppTheme.accentColor)
-          : SvgPicture.asset(
-              AppIcons.chevronLeft,
-              width: AppDimensions.iconS,
-              height: AppDimensions.iconS,
-              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
-            ),
-      onTap: () {
-        setState(() => _selectedFilter = filterValue);
-        Navigator.pop(context);
       },
     );
   }

@@ -161,11 +161,6 @@ class AppRouter {
           builder: (context, state) => const SupportScreen(),
         ),
         GoRoute(
-          path: '/about',
-          name: 'about',
-          builder: (context, state) => const AboutScreen(),
-        ),
-        GoRoute(
           path: '/notification-settings',
           name: 'notification-settings',
           builder: (context, state) => const NotificationSettingsScreen(),
@@ -457,6 +452,12 @@ class AppRouter {
                   builder: (context, state) => const CreateStoreScreen(),
                 ),
               ],
+            ),
+            // صفحة من نحن داخل الـ Shell
+            GoRoute(
+              path: '/dashboard/about',
+              name: 'about',
+              builder: (context, state) => const AboutScreen(),
             ),
           ],
         ),

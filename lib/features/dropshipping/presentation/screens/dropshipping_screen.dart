@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_icons.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/auth_token_storage.dart';
 import '../../../products/data/categories_repository.dart';
@@ -305,52 +303,46 @@ class _DropshippingScreenState extends ConsumerState<DropshippingScreen>
       length: 3,
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          elevation: 0,
-          leading: IconButton(
-            icon: SvgPicture.asset(AppIcons.arrowBack, width: 24, height: 24),
-            onPressed: () => context.pop(),
-          ),
-          title: const Text(
-            'دروب شوبينقنا',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: AppDimensions.fontHeadline,
-            ),
-          ),
-          centerTitle: true,
-          bottom: TabBar(
-            controller: _tabController,
-            onTap: (index) {
-              if (index == 1 && _categories.isEmpty) {
-                _loadCategories();
-              } else if (index == 2) {
-                if (_myProductsTabIndex == 0 && _supplierProducts.isEmpty) {
-                  _loadSupplierProducts();
-                } else if (_myProductsTabIndex == 1 &&
-                    _resellerListings.isEmpty) {
-                  _loadResellerListings();
-                }
-              }
-            },
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: AppTheme.primaryColor,
-            tabs: const [
-              Tab(text: 'ماهو شوبينقنا؟'),
-              Tab(text: 'التصنيفات'),
-              Tab(text: 'منتجاتي'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
+        body: Column(
           children: [
-            _buildInfoTab(),
-            _buildCategoriesTab(),
-            _buildMyProductsTab(),
+            // التبويبات ملتصقة بالبار العلوي
+            Container(
+              color: Colors.white,
+              child: TabBar(
+                controller: _tabController,
+                onTap: (index) {
+                  if (index == 1 && _categories.isEmpty) {
+                    _loadCategories();
+                  } else if (index == 2) {
+                    if (_myProductsTabIndex == 0 && _supplierProducts.isEmpty) {
+                      _loadSupplierProducts();
+                    } else if (_myProductsTabIndex == 1 &&
+                        _resellerListings.isEmpty) {
+                      _loadResellerListings();
+                    }
+                  }
+                },
+                labelColor: AppTheme.primaryColor,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: AppTheme.primaryColor,
+                tabs: const [
+                  Tab(text: 'ماهو شوبينقنا؟'),
+                  Tab(text: 'التصنيفات'),
+                  Tab(text: 'منتجاتي'),
+                ],
+              ),
+            ),
+            // المحتوى
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildInfoTab(),
+                  _buildCategoriesTab(),
+                  _buildMyProductsTab(),
+                ],
+              ),
+            ),
           ],
         ),
       ),

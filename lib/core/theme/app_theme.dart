@@ -5,13 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
 // ║                                                                           ║
 // ║   هذا الملف يحتوي على التصميم المعتمد والنهائي للتطبيق                     ║
-// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║   تاريخ التثبيت: 19 ديسمبر 2025                                           ║
 // ║                                                                           ║
 // ║   ⛔ ممنوع تعديل الألوان أو التصميم إلا بطلب صريح وواضح من المالك          ║
 // ║   ⛔ DO NOT MODIFY colors or design without EXPLICIT owner request        ║
 // ║                                                                           ║
 // ║   الألوان المعتمدة:                                                       ║
-// ║   • Primary: Navy Blue #1E3A5F (الثقة والاحترافية)                        ║
+// ║   • Primary: Oxford Blue #00214A (الثقة والاحترافية)                      ║
 // ║   • Secondary: Teal #00B4B4 (الحداثة والانتعاش)                           ║
 // ║   • Accent: Orange #FF6B35 (الإجراءات والتحفيز)                           ║
 // ║                                                                           ║
@@ -25,15 +25,15 @@ import 'package:google_fonts/google_fonts.dart';
 /// Do not change without explicit request
 class AppTheme {
   // ============================================================================
-  // E-commerce Color Palette (Amazon/Noon/Shopify Inspired)
+  // E-commerce Color Palette - Oxford Blue Theme
   // ============================================================================
 
-  // === Primary Colors (Blue - From FAB Button) ===
+  // === Primary Colors (Oxford Blue - الأزرق الأكسفوردي) ===
   static const Color primaryColor = Color(
-    0xFF2563EB,
-  ); // Blue - Main color from FAB
-  static const Color primaryLight = Color(0xFF3B82F6); // Blue-500
-  static const Color primaryDark = Color(0xFF1D4ED8); // Blue-700
+    0xFF00214A,
+  ); // Oxford Blue - اللون الأساسي
+  static const Color primaryLight = Color(0xFF003366); // Oxford Blue Light
+  static const Color primaryDark = Color(0xFF001830); // Oxford Blue Dark
 
   // === Purple Colors (Reduced Usage) ===
   static const Color purpleColor = Color(

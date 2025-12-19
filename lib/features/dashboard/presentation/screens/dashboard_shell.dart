@@ -1,51 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../shared/widgets/app_icon.dart';
+import '../../../../shared/widgets/app_search_delegate.dart';
+import '../../../merchant/data/merchant_store_provider.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
 // ║                                                                           ║
-// ║   شريط التنقل السفلي - التصميم مثبت ومعتمد                                ║
-// ║   تاريخ التثبيت: 14 ديسمبر 2025                                           ║
+// ║   شريط التنقل السفلي + الهيدر العلوي - التصميم مثبت ومعتمد                ║
+// ║   تاريخ التثبيت: 19 ديسمبر 2025                                           ║
 // ║                                                                           ║
 // ║   العناصر المثبتة:                                                        ║
-// ║   • 5 تبويبات: الرئيسية، الطلبات، +، المحادثات، دروب شوبينقنا            ║
-// ║   • زر + بتدرج أزرق (metallicGradient)                                    ║
-// ║   • الأيقونة النشطة: primaryColor (Blue #2563EB)                          ║
-// ║   • تم التبديل بين دروب شوبينقنا واختصاراتي - مثبت                        ║
+// ║   • 5 تبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، دروب شوبينقنا     ║
+// ║   • الأيقونة النشطة: primaryColor (Oxford Blue #00214A)                   ║
+// ║   • الهيدر العلوي الثابت مع Oxford Blue                                   ║
+// ║   • شريط الحالة بأيقونات بيضاء                                            ║
 // ║                                                                           ║
 // ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
 // ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
 // ║                                                                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-/// Dashboard Shell - يحتوي على البار السفلي الثابت
-/// يعرض الصفحات الفرعية داخله مع إبقاء البار السفلي ظاهراً
-/// التبويبات: الرئيسية، الطلبات، +، المحادثات، دروب شوبينقنا
+/// Dashboard Shell - يحتوي على البار السفلي الثابت والهيدر العلوي
+/// يعرض الصفحات الفرعية داخله مع إبقاء البار السفلي والهيدر العلوي ظاهراً
+/// التبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، دروب شوبينقنا
 ///
 /// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-15
-/// تم التبديل بين دروب شوبينقنا واختصاراتي - التصميم مثبت الآن
-class DashboardShell extends StatefulWidget {
+/// Last updated: 2025-12-19
+/// تم إضافة الهيدر العلوي الثابت مع Oxford Blue
+class DashboardShell extends ConsumerStatefulWidget {
   final Widget child;
 
   const DashboardShell({super.key, required this.child});
 
   @override
-  State<DashboardShell> createState() => _DashboardShellState();
+  ConsumerState<DashboardShell> createState() => _DashboardShellState();
 }
 
-class _DashboardShellState extends State<DashboardShell> {
+class _DashboardShellState extends ConsumerState<DashboardShell> {
   /// الحصول على الـ index الحالي بناءً على المسار
-  /// الترتيب: الرئيسية(0)، الطلبات(1)، +(2) إضافة منتج، المحادثات(3)، دروب شوبينقنا(4)
+  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، المحادثات(3)، دروب شوبينقنا(4)
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
 
     if (location.startsWith('/dashboard/orders')) return 1;
-    if (location.startsWith('/dashboard/products/add')) {
-      return 2; // زر + يظهر عند صفحة إضافة المنتجات
+    if (location.startsWith('/dashboard/products')) {
+      return 2; // صفحة المنتجات
     }
     if (location.startsWith('/dashboard/conversations')) return 3;
     if (location.startsWith('/dashboard/dropshipping')) {
@@ -63,8 +67,8 @@ class _DashboardShellState extends State<DashboardShell> {
         context.go('/dashboard/orders');
         break;
       case 2:
-        // زر + يفتح صفحة إضافة منتج مباشرة
-        context.push('/dashboard/products/add');
+        // صفحة المنتجات
+        context.go('/dashboard/products');
         break;
       case 3:
         context.go('/dashboard/conversations');
@@ -76,15 +80,258 @@ class _DashboardShellState extends State<DashboardShell> {
     }
   }
 
+  void _openSearch(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showSearch(context: context, delegate: AppSearchDelegate());
+  }
+
+  /// عرض قائمة اختيار نوع المنتج
+  void _showProductTypeSelection(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'اختر نوع المنتج',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildProductTypeOption(
+                    context,
+                    'منتج ملموس',
+                    Icons.inventory_2,
+                  ),
+                  _buildProductTypeOption(
+                    context,
+                    'خدمة حسب الطلب',
+                    Icons.edit,
+                  ),
+                  _buildProductTypeOption(
+                    context,
+                    'أكل ومشروبات',
+                    Icons.restaurant,
+                  ),
+                  _buildProductTypeOption(
+                    context,
+                    'منتج رقمي',
+                    Icons.cloud_download,
+                  ),
+                  _buildProductTypeOption(
+                    context,
+                    'حجز موعد',
+                    Icons.calendar_today,
+                  ),
+                  _buildProductTypeOption(context, 'اشتراك', Icons.repeat),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductTypeOption(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
+    return ListTile(
+      leading: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: AppTheme.primaryColor),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      trailing: const Icon(Icons.chevron_left),
+      onTap: () {
+        Navigator.pop(context);
+        context.push('/dashboard/products/add', extra: {'productType': title});
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateSelectedIndex(context);
+    final storeState = ref.watch(merchantStoreControllerProvider);
+    final store = storeState.store;
+
+    // جعل أيقونات شريط الحالة بيضاء
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light, // أيقونات بيضاء
+        statusBarBrightness: Brightness.dark, // للـ iOS
+      ),
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: widget.child,
-      extendBody: true, // Important: allows FAB to extend above nav bar
+      body: Column(
+        children: [
+          // الهيدر العلوي الثابت
+          _buildPersistentHeader(context, store?.name ?? 'mbuy'),
+          // المحتوى
+          Expanded(child: widget.child),
+        ],
+      ),
       bottomNavigationBar: _buildCustomBottomNav(context, currentIndex),
+    );
+  }
+
+  /// الهيدر العلوي الثابت - Oxford Blue
+  Widget _buildPersistentHeader(BuildContext context, String storeName) {
+    const oxfordBlue = Color(0xFF00214A);
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: topPadding + 8,
+        bottom: 16,
+        left: 16,
+        right: 16,
+      ),
+      decoration: BoxDecoration(
+        color: oxfordBlue,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // الجانب الأيسر - أزرار الإجراءات
+          Row(
+            children: [
+              _buildHeaderButton(Icons.search, () => _openSearch(context)),
+              const SizedBox(width: 8),
+              _buildHeaderButton(
+                Icons.notifications_outlined,
+                () => context.push('/notification-settings'),
+              ),
+              const SizedBox(width: 8),
+              _buildHeaderButton(
+                Icons.bolt,
+                () => context.push('/dashboard/shortcuts'),
+              ),
+              const SizedBox(width: 8),
+              _buildHeaderButton(
+                Icons.add,
+                () => _showProductTypeSelection(context),
+              ),
+            ],
+          ),
+          // الجانب الأيمن - اسم المتجر والشعار
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    storeName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push('/dashboard/view-store'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'عرض متجري',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue.shade200,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.visibility,
+                          size: 14,
+                          color: Colors.blue.shade200,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              // أيقونة المتجر - قابلة للضغط
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  context.push('/dashboard/store-management');
+                },
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.storefront,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
     );
   }
 
@@ -104,85 +351,38 @@ class _DashboardShellState extends State<DashboardShell> {
       ),
       child: Padding(
         padding: EdgeInsets.only(bottom: bottomPadding),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Navigation Bar
-            Positioned.fill(
-              child: Row(
-                children: [
-                  // الجزء الأيسر - عنصرين
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildNavItem(
-                          icon: AppIcons.home,
-                          label: 'الرئيسية',
-                          isSelected: currentIndex == 0,
-                          onTap: () => _onItemTapped(0, context),
-                        ),
-                        _buildNavItem(
-                          icon: AppIcons.orders,
-                          label: 'الطلبات',
-                          isSelected: currentIndex == 1,
-                          onTap: () => _onItemTapped(1, context),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // مساحة للزر المركزي
-                  const SizedBox(width: 72),
-                  // الجزء الأيمن - عنصرين
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildNavItem(
-                          icon: AppIcons.chat,
-                          label: 'المحادثات',
-                          isSelected: currentIndex == 3,
-                          onTap: () => _onItemTapped(3, context),
-                        ),
-                        _buildNavItem(
-                          icon: AppIcons.shipping,
-                          label: 'دروب شيب',
-                          isSelected: currentIndex == 4,
-                          onTap: () => _onItemTapped(4, context),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            _buildNavItem(
+              icon: AppIcons.home,
+              label: 'الرئيسية',
+              isSelected: currentIndex == 0,
+              onTap: () => _onItemTapped(0, context),
             ),
-            // زر + في المنتصف
-            Positioned(
-              top: -20,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _onItemTapped(2, context),
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      gradient: AppTheme.metallicGradient,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: AppIcon(AppIcons.add, color: Colors.white, size: 28),
-                  ),
-                ),
-              ),
+            _buildNavItem(
+              icon: AppIcons.orders,
+              label: 'الطلبات',
+              isSelected: currentIndex == 1,
+              onTap: () => _onItemTapped(1, context),
+            ),
+            _buildNavItem(
+              icon: AppIcons.product,
+              label: 'المنتجات',
+              isSelected: currentIndex == 2,
+              onTap: () => _onItemTapped(2, context),
+            ),
+            _buildNavItem(
+              icon: AppIcons.chat,
+              label: 'المحادثات',
+              isSelected: currentIndex == 3,
+              onTap: () => _onItemTapped(3, context),
+            ),
+            _buildNavItem(
+              icon: AppIcons.shipping,
+              label: 'دروب شيب',
+              isSelected: currentIndex == 4,
+              onTap: () => _onItemTapped(4, context),
             ),
           ],
         ),

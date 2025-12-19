@@ -1,43 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_plus/share_plus.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_icons.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'dart:ui';
 import '../../../../shared/widgets/skeleton_loading.dart';
-import '../../../../shared/widgets/app_search_delegate.dart';
-import '../../../onboarding/presentation/widgets/feature_spotlight.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
-import '../../../auth/data/auth_controller.dart';
-
-// هذا نص واضح يسمح بالتعديل على التصميم
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
+// ║                    🎨 Glass Design - Oxford Blue Theme                    ║
 // ║                                                                           ║
-// ║   الصفحة الرئيسية - التصميم مثبت ومعتمد                                   ║
-// ║   تاريخ التثبيت: 15 ديسمبر 2025                                           ║
-// ║                                                                           ║
-// ║   العناصر المثبتة:                                                        ║
-// ║   • بطاقات الإحصائيات (4 بطاقات بدون أيقونات)                             ║
-// ║   • شبكة الأيقونات: اختصاراتي، السجلات والتقارير، التسويق                ║
-// ║   • الصف الثاني: أدوات AI (3D)، توليد AI (3D)، حزم التوفير              ║
-// ║   • زر "متجرك على جوك"                                                    ║
-// ║   • تم التبديل: اختصاراتي في مكان دروب شوبينقنا                           ║
-// ║                                                                           ║
-// ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
-// ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
-// ║                                                                           ║
+// ║   تصميم زجاجي حديث مع ألوان Oxford Blue                                  ║
+// ║   تاريخ التحديث: 19 ديسمبر 2025                                          ║
+// ║   ملاحظة: الهيدر العلوي موجود في DashboardShell                          ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
-/// الصفحة الرئيسية للتاجر
-/// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-15
-/// تم التبديل بين دروب شوبينقنا واختصاراتي - التصميم مثبت الآن
+/// ألوان التصميم الجديد
+class _HomeColors {
+  static const Color primary = Color(0xFF00214A); // Oxford Blue
+  static const Color surfaceLight = Color(0xFFF8FAFC);
+}
+
+/// الصفحة الرئيسية للتاجر - تصميم زجاجي
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
 
@@ -47,21 +31,10 @@ class HomeTab extends ConsumerStatefulWidget {
 
 class _HomeTabState extends ConsumerState<HomeTab> {
   bool _isLoading = true;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void _openProfileDrawer() {
-    _scaffoldKey.currentState?.openEndDrawer();
-  }
-
-  void _openSearch(BuildContext context) {
-    HapticFeedback.lightImpact();
-    showSearch(context: context, delegate: AppSearchDelegate());
-  }
 
   @override
   void initState() {
     super.initState();
-    // تحميل بيانات المتجر عند فتح الصفحة
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
@@ -83,335 +56,204 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final store = storeState.store;
 
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: AppTheme.backgroundColor, // Slate-100
-      endDrawer: _buildProfileDrawer(context, ref),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _loadData,
-          color: AppTheme.accentColor,
-          child: _isLoading
-              ? const SkeletonHomeDashboard()
-              : SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: AppDimensions.paddingS,
-                  child: Column(
-                    children: [
-                      // 1. بار رابط متجري
-                      _buildStoreLinkCard(
-                        context,
-                        storeName: store?.name ?? 'متجري',
-                        isLoading: storeState.isLoading,
+      backgroundColor: _HomeColors.surfaceLight,
+      body: Stack(
+        children: [
+          // خلفية الـ Blobs
+          _buildBackgroundBlobs(),
+          // المحتوى الرئيسي
+          RefreshIndicator(
+            onRefresh: _loadData,
+            color: _HomeColors.primary,
+            child: _isLoading
+                ? const SkeletonHomeDashboard()
+                : CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      // المحتوى (بدون Header - موجود في الـ shell)
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            const SizedBox(height: 16),
+                            // رابط المتجر
+                            _buildStoreLinkCard(store?.name ?? 'mbuy'),
+                            const SizedBox(height: 12),
+                            // شبكة الإحصائيات
+                            _buildStatsGrid(context, store),
+                            const SizedBox(height: 12),
+                            // شبكة الأيقونات
+                            _buildFeaturesGrid(context),
+                            const SizedBox(height: 100),
+                          ]),
+                        ),
                       ),
-                      SizedBox(height: AppDimensions.spacing12),
-                      // 2. الإحصائيات الأربعة
-                      _buildStatsGrid(context, store: store),
-                      SizedBox(height: AppDimensions.spacing12),
-                      // 3. شبكة الأيقونات (4 أيقونات)
-                      _buildIconsGrid(context),
-                      SizedBox(height: AppDimensions.spacing12),
-                      // 4. زر تجربة العميل (تمت إزالته)
-                      // _buildCustomerModeButton(context),
-                      SizedBox(height: AppDimensions.spacing8),
                     ],
                   ),
-                ),
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  /// بار رابط متجري - نُقل من صفحة المتجر
-  Widget _buildStoreLinkCard(
-    BuildContext context, {
-    required String storeName,
-    bool isLoading = false,
-  }) {
-    final storeSlug = storeName.replaceAll(' ', '-');
+  /// خلفية الـ Blobs الملونة
+  Widget _buildBackgroundBlobs() {
+    return Stack(
+      children: [
+        // خلفية ثابتة
+        Container(color: _HomeColors.surfaceLight),
+        // Blob أزرق في الأعلى
+        Positioned(
+          top: -80,
+          right: -80,
+          child: Container(
+            width: 280,
+            height: 280,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.blue.shade300.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        // Blob بنفسجي في المنتصف
+        Positioned(
+          bottom: 200,
+          left: -100,
+          child: Container(
+            width: 240,
+            height: 240,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.purple.shade300.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        // Blob سماوي
+        Positioned(
+          top: 300,
+          right: 50,
+          child: Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.cyan.shade200.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        // تأثير الضبابية
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+          child: Container(color: Colors.transparent),
+        ),
+      ],
+    );
+  }
+
+  /// بطاقة رابط المتجر
+  Widget _buildStoreLinkCard(String storeName) {
+    final storeSlug = storeName.replaceAll(' ', '-').toLowerCase();
     final storeUrl = 'tabayu.com/$storeSlug';
 
     return Container(
-      padding: AppDimensions.paddingM,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
-        borderRadius: AppDimensions.borderRadiusXL,
-        border: Border.all(
-          color: AppTheme.borderColor, // Metallic edge
-          width: 1,
-        ),
+        color: Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: _openProfileDrawer,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                    borderRadius: AppDimensions.borderRadiusM,
-                  ),
-                  child: SvgPicture.asset(
-                    AppIcons.store,
-                    width: AppDimensions.iconXL,
-                    height: AppDimensions.iconXL,
-                    colorFilter: ColorFilter.mode(
-                      AppTheme.darkSlate,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    isLoading
-                        ? Container(
-                            width: 80,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          )
-                        : Text(
-                            storeName,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  AppTheme.darkSlate, // Dark Slate for headings
-                            ),
-                          ),
-                    const SizedBox(height: 4),
-                    // زر عرض متجري (منقول)
-                    InkWell(
-                      onTap: () => context.push('/dashboard/view-store'),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            AppIcons.eye,
-                            width: AppDimensions.iconXS,
-                            height: AppDimensions.iconXS,
-                            colorFilter: ColorFilter.mode(
-                              AppTheme.mutedSlate,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'عرض متجري',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  AppTheme.mutedSlate, // Muted Slate for body
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // زر البحث مع Spotlight
-              FeatureSpotlight(
-                featureId: 'global_search',
-                title: 'البحث السريع ✨',
-                description:
-                    'ابحث في جميع ميزات التطبيق بنقرة واحدة! جرب البحث عن "كوبونات" أو "منتجات"',
-                position: SpotlightPosition.bottom,
-                child: Semantics(
-                  label: 'البحث في التطبيق',
-                  button: true,
-                  child: IconButton(
-                    icon: SvgPicture.asset(
-                      AppIcons.search,
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        AppTheme.darkSlate,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onPressed: () => _openSearch(context),
-                  ),
-                ),
-              ),
-              // زر الإشعارات
-              Semantics(
-                label: 'الإشعارات',
-                button: true,
-                child: IconButton(
-                  icon: SvgPicture.asset(
-                    AppIcons.notifications,
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      AppTheme.darkSlate,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  onPressed: () {
-                    context.push('/dashboard/notifications');
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppDimensions.spacing16),
-          // أزرار إدارة المتجر - تم تبديل تخصيص المتجر بمظهر المتجر
-          Row(
-            children: [
-              Expanded(
-                child: _buildLinkActionButton(
-                  iconPath: AppIcons.settings,
-                  label: 'إدارة المتجر',
-                  onTap: () => context.push('/dashboard/store-management'),
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _buildLinkActionButton(
-                  iconPath: AppIcons.storefront,
-                  label: 'مظهر المتجر',
-                  onTap: () => context.push('/dashboard/webstore'),
-                ),
-              ),
-              // تم نقل زر عرض متجري للأعلى
-            ],
-          ),
-          SizedBox(height: AppDimensions.spacing12),
-          // رابط المتجر مع زر نسخ - Recessed Metal Look
+          // أيقونة المشاركة
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              gradient: AppTheme.recessedMetalGradient,
-              borderRadius: AppDimensions.borderRadiusS,
+              color: _HomeColors.primary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.slate300.withValues(alpha: 0.5),
-                width: 1,
+                color: _HomeColors.primary.withValues(alpha: 0.05),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
+            ),
+            child: const Icon(
+              Icons.share,
+              size: 20,
+              color: _HomeColors.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // الرابط
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'رابط المتجر',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade500,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  storeUrl,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: _HomeColors.primary,
+                    fontFamily: 'monospace',
+                  ),
+                  textDirection: TextDirection.ltr,
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  AppIcons.link,
-                  width: AppDimensions.iconXS,
-                  height: AppDimensions.iconXS,
-                  colorFilter: ColorFilter.mode(
-                    AppTheme.darkSlate,
-                    BlendMode.srcIn,
+          ),
+          // زر النسخ
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              Clipboard.setData(ClipboardData(text: storeUrl));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('تم نسخ الرابط'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    storeUrl,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.darkSlate,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textDirection: TextDirection.ltr,
-                    overflow: TextOverflow.ellipsis,
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: _HomeColors.primary,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: _HomeColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: const Text(
+                'نسخ',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
-                SizedBox(width: AppDimensions.spacing8),
-                // زر النسخ
-                Semantics(
-                  label: 'نسخ رابط المتجر',
-                  button: true,
-                  child: GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      Clipboard.setData(ClipboardData(text: storeUrl));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('تم نسخ الرابط'),
-                          backgroundColor: AppTheme.successColor,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'نسخ',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontLabel,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: AppDimensions.spacing8),
-                // زر المشاركة
-                Semantics(
-                  label: 'مشاركة رابط المتجر',
-                  button: true,
-                  child: GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      SharePlus.instance.share(
-                        ShareParams(
-                          text: 'تفضل بزيارة متجري على: $storeUrl',
-                          subject: 'رابط متجري',
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: SvgPicture.asset(
-                        AppIcons.share,
-                        width: AppDimensions.iconXS,
-                        height: AppDimensions.iconXS,
-                        colorFilter: ColorFilter.mode(
-                          AppTheme.primaryColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -419,108 +261,54 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     );
   }
 
-  Widget _buildLinkActionButton({
-    required String iconPath,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: AppDimensions.borderRadiusM,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AppDimensions.borderRadiusM,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              gradient: AppTheme.cardGradient,
-              borderRadius: AppDimensions.borderRadiusM,
-              border: Border.all(color: AppTheme.borderColor, width: 1),
-            ),
-            child: Column(
-              children: [
-                SvgPicture.asset(
-                  iconPath,
-                  width: AppDimensions.iconS,
-                  height: AppDimensions.iconS,
-                  colorFilter: ColorFilter.mode(
-                    AppTheme.darkSlate,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontLabel,
-                    color: AppTheme
-                        .mutedSlate, // Muted Slate (#64748B) for labels from image
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// شبكة الإحصائيات الأربعة - قابلة للنقر
-  Widget _buildStatsGrid(BuildContext context, {Store? store}) {
+  /// شبكة الإحصائيات
+  Widget _buildStatsGrid(BuildContext context, Store? store) {
     return Column(
       children: [
-        // الصف الأول: الرصيد + النقاط
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
-                iconPath: AppIcons.wallet,
-                title: 'الرصيد',
                 value: '0.00',
                 suffix: 'ر.س',
-                color: Colors.green,
+                label: 'الرصيد',
                 onTap: () => context.push('/dashboard/wallet'),
+                hasBlob: true,
+                blobColor: Colors.blue.shade400,
+                blobAlignment: Alignment.topRight,
               ),
             ),
-            SizedBox(width: AppDimensions.spacing12),
+            const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                iconPath: AppIcons.points,
-                title: 'النقاط',
                 value: '0',
                 suffix: 'نقطة',
-                color: Colors.orange,
+                label: 'النقاط',
                 onTap: () => context.push('/dashboard/points'),
+                hasBlob: true,
+                blobColor: Colors.purple.shade400,
+                blobAlignment: Alignment.bottomLeft,
               ),
             ),
           ],
         ),
-        SizedBox(height: AppDimensions.spacing12),
-        // الصف الثاني: العملاء + المبيعات
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
-                iconPath: AppIcons.users,
-                title: 'العملاء',
                 value: '${store?.followersCount ?? 0}',
-                suffix: 'متابع',
-                color: Colors.blue,
+                suffix: '',
+                label: 'العملاء',
                 onTap: () => context.push('/dashboard/customers'),
               ),
             ),
-            SizedBox(width: AppDimensions.spacing12),
+            const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                iconPath: AppIcons.star,
-                title: 'المبيعات',
                 value: '0',
-                suffix: ' ',
-                color: Colors.amber,
+                suffix: '',
+                label: 'المبيعات',
                 onTap: () => context.push('/dashboard/sales'),
               ),
             ),
@@ -531,404 +319,90 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   Widget _buildStatCard({
-    required String iconPath,
-    required String title,
     required String value,
     required String suffix,
-    required Color color,
-    VoidCallback? onTap,
+    required String label,
+    required VoidCallback onTap,
+    bool hasBlob = false,
+    Color? blobColor,
+    Alignment? blobAlignment,
   }) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: AppDimensions.borderRadiusL,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppDimensions.borderRadiusL,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            gradient: AppTheme.cardGradient,
-            borderRadius: AppDimensions.borderRadiusL,
-            border: Border.all(
-              color: AppTheme.borderColor, // Metallic edge
-              width: 1,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+          ],
+        ),
+        child: Stack(
+          children: [
+            if (hasBlob && blobColor != null)
+              Positioned(
+                top: blobAlignment == Alignment.topRight ? -20 : null,
+                right: blobAlignment == Alignment.topRight ? -20 : null,
+                bottom: blobAlignment == Alignment.bottomLeft ? -20 : null,
+                left: blobAlignment == Alignment.bottomLeft ? -20 : null,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: blobColor.withValues(alpha: 0.1),
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+            Center(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Flexible(
-                    child: Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontDisplay3,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.darkSlate, // Dark Slate for headings
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    suffix,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontLabel,
-                      color: AppTheme.mutedSlate, // Muted Slate for body
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppTheme.mutedSlate, // Muted Slate for body
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// شبكة الأيقونات (6 أيقونات)
-  /// تم التحديث: استبدال التسويق وأدوات AI بالمتجر والمنتجات
-  /// الترتيب: الصف الأول: اختصاراتي، السجلات والتقارير، المنتجات | الصف الثاني: المتجر، توليد AI، حزم التوفير
-  Widget _buildIconsGrid(BuildContext context) {
-    return Column(
-      children: [
-        // الصف الأول: اختصاراتي، السجلات والتقارير، المنتجات
-        SizedBox(
-          height: 110,
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.flash,
-                  label: 'اختصاراتي',
-                  screen: 'Shortcuts',
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.document,
-                  label: 'السجلات والتقارير',
-                  screen: 'Reports',
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.inventory2,
-                  label: 'المنتجات',
-                  screen: 'Products',
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: AppDimensions.spacing12),
-        // الصف الثاني: المتجر (يحتوي التسويق + أدوات AI)، توليد AI، حزم التوفير
-        SizedBox(
-          height: 110,
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.store,
-                  label: 'المتجر',
-                  screen: 'StoreTools',
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.sparkle,
-                  label: 'توليد AI',
-                  screen: 'AIGeneration',
-                ),
-              ),
-              SizedBox(width: AppDimensions.spacing12),
-              Expanded(
-                child: _buildBottomCard(
-                  context: context,
-                  iconPath: AppIcons.gift,
-                  label: 'حزم التوفير',
-                  screen: 'MbuyPackage',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomCard({
-    required BuildContext context,
-    required String iconPath,
-    required String label,
-    required String screen,
-  }) {
-    return Semantics(
-      button: true,
-      label: label,
-      hint: 'انقر للانتقال إلى $label',
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          onTap: () => _navigateToScreen(context, screen, label),
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.cardGradient,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: AppTheme.borderColor, // Metallic edge
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppTheme.primaryColor.withValues(alpha: 0.1),
-                          AppTheme.primaryLight.withValues(alpha: 0.1),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(17),
-                      ),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        iconPath,
-                        width: 36,
-                        height: 36,
-                        colorFilter: ColorFilter.mode(
-                          AppTheme.darkSlate,
-                          BlendMode.srcIn,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: _HomeColors.primary,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                    ),
+                      if (suffix.isNotEmpty) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          suffix,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
+                  const SizedBox(height: 4),
+                  Text(
                     label,
                     style: TextStyle(
-                      fontSize: AppDimensions.fontLabel,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.darkSlate, // Dark Slate for headings
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade500,
+                      letterSpacing: 0.5,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _navigateToScreen(BuildContext context, String screen, String label) {
-    switch (screen) {
-      case 'MbuyStudio':
-        context.push('/dashboard/studio');
-        break;
-      case 'MbuyTools':
-        context.push('/dashboard/tools');
-        break;
-      case 'Marketing':
-        context.push('/dashboard/marketing');
-        break;
-      case 'Products':
-        context.push('/dashboard/products');
-        break;
-      case 'EarnMore':
-        context.push('/dashboard/feature/${Uri.encodeComponent('اربح أكثر')}');
-        break;
-      case 'BoostSales':
-        context.push('/dashboard/boost-sales');
-        break;
-      case 'Shortcuts':
-        context.push('/dashboard/shortcuts');
-        break;
-      case 'DoubleExposure':
-        context.push('/dashboard/promotions');
-        break;
-      case 'MbuyPackage':
-        // صفحة حزم التوفير
-        context.push('/dashboard/packages');
-        break;
-      case 'DropShipping':
-        context.push('/dashboard/dropshipping');
-        break;
-      case 'Reports':
-        // صفحة التقارير والسجلات
-        context.push('/dashboard/reports');
-        break;
-      case 'StoreTools':
-        // صفحة المتجر الجديدة (تسويق + أدوات AI)
-        context.push('/dashboard/store-tools');
-        break;
-      case 'AIGeneration':
-        // صفحة توليد AI - استوديو MBUY
-        context.push('/dashboard/studio');
-        break;
-      default:
-        context.push('/dashboard/feature/${Uri.encodeComponent(label)}');
-    }
-  }
-
-  /// Drawer إعدادات الملف الشخصي
-  Widget _buildProfileDrawer(BuildContext context, WidgetRef ref) {
-    return Drawer(
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        AppIcons.person,
-                        width: 40,
-                        height: 40,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'إعدادات الحساب',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            // Menu Items
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildDrawerItem(
-                    iconPath: AppIcons.settings,
-                    title: 'إعدادات الحساب',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/settings');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.supportAgent,
-                    title: 'الدعم والمساعدة',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/support');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.info,
-                    title: 'عن التطبيق',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/about');
-                    },
-                  ),
-                  const Divider(height: 32),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.document,
-                    title: 'سياسة الخصوصية',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/privacy-policy');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.document,
-                    title: 'شروط الاستخدام',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.push('/terms');
-                    },
-                  ),
-                  const Divider(height: 32),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.share,
-                    title: 'شارك التطبيق',
-                    onTap: () {
-                      Navigator.pop(context);
-                      SharePlus.instance.share(
-                        ShareParams(
-                          text: 'جرب تطبيق MBUY لإدارة متجرك الإلكتروني',
-                          subject: 'تطبيق MBUY',
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(height: 32),
-                  _buildDrawerItem(
-                    iconPath: AppIcons.logout,
-                    title: 'تسجيل الخروج',
-                    onTap: () {
-                      Navigator.pop(context);
-                      ref.read(authControllerProvider.notifier).logout();
-                    },
-                    textColor: Colors.red,
-                    iconColor: Colors.red,
                   ),
                 ],
               ),
@@ -939,36 +413,170 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     );
   }
 
-  Widget _buildDrawerItem({
-    required String iconPath,
-    required String title,
+  /// شبكة الميزات (6 أيقونات)
+  Widget _buildFeaturesGrid(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.info_outline,
+                label: 'من نحن',
+                onTap: () => context.push('/about'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.receipt_long,
+                label: 'السجلات\nوالتقارير',
+                onTap: () => context.push('/dashboard/reports'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.campaign,
+                label: 'التسويق',
+                onTap: () => context.push('/dashboard/marketing'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.store,
+                label: 'المتجر',
+                onTap: () => context.push('/dashboard/store-tools'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.auto_awesome,
+                label: 'توليد AI',
+                onTap: () => context.push('/dashboard/studio'),
+                showBadge: true,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildFeatureCard(
+                icon: Icons.card_giftcard,
+                label: 'حزم التوفير',
+                onTap: () => context.push('/dashboard/packages'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String label,
     required VoidCallback onTap,
-    Color? textColor,
-    Color? iconColor,
+    bool showBadge = false,
   }) {
-    return ListTile(
-      leading: SvgPicture.asset(
-        iconPath,
-        width: 24,
-        height: 24,
-        colorFilter: ColorFilter.mode(
-          iconColor ?? AppTheme.darkSlate,
-          BlendMode.srcIn,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Container(
+        height: 110,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: 0.9),
+              const Color(0xFFF0F9FF).withValues(alpha: 0.95),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+          boxShadow: [
+            BoxShadow(
+              color: _HomeColors.primary.withValues(alpha: 0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: textColor ?? AppTheme.darkSlate, // Dark Slate for text
-          fontWeight: FontWeight.w500,
+        child: Stack(
+          children: [
+            // Blob خلفي
+            Positioned(
+              top: -16,
+              right: -16,
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue.shade600.withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            // Badge
+            if (showBadge)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade500,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withValues(alpha: 0.6),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            // المحتوى
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: _HomeColors.primary.withValues(alpha: 0.05),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _HomeColors.primary.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Icon(icon, size: 22, color: _HomeColors.primary),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: _HomeColors.primary,
+                      height: 1.3,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
-      onTap: onTap,
-      trailing: SvgPicture.asset(
-        AppIcons.chevronRight,
-        width: 16,
-        height: 16,
-        colorFilter: ColorFilter.mode(AppTheme.mutedSlate, BlendMode.srcIn),
       ),
     );
   }
