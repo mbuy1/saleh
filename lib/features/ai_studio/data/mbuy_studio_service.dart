@@ -204,4 +204,21 @@ class MbuyStudioService {
     'prompt': prompt,
     if (imageBase64 != null) 'image': imageBase64,
   });
+
+  // ============= NanoBanana API =============
+
+  /// بدء مهمة توليد صورة عبر NanoBanana
+  Future<Map<String, dynamic>> nanoBananaGenerate(String prompt) => _post(
+    '/api/ai/nano-banana/generate', // مسار بدون مصادقة للاختبار
+    {'prompt': prompt},
+    timeout: const Duration(seconds: 120),
+  );
+
+  /// التحقق من حالة مهمة
+  Future<Map<String, dynamic>> nanoBananaGetTask(String taskId) =>
+      _get('/secure/ai/nano-banana/task', query: {'taskId': taskId});
+
+  /// الحصول على قائمة الخدمات المتاحة
+  Future<Map<String, dynamic>> getAvailableProviders() =>
+      _get('/secure/ai/providers');
 }

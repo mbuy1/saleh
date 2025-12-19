@@ -8,9 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../ai_studio/data/mbuy_studio_service.dart';
-import '../../../ai_studio/data/ai_results_service.dart';
 import '../../../auth/data/auth_controller.dart';
-import '../../../merchant/data/merchant_repository.dart';
 
 /// صفحة اختصاراتي المُعاد تصميمها
 /// - صفحة فارغة مع نص توضيحي في البداية
@@ -1200,6 +1198,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   String _result = '';
   bool _isLoading = false;
   String _selectedTool = 'text'; // الأداة المحددة حالياً
+  String? _generatedImageUrl; // رابط الصورة المولدة
+  String? _currentTaskId; // معرف مهمة NanoBanana
 
   // إعدادات إضافية لكل أداة
   String _textTone = 'marketing'; // تسويقي / رسمي / مختصر
@@ -1233,8 +1233,6 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     setState(() {
       _isLoading = true;
       _result = '⏳ جاري توليد النص...';
-      _generatedImageUrl = null;
-      _lastGeneratedType = 'text';
     });
 
     try {
@@ -1348,6 +1346,170 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     }
   }
 
+  // ============= AI Image Generation =============
+  Future<void> _testNanoBananaGenerate() async {
+    if (!_checkAuth()) return;
+    if (_promptController.text.isEmpty) {
+      setState(
+        () => _result =
+            '⚠️ أدخل وصف الصورة بالإنجليزية\n(مثال: Professional product photo of a smartwatch on white background)',
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري توليد الصورة عبر NanoBanana...';
+      _generatedImageUrl = null;
+      _currentTaskId = null;
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+
+      // توليد الصورة
+      final response = await service.nanoBananaGenerate(_promptController.text);
+
+      // التحقق من النتيجة
+      final status = response['status'];
+      final imageUrl = response['image_url'] ?? response['imageUrl'];
+
+      if (status == 'completed' && imageUrl != null) {
+        setState(() {
+          _generatedImageUrl = imageUrl;
+          _result = '✅ تم توليد الصورة بنجاح!';
+        });
+      } else {
+        setState(() {
+          _result =
+              '❌ فشل: ${response['error'] ?? response['details'] ?? 'استجابة غير متوقعة'}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _result = '❌ فشل: $e';
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // ignore: unused_element - محفوظة للاستخدام المستقبلي
+  Future<void> _pollTaskStatus(String taskId) async {
+    final service = widget.ref.read(mbuyStudioServiceProvider);
+    int attempts = 0;
+    const maxAttempts = 30; // 30 محاولة × 2 ثانية = دقيقة واحدة كحد أقصى
+
+    while (attempts < maxAttempts) {
+      attempts++;
+      await Future.delayed(const Duration(seconds: 2));
+
+      try {
+        final taskResponse = await service.nanoBananaGetTask(taskId);
+        final status = taskResponse['status']?.toString().toLowerCase();
+
+        if (status == 'completed' || status == 'success') {
+          // البحث عن رابط الصورة في النتيجة
+          final result = taskResponse['result'];
+          String? imageUrl;
+
+          if (result is List && result.isNotEmpty) {
+            imageUrl = result[0]?.toString();
+          } else if (result is Map) {
+            imageUrl = result['url'] ?? result['image_url'] ?? result['image'];
+          } else if (result is String) {
+            imageUrl = result;
+          }
+
+          // أيضاً تحقق من المستوى الأعلى
+          imageUrl ??=
+              taskResponse['url'] ??
+              taskResponse['image_url'] ??
+              taskResponse['image'];
+
+          setState(() {
+            _generatedImageUrl = imageUrl;
+            _result = imageUrl != null
+                ? '✅ تم توليد الصورة بنجاح!'
+                : '✅ اكتملت المهمة لكن لم يتم العثور على رابط الصورة\n\nالنتيجة: $taskResponse';
+          });
+          return;
+        } else if (status == 'failed' || status == 'error') {
+          final error =
+              taskResponse['error'] ??
+              taskResponse['message'] ??
+              'خطأ غير معروف';
+          setState(() {
+            _result = '❌ فشلت المهمة: $error';
+          });
+          return;
+        } else {
+          // لا زالت قيد التنفيذ
+          setState(() {
+            _result =
+                '⏳ حالة المهمة: ${status ?? 'processing'}\nالمحاولة: $attempts/$maxAttempts';
+          });
+        }
+      } catch (e) {
+        debugPrint('[NanoBanana] Poll error: $e');
+        // استمر في المحاولة
+      }
+    }
+
+    setState(() {
+      _result = '⚠️ انتهت المهلة. يمكنك التحقق لاحقاً من المهمة: $taskId';
+    });
+  }
+
+  Future<void> _checkTaskStatus() async {
+    if (_currentTaskId == null) {
+      setState(() => _result = '⚠️ لا توجد مهمة للتحقق منها');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _result = '⏳ جاري التحقق من حالة المهمة...';
+    });
+
+    try {
+      final service = widget.ref.read(mbuyStudioServiceProvider);
+      final response = await service.nanoBananaGetTask(_currentTaskId!);
+
+      final status = response['status'];
+      final result = response['result'];
+
+      setState(() {
+        _result =
+            '📋 حالة المهمة: $status\n\nالتفاصيل:\n${_formatJson(response)}';
+
+        // إذا اكتملت، حاول استخراج الصورة
+        if (status == 'completed' || status == 'success') {
+          String? imageUrl;
+          if (result is List && result.isNotEmpty) {
+            imageUrl = result[0]?.toString();
+          } else if (result is Map) {
+            imageUrl = result['url'] ?? result['image_url'];
+          }
+          imageUrl ??= response['url'] ?? response['image_url'];
+          _generatedImageUrl = imageUrl;
+        }
+      });
+    } catch (e) {
+      setState(() => _result = '❌ فشل التحقق: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  String _formatJson(Map<String, dynamic> json) {
+    try {
+      return json.entries.map((e) => '${e.key}: ${e.value}').join('\n');
+    } catch (_) {
+      return json.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -1429,6 +1591,12 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 Icons.key,
                 Colors.indigo,
               ),
+              _buildToolChip(
+                'nano_banana',
+                '🍌 صورة AI',
+                Icons.image,
+                Colors.orange,
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -1480,6 +1648,103 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             ),
           ),
           const SizedBox(height: 24),
+
+          // عرض الصورة المولدة (NanoBanana)
+          if (_generatedImageUrl != null) ...[
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange, width: 2),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  _generatedImageUrl!,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      color: Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.broken_image,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'فشل تحميل الصورة',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        const SizedBox(height: 4),
+                        SelectableText(
+                          _generatedImageUrl!,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _generatedImageUrl!));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تم نسخ الرابط')),
+                    );
+                  },
+                  icon: const Icon(Icons.copy, size: 16),
+                  label: const Text('نسخ الرابط'),
+                ),
+                const SizedBox(width: 16),
+                TextButton.icon(
+                  onPressed: () => setState(() {
+                    _generatedImageUrl = null;
+                    _result = '';
+                  }),
+                  icon: const Icon(Icons.close, size: 16),
+                  label: const Text('إخفاء'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // زر التحقق من المهمة (NanoBanana)
+          if (_selectedTool == 'nano_banana' &&
+              _currentTaskId != null &&
+              !_isLoading)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: OutlinedButton.icon(
+                onPressed: _checkTaskStatus,
+                icon: const Icon(Icons.refresh),
+                label: Text(
+                  'تحقق من المهمة: ${_currentTaskId!.substring(0, 8)}...',
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.orange,
+                  side: const BorderSide(color: Colors.orange),
+                ),
+              ),
+            ),
 
           // نتيجة
           Container(
@@ -1540,6 +1805,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         return 'اسم المنتج ومميزاته (عربي)';
       case 'keywords':
         return 'اسم المنتج/الفئة (عربي)';
+      case 'nano_banana':
+        return 'وصف الصورة (إنجليزي أفضل)';
       default:
         return 'الإدخال';
     }
@@ -1553,6 +1820,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         return 'مثال: ساعة ذكية - مقاومة للماء - شاشة AMOLED';
       case 'keywords':
         return 'مثال: حقيبة جلد نسائية';
+      case 'nano_banana':
+        return 'مثال: Professional product photo of a smartwatch on white background';
       default:
         return '';
     }
@@ -1566,6 +1835,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         return Colors.teal;
       case 'keywords':
         return Colors.indigo;
+      case 'nano_banana':
+        return Colors.orange;
       default:
         return Colors.blue;
     }
@@ -1581,6 +1852,9 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         break;
       case 'keywords':
         _testGenerateKeywords();
+        break;
+      case 'nano_banana':
+        _testNanoBananaGenerate();
         break;
     }
   }
@@ -1694,6 +1968,25 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                   onSelected: (_) => setState(() => _productTone = 'luxury'),
                 ),
               ],
+            ),
+          ],
+        );
+      case 'nano_banana':
+        return const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '🍌 NanoBanana',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'توليد صور بالذكاء الاصطناعي عبر OpenRouter',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
         );

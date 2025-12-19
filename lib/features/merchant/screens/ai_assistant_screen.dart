@@ -46,61 +46,24 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
   Future<void> _loadData() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
       _error = null;
+      // بدء بدون محادثات - المساعد الشخصي يعمل مباشرة
+      _conversations = [];
+      _quickCommands = [
+        {'id': '1', 'title': 'كتابة وصف منتج', 'icon': 'description'},
+        {'id': '2', 'title': 'أفكار تسويقية', 'icon': 'campaign'},
+        {'id': '3', 'title': 'تحسين المبيعات', 'icon': 'trending_up'},
+        {'id': '4', 'title': 'الرد على عميل', 'icon': 'support_agent'},
+      ];
     });
-
-    try {
-      final results = await Future.wait([
-        _api.get('/secure/ai/conversations'),
-        _api.get('/secure/ai/commands'),
-      ]);
-
-      if (!mounted) return;
-
-      final convsRes = jsonDecode(results[0].body);
-      final cmdsRes = jsonDecode(results[1].body);
-
-      setState(() {
-        _conversations = List<Map<String, dynamic>>.from(
-          convsRes['data'] ?? [],
-        );
-        _quickCommands = List<Map<String, dynamic>>.from(cmdsRes['data'] ?? []);
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-    }
   }
 
   Future<void> _loadConversation(String conversationId) async {
-    try {
-      final response = await _api.get(
-        '/secure/ai/conversations/$conversationId',
-      );
-
-      if (!mounted) return;
-      final data = jsonDecode(response.body);
-
-      setState(() {
-        _activeConversation = data['data'];
-        _messages = List<Map<String, dynamic>>.from(
-          data['data']['messages'] ?? [],
-        );
-        _showConversations = false;
-      });
-
-      _scrollToBottom();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('فشل تحميل المحادثة: $e')));
-    }
+    // المساعد الجديد لا يحتاج تحميل محادثات - يعمل مباشرة
+    setState(() {
+      _showConversations = false;
+    });
   }
 
   Future<void> _sendMessage() async {
@@ -119,27 +82,32 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     _scrollToBottom();
 
     try {
+      // استخدام المساعد الشخصي الجديد عبر OpenRouter
       final response = await _api.post(
-        '/secure/ai/chat',
+        '/api/ai/assistant',
         body: {
-          'conversation_id': _activeConversation?['id'],
           'message': message,
+          'history': _messages
+              .map((m) => {'role': m['role'], 'content': m['content']})
+              .toList(),
         },
       );
 
       if (!mounted) return;
       final data = jsonDecode(response.body);
 
-      if (data['ok'] == true) {
+      if (data['success'] == true && data['reply'] != null) {
         setState(() {
-          _activeConversation ??= {'id': data['data']['conversation_id']};
-          _messages.add(data['data']['message']);
+          _messages.add({
+            'role': 'assistant',
+            'content': data['reply'],
+            'created_at': DateTime.now().toIso8601String(),
+          });
           _isSending = false;
         });
         _scrollToBottom();
-        _loadData(); // Refresh conversations list
       } else {
-        throw Exception(data['error']);
+        throw Exception(data['error'] ?? 'خطأ غير معروف');
       }
     } catch (e) {
       if (!mounted) return;
@@ -158,36 +126,47 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   }
 
   Future<void> _executeQuickCommand(Map<String, dynamic> command) async {
-    setState(() => _isSending = true);
+    final userText = _messageController.text.trim();
+    final prompt =
+        '${command['title']}: ${userText.isNotEmpty ? userText : 'ساعدني'}';
+
+    setState(() {
+      _isSending = true;
+      _messages.add({
+        'role': 'user',
+        'content': prompt,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    });
+    _messageController.clear();
+    _scrollToBottom();
 
     try {
       final response = await _api.post(
-        '/secure/ai/quick-command',
+        '/api/ai/assistant',
         body: {
-          'command_id': command['id'],
-          'selection': _messageController.text,
+          'message': prompt,
+          'history': _messages
+              .map((m) => {'role': m['role'], 'content': m['content']})
+              .toList(),
         },
       );
 
       if (!mounted) return;
       final data = jsonDecode(response.body);
 
-      if (data['ok'] == true) {
+      if (data['success'] == true && data['reply'] != null) {
         setState(() {
           _messages.add({
-            'role': 'user',
-            'content': '${command['title']}: ${_messageController.text}',
-            'created_at': DateTime.now().toIso8601String(),
-          });
-          _messages.add({
             'role': 'assistant',
-            'content': data['data']['result'],
+            'content': data['reply'],
             'created_at': DateTime.now().toIso8601String(),
           });
           _isSending = false;
         });
-        _messageController.clear();
         _scrollToBottom();
+      } else {
+        throw Exception(data['error'] ?? 'خطأ غير معروف');
       }
     } catch (e) {
       if (!mounted) return;

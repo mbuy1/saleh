@@ -208,7 +208,7 @@ class _AiResultActionsSheetState extends State<_AiResultActionsSheet> {
               height: 100,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorBuilder: (context, error, stackTrace) => Container(
                 height: 100,
                 color: Colors.grey[200],
                 child: const Icon(Icons.image, size: 40),
@@ -271,7 +271,7 @@ class _AiResultActionsSheetState extends State<_AiResultActionsSheet> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withAlpha(77)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -279,7 +279,7 @@ class _AiResultActionsSheetState extends State<_AiResultActionsSheet> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withAlpha(26),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: isThisLoading
