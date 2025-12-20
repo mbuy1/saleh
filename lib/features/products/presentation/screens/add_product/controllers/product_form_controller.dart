@@ -11,22 +11,24 @@ import '../../../../data/products_repository.dart';
 
 /// متحكم نموذج إضافة المنتج
 class ProductFormController extends StateNotifier<ProductFormState> {
-  final Ref ref;
   final ImagePicker _picker = ImagePicker();
+  final CategoriesRepository _categoriesRepo;
+  final ProductsRepository _productsRepo;
 
   List<Category> categories = [];
   bool loadingCategories = false;
 
-  ProductFormController(
-    this.ref, {
-    ProductType? initialType,
-    String? initialName,
-    double? initialPrice,
-  }) : super(
+  ProductFormController({
+    required CategoriesRepository categoriesRepo,
+    required ProductsRepository productsRepo,
+    ProductFormParams? params,
+  }) : _categoriesRepo = categoriesRepo,
+       _productsRepo = productsRepo,
+       super(
          ProductFormState(
-           productType: initialType ?? ProductType.physical,
-           name: initialName ?? '',
-           price: initialPrice,
+           productType: params?.initialType ?? ProductType.physical,
+           name: params?.initialName ?? '',
+           price: params?.initialPrice,
          ),
        ) {
     _loadCategories();
@@ -39,8 +41,7 @@ class ProductFormController extends StateNotifier<ProductFormState> {
   Future<void> _loadCategories() async {
     loadingCategories = true;
     try {
-      final categoriesRepo = ref.read(categoriesRepositoryProvider);
-      categories = await categoriesRepo.getCategories();
+      categories = await _categoriesRepo.getCategories();
     } catch (e) {
       debugPrint('Error loading categories: $e');
     } finally {
@@ -393,8 +394,6 @@ class ProductFormController extends StateNotifier<ProductFormState> {
     state = state.copyWith(isSubmitting: true);
 
     try {
-      final productsRepo = ref.read(productsRepositoryProvider);
-
       // رفع الصور أولاً
       List<String> imageUrls = [];
       for (final image in state.images) {
@@ -406,7 +405,7 @@ class ProductFormController extends StateNotifier<ProductFormState> {
           ? imageUrls[state.mainImageIndex]
           : null;
 
-      await productsRepo.createProduct(
+      await _productsRepo.createProduct(
         name: state.name,
         price: state.price ?? 0,
         stock: state.stock ?? 0,
@@ -550,17 +549,13 @@ class ProductFormController extends StateNotifier<ProductFormState> {
 
 /// Provider للمتحكم
 final productFormControllerProvider = StateNotifierProvider.autoDispose
-    .family<ProductFormController, ProductFormState, ProductFormParams>((
-      ref,
-      params,
-    ) {
-      return ProductFormController(
-        ref,
-        initialType: params.initialType,
-        initialName: params.initialName,
-        initialPrice: params.initialPrice,
-      );
-    });
+    .family<ProductFormController, ProductFormState, ProductFormParams>(
+      (ref, params) => ProductFormController(
+        categoriesRepo: ref.watch(categoriesRepositoryProvider),
+        productsRepo: ref.watch(productsRepositoryProvider),
+        params: params,
+      ),
+    );
 
 /// معاملات إنشاء المتحكم
 class ProductFormParams {

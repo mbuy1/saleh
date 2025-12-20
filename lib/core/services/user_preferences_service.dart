@@ -10,9 +10,9 @@ final userPreferencesProvider = Provider<UserPreferencesService>((ref) {
 
 /// مزود حالة التفضيلات
 final preferencesStateProvider =
-    StateNotifierProvider<PreferencesNotifier, UserPreferences>((ref) {
-  return PreferencesNotifier(ref.read(userPreferencesProvider));
-});
+    StateNotifierProvider<PreferencesNotifier, UserPreferences>(
+      (ref) => PreferencesNotifier(ref.watch(userPreferencesProvider)),
+    );
 
 /// خدمة تفضيلات المستخدم الشاملة
 /// تدير جميع إعدادات وتفضيلات المستخدم
@@ -22,11 +22,13 @@ class UserPreferencesService {
   // ============================================================================
   // Keys
   // ============================================================================
-  static const String keyOnboardingComplete = '${_keyPrefix}onboarding_complete';
+  static const String keyOnboardingComplete =
+      '${_keyPrefix}onboarding_complete';
   static const String keyOnboardingStep = '${_keyPrefix}onboarding_step';
   static const String keyShortcuts = '${_keyPrefix}shortcuts';
   static const String keyQuickActions = '${_keyPrefix}quick_actions';
-  static const String keyNotificationSettings = '${_keyPrefix}notification_settings';
+  static const String keyNotificationSettings =
+      '${_keyPrefix}notification_settings';
   static const String keyHomeLayout = '${_keyPrefix}home_layout';
   static const String keyThemeMode = '${_keyPrefix}theme_mode';
   static const String keyLanguage = '${_keyPrefix}language';
@@ -309,21 +311,21 @@ class NotificationSettings {
   }
 
   Map<String, dynamic> toJson() => {
-        'enabled': enabled,
-        'new_orders': newOrders,
-        'order_status': orderStatus,
-        'low_stock': lowStock,
-        'customer_messages': customerMessages,
-        'reviews': reviews,
-        'promotions': promotions,
-        'system_updates': systemUpdates,
-        'reports': reports,
-        'sound': sound,
-        'vibration': vibration,
-        'quiet_mode': quietMode,
-        'quiet_start_hour': quietStartHour,
-        'quiet_end_hour': quietEndHour,
-      };
+    'enabled': enabled,
+    'new_orders': newOrders,
+    'order_status': orderStatus,
+    'low_stock': lowStock,
+    'customer_messages': customerMessages,
+    'reviews': reviews,
+    'promotions': promotions,
+    'system_updates': systemUpdates,
+    'reports': reports,
+    'sound': sound,
+    'vibration': vibration,
+    'quiet_mode': quietMode,
+    'quiet_start_hour': quietStartHour,
+    'quiet_end_hour': quietEndHour,
+  };
 
   NotificationSettings copyWith({
     bool? enabled,
@@ -414,11 +416,11 @@ class PreferencesNotifier extends StateNotifier<UserPreferences> {
   final UserPreferencesService _service;
 
   PreferencesNotifier(this._service) : super(const UserPreferences()) {
-    loadAll();
+    _loadAllAsync();
   }
 
   /// تحميل جميع التفضيلات
-  Future<void> loadAll() async {
+  Future<void> _loadAllAsync() async {
     state = state.copyWith(isLoading: true);
 
     final shortcuts = await _service.getShortcuts();
@@ -439,6 +441,11 @@ class PreferencesNotifier extends StateNotifier<UserPreferences> {
       language: language,
       onboardingComplete: onboardingComplete,
     );
+  }
+
+  /// تحميل جميع التفضيلات
+  Future<void> loadAll() async {
+    await _loadAllAsync();
   }
 
   /// تحديث الاختصارات

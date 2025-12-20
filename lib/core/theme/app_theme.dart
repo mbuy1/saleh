@@ -11,7 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 // ║   ⛔ DO NOT MODIFY colors or design without EXPLICIT owner request        ║
 // ║                                                                           ║
 // ║   الألوان المعتمدة:                                                       ║
-// ║   • Primary: Oxford Blue #00214A (الثقة والاحترافية)                      ║
+// ║   • Primary: Teal Green #215950 (الثقة والاحترافية)                       ║
 // ║   • Secondary: Teal #00B4B4 (الحداثة والانتعاش)                           ║
 // ║   • Accent: Orange #FF6B35 (الإجراءات والتحفيز)                           ║
 // ║                                                                           ║
@@ -28,12 +28,12 @@ class AppTheme {
   // E-commerce Color Palette - Oxford Blue Theme
   // ============================================================================
 
-  // === Primary Colors (Oxford Blue - الأزرق الأكسفوردي) ===
+  // === Primary Colors (Teal Green - الأخضر الفيروزي) ===
   static const Color primaryColor = Color(
-    0xFF00214A,
-  ); // Oxford Blue - اللون الأساسي
-  static const Color primaryLight = Color(0xFF003366); // Oxford Blue Light
-  static const Color primaryDark = Color(0xFF001830); // Oxford Blue Dark
+    0xFF215950,
+  ); // Teal Green - اللون الأساسي
+  static const Color primaryLight = Color(0xFF2D7A6E); // Teal Green Light
+  static const Color primaryDark = Color(0xFF153B35); // Teal Green Dark
 
   // === Purple Colors (Reduced Usage) ===
   static const Color purpleColor = Color(

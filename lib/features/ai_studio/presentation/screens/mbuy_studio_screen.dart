@@ -240,28 +240,181 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
   Widget _buildBigCardsSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _buildBigCard(
-              context: context,
-              title: 'تعديل الصورة',
-              icon: Icons.image_outlined,
-              hasProBadge: true,
-              onTap: () => _openImageEdit(context),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildBigCard(
-              context: context,
-              title: 'فيديو جديد',
-              icon: Icons.add_circle_outline,
-              isVideo: true,
-              onTap: () => _openVideoNew(context),
-            ),
+          // AI Content Studio - Featured Card
+          _buildFeaturedStudioCard(context),
+          const SizedBox(height: 12),
+          // Original Big Cards Row
+          Row(
+            children: [
+              Expanded(
+                child: _buildBigCard(
+                  context: context,
+                  title: 'تعديل الصورة',
+                  icon: Icons.image_outlined,
+                  hasProBadge: true,
+                  onTap: () => _openImageEdit(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBigCard(
+                  context: context,
+                  title: 'فيديو جديد',
+                  icon: Icons.add_circle_outline,
+                  isVideo: true,
+                  onTap: () => _openVideoNew(context),
+                ),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  // Featured AI Content Studio Card
+  Widget _buildFeaturedStudioCard(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (!_checkAuth()) return;
+          context.push('/dashboard/studio');
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFA855F7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Left side - Text content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // NEW badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.auto_awesome,
+                            size: 14,
+                            color: Colors.amber,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            'جديد',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Title
+                    const Text(
+                      'استوديو المحتوى بالذكاء الاصطناعي',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Description
+                    Text(
+                      'أنشئ فيديوهات احترافية من النص في دقائق',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Features row
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        _buildFeatureChip('سيناريو AI'),
+                        _buildFeatureChip('صور AI'),
+                        _buildFeatureChip('صوت AI'),
+                        _buildFeatureChip('فيديو AI'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Right side - Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.movie_creation_outlined,
+                  size: 40,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureChip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -519,38 +672,59 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
 
   Widget _buildToolTile(BuildContext context, int index) {
     final tools = [
-      {'title': 'المساحة', 'icon': Icons.cloud_outlined, 'hasPro': false},
+      {
+        'title': 'استوديو المحتوى',
+        'icon': Icons.movie_creation_outlined,
+        'hasPro': false,
+        'isNew': true,
+      },
+      {
+        'title': 'المساحة',
+        'icon': Icons.cloud_outlined,
+        'hasPro': false,
+        'isNew': false,
+      },
       {
         'title': 'التنميق',
         'icon': Icons.auto_fix_high_outlined,
         'hasPro': false,
+        'isNew': false,
       },
-      {'title': 'AutoCut', 'icon': Icons.play_circle_outline, 'hasPro': false},
+      {
+        'title': 'AutoCut',
+        'icon': Icons.play_circle_outline,
+        'hasPro': false,
+        'isNew': false,
+      },
       {
         'title': 'أدوات الصور',
         'icon': Icons.camera_alt_outlined,
         'hasPro': false,
+        'isNew': false,
       },
       {
         'title': 'التحسين التلقائي',
         'icon': Icons.auto_awesome_outlined,
         'hasPro': false,
+        'isNew': false,
       },
       {
         'title': 'أداة تعديل سطح المكتب',
         'icon': Icons.desktop_windows_outlined,
         'hasPro': true,
+        'isNew': false,
       },
       {
         'title': 'الشرح التلقائي',
         'icon': Icons.subtitles_outlined,
         'hasPro': false,
+        'isNew': false,
       },
-      {'title': 'إزالة الخلفية', 'icon': Icons.person_outline, 'hasPro': false},
       {
-        'title': 'أدوات التسويق',
-        'icon': Icons.shopping_bag_outlined,
+        'title': 'إزالة الخلفية',
+        'icon': Icons.person_outline,
         'hasPro': false,
+        'isNew': false,
       },
     ];
 
@@ -576,7 +750,9 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
                   Icon(
                     tool['icon'] as IconData,
                     size: 26,
-                    color: AppTheme.primaryColor,
+                    color: tool['isNew'] == true
+                        ? const Color(0xFF8B5CF6)
+                        : AppTheme.primaryColor,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -592,6 +768,31 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
                   ),
                 ],
               ),
+              if (tool['isNew'] == true)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'جديد',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               if (tool['hasPro'] == true)
                 Positioned(
                   top: 0,
@@ -674,7 +875,13 @@ class _MbuyStudioScreenState extends ConsumerState<MbuyStudioScreen> {
     final toolRoutes = {
       'أدوات التسويق': '/dashboard/marketing',
       'تعديل الصور AI': '/dashboard/studio',
+      'استوديو المحتوى': '/dashboard/studio',
     };
+
+    // Check auth for studio
+    if (toolName == 'استوديو المحتوى') {
+      if (!_checkAuth()) return;
+    }
 
     final route = toolRoutes[toolName];
     if (route != null) {

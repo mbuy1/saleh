@@ -103,4 +103,3 @@ final currentAppProvider = Provider<CurrentApp>((ref) {
 final isMerchantAppProvider = Provider<bool>((ref) {
   return ref.watch(rootControllerProvider).isMerchantApp;
 });
-
