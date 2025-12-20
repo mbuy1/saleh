@@ -130,10 +130,9 @@ class MerchantStoreController extends StateNotifier<MerchantStoreState> {
 
 /// Provider للـ MerchantStoreController
 final merchantStoreControllerProvider =
-    StateNotifierProvider<MerchantStoreController, MerchantStoreState>((ref) {
-      final repository = ref.watch(merchantRepositoryProvider);
-      return MerchantStoreController(repository);
-    });
+    StateNotifierProvider<MerchantStoreController, MerchantStoreState>(
+      (ref) => MerchantStoreController(ref.watch(merchantRepositoryProvider)),
+    );
 
 /// Provider لحالة المتجر فقط
 final merchantStoreProvider = Provider<Store?>((ref) {

@@ -47,6 +47,7 @@ import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
 import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
+import '../../features/studio/studio.dart';
 import '../../features/merchant/screens/abandoned_cart_screen.dart';
 import '../../features/merchant/screens/referral_screen.dart';
 import '../../features/merchant/screens/loyalty_program_screen.dart';
@@ -373,6 +374,61 @@ class AppRouter {
                   path: 'ai-generation',
                   name: 'ai-generation',
                   builder: (context, state) => const MbuyStudioScreen(),
+                ),
+                // ====== استوديو المحتوى AI ======
+                GoRoute(
+                  path: 'studio',
+                  name: 'studio',
+                  builder: (context, state) => const StudioHomeScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'script-generator',
+                      name: 'studio-script',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final template = extra?['template'] as StudioTemplate?;
+                        return ScriptGeneratorScreen(template: template);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'editor',
+                      name: 'studio-editor',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final projectId = extra?['projectId'] as String? ?? '';
+                        final script = extra?['script'] as ScriptData?;
+                        return SceneEditorScreen(
+                          projectId: projectId,
+                          initialScript: script,
+                        );
+                      },
+                    ),
+                    GoRoute(
+                      path: 'canvas',
+                      name: 'studio-canvas',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final scene = extra?['scene'] as Scene;
+                        return CanvasEditorScreen(scene: scene);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'preview',
+                      name: 'studio-preview',
+                      builder: (context, state) {
+                        return ComingSoonScreen(title: 'معاينة الفيديو');
+                      },
+                    ),
+                    GoRoute(
+                      path: 'export',
+                      name: 'studio-export',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final projectId = extra?['projectId'] as String? ?? '';
+                        return ExportScreen(projectId: projectId);
+                      },
+                    ),
+                  ],
                 ),
                 // ====== أدوات AI الإضافية ======
                 GoRoute(

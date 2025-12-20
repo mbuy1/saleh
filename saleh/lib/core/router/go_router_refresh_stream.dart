@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// Helper class لجعل GoRouter يستمع لتغييرات StateNotifier
-/// يتم استخدامه في جميع Routers لتحديث التنقل عند تغيير حالة المصادقة
+/// Helper class لجعل GoRouter يستمع لتغييرات Stream
+/// يستخدم مع StateNotifier.stream لتحديث التنقل عند تغيير حالة المصادقة
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
@@ -19,4 +19,3 @@ class GoRouterRefreshStream extends ChangeNotifier {
     super.dispose();
   }
 }
-

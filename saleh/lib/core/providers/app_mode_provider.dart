@@ -50,11 +50,9 @@ class AppModeController extends StateNotifier<AppModeState> {
 }
 
 /// Provider لوضع التطبيق
-final appModeProvider = StateNotifierProvider<AppModeController, AppModeState>((
-  ref,
-) {
-  return AppModeController();
-});
+final appModeProvider = StateNotifierProvider<AppModeController, AppModeState>(
+  (ref) => AppModeController(),
+);
 
 /// Provider مختصر للوضع الحالي
 final currentAppModeProvider = Provider<AppMode>((ref) {

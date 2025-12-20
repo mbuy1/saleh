@@ -232,10 +232,7 @@ class AuthController extends StateNotifier<AuthState> {
 
 /// Provider لـ AuthController
 final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
-  (ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
-    return AuthController(authRepository);
-  },
+  (ref) => AuthController(ref.watch(authRepositoryProvider)),
 );
 
 /// Provider للتحقق السريع من حالة تسجيل الدخول

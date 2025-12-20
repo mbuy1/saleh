@@ -35,7 +35,11 @@ class ProductsController extends StateNotifier<ProductsState> {
 
   ProductsController(this._repository) : super(ProductsState()) {
     // جلب المنتجات عند إنشاء Controller
-    loadProducts();
+    _loadProductsAsync();
+  }
+
+  Future<void> _loadProductsAsync() async {
+    await loadProducts();
   }
 
   /// جلب قائمة المنتجات
@@ -184,10 +188,9 @@ class ProductsController extends StateNotifier<ProductsState> {
 
 /// Riverpod Provider for ProductsController
 final productsControllerProvider =
-    StateNotifierProvider<ProductsController, ProductsState>((ref) {
-      final repository = ref.watch(productsRepositoryProvider);
-      return ProductsController(repository);
-    });
+    StateNotifierProvider<ProductsController, ProductsState>(
+      (ref) => ProductsController(ref.watch(productsRepositoryProvider)),
+    );
 
 /// Provider للوصول السريع لقائمة المنتجات
 final productsListProvider = Provider<List<Product>>((ref) {
