@@ -55,6 +55,8 @@ dependencies:
   # SVG Icons
   flutter_svg: ^2.0.10+1
   path_provider: ^2.1.5
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +66,10 @@ dev_dependencies:
   
   # Code Generation for Riverpod
   riverpod_generator: ^2.3.9
-  build_runner: ^2.4.8
+  build_runner: ^2.5.4
+  mockito: ^5.4.6
+  freezed: ^3.1.0
+  json_serializable: ^6.9.5
 
 flutter:
   uses-material-design: true

@@ -373,7 +373,15 @@ class MerchantRouter {
                   builder: (context, state) {
                     final extra = state.extra as Map<String, dynamic>?;
                     final productType = extra?['productType'] as String?;
-                    return AddProductScreen(productType: productType);
+                    final quickAdd = extra?['quickAdd'] as bool? ?? false;
+                    final name = extra?['name'] as String?;
+                    final price = extra?['price'] as String?;
+                    return AddProductScreen(
+                      productType: productType,
+                      quickAdd: quickAdd,
+                      initialName: name,
+                      initialPrice: price,
+                    );
                   },
                 ),
                 GoRoute(

@@ -137,20 +137,6 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showProductTypeSelection(context),
-        backgroundColor: AppTheme.primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'إضافة منتج',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: AppDimensions.fontBody,
-          ),
-        ),
-      ),
     );
   }
 
@@ -205,85 +191,6 @@ class _ProductsTabState extends ConsumerState<ProductsTab>
     return products
         .where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
-  }
-
-  void _showProductTypeSelection(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'اختر نوع المنتج',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildProductTypeOption(
-                    context,
-                    'منتج ملموس',
-                    AppIcons.inventory2,
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    'خدمة حسب الطلب',
-                    AppIcons.edit,
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    'أكل ومشروبات',
-                    AppIcons.store, // أو أيقونة مناسبة
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    'منتج رقمي',
-                    AppIcons.downloadCloud,
-                  ),
-                  _buildProductTypeOption(
-                    context,
-                    'مجموعة منتجات',
-                    AppIcons.layers,
-                  ),
-                  _buildProductTypeOption(context, 'حجوزات', AppIcons.calendar),
-                  _buildProductTypeOption(
-                    context,
-                    'دروب شوبينق',
-                    AppIcons.importExport,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildProductTypeOption(
-    BuildContext context,
-    String title,
-    String icon,
-  ) {
-    return ListTile(
-      leading: AppIcon(icon, color: AppTheme.primaryColor),
-      title: Text(title),
-      onTap: () {
-        Navigator.pop(context);
-        context.push('/dashboard/products/add', extra: {'productType': title});
-      },
-    );
   }
 
   /// تبويب المنتجات المحذوفة

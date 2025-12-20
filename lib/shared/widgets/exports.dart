@@ -31,7 +31,7 @@ export '../../core/constants/app_icons.dart';
 // Shared Widgets - المكونات الأساسية
 // ============================================================================
 // نخفي المكونات المكررة من shared_widgets
-export 'shared_widgets.dart' hide MbuyButton, MbuyButtonType, MbuyCard;
+export 'shared_widgets.dart' hide MbuyButton, MbuyButtonType;
 
 // ============================================================================
 // Buttons - الأزرار

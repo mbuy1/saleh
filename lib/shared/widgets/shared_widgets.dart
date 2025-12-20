@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_icons.dart';
 import '../../core/theme/app_theme.dart';
+import 'mbuy_card.dart';
 
 /// ============================================================================
 /// Shared Widgets - مكونات مشتركة للتطبيق
@@ -348,69 +349,6 @@ class MbuyTextField extends StatelessWidget {
       ),
       validator: validator,
     );
-  }
-}
-
-/// بطاقة مخصصة للتطبيق
-class MbuyCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
-  final VoidCallback? onTap;
-  final Color? backgroundColor;
-  final double? borderRadius;
-
-  const MbuyCard({
-    super.key,
-    required this.child,
-    this.padding,
-    this.margin,
-    this.onTap,
-    this.backgroundColor,
-    this.borderRadius,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final card = Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        color: backgroundColor ?? AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? AppDimensions.radiusM,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: onTap != null
-          ? Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(
-                borderRadius ?? AppDimensions.radiusM,
-              ),
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(
-                  borderRadius ?? AppDimensions.radiusM,
-                ),
-                child: Padding(
-                  padding: padding ?? AppDimensions.screenPadding,
-                  child: child,
-                ),
-              ),
-            )
-          : Padding(
-              padding: padding ?? AppDimensions.screenPadding,
-              child: child,
-            ),
-    );
-
-    return card;
   }
 }
 
