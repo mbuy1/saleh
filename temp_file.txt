@@ -1,0 +1,373 @@
+﻿import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'studio_package.freezed.dart';
+part 'studio_package.g.dart';
+
+/// Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø­Ø²Ù…
+enum PackageType {
+  @JsonValue('motion_graphics')
+  motionGraphics,
+  @JsonValue('vlog')
+  vlog,
+  @JsonValue('ad_campaign')
+  adCampaign,
+  @JsonValue('ugc_video')
+  ugcVideo,
+  @JsonValue('social_ads')
+  socialAds,
+  @JsonValue('brand_identity')
+  brandIdentity,
+}
+
+/// Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù„Ø¨
+enum PackageStatus {
+  @JsonValue('draft')
+  draft,
+  @JsonValue('pending')
+  pending,
+  @JsonValue('processing')
+  processing,
+  @JsonValue('completed')
+  completed,
+  @JsonValue('failed')
+  failed,
+  @JsonValue('cancelled')
+  cancelled,
+}
+
+/// ØªØ¹Ø±ÙŠÙ Ø§Ù„Ø­Ø²Ù…Ø©
+@freezed
+class PackageDefinition with _$PackageDefinition {
+  const factory PackageDefinition({
+    required PackageType id,
+    required String name,
+    required String nameAr,
+    required String description,
+    required String descriptionAr,
+    required String icon,
+    required int creditsCost,
+    required int estimatedTimeMinutes,
+    required List<PackageDeliverable> deliverables,
+    required List<String> features,
+    required List<String> featuresAr,
+    @Default(false) bool isPremium,
+    @Default(false) bool isPopular,
+  }) = _PackageDefinition;
+
+  factory PackageDefinition.fromJson(Map<String, dynamic> json) =>
+      _$PackageDefinitionFromJson(json);
+}
+
+/// Ù…Ø­ØªÙˆÙ‰ Ø§Ù„ØªØ³Ù„ÙŠÙ…
+@freezed
+class PackageDeliverable with _$PackageDeliverable {
+  const factory PackageDeliverable({
+    required String type,
+    required String format,
+    required int quantity,
+    required String description,
+    required String descriptionAr,
+  }) = _PackageDeliverable;
+
+  factory PackageDeliverable.fromJson(Map<String, dynamic> json) =>
+      _$PackageDeliverableFromJson(json);
+}
+
+/// Ø·Ù„Ø¨ Ø­Ø²Ù…Ø©
+@freezed
+class PackageOrder with _$PackageOrder {
+  const factory PackageOrder({
+    required String id,
+    required String userId,
+    required String storeId,
+    required PackageType packageType,
+    required PackageStatus status,
+    String? productId,
+    required Map<String, dynamic> productData,
+    Map<String, dynamic>? brandData,
+    required Map<String, dynamic> preferences,
+    @Default([]) List<PackageDeliverableResult> deliverables,
+    @Default(0) int progress,
+    String? currentStep,
+    String? errorMessage,
+    required int creditsCost,
+    int? creditsRefunded,
+    DateTime? startedAt,
+    DateTime? completedAt,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) = _PackageOrder;
+
+  factory PackageOrder.fromJson(Map<String, dynamic> json) =>
+      _$PackageOrderFromJson(json);
+}
+
+/// Ù†ØªÙŠØ¬Ø© Ø§Ù„ØªØ³Ù„ÙŠÙ…
+@freezed
+class PackageDeliverableResult with _$PackageDeliverableResult {
+  const factory PackageDeliverableResult({
+    required String id,
+    required String type,
+    required String format,
+    required String url,
+    String? thumbnailUrl,
+    int? fileSizeBytes,
+    int? durationMs,
+    int? width,
+    int? height,
+    Map<String, dynamic>? metadata,
+    required DateTime createdAt,
+  }) = _PackageDeliverableResult;
+
+  factory PackageDeliverableResult.fromJson(Map<String, dynamic> json) =>
+      _$PackageDeliverableResultFromJson(json);
+}
+
+/// Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù†ØªØ¬ Ø§Ù„Ù…Ø¯Ø®Ù„Ø©
+@freezed
+class ProductInputData with _$ProductInputData {
+  const factory ProductInputData({
+    required String name,
+    String? nameAr,
+    String? description,
+    String? descriptionAr,
+    double? price,
+    String? currency,
+    String? category,
+    @Default([]) List<String> images,
+    @Default([]) List<String> features,
+    String? targetAudience,
+    @Default([]) List<String> uniqueSellingPoints,
+  }) = _ProductInputData;
+
+  factory ProductInputData.fromJson(Map<String, dynamic> json) =>
+      _$ProductInputDataFromJson(json);
+}
+
+/// Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù„Ø§Ù…Ø© Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ©
+@freezed
+class BrandInputData with _$BrandInputData {
+  const factory BrandInputData({
+    required String storeName,
+    String? storeNameAr,
+    String? tagline,
+    String? taglineAr,
+    String? primaryColor,
+    String? secondaryColor,
+    String? existingLogoUrl,
+    String? industry,
+    @Default([]) List<String> stylePreferences,
+  }) = _BrandInputData;
+
+  factory BrandInputData.fromJson(Map<String, dynamic> json) =>
+      _$BrandInputDataFromJson(json);
+}
+
+/// ØªÙØ¶ÙŠÙ„Ø§Øª Ø§Ù„Ø­Ø²Ù…Ø©
+@freezed
+class PackagePreferences with _$PackagePreferences {
+  const factory PackagePreferences({
+    @Default('ar') String language,
+    String? tone,
+    int? durationSeconds,
+    String? aspectRatio,
+    @Default([]) List<String> platforms,
+    String? musicStyle,
+    String? voiceGender,
+    @Default(false) bool includeSubtitles,
+    String? customInstructions,
+  }) = _PackagePreferences;
+
+  factory PackagePreferences.fromJson(Map<String, dynamic> json) =>
+      _$PackagePreferencesFromJson(json);
+}
+
+/// Ø§Ù„Ø­Ø²Ù… Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ© (Ù„Ù„Ø¹Ø±Ø¶ Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„)
+List<PackageDefinition> getDefaultPackages() => [
+  const PackageDefinition(
+    id: PackageType.motionGraphics,
+    name: 'Motion Graphics',
+    nameAr: 'Ù…ÙˆØ´Ù† Ø¬Ø±Ø§ÙÙŠÙƒ',
+    description: 'Professional animated video for your product',
+    descriptionAr: 'ÙÙŠØ¯ÙŠÙˆ Ù…ØªØ­Ø±Ùƒ Ø§Ø­ØªØ±Ø§ÙÙŠ Ù„Ù…Ù†ØªØ¬Ùƒ',
+    icon: 'movie_filter',
+    creditsCost: 50,
+    estimatedTimeMinutes: 15,
+    deliverables: [
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 1,
+        description: '30s Motion Graphics Video',
+        descriptionAr: 'ÙÙŠØ¯ÙŠÙˆ Ù…ÙˆØ´Ù† Ø¬Ø±Ø§ÙÙŠÙƒ 30 Ø«Ø§Ù†ÙŠØ©',
+      ),
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 1,
+        description: '15s Short Version',
+        descriptionAr: 'Ù†Ø³Ø®Ø© Ù‚ØµÙŠØ±Ø© 15 Ø«Ø§Ù†ÙŠØ©',
+      ),
+    ],
+    features: [
+      'AI-generated script',
+      'Professional animations',
+      'Background music',
+    ],
+    featuresAr: [
+      'Ø³ÙŠÙ†Ø§Ø±ÙŠÙˆ Ø¨Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ',
+      'Ø±Ø³ÙˆÙ… Ù…ØªØ­Ø±ÙƒØ© Ø§Ø­ØªØ±Ø§ÙÙŠØ©',
+      'Ù…ÙˆØ³ÙŠÙ‚Ù‰ Ø®Ù„ÙÙŠØ©',
+    ],
+    isPremium: false,
+    isPopular: true,
+  ),
+  const PackageDefinition(
+    id: PackageType.vlog,
+    name: 'Vlog Video',
+    nameAr: 'ÙÙ„ÙˆÙ‚ ÙÙŠØ¯ÙŠÙˆ',
+    description: 'AI presenter talking about your product',
+    descriptionAr: 'Ù…Ù‚Ø¯Ù… Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ÙŠØªØ­Ø¯Ø« Ø¹Ù† Ù…Ù†ØªØ¬Ùƒ',
+    icon: 'person_play',
+    creditsCost: 80,
+    estimatedTimeMinutes: 20,
+    deliverables: [
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 1,
+        description: '1-2 min Vlog Video',
+        descriptionAr: 'ÙÙŠØ¯ÙŠÙˆ ÙÙ„ÙˆÙ‚ 1-2 Ø¯Ù‚ÙŠÙ‚Ø©',
+      ),
+    ],
+    features: ['AI Avatar presenter', 'Natural voice', 'Product showcase'],
+    featuresAr: ['Ù…Ù‚Ø¯Ù… Ø£ÙØ§ØªØ§Ø± Ø°ÙƒÙŠ', 'ØµÙˆØª Ø·Ø¨ÙŠØ¹ÙŠ', 'Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù†ØªØ¬'],
+    isPremium: true,
+    isPopular: false,
+  ),
+  const PackageDefinition(
+    id: PackageType.adCampaign,
+    name: 'Ad Campaign',
+    nameAr: 'Ø­Ù…Ù„Ø© Ø¥Ø¹Ù„Ø§Ù†ÙŠØ©',
+    description: 'Complete ad package for all platforms',
+    descriptionAr: 'Ø­Ø²Ù…Ø© Ø¥Ø¹Ù„Ø§Ù†ÙŠØ© ÙƒØ§Ù…Ù„Ø© Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù†ØµØ§Øª',
+    icon: 'campaign',
+    creditsCost: 100,
+    estimatedTimeMinutes: 25,
+    deliverables: [
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 3,
+        description: 'Ad Videos (15s, 30s, 60s)',
+        descriptionAr: 'ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ø¥Ø¹Ù„Ø§Ù†ÙŠØ©',
+      ),
+      PackageDeliverable(
+        type: 'image',
+        format: 'png',
+        quantity: 5,
+        description: 'Static Ad Images',
+        descriptionAr: 'ØµÙˆØ± Ø¥Ø¹Ù„Ø§Ù†ÙŠØ© Ø«Ø§Ø¨ØªØ©',
+      ),
+    ],
+    features: ['Multi-platform formats', 'A/B variations', 'Ad copy included'],
+    featuresAr: ['ØµÙŠØº Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù†ØµØ§Øª', 'Ù†Ø³Ø® A/B', 'Ù†ØµÙˆØµ Ø¥Ø¹Ù„Ø§Ù†ÙŠØ© Ø¬Ø§Ù‡Ø²Ø©'],
+    isPremium: false,
+    isPopular: true,
+  ),
+  const PackageDefinition(
+    id: PackageType.ugcVideo,
+    name: 'UGC Video',
+    nameAr: 'ÙÙŠØ¯ÙŠÙˆ UGC',
+    description: 'User-generated content style review video',
+    descriptionAr: 'ÙÙŠØ¯ÙŠÙˆ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨Ø£Ø³Ù„ÙˆØ¨ UGC',
+    icon: 'video_camera_front',
+    creditsCost: 70,
+    estimatedTimeMinutes: 18,
+    deliverables: [
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 1,
+        description: '30-60s UGC Review',
+        descriptionAr: 'Ù…Ø±Ø§Ø¬Ø¹Ø© UGC 30-60 Ø«Ø§Ù†ÙŠØ©',
+      ),
+    ],
+    features: ['Realistic AI presenter', 'Authentic style', 'Call to action'],
+    featuresAr: ['Ù…Ù‚Ø¯Ù… ÙˆØ§Ù‚Ø¹ÙŠ', 'Ø£Ø³Ù„ÙˆØ¨ Ø£ØµÙŠÙ„', 'Ø¯Ø¹ÙˆØ© Ù„Ù„Ø¥Ø¬Ø±Ø§Ø¡'],
+    isPremium: true,
+    isPopular: true,
+  ),
+  const PackageDefinition(
+    id: PackageType.socialAds,
+    name: 'Social Media Ads',
+    nameAr: 'Ø¥Ø¹Ù„Ø§Ù†Ø§Øª Ø³ÙˆØ´Ù„ Ù…ÙŠØ¯ÙŠØ§',
+    description: 'Ready-to-post content for all platforms',
+    descriptionAr: 'Ù…Ø­ØªÙˆÙ‰ Ø¬Ø§Ù‡Ø² Ù„Ù„Ù†Ø´Ø±',
+    icon: 'share',
+    creditsCost: 40,
+    estimatedTimeMinutes: 10,
+    deliverables: [
+      PackageDeliverable(
+        type: 'image',
+        format: 'png',
+        quantity: 10,
+        description: 'Social Media Posts',
+        descriptionAr: 'Ù…Ù†Ø´ÙˆØ±Ø§Øª Ø³ÙˆØ´Ù„ Ù…ÙŠØ¯ÙŠØ§',
+      ),
+      PackageDeliverable(
+        type: 'video',
+        format: 'mp4',
+        quantity: 3,
+        description: 'Story/Reel Videos',
+        descriptionAr: 'ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ø³ØªÙˆØ±ÙŠ/Ø±ÙŠÙ„Ø²',
+      ),
+    ],
+    features: ['All platform sizes', 'Stories & Reels', 'Captions included'],
+    featuresAr: ['Ø¬Ù…ÙŠØ¹ Ø£Ø­Ø¬Ø§Ù… Ø§Ù„Ù…Ù†ØµØ§Øª', 'Ø³ØªÙˆØ±ÙŠØ² ÙˆØ±ÙŠÙ„Ø²', 'Ù†ØµÙˆØµ Ø¬Ø§Ù‡Ø²Ø©'],
+    isPremium: false,
+    isPopular: false,
+  ),
+  const PackageDefinition(
+    id: PackageType.brandIdentity,
+    name: 'Brand Identity',
+    nameAr: 'Ù‡ÙˆÙŠØ© Ø¨ØµØ±ÙŠØ©',
+    description: 'Complete visual identity for your store',
+    descriptionAr: 'Ù‡ÙˆÙŠØ© Ø¨ØµØ±ÙŠØ© ÙƒØ§Ù…Ù„Ø© Ù„Ù…ØªØ¬Ø±Ùƒ',
+    icon: 'palette',
+    creditsCost: 150,
+    estimatedTimeMinutes: 30,
+    deliverables: [
+      PackageDeliverable(
+        type: 'logo',
+        format: 'svg',
+        quantity: 1,
+        description: 'Primary Logo',
+        descriptionAr: 'Ø§Ù„Ø´Ø¹Ø§Ø± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ',
+      ),
+      PackageDeliverable(
+        type: 'image',
+        format: 'png',
+        quantity: 5,
+        description: 'Social Media Kit',
+        descriptionAr: 'Ø­Ø²Ù…Ø© Ø³ÙˆØ´Ù„ Ù…ÙŠØ¯ÙŠØ§',
+      ),
+      PackageDeliverable(
+        type: 'document',
+        format: 'pdf',
+        quantity: 1,
+        description: 'Brand Guidelines',
+        descriptionAr: 'Ø¯Ù„ÙŠÙ„ Ø§Ù„Ù‡ÙˆÙŠØ© Ø§Ù„Ø¨ØµØ±ÙŠØ©',
+      ),
+    ],
+    features: [
+      'Logo design',
+      'Color palette',
+      'Typography',
+      'Brand guidelines',
+    ],
+    featuresAr: ['ØªØµÙ…ÙŠÙ… Ø§Ù„Ø´Ø¹Ø§Ø±', 'Ù„ÙˆØ­Ø© Ø§Ù„Ø£Ù„ÙˆØ§Ù†', 'Ø§Ù„Ø®Ø·ÙˆØ·', 'Ø¯Ù„ÙŠÙ„ Ø§Ù„Ù‡ÙˆÙŠØ©'],
+    isPremium: true,
+    isPopular: true,
+  ),
+];
