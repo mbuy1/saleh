@@ -17,7 +17,6 @@ import '../../features/dashboard/presentation/screens/shortcuts_screen.dart';
 import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
 import '../../features/dashboard/presentation/screens/notifications_screen.dart';
 import '../../features/dashboard/presentation/screens/customers_screen.dart';
-import '../../features/dashboard/presentation/screens/mbuy_packages_screen.dart';
 import '../../features/dashboard/presentation/screens/reports_screen.dart';
 // Finance
 import '../../features/finance/presentation/screens/wallet_screen.dart';
@@ -46,7 +45,6 @@ import '../../features/conversations/presentation/screens/conversations_screen.d
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
-import '../../features/ai_studio/presentation/screens/mbuy_studio_screen.dart';
 import '../../features/studio/studio.dart';
 import '../../features/merchant/screens/abandoned_cart_screen.dart';
 import '../../features/merchant/screens/referral_screen.dart';
@@ -197,7 +195,7 @@ class AppRouter {
                 GoRoute(
                   path: 'studio',
                   name: 'mbuy-studio',
-                  builder: (context, state) => const MbuyStudioScreen(),
+                  builder: (context, state) => const StudioMainPage(),
                 ),
                 GoRoute(
                   path: 'tools',
@@ -294,7 +292,7 @@ class AppRouter {
                 GoRoute(
                   path: 'packages',
                   name: 'packages',
-                  builder: (context, state) => const MbuyPackagesScreen(),
+                  builder: (context, state) => const PackagesPage(),
                 ),
                 GoRoute(
                   path: 'reports',
@@ -369,11 +367,11 @@ class AppRouter {
                   name: 'store-tools',
                   builder: (context, state) => const StoreToolsTab(),
                 ),
-                // صفحة توليد AI (قديمة - للتوافق)
+                // صفحة توليد AI (للتوافق - تحويل للصفحة الجديدة)
                 GoRoute(
                   path: 'ai-generation',
                   name: 'ai-generation',
-                  builder: (context, state) => const MbuyStudioScreen(),
+                  builder: (context, state) => const StudioMainPage(),
                 ),
                 // ====== استوديو المحتوى AI ======
                 GoRoute(

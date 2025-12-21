@@ -560,6 +560,531 @@ class StudioApiService {
       'updatedAt': data['updated_at'],
     };
   }
+
+  // =====================================================
+  // Edit Tools - أدوات التحرير
+  // =====================================================
+
+  /// إزالة الخلفية
+  Future<({String resultUrl, int creditsUsed})> removeBackground({
+    required String imageUrl,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/remove-background'),
+      headers: _headers,
+      body: jsonEncode({'imageUrl': imageUrl}),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(3, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إزالة الخلفية', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      resultUrl: data['resultUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 3) as int,
+    );
+  }
+
+  /// تحسين جودة الصورة
+  Future<({String resultUrl, int creditsUsed})> enhanceImage({
+    required String imageUrl,
+    String enhanceType = 'general',
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/enhance-quality'),
+      headers: _headers,
+      body: jsonEncode({'imageUrl': imageUrl, 'enhanceType': enhanceType}),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(2, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في تحسين الصورة', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      resultUrl: data['resultUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 2) as int,
+    );
+  }
+
+  /// تغيير حجم الصورة
+  Future<({String resultUrl, int creditsUsed})> resizeImage({
+    required String imageUrl,
+    required int width,
+    required int height,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/resize'),
+      headers: _headers,
+      body: jsonEncode({
+        'imageUrl': imageUrl,
+        'width': width,
+        'height': height,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في تغيير الحجم', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      resultUrl: data['resultUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 1) as int,
+    );
+  }
+
+  /// قص الفيديو
+  Future<({String jobId, int creditsUsed})> trimVideo({
+    required String videoUrl,
+    required int startMs,
+    required int endMs,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/trim-video'),
+      headers: _headers,
+      body: jsonEncode({
+        'videoUrl': videoUrl,
+        'startMs': startMs,
+        'endMs': endMs,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في قص الفيديو', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 2) as int,
+    );
+  }
+
+  /// دمج فيديوهات
+  Future<({String jobId, int creditsUsed})> mergeVideos({
+    required List<String> videoUrls,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/merge-videos'),
+      headers: _headers,
+      body: jsonEncode({'videoUrls': videoUrls}),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في دمج الفيديوهات', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 3) as int,
+    );
+  }
+
+  /// إضافة موسيقى
+  Future<({String jobId, int creditsUsed})> addMusic({
+    required String videoUrl,
+    required String audioUrl,
+    double volume = 0.5,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/add-music'),
+      headers: _headers,
+      body: jsonEncode({
+        'videoUrl': videoUrl,
+        'audioUrl': audioUrl,
+        'volume': volume,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إضافة الموسيقى', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 2) as int,
+    );
+  }
+
+  /// إضافة ترجمة
+  Future<({String jobId, int creditsUsed})> addSubtitles({
+    required String videoUrl,
+    required String subtitlesText,
+    String fontColor = '#FFFFFF',
+    int fontSize = 24,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/add-subtitles'),
+      headers: _headers,
+      body: jsonEncode({
+        'videoUrl': videoUrl,
+        'subtitlesText': subtitlesText,
+        'fontColor': fontColor,
+        'fontSize': fontSize,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إضافة الترجمة', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 2) as int,
+    );
+  }
+
+  /// تحويل فيديو إلى GIF
+  Future<({String jobId, int creditsUsed})> videoToGif({
+    required String videoUrl,
+    int fps = 15,
+    int width = 480,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/edit/video-to-gif'),
+      headers: _headers,
+      body: jsonEncode({'videoUrl': videoUrl, 'fps': fps, 'width': width}),
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في التحويل', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 1) as int,
+    );
+  }
+
+  // =====================================================
+  // Generate Tools - أدوات الإنشاء
+  // =====================================================
+
+  /// إنشاء صور منتج
+  Future<({List<String> imageUrls, int creditsUsed})> generateProductImages({
+    required String productName,
+    required String productDescription,
+    String style = 'modern',
+    int count = 4,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/product-images'),
+      headers: _headers,
+      body: jsonEncode({
+        'productName': productName,
+        'productDescription': productDescription,
+        'style': style,
+        'count': count,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(8, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء الصور', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      imageUrls: List<String>.from(data['imageUrls'] ?? []),
+      creditsUsed: (data['creditsUsed'] ?? 8) as int,
+    );
+  }
+
+  /// إنشاء بانر
+  Future<({String imageUrl, int creditsUsed})> generateBanner({
+    required String title,
+    String? subtitle,
+    String style = 'modern',
+    String size = '1200x628',
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/banner'),
+      headers: _headers,
+      body: jsonEncode({
+        'title': title,
+        'subtitle': subtitle,
+        'style': style,
+        'size': size,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(3, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء البانر', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      imageUrl: data['imageUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 3) as int,
+    );
+  }
+
+  /// إنشاء شعار
+  Future<({List<String> logoUrls, int creditsUsed})> generateLogo({
+    required String brandName,
+    String? brandDescription,
+    String style = 'modern',
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/logo'),
+      headers: _headers,
+      body: jsonEncode({
+        'brandName': brandName,
+        'brandDescription': brandDescription,
+        'style': style,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(10, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء الشعار', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      logoUrls: List<String>.from(data['logoUrls'] ?? []),
+      creditsUsed: (data['creditsUsed'] ?? 10) as int,
+    );
+  }
+
+  /// إنشاء صورة متحركة
+  Future<({String videoUrl, int creditsUsed})> generateAnimatedImage({
+    required String imageUrl,
+    String motionType = 'zoom',
+    int durationMs = 3000,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/animated-image'),
+      headers: _headers,
+      body: jsonEncode({
+        'imageUrl': imageUrl,
+        'motionType': motionType,
+        'durationMs': durationMs,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(5, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء الصورة المتحركة', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      videoUrl: data['videoUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 5) as int,
+    );
+  }
+
+  /// إنشاء فيديو قصير
+  Future<({String jobId, int creditsUsed})> generateShortVideo({
+    required String prompt,
+    int durationSeconds = 5,
+    String aspectRatio = '9:16',
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/short-video'),
+      headers: _headers,
+      body: jsonEncode({
+        'prompt': prompt,
+        'durationSeconds': durationSeconds,
+        'aspectRatio': aspectRatio,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(15, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء الفيديو', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      jobId: data['jobId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 15) as int,
+    );
+  }
+
+  /// إنشاء صفحة هبوط
+  Future<({String htmlContent, String previewUrl, int creditsUsed})>
+  generateLandingPage({
+    required String productName,
+    required String productDescription,
+    String? productImageUrl,
+    String template = 'modern',
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/tools/generate/landing-page'),
+      headers: _headers,
+      body: jsonEncode({
+        'productName': productName,
+        'productDescription': productDescription,
+        'productImageUrl': productImageUrl,
+        'template': template,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(20, 0);
+    }
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في إنشاء صفحة الهبوط', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      htmlContent: data['htmlContent'] as String,
+      previewUrl: data['previewUrl'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 20) as int,
+    );
+  }
+
+  // =====================================================
+  // Packages - الباقات
+  // =====================================================
+
+  /// الحصول على تعريفات الباقات
+  Future<List<Map<String, dynamic>>> getPackageDefinitions() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/secure/studio/packages/definitions'),
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في جلب الباقات', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['packages'] ?? []);
+  }
+
+  /// طلب باقة
+  Future<({String orderId, int creditsUsed})> orderPackage({
+    required String packageType,
+    required Map<String, dynamic> productData,
+    Map<String, dynamic>? brandData,
+    Map<String, dynamic>? preferences,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/packages/orders'),
+      headers: _headers,
+      body: jsonEncode({
+        'packageType': packageType,
+        'productData': productData,
+        'brandData': brandData,
+        'preferences': preferences,
+      }),
+    );
+
+    if (response.statusCode == 402) {
+      throw InsufficientCreditsException(50, 0);
+    }
+
+    if (response.statusCode != 201) {
+      throw ApiException('فشل في طلب الباقة', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      orderId: data['orderId'] as String,
+      creditsUsed: (data['creditsUsed'] ?? 50) as int,
+    );
+  }
+
+  /// الحصول على حالة طلب باقة
+  Future<Map<String, dynamic>> getPackageOrderStatus(String orderId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/secure/studio/packages/orders/$orderId'),
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في جلب حالة الطلب', response.statusCode);
+    }
+
+    return jsonDecode(response.body);
+  }
+
+  /// الحصول على طلبات الباقات
+  Future<List<Map<String, dynamic>>> getPackageOrders() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/secure/studio/packages/orders'),
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في جلب الطلبات', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['orders'] ?? []);
+  }
+
+  /// تطبيق مخرجات الباقة على المتجر
+  Future<void> applyPackageToStore(String orderId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/secure/studio/packages/orders/$orderId/apply'),
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في تطبيق الباقة', response.statusCode);
+    }
+  }
+
+  // =====================================================
+  // Job Status - حالة المهام
+  // =====================================================
+
+  /// التحقق من حالة مهمة
+  Future<({String status, String? resultUrl, String? error})> getJobStatus(
+    String jobId,
+  ) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/secure/studio/jobs/$jobId'),
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      throw ApiException('فشل في جلب حالة المهمة', response.statusCode);
+    }
+
+    final data = jsonDecode(response.body);
+    return (
+      status: data['status'] as String,
+      resultUrl: data['resultUrl'] as String?,
+      error: data['error'] as String?,
+    );
+  }
 }
 
 /// استثناء API

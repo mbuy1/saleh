@@ -1,0 +1,114 @@
+version: '3.8'
+
+# MBUY Studio - Docker Compose
+# يتضمن: n8n (Workflow Automation) + FFmpeg (Media Processing)
+
+services:
+  # ============================================
+  # n8n - Workflow Automation
+  # ============================================
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: mbuy-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # General Settings
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      
+      # Security
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=mbuy_studio_2024
+      
+      # Execution
+      - EXECUTIONS_MODE=queue
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+      
+      # Timezone
+      - GENERIC_TIMEZONE=Asia/Riyadh
+      - TZ=Asia/Riyadh
+      
+      # Database (SQLite for simplicity)
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+      
+      # External Services (to be configured)
+      # - FAL_AI_API_KEY=${FAL_AI_API_KEY}
+      # - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      # - DID_API_KEY=${DID_API_KEY}
+      # - SUPABASE_URL=${SUPABASE_URL}
+      # - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/home/node/.n8n/workflows
+      - ./shared/input:/data/input
+      - ./shared/output:/data/output
+    networks:
+      - mbuy-studio
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # FFmpeg Service - Media Processing
+  # ============================================
+  ffmpeg:
+    build:
+      context: ./ffmpeg
+      dockerfile: Dockerfile
+    container_name: mbuy-ffmpeg
+    restart: unless-stopped
+    volumes:
+      - ./shared/input:/data/input
+      - ./shared/output:/data/output
+      - ./ffmpeg/scripts:/scripts
+    networks:
+      - mbuy-studio
+    # This service is triggered by n8n via exec or API
+    command: ["tail", "-f", "/dev/null"]  # Keep container running
+    
+  # ============================================
+  # Redis (Optional - for n8n queue mode)
+  # ============================================
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: mbuy-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - mbuy-studio
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  mbuy-studio:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  n8n_data:
+    driver: local
+  # redis_data:
+  #   driver: local
