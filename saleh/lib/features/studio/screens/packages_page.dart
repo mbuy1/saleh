@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import '../models/studio_package.dart';
 import '../providers/studio_provider.dart';
 import '../services/studio_api_service.dart';
-import '../constants/studio_colors.dart';
 
 /// صفحة حزم التوفير - تصميم حديث
 class PackagesPage extends ConsumerStatefulWidget {
@@ -22,10 +23,13 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
     viewportFraction: 0.88,
   );
   int _currentFeaturedIndex = 0;
+  late List<PackageDefinition> _packages;
+  int? _pressedCardIndex;
 
   @override
   void initState() {
     super.initState();
+    _packages = getDefaultPackages();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -46,7 +50,6 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final packages = getDefaultPackages();
     final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
@@ -203,7 +206,8 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                             description: 'تحريك شعارات ورسوم توضيحية احترافية.',
                             cardColor: cardColor,
                             isDark: isDark,
-                            onTap: () => _openPackage(packages[0]),
+                            cardIndex: 0,
+                            onTap: () => _openPackage(_packages[0]),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -219,7 +223,8 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                                 'تصاميم جذابة لزيادة التفاعل والمبيعات.',
                             cardColor: cardColor,
                             isDark: isDark,
-                            onTap: () => _openPackage(packages[1]),
+                            cardIndex: 1,
+                            onTap: () => _openPackage(_packages[1]),
                           ),
                         ),
                       ],
@@ -244,7 +249,8 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                             description: 'مونتاج يومياتك بأسلوب سينمائي مميز.',
                             cardColor: cardColor,
                             isDark: isDark,
-                            onTap: () => _openPackage(packages[2]),
+                            cardIndex: 2,
+                            onTap: () => _openPackage(_packages[2]),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -259,7 +265,8 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                             description: 'محتوى عفوي من صناع محتوى حقيقيين.',
                             cardColor: cardColor,
                             isDark: isDark,
-                            onTap: () => _openPackage(packages[3]),
+                            cardIndex: 3,
+                            onTap: () => _openPackage(_packages[3]),
                           ),
                         ),
                       ],
@@ -281,7 +288,8 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
                                 'بناء هوية كاملة ومتميزة لعلامتك التجارية.',
                             cardColor: cardColor,
                             isDark: isDark,
-                            onTap: () => _openPackage(packages[4]),
+                            cardIndex: 4,
+                            onTap: () => _openPackage(_packages[4]),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -310,137 +318,147 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
     final isFirst = index == 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          final packages = getDefaultPackages();
-          if (packages.isNotEmpty) {
-            _openPackage(packages[index % packages.length]);
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: isFirst
-                    ? const Color(0xFF3B82F6).withOpacity(0.15)
-                    : const Color(0xFF8B5CF6).withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // الصورة الخلفية
-                Image.network(
-                  isFirst
-                      ? 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800'
-                      : 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isFirst
-                            ? [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)]
-                            : [
-                                const Color(0xFF8B5CF6),
-                                const Color(0xFFEC4899),
-                              ],
-                      ),
-                    ),
-                  ),
-                ),
-                // التدرج الداكن
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.4),
-                        Colors.black.withOpacity(0.9),
-                      ],
-                      stops: const [0.0, 0.5, 1.0],
-                    ),
-                  ),
-                ),
-                // المحتوى
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  left: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // الشارة
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isFirst
-                              ? const Color(0xFF3B82F6).withOpacity(0.9)
-                              : const Color(0xFF8B5CF6).withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isFirst ? Icons.trending_up : Icons.auto_awesome,
-                              size: 14,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isFirst ? 'الأكثر طلباً' : 'جديد',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // العنوان
-                      Text(
-                        isFirst
-                            ? 'حملات إعلانية متكاملة'
-                            : 'محرر الذكاء الاصطناعي',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // الوصف
-                      Text(
-                        isFirst
-                            ? 'حلول تسويقية شاملة لعلامتك التجارية من التخطيط إلى التنفيذ.'
-                            : 'حول أفكارك ونصوصك إلى فيديو احترافي في ثوانٍ معدودة.',
-                        style: TextStyle(
-                          color: Colors.grey[300],
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+      child: Semantics(
+        label: isFirst ? 'حملات إعلانية متكاملة' : 'محرر الذكاء الاصطناعي',
+        button: true,
+        child: GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            if (_packages.isNotEmpty) {
+              _openPackage(_packages[index % _packages.length]);
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: isFirst
+                      ? const Color(0xFF3B82F6).withOpacity(0.15)
+                      : const Color(0xFF8B5CF6).withOpacity(0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // الصورة الخلفية مع التخزين المؤقت
+                  CachedNetworkImage(
+                    imageUrl: isFirst
+                        ? 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800'
+                        : 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        _buildShimmerPlaceholder(isDark),
+                    errorWidget: (_, __, ___) => Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isFirst
+                              ? [
+                                  const Color(0xFF3B82F6),
+                                  const Color(0xFF8B5CF6),
+                                ]
+                              : [
+                                  const Color(0xFF8B5CF6),
+                                  const Color(0xFFEC4899),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // التدرج الداكن
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.4),
+                          Colors.black.withOpacity(0.9),
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                  ),
+                  // المحتوى
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    left: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // الشارة
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isFirst
+                                ? const Color(0xFF3B82F6).withOpacity(0.9)
+                                : const Color(0xFF8B5CF6).withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isFirst
+                                    ? Icons.trending_up
+                                    : Icons.auto_awesome,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                isFirst ? 'الأكثر طلباً' : 'جديد',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // العنوان
+                        Text(
+                          isFirst
+                              ? 'حملات إعلانية متكاملة'
+                              : 'محرر الذكاء الاصطناعي',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // الوصف
+                        Text(
+                          isFirst
+                              ? 'حلول تسويقية شاملة لعلامتك التجارية من التخطيط إلى التنفيذ.'
+                              : 'حول أفكارك ونصوصك إلى فيديو احترافي في ثوانٍ معدودة.',
+                          style: TextStyle(
+                            color: Colors.grey[300],
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -457,201 +475,225 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
     required Color cardColor,
     required bool isDark,
     required VoidCallback onTap,
+    int? cardIndex,
   }) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.transparent,
-          ),
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+    final isPressed = _pressedCardIndex == cardIndex;
+    return Semantics(
+      label: '$title: $description',
+      button: true,
+      child: GestureDetector(
+        onTapDown: cardIndex != null
+            ? (_) => setState(() => _pressedCardIndex = cardIndex)
+            : null,
+        onTapUp: cardIndex != null
+            ? (_) => setState(() => _pressedCardIndex = null)
+            : null,
+        onTapCancel: cardIndex != null
+            ? () => setState(() => _pressedCardIndex = null)
+            : null,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: AnimatedScale(
+          scale: isPressed ? 0.96 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withOpacity(0.05)
+                    : Colors.transparent,
+              ),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // الأيقونة
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // الأيقونة
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(icon, size: 32, color: iconColor),
+                  child: Icon(icon, size: 32, color: iconColor),
+                ),
+                const SizedBox(height: 16),
+                // العنوان
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // الوصف
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            // العنوان
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // الوصف
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-                height: 1.4,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFeaturedServiceCard({required bool isDark}) {
-    final packages = getDefaultPackages();
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        if (packages.length > 2) {
-          _openPackage(packages[2]);
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+    return Semantics(
+      label: 'الخدمة المميزة: حملة إعلانية كاملة',
+      button: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          if (_packages.length > 2) {
+            _openPackage(_packages[2]);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+            ),
+            borderRadius: BorderRadius.circular(40),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4F46E5).withOpacity(0.3),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-          borderRadius: BorderRadius.circular(40),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF4F46E5).withOpacity(0.3),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // الدوائر الزخرفية
-            Positioned(
-              top: -60,
-              right: -40,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.05),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -40,
-              left: -40,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.1),
-                ),
-              ),
-            ),
-            // المحتوى
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // الشارة
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.rocket_launch,
-                              size: 20,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'الخدمة المميزة',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo[200],
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // العنوان
-                      const Text(
-                        'حملة إعلانية كاملة',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // الوصف
-                      Text(
-                        'إدارة شاملة لحملتك من التخطيط إلى التنفيذ مع تقارير أداء دورية.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.indigo[100],
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // زر السهم
-                Container(
-                  padding: const EdgeInsets.all(12),
+          child: Stack(
+            children: [
+              // الدوائر الزخرفية
+              Positioned(
+                top: -60,
+                right: -40,
+                child: Container(
+                  width: 160,
+                  height: 160,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.05),
                   ),
-                  child: Transform.scale(
-                    scaleX: -1,
-                    child: const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 24,
+                ),
+              ),
+              Positioned(
+                bottom: -40,
+                left: -40,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ),
+              ),
+              // المحتوى
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // الشارة
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.rocket_launch,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'الخدمة المميزة',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo[200],
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        // العنوان
+                        const Text(
+                          'حملة إعلانية كاملة',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // الوصف
+                        Text(
+                          'إدارة شاملة لحملتك من التخطيط إلى التنفيذ مع تقارير أداء دورية.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.indigo[100],
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 16),
+                  // زر السهم
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Transform.scale(
+                      scaleX: -1,
+                      child: const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -661,56 +703,72 @@ class _PackagesPageState extends ConsumerState<PackagesPage>
     required bool isDark,
     required Color cardColor,
   }) {
-    return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
-            width: 2,
-            strokeAlign: BorderSide.strokeAlignInside,
+    return Semantics(
+      label: 'المزيد من الخدمات',
+      button: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          // TODO: الانتقال إلى صفحة جميع الخدمات
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200]!,
+              width: 2,
+              strokeAlign: BorderSide.strokeAlignInside,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                          ),
+                        ],
+                ),
+                child: Icon(
+                  Icons.add,
+                  size: 28,
+                  color: isDark ? Colors.grey[400] : Colors.grey[500],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'المزيد من الخدمات',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: isDark
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                        ),
-                      ],
-              ),
-              child: Icon(
-                Icons.add,
-                size: 28,
-                color: isDark ? Colors.grey[400] : Colors.grey[500],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'المزيد من الخدمات',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
+    );
+  }
+
+  /// Shimmer placeholder للصور أثناء التحميل
+  Widget _buildShimmerPlaceholder(bool isDark) {
+    return Shimmer.fromColors(
+      baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+      highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+      child: Container(color: isDark ? Colors.grey[800] : Colors.grey[300]),
     );
   }
 
@@ -1197,80 +1255,399 @@ class _PackageDetailSheetState extends ConsumerState<_PackageDetailSheet> {
   Future<Map<String, dynamic>?> _showProductInputDialog() async {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final cardColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFF8FAFC);
 
-    return showDialog<Map<String, dynamic>>(
+    return showModalBottomSheet<Map<String, dynamic>>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('بيانات المنتج'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'اسم المنتج *',
-                  hintText: 'أدخل اسم المنتج',
-                ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.white24 : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // العنوان
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3B82F6).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.inventory_2_outlined,
+                          color: Color(0xFF3B82F6),
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'بيانات المنتج',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'أدخل معلومات منتجك لإنشاء المحتوى',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // حقل اسم المنتج
+                  Text(
+                    'اسم المنتج',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: nameController,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      hintText: 'مثال: ساعة ذكية رياضية',
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      filled: true,
+                      fillColor: cardColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: isDark
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.grey[200]!,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF3B82F6),
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // حقل وصف المنتج
+                  Text(
+                    'وصف المنتج',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: descriptionController,
+                    maxLines: 4,
+                    maxLength: 500,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      hintText:
+                          'اكتب وصفاً تفصيلياً للمنتج، مميزاته، والجمهور المستهدف...',
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      filled: true,
+                      fillColor: cardColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: isDark
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.grey[200]!,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF3B82F6),
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.all(16),
+                      counterStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // الأزرار
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: cardColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.1)
+                                    : Colors.grey[300]!,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (nameController.text.trim().isEmpty ||
+                                descriptionController.text.trim().isEmpty) {
+                              HapticFeedback.heavyImpact();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.warning_amber,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 12),
+                                      Text('يرجى ملء جميع الحقول المطلوبة'),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.orange[700],
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  margin: const EdgeInsets.all(16),
+                                ),
+                              );
+                              return;
+                            }
+                            HapticFeedback.lightImpact();
+                            Navigator.pop(context, {
+                              'name': nameController.text.trim(),
+                              'description': descriptionController.text.trim(),
+                            });
+                          },
+                          child: Container(
+                            height: 56,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF3B82F6,
+                                  ).withOpacity(0.4),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'متابعة',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                ],
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descriptionController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'وصف المنتج *',
-                  hintText: 'أدخل وصفاً تفصيلياً للمنتج',
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (nameController.text.isEmpty ||
-                  descriptionController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('يرجى ملء جميع الحقول المطلوبة'),
-                  ),
-                );
-                return;
-              }
-              Navigator.pop(context, {
-                'name': nameController.text,
-                'description': descriptionController.text,
-              });
-            },
-            child: const Text('متابعة'),
-          ),
-        ],
       ),
     );
   }
 
   void _showErrorDialog(String title, String message) {
-    showDialog(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error, color: Colors.red),
-            const SizedBox(width: 8),
-            Text(title),
+            // Handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // أيقونة الخطأ
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 48,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // العنوان
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // الرسالة
+            Text(
+              message,
+              style: TextStyle(
+                fontSize: 16,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+
+            // زر الإغلاق
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    'حسناً',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('حسناً'),
-          ),
-        ],
       ),
     );
   }
