@@ -375,8 +375,8 @@ class AppRouter {
                 ),
                 // ====== استوديو المحتوى AI ======
                 GoRoute(
-                  path: 'studio',
-                  name: 'studio',
+                  path: 'content-studio',
+                  name: 'content-studio',
                   builder: (context, state) => const StudioHomeScreen(),
                   routes: [
                     GoRoute(
