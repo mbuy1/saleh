@@ -141,18 +141,23 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
           ? FloatingActionButton.extended(
               onPressed: _showAddShortcutSheet,
               backgroundColor: AppTheme.primaryColor,
-              icon: const Icon(Icons.add, color: Colors.white, size: 20),
+              elevation: 4,
+              icon: const Icon(Icons.add, color: Colors.white, size: 22),
               label: const Text(
                 'إضافة اختصار',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 14,
                 ),
               ),
-              extendedPadding: const EdgeInsets.symmetric(horizontal: 16),
+              extendedPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
             )
           : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 

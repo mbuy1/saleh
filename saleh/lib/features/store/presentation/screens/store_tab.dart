@@ -84,11 +84,35 @@ class StoreTab extends ConsumerWidget {
               ),
             ),
             SizedBox(height: AppDimensions.spacing24),
-            // قسم تسجيل الخروج
+            // قسم الإعدادات
+            _buildSectionTitle('الإعدادات'),
+            SizedBox(height: AppDimensions.spacing12),
+            // إعدادات التطبيق
+            _buildStoreOptionCard(
+              context: context,
+              icon: Icons.settings_outlined,
+              title: 'إعدادات التطبيق',
+              subtitle: 'الإشعارات واللغة والمظهر',
+              onTap: () => context.push('/dashboard/settings'),
+            ),
+            SizedBox(height: AppDimensions.spacing12),
+            // إعدادات الحساب
+            _buildStoreOptionCard(
+              context: context,
+              icon: Icons.person_outline,
+              title: 'إعدادات الحساب',
+              subtitle: 'البريد الإلكتروني وكلمة المرور',
+              onTap: () => context.push('/dashboard/account-settings'),
+            ),
+            SizedBox(height: AppDimensions.spacing24),
+            // قسم الحساب
             _buildSectionTitle('الحساب'),
             SizedBox(height: AppDimensions.spacing12),
             // تسجيل الخروج
             _buildLogoutCard(context: context, ref: ref),
+            SizedBox(height: AppDimensions.spacing12),
+            // حذف المتجر
+            _buildDeleteStoreCard(context: context, ref: ref),
           ],
         ),
       ),
@@ -177,6 +201,120 @@ class StoreTab extends ConsumerWidget {
                     SizedBox(height: AppDimensions.spacing2),
                     Text(
                       'الخروج من الحساب الحالي',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLabel,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: AppDimensions.iconXS,
+                color: Colors.grey[400],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteStoreDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Text('حذف المتجر'),
+          ],
+        ),
+        content: const Text(
+          'هل أنت متأكد من حذف المتجر؟\n\nهذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع البيانات المرتبطة بالمتجر.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              // TODO: تنفيذ حذف المتجر
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('سيتم تفعيل هذه الميزة قريباً'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('حذف نهائياً'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeleteStoreCard({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: AppDimensions.borderRadiusM,
+      child: InkWell(
+        onTap: () => _showDeleteStoreDialog(context, ref),
+        borderRadius: AppDimensions.borderRadiusM,
+        child: Container(
+          padding: AppDimensions.paddingM,
+          decoration: BoxDecoration(
+            borderRadius: AppDimensions.borderRadiusM,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: AppDimensions.avatarM,
+                height: AppDimensions.avatarM,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: AppDimensions.borderRadiusM,
+                ),
+                child: Icon(
+                  Icons.delete_forever_outlined,
+                  size: AppDimensions.iconM,
+                  color: Colors.red,
+                ),
+              ),
+              SizedBox(width: AppDimensions.spacing14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'حذف المتجر',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontSubtitle,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: AppDimensions.spacing2),
+                    Text(
+                      'حذف المتجر وجميع البيانات نهائياً',
                       style: TextStyle(
                         fontSize: AppDimensions.fontLabel,
                         color: Colors.grey[500],
