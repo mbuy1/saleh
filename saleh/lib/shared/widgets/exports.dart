@@ -49,6 +49,7 @@ export 'glass_card.dart';
 // ============================================================================
 export 'mbuy_dropdown.dart';
 export 'mbuy_switch.dart';
+export 'mbuy_form_builder.dart';
 
 // ============================================================================
 // Dialogs & Sheets - الحوارات والنوافذ

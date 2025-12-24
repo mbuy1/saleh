@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_dimensions.dart';
-import 'edit_studio_page.dart';
-import 'generation_studio_page.dart';
 import '../constants/studio_colors.dart';
 
 /// صفحة الاستوديو الرئيسية - استديو AI
@@ -526,10 +525,7 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
   }
 
   void _navigateToGenerationStudio(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const GenerationStudioPage()),
-    );
+    context.push('/dashboard/content-studio/script-generator');
   }
 
   void _showVideoEditorDialog(BuildContext context) {
@@ -553,10 +549,7 @@ class _StudioMainPageState extends ConsumerState<StudioMainPage>
   }
 
   void _navigateToEditStudio(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EditStudioPage()),
-    );
+    context.push('/dashboard/content-studio/editor');
   }
 
   void _showToolDialog(

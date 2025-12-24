@@ -13,10 +13,10 @@ import '../../../merchant/data/merchant_store_provider.dart';
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
 // ║                                                                           ║
 // ║   شريط التنقل السفلي + الهيدر العلوي - التصميم مثبت ومعتمد                ║
-// ║   تاريخ التثبيت: 19 ديسمبر 2025                                           ║
+// ║   تاريخ التثبيت: 24 ديسمبر 2025                                           ║
 // ║                                                                           ║
 // ║   العناصر المثبتة:                                                        ║
-// ║   • 5 تبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، دروب شوبينقنا     ║
+// ║   • 5 تبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، استديو AI         ║
 // ║   • الأيقونة النشطة: primaryColor (Oxford Blue #00214A)                   ║
 // ║   • الهيدر العلوي الثابت مع Oxford Blue                                   ║
 // ║   • شريط الحالة بأيقونات بيضاء                                            ║
@@ -28,10 +28,10 @@ import '../../../merchant/data/merchant_store_provider.dart';
 
 /// Dashboard Shell - يحتوي على البار السفلي الثابت والهيدر العلوي
 /// يعرض الصفحات الفرعية داخله مع إبقاء البار السفلي والهيدر العلوي ظاهراً
-/// التبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، دروب شوبينقنا
+/// التبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، استديو AI
 ///
 /// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-19
+/// Last updated: 2025-12-24
 /// تم إضافة الهيدر العلوي الثابت مع Oxford Blue
 class DashboardShell extends ConsumerStatefulWidget {
   final Widget child;
@@ -44,7 +44,7 @@ class DashboardShell extends ConsumerStatefulWidget {
 
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   /// الحصول على الـ index الحالي بناءً على المسار
-  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، المحادثات(3)، دروب شوبينقنا(4)
+  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، المحادثات(3)، استديو AI(4)
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
 
@@ -53,8 +53,9 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       return 2; // صفحة المنتجات
     }
     if (location.startsWith('/dashboard/conversations')) return 3;
-    if (location.startsWith('/dashboard/dropshipping')) {
-      return 4; // دروب شوبينقنا في البار السفلي
+    if (location.startsWith('/dashboard/studio') ||
+        location.startsWith('/dashboard/content-studio')) {
+      return 4; // استديو AI في البار السفلي
     }
     return 0; // home
   }
@@ -75,8 +76,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         context.go('/dashboard/conversations');
         break;
       case 4:
-        // دروب شوبينقنا في البار السفلي
-        context.go('/dashboard/dropshipping');
+        // استديو AI في البار السفلي
+        context.go('/dashboard/studio');
         break;
     }
   }
@@ -709,8 +710,8 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isDark: isDark,
             ),
             _buildNavItem(
-              icon: AppIcons.shipping,
-              label: 'دروب شيب',
+              icon: AppIcons.studio,
+              label: 'استديو AI',
               isSelected: currentIndex == 4,
               onTap: () => _onItemTapped(4, context),
               isDark: isDark,

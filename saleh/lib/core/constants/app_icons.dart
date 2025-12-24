@@ -198,6 +198,7 @@ class AppIcons {
   static const String playCircle = '${_basePath}play_circle.svg';
   static const String verified = '${_basePath}verified.svg';
   static const String qrCode = '${_basePath}qr_code.svg';
+  static const String studio = '${_basePath}studio.svg'; // استديو AI
   static const String document = '${_basePath}document.svg';
   static const String unlock = '${_basePath}unlock.svg';
   static const String growth = '${_basePath}growth.svg';

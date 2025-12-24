@@ -462,9 +462,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildFeatureCard(
-                icon: Icons.auto_awesome,
-                label: 'استديو AI',
-                onTap: () => context.push('/dashboard/studio'),
+                icon: Icons.trending_up,
+                label: 'ضاعف ظهورك',
+                onTap: () => context.push('/dashboard/boost-sales'),
                 showBadge: true,
               ),
             ),
