@@ -127,7 +127,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
     final backgroundColor = isDark
         ? AppTheme.backgroundColorDark
         : AppTheme.backgroundLight;
-    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
     final textColor = isDark
         ? AppTheme.textPrimaryColorDark
         : AppTheme.textPrimaryColor;
@@ -162,7 +162,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     // Section 1: Identity (الهوية)
                     _buildSectionHeader('الهوية', textColor),
                     _buildIdentitySection(
-                      surfaceColor,
+                      cardColor,
                       textColor,
                       secondaryTextColor,
                       borderColor,
@@ -173,7 +173,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     // Section 2: Contact Info (معلومات الاتصال)
                     _buildSectionHeader('معلومات الاتصال', textColor),
                     _buildContactSection(
-                      surfaceColor,
+                      cardColor,
                       textColor,
                       secondaryTextColor,
                       borderColor,
@@ -184,7 +184,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     // Section 3: Policies (السياسات)
                     _buildSectionHeader('السياسات', textColor),
                     _buildPoliciesSection(
-                      surfaceColor,
+                      cardColor,
                       textColor,
                       secondaryTextColor,
                       borderColor,
@@ -195,7 +195,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     // Section 4: Business Hours (أوقات العمل)
                     _buildBusinessHoursHeader(textColor, secondaryTextColor),
                     _buildBusinessHoursSection(
-                      surfaceColor,
+                      cardColor,
                       textColor,
                       secondaryTextColor,
                       borderColor,
@@ -304,7 +304,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   }
 
   Widget _buildIdentitySection(
-    Color surfaceColor,
+    Color cardColor,
     Color textColor,
     Color secondaryTextColor,
     Color borderColor,
@@ -313,7 +313,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor.withValues(alpha: 0.5)),
         boxShadow: isDark
@@ -522,7 +522,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   }
 
   Widget _buildContactSection(
-    Color surfaceColor,
+    Color cardColor,
     Color textColor,
     Color secondaryTextColor,
     Color borderColor,
@@ -531,7 +531,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor.withValues(alpha: 0.5)),
         boxShadow: isDark
@@ -744,7 +744,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   }
 
   Widget _buildPoliciesSection(
-    Color surfaceColor,
+    Color cardColor,
     Color textColor,
     Color secondaryTextColor,
     Color borderColor,
@@ -753,7 +753,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor.withValues(alpha: 0.5)),
         boxShadow: isDark
@@ -973,7 +973,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   }
 
   Widget _buildBusinessHoursSection(
-    Color surfaceColor,
+    Color cardColor,
     Color textColor,
     Color secondaryTextColor,
     Color borderColor,
@@ -985,7 +985,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor.withValues(alpha: 0.5)),
         boxShadow: isDark

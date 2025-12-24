@@ -82,25 +82,40 @@ class AppTheme {
     0xFF334155,
   ); // Dark charcoal for ad banners
 
-  // === Background & Surface (Dark Mode) - Green Dark Theme ===
-  static const Color backgroundColorDark = Color(0xFF0D1F17); // أخضر غامق
-  static const Color surfaceColorDark = Color(0xFF152A20); // أخضر غامق للسطح
-  static const Color cardColorDark = Color(0xFF1E3829); // أخضر غامق للكروت
+  // === Background & Surface (Dark Mode) - Dark Theme with Light Cards ===
+  static const Color backgroundColorDark = Color(
+    0xFF0F1419,
+  ); // خلفية داكنة جداً
+  static const Color surfaceColorDark = Color(
+    0xFF15202B,
+  ); // سطح داكن للـ AppBar
+  static const Color cardColorDark = Color(0xFF1E2D3D); // كروت أفتح للقراءة
 
   // === Dark Mode Extended Palette (Single Source of Truth) ===
-  static const Color surfaceDarkAccent = Color(0xFF1A3526); // Dark green accent
+  static const Color surfaceDarkAccent = Color(
+    0xFF243447,
+  ); // Accent surface للكروت
   static const Color iconBgDark = Color(
-    0xFF24402F,
-  ); // Dark green for icon backgrounds
+    0xFF2C3E50,
+  ); // خلفية الأيقونات - أفتح للوضوح
   static const Color dividerDark = Color(
-    0xFF2A4536,
-  ); // Divider/border for dark mode - أخضر غامق
-  static const Color disabledDark = Color(0xFF5A5A5A); // Disabled elements
-  static const Color textMutedDark = Color(0xFF8A8A8A); // Muted text
+    0xFF2C3E50,
+  ); // Divider/border for dark mode
+  static const Color disabledDark = Color(0xFF6B7C93); // Disabled elements
+  static const Color textMutedDark = Color(0xFF9AA5B1); // Muted text - أوضح
   static const Color iconPrimaryDark = Color(0xFFFFFFFF); // Primary icons
-  static const Color iconSecondaryDark = Color(0xFFB3B3B3); // Secondary icons
+  static const Color iconSecondaryDark = Color(
+    0xFFCBD5E0,
+  ); // Secondary icons - أوضح
   static const Color shadowDark = Color(0x40000000); // Shadow for dark mode
   static const Color overlayDark = Color(0x0DFFFFFF); // 5% white overlay
+
+  // === Card Colors for Dark Mode (Light Cards) ===
+  static const Color cardSurfaceDark = Color(0xFF1E2D3D); // لون الكارت الأساسي
+  static const Color cardHoverDark = Color(
+    0xFF243447,
+  ); // لون الكارت عند التحويم
+  static const Color cardBorderDark = Color(0xFF3D5A73); // حدود الكارت
 
   // === Light Background Variant ===
   static const Color backgroundLight = Color(0xFFF6F8F7); // Slightly warm slate
@@ -114,10 +129,16 @@ class AppTheme {
   ); // Muted Slate - Body text
   static const Color textHintColor = Color(0xFF94A3B8); // Slate-400
 
-  // === Text Colors (Dark Mode) ===
-  static const Color textPrimaryColorDark = Color(0xFFEEEEEE);
-  static const Color textSecondaryColorDark = Color(0xFFB3B3B3);
-  static const Color textHintColorDark = Color(0xFF808080);
+  // === Text Colors (Dark Mode) - Enhanced Readability ===
+  static const Color textPrimaryColorDark = Color(
+    0xFFF7FAFC,
+  ); // أبيض ناصع للعناوين
+  static const Color textSecondaryColorDark = Color(
+    0xFFCBD5E0,
+  ); // رمادي فاتح للنص الثانوي
+  static const Color textHintColorDark = Color(
+    0xFF8899A6,
+  ); // رمادي متوسط للتلميحات
 
   // === Status Colors (Semantic - Do Not Change) ===
   static const Color successColor = Color(0xFF28A745);
@@ -154,8 +175,8 @@ class AppTheme {
   static const Color borderColor = Color(
     0xFFCBD5E1,
   ); // Slate-300 - Metallic edge
-  static const Color dividerColorDark = Color(0xFF404040);
-  static const Color borderColorDark = Color(0xFF505050);
+  static const Color dividerColorDark = Color(0xFF2C3E50); // حدود مرئية
+  static const Color borderColorDark = Color(0xFF3D5A73); // حدود الكروت - أوضح
 
   // ============================================================================
   // Gradients - E-commerce Identity
@@ -782,10 +803,10 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration
+      // Input Decoration - Lighter inputs for readability
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF2A2A2A), // Darker input background
+        fillColor: const Color(0xFF1E2D3D), // نفس لون الكارت
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
@@ -819,33 +840,32 @@ class AppTheme {
         suffixIconColor: textSecondaryColorDark,
       ),
 
-      // Card Theme
+      // Card Theme - Light Cards on Dark Background
       cardTheme: CardThemeData(
-        elevation: 1,
-        shadowColor: Colors.black.withValues(alpha: 0.4),
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadiusLarge),
           side: const BorderSide(color: borderColorDark, width: 1),
         ),
-        color: cardColorDark,
+        color: cardColorDark, // كروت أفتح من الخلفية
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
       ),
 
-      // Bottom Navigation Bar - أخضر غامق
+      // Bottom Navigation Bar - Dark with clear icons
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor:
-            backgroundColorDark, // أخضر غامق بدلاً من surfaceColorDark
+        backgroundColor: surfaceColorDark, // سطح داكن
         elevation: 8,
-        selectedItemColor: const Color(0xFF4ADE80), // أخضر فاتح للعنصر المحدد
-        unselectedItemColor: const Color(0xFF6B8F7A), // أخضر رمادي
+        selectedItemColor: primaryColor, // اللون الأساسي للعنصر المحدد
+        unselectedItemColor: textSecondaryColorDark, // رمادي فاتح
       ),
 
-      // Navigation Bar (M3) - أخضر غامق
+      // Navigation Bar (M3) - Dark surface
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: backgroundColorDark, // أخضر غامق
+        backgroundColor: surfaceColorDark, // سطح داكن
         elevation: 8,
-        indicatorColor: const Color(0xFF4ADE80).withValues(alpha: 0.2),
+        indicatorColor: primaryColor.withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final color = states.contains(WidgetState.selected)
               ? primaryColor

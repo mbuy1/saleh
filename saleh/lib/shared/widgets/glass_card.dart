@@ -32,7 +32,7 @@ class GlassCardStyle {
   );
 
   /// لون الخلفية للوضع الداكن
-  static Color backgroundColorDark = AppTheme.surfaceColorDark.withValues(
+  static Color backgroundColorDark = AppTheme.cardColorDark.withValues(
     alpha: 0.12,
   );
 

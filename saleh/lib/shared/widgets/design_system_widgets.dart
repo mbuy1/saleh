@@ -154,7 +154,7 @@ class MbuyFeatureCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = AppTheme.primaryColor;
 
-    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.1)
         : AppTheme.borderColor;
@@ -166,7 +166,7 @@ class MbuyFeatureCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: isDark
@@ -306,7 +306,7 @@ class MbuyBannerCarouselCard extends StatelessWidget {
       end: Alignment.bottomRight,
       colors: [
         primaryColor.withValues(alpha: 0.2),
-        isDark ? AppTheme.surfaceColorDark : Colors.white,
+        isDark ? AppTheme.cardColorDark : Colors.white,
       ],
     );
 
@@ -484,13 +484,13 @@ class MbuySearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
     final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppTheme.cardBorderDark
         : AppTheme.borderColor;
-    final textColor = isDark ? Colors.white : AppTheme.textPrimaryColor;
+    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
     final hintColor = isDark
-        ? Colors.white.withValues(alpha: 0.5)
+        ? AppTheme.textHintColorDark
         : AppTheme.textHintColor;
 
     return Padding(
@@ -498,7 +498,7 @@ class MbuySearchField extends StatelessWidget {
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: surfaceColor,
+          color: cardColor,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(color: borderColor, width: 1),
           boxShadow: isDark
@@ -728,19 +728,19 @@ class MbuyListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
     final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppTheme.cardBorderDark
         : AppTheme.borderColor;
-    final textColor = isDark ? Colors.white : AppTheme.textPrimaryColor;
+    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
-        ? Colors.white.withValues(alpha: 0.7)
+        ? AppTheme.textSecondaryColorDark
         : AppTheme.textSecondaryColor;
 
     return Container(
       margin: margin ?? const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: surfaceColor,
+        color: cardColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: isDark
@@ -836,18 +836,18 @@ class MbuyStatCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = AppTheme.primaryColor;
 
-    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
     final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppTheme.cardBorderDark
         : AppTheme.borderColor;
-    final textColor = isDark ? Colors.white : AppTheme.textPrimaryColor;
+    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
-        ? Colors.white.withValues(alpha: 0.7)
+        ? AppTheme.textSecondaryColorDark
         : AppTheme.textSecondaryColor;
 
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor ?? surfaceColor,
+        color: backgroundColor ?? cardColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: isDark
