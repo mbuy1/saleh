@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/theme/app_theme.dart';
 
 /// ╔═══════════════════════════════════════════════════════════════════════════╗
 /// ║                    🔮 Glass Card - البطاقة الزجاجية                        ║
@@ -23,22 +24,28 @@ class GlassCardStyle {
   // ============================================================================
 
   /// لون الخلفية الأساسي - أبيض نظيف مثل البار السفلي
-  static Color backgroundColor = Colors.white;
+  static Color backgroundColor = AppTheme.surfaceColor;
 
   /// لون الخلفية شبه شفاف للتأثير الزجاجي
-  static Color backgroundColorGlass = Colors.white.withValues(alpha: 0.95);
+  static Color backgroundColorGlass = AppTheme.surfaceColor.withValues(
+    alpha: 0.95,
+  );
 
   /// لون الخلفية للوضع الداكن
-  static Color backgroundColorDark = Colors.white.withValues(alpha: 0.12);
+  static Color backgroundColorDark = AppTheme.surfaceColorDark.withValues(
+    alpha: 0.12,
+  );
 
   /// لون الحدود - شفاف جداً
-  static Color borderColor = Colors.grey.withValues(alpha: 0.1);
+  static Color borderColor = AppTheme.borderColor.withValues(alpha: 0.1);
 
   /// لون الحدود للوضع الداكن
-  static Color borderColorDark = Colors.white.withValues(alpha: 0.1);
+  static Color borderColorDark = AppTheme.borderColorDark.withValues(
+    alpha: 0.2,
+  );
 
   /// لون التوهج الداخلي
-  static Color innerGlowColor = Colors.white.withValues(alpha: 0.05);
+  static Color innerGlowColor = AppTheme.surfaceColor.withValues(alpha: 0.05);
 
   // ============================================================================
   // تأثير الضبابية (Blur)
@@ -110,10 +117,10 @@ class GlassCardStyle {
   // ============================================================================
 
   /// تدرج الزجاج الأساسي - أبيض نظيف
-  static LinearGradient glassGradient = const LinearGradient(
+  static const LinearGradient glassGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Colors.white, Color(0xFFFAFAFA)],
+    colors: [Colors.white, AppTheme.backgroundLight],
   );
 
   /// تدرج الزجاج الداكن

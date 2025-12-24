@@ -2,20 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-/// ثوابت ألوان صفحة متجر التطبيقات
-class _AppStoreColors {
-  static const Color primary = Color(0xFF13EC80);
-  static const Color primaryDark = Color(0xFF0FD96F);
-  static const Color backgroundDark = Color(0xFF102219);
-  static const Color surfaceDark = Color(0xFF193326);
-  static const Color cardDark = Color(0xFF1C3228);
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFF92C9AD);
-  static const Color textMuted = Color(0xFF6B9B84);
-  static const Color borderColor = Color(0xFF2A4A3A);
-  static const Color starColor = Color(0xFFFFC107);
-}
+import '../../../../core/theme/app_theme.dart';
 
 /// نموذج بيانات التطبيق
 class AppModel {
@@ -194,7 +181,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _AppStoreColors.backgroundDark,
+      backgroundColor: AppTheme.backgroundColorDark,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -235,16 +222,13 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: _AppStoreColors.surfaceDark,
+                color: AppTheme.surfaceColorDark,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _AppStoreColors.borderColor,
-                  width: 1,
-                ),
+                border: Border.all(color: AppTheme.borderColorDark, width: 1),
               ),
               child: const Icon(
                 Icons.arrow_forward_ios,
-                color: _AppStoreColors.textPrimary,
+                color: AppTheme.textPrimaryColorDark,
                 size: 18,
               ),
             ),
@@ -260,7 +244,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: _AppStoreColors.textPrimary,
+                    color: AppTheme.textPrimaryColorDark,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -268,7 +252,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   'اكتشف التطبيقات التي تعزز متجرك',
                   style: TextStyle(
                     fontSize: 14,
-                    color: _AppStoreColors.textSecondary,
+                    color: AppTheme.textSecondaryColorDark,
                   ),
                 ),
               ],
@@ -283,24 +267,24 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: _AppStoreColors.primary.withValues(alpha: 0.15),
+                color: AppTheme.primaryColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _AppStoreColors.primary.withValues(alpha: 0.3),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.apps, color: _AppStoreColors.primary, size: 18),
+                  Icon(Icons.apps, color: AppTheme.primaryColor, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'المثبتة',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: _AppStoreColors.primary,
+                      color: AppTheme.primaryColor,
                     ),
                   ),
                 ],
@@ -318,25 +302,25 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: _AppStoreColors.surfaceDark,
+          color: AppTheme.surfaceColorDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _AppStoreColors.borderColor, width: 1),
+          border: Border.all(color: AppTheme.borderColorDark, width: 1),
         ),
         child: TextField(
           controller: _searchController,
           style: const TextStyle(
-            color: _AppStoreColors.textPrimary,
+            color: AppTheme.textPrimaryColorDark,
             fontSize: 15,
           ),
           decoration: InputDecoration(
             hintText: 'ابحث عن تطبيقات...',
             hintStyle: TextStyle(
-              color: _AppStoreColors.textMuted,
+              color: AppTheme.textHintColorDark,
               fontSize: 15,
             ),
             prefixIcon: const Icon(
               Icons.search,
-              color: _AppStoreColors.textMuted,
+              color: AppTheme.textHintColorDark,
               size: 22,
             ),
             suffixIcon: _searchController.text.isNotEmpty
@@ -347,7 +331,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     },
                     icon: const Icon(
                       Icons.close,
-                      color: _AppStoreColors.textMuted,
+                      color: AppTheme.textHintColorDark,
                       size: 20,
                     ),
                   )
@@ -378,7 +362,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                 children: [
                   Icon(
                     Icons.star_rounded,
-                    color: _AppStoreColors.starColor,
+                    color: AppTheme.ratingStarColor,
                     size: 22,
                   ),
                   SizedBox(width: 8),
@@ -387,7 +371,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _AppStoreColors.textPrimary,
+                      color: AppTheme.textPrimaryColorDark,
                     ),
                   ),
                 ],
@@ -402,7 +386,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -438,8 +422,8 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
               height: 8,
               decoration: BoxDecoration(
                 color: _currentFeaturedIndex == index
-                    ? _AppStoreColors.primary
-                    : _AppStoreColors.borderColor,
+                    ? AppTheme.primaryColor
+                    : AppTheme.borderColorDark,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -457,13 +441,13 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            _AppStoreColors.primary.withValues(alpha: 0.2),
-            _AppStoreColors.cardDark,
+            AppTheme.primaryColor.withValues(alpha: 0.2),
+            AppTheme.cardColorDark,
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: _AppStoreColors.primary.withValues(alpha: 0.3),
+          color: AppTheme.primaryColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -487,12 +471,12 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: _AppStoreColors.primary.withValues(alpha: 0.2),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(
                         Icons.apps,
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                         size: 28,
                       ),
                     ),
@@ -509,7 +493,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: _AppStoreColors.textPrimary,
+                                    color: AppTheme.textPrimaryColorDark,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -523,7 +507,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: _AppStoreColors.starColor,
+                                    color: AppTheme.ratingStarColor,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Text(
@@ -531,7 +515,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      color: AppTheme.backgroundColorDark,
                                     ),
                                   ),
                                 ),
@@ -544,7 +528,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: _AppStoreColors.primary,
+                                    color: AppTheme.primaryColor,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Text(
@@ -552,7 +536,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      color: AppTheme.backgroundColorDark,
                                     ),
                                   ),
                                 ),
@@ -564,7 +548,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                             app.category,
                             style: const TextStyle(
                               fontSize: 13,
-                              color: _AppStoreColors.textSecondary,
+                              color: AppTheme.textSecondaryColorDark,
                             ),
                           ),
                         ],
@@ -577,7 +561,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   app.description,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: _AppStoreColors.textSecondary,
+                    color: AppTheme.textSecondaryColorDark,
                     height: 1.5,
                   ),
                   maxLines: 2,
@@ -592,7 +576,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       children: [
                         const Icon(
                           Icons.star_rounded,
-                          color: _AppStoreColors.starColor,
+                          color: AppTheme.ratingStarColor,
                           size: 18,
                         ),
                         const SizedBox(width: 4),
@@ -601,7 +585,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: _AppStoreColors.textPrimary,
+                            color: AppTheme.textPrimaryColorDark,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -609,7 +593,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           '(${app.reviewCount})',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: _AppStoreColors.textMuted,
+                            color: AppTheme.textHintColorDark,
                           ),
                         ),
                       ],
@@ -621,7 +605,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
@@ -629,7 +613,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppTheme.backgroundColorDark,
                         ),
                       ),
                     ),
@@ -654,7 +638,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: _AppStoreColors.textPrimary,
+              color: AppTheme.textPrimaryColorDark,
             ),
           ),
         ),
@@ -684,13 +668,13 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? _AppStoreColors.primary
-                          : _AppStoreColors.surfaceDark,
+                          ? AppTheme.primaryColor
+                          : AppTheme.surfaceColorDark,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
                         color: isSelected
-                            ? _AppStoreColors.primary
-                            : _AppStoreColors.borderColor,
+                            ? AppTheme.primaryColor
+                            : AppTheme.borderColorDark,
                         width: 1,
                       ),
                     ),
@@ -700,8 +684,8 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: isSelected
-                            ? Colors.black
-                            : _AppStoreColors.textSecondary,
+                            ? AppTheme.backgroundColorDark
+                            : AppTheme.textSecondaryColorDark,
                       ),
                     ),
                   ),
@@ -727,7 +711,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                 children: [
                   Icon(
                     Icons.local_fire_department_rounded,
-                    color: Colors.orange,
+                    color: AppTheme.accentColor,
                     size: 22,
                   ),
                   SizedBox(width: 8),
@@ -736,7 +720,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _AppStoreColors.textPrimary,
+                      color: AppTheme.textPrimaryColorDark,
                     ),
                   ),
                 ],
@@ -750,7 +734,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -774,9 +758,9 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: _AppStoreColors.cardDark,
+        color: AppTheme.cardColorDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _AppStoreColors.borderColor, width: 1),
+        border: Border.all(color: AppTheme.borderColorDark, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -795,7 +779,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: _AppStoreColors.primary.withValues(alpha: 0.15),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -804,7 +788,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                       ),
                     ),
                   ),
@@ -815,12 +799,12 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: _AppStoreColors.surfaceDark,
+                    color: AppTheme.surfaceColorDark,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     _getCategoryIcon(app.category),
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                     size: 26,
                   ),
                 ),
@@ -838,7 +822,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: _AppStoreColors.textPrimary,
+                                color: AppTheme.textPrimaryColorDark,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -852,7 +836,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: _AppStoreColors.starColor,
+                                color: AppTheme.ratingStarColor,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
@@ -860,7 +844,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                                 style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppTheme.backgroundColorDark,
                                 ),
                               ),
                             ),
@@ -872,7 +856,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         app.description,
                         style: const TextStyle(
                           fontSize: 13,
-                          color: _AppStoreColors.textMuted,
+                          color: AppTheme.textHintColorDark,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -882,7 +866,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         children: [
                           const Icon(
                             Icons.star_rounded,
-                            color: _AppStoreColors.starColor,
+                            color: AppTheme.ratingStarColor,
                             size: 14,
                           ),
                           const SizedBox(width: 4),
@@ -891,7 +875,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: _AppStoreColors.textPrimary,
+                              color: AppTheme.textPrimaryColorDark,
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -899,7 +883,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                             '(${app.reviewCount})',
                             style: const TextStyle(
                               fontSize: 11,
-                              color: _AppStoreColors.textMuted,
+                              color: AppTheme.textHintColorDark,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -909,14 +893,14 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: _AppStoreColors.surfaceDark,
+                              color: AppTheme.surfaceColorDark,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               app.category,
                               style: const TextStyle(
                                 fontSize: 10,
-                                color: _AppStoreColors.textSecondary,
+                                color: AppTheme.textSecondaryColorDark,
                               ),
                             ),
                           ),
@@ -941,16 +925,16 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: _AppStoreColors.surfaceDark,
+          color: AppTheme.surfaceColorDark,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _AppStoreColors.borderColor, width: 1),
+          border: Border.all(color: AppTheme.borderColorDark, width: 1),
         ),
         child: const Text(
           'مثبت',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: _AppStoreColors.textMuted,
+            color: AppTheme.textHintColorDark,
           ),
         ),
       );
@@ -958,7 +942,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: _AppStoreColors.primary,
+        color: AppTheme.primaryColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Text(
@@ -966,7 +950,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
-          color: Colors.black,
+          color: AppTheme.backgroundColorDark,
         ),
       ),
     );
@@ -985,7 +969,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                 children: [
                   Icon(
                     Icons.new_releases_rounded,
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                     size: 22,
                   ),
                   SizedBox(width: 8),
@@ -994,7 +978,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _AppStoreColors.textPrimary,
+                      color: AppTheme.textPrimaryColorDark,
                     ),
                   ),
                 ],
@@ -1008,7 +992,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -1038,9 +1022,9 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
   Widget _buildNewAppCard(AppModel app) {
     return Container(
       decoration: BoxDecoration(
-        color: _AppStoreColors.cardDark,
+        color: AppTheme.cardColorDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _AppStoreColors.borderColor, width: 1),
+        border: Border.all(color: AppTheme.borderColorDark, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1063,12 +1047,12 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: _AppStoreColors.primary.withValues(alpha: 0.15),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         _getCategoryIcon(app.category),
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                         size: 24,
                       ),
                     ),
@@ -1082,7 +1066,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _AppStoreColors.primary,
+                              color: AppTheme.primaryColor,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -1090,7 +1074,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppTheme.backgroundColorDark,
                               ),
                             ),
                           ),
@@ -1102,7 +1086,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _AppStoreColors.starColor,
+                              color: AppTheme.ratingStarColor,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -1110,7 +1094,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppTheme.backgroundColorDark,
                               ),
                             ),
                           ),
@@ -1125,7 +1109,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _AppStoreColors.textPrimary,
+                    color: AppTheme.textPrimaryColorDark,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1135,7 +1119,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   app.description,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: _AppStoreColors.textMuted,
+                    color: AppTheme.textHintColorDark,
                     height: 1.3,
                   ),
                   maxLines: 2,
@@ -1150,7 +1134,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       children: [
                         const Icon(
                           Icons.star_rounded,
-                          color: _AppStoreColors.starColor,
+                          color: AppTheme.ratingStarColor,
                           size: 14,
                         ),
                         const SizedBox(width: 4),
@@ -1159,7 +1143,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: _AppStoreColors.textPrimary,
+                            color: AppTheme.textPrimaryColorDark,
                           ),
                         ),
                       ],
@@ -1171,7 +1155,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
@@ -1179,7 +1163,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppTheme.backgroundColorDark,
                         ),
                       ),
                     ),
@@ -1217,7 +1201,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _AppStoreColors.textPrimary,
+                      color: AppTheme.textPrimaryColorDark,
                     ),
                   ),
                 ],
@@ -1231,7 +1215,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _AppStoreColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -1258,9 +1242,9 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
       width: 280,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: _AppStoreColors.cardDark,
+        color: AppTheme.cardColorDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _AppStoreColors.borderColor, width: 1),
+        border: Border.all(color: AppTheme.borderColorDark, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1280,12 +1264,12 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: _AppStoreColors.primary.withValues(alpha: 0.15),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         _getCategoryIcon(app.category),
-                        color: _AppStoreColors.primary,
+                        color: AppTheme.primaryColor,
                         size: 24,
                       ),
                     ),
@@ -1299,7 +1283,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: _AppStoreColors.textPrimary,
+                              color: AppTheme.textPrimaryColorDark,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1309,7 +1293,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                             app.category,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: _AppStoreColors.textMuted,
+                              color: AppTheme.textHintColorDark,
                             ),
                           ),
                         ],
@@ -1322,7 +1306,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _AppStoreColors.starColor,
+                          color: AppTheme.ratingStarColor,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
@@ -1330,7 +1314,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppTheme.backgroundColorDark,
                           ),
                         ),
                       ),
@@ -1341,7 +1325,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                   app.description,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: _AppStoreColors.textSecondary,
+                    color: AppTheme.textSecondaryColorDark,
                     height: 1.4,
                   ),
                   maxLines: 2,
@@ -1355,7 +1339,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                       children: [
                         const Icon(
                           Icons.star_rounded,
-                          color: _AppStoreColors.starColor,
+                          color: AppTheme.ratingStarColor,
                           size: 16,
                         ),
                         const SizedBox(width: 4),
@@ -1364,7 +1348,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: _AppStoreColors.textPrimary,
+                            color: AppTheme.textPrimaryColorDark,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -1372,7 +1356,7 @@ class _AppStoreScreenState extends ConsumerState<AppStoreScreen> {
                           '(${app.reviewCount})',
                           style: const TextStyle(
                             fontSize: 11,
-                            color: _AppStoreColors.textMuted,
+                            color: AppTheme.textHintColorDark,
                           ),
                         ),
                       ],

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// نموذج العميل
 class CustomerItem {
@@ -89,11 +89,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   int _totalCustomers = 0;
   int _newCustomersThisMonth = 0;
 
-  // Colors
-  static const Color _primaryColor = Color(0xFF13EC80);
-  static const Color _backgroundDark = Color(0xFF102219);
-  static const Color _cardDark = Color(0xFF1C3228);
-  static const Color _secondaryText = Color(0xFF92C9AD);
+  // Colors - App Store Design Style
 
   final List<String> _filters = [
     'الكل',
@@ -176,10 +172,16 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? _backgroundDark : const Color(0xFFF6F8F7);
-    final cardColor = isDark ? _cardDark : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final secondaryTextColor = isDark ? _secondaryText : Colors.grey[600]!;
+    final backgroundColor = isDark
+        ? AppTheme.backgroundColorDark
+        : AppTheme.backgroundLight;
+    final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
+    final secondaryTextColor = isDark
+        ? AppTheme.textSecondaryColorDark
+        : AppTheme.textHintColorDark;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -198,13 +200,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(color: _primaryColor),
+                      child: CircularProgressIndicator(
+                        color: AppTheme.primaryColor,
+                      ),
                     )
                   : _error != null
                   ? _buildErrorState(textColor)
                   : RefreshIndicator(
                       onRefresh: _loadCustomers,
-                      color: _primaryColor,
+                      color: AppTheme.primaryColor,
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
@@ -223,7 +227,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                               ),
                               color: isDark
                                   ? Colors.white.withValues(alpha: 0.05)
-                                  : Colors.grey[200],
+                                  : AppTheme.textHintColorDark,
                             ),
                             const SizedBox(height: 8),
                             // Customer List
@@ -270,7 +274,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
           bottom: BorderSide(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[200]!,
+                : AppTheme.textHintColorDark,
           ),
         ),
       ),
@@ -291,7 +295,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       shape: BoxShape.circle,
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.grey[100],
+                          : AppTheme.textHintColorDark,
                     ),
                     child: Icon(
                       Icons.arrow_forward,
@@ -323,11 +327,11 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _primaryColor.withValues(alpha: 0.1),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     ),
                     child: const Icon(
                       Icons.person_add,
-                      color: _primaryColor,
+                      color: AppTheme.primaryColor,
                       size: 24,
                     ),
                   ),
@@ -341,7 +345,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: isDark ? _cardDark : Colors.grey[100],
+                color: isDark ? AppTheme.cardColorDark : AppTheme.textHintColorDark,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.transparent),
               ),
@@ -394,20 +398,24 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? _primaryColor
-                            : (isDark ? _cardDark : Colors.grey[100]),
+                            ? AppTheme.primaryColor
+                            : (isDark
+                                  ? AppTheme.cardColorDark
+                                  : AppTheme.textHintColorDark),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
-                              ? _primaryColor
+                              ? AppTheme.primaryColor
                               : (isDark
                                     ? Colors.white.withValues(alpha: 0.05)
-                                    : Colors.grey[300]!),
+                                    : AppTheme.textHintColorDark),
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: _primaryColor.withValues(alpha: 0.2),
+                                  color: AppTheme.primaryColor.withValues(
+                                    alpha: 0.2,
+                                  ),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -423,7 +431,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                               ? FontWeight.bold
                               : FontWeight.w500,
                           color: isSelected
-                              ? _backgroundDark
+                              ? AppTheme.backgroundColorDark
                               : secondaryTextColor,
                         ),
                       ),
@@ -490,8 +498,11 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: isDark
-            ? const LinearGradient(
-                colors: [Color(0xFF1C3228), Color(0xFF162920)],
+            ? LinearGradient(
+                colors: [
+                  AppTheme.cardColorDark,
+                  AppTheme.cardColorDark.withValues(alpha: 0.8),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
@@ -501,7 +512,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
         border: Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[200]!,
+              : AppTheme.textHintColorDark,
         ),
         boxShadow: [
           BoxShadow(
@@ -520,15 +531,15 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withValues(alpha: 0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: _primaryColor, size: 20),
+                child: Icon(icon, color: AppTheme.primaryColor, size: 20),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _primaryColor.withValues(alpha: 0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -536,7 +547,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   children: [
                     const Icon(
                       Icons.trending_up,
-                      color: _primaryColor,
+                      color: AppTheme.primaryColor,
                       size: 12,
                     ),
                     const SizedBox(width: 2),
@@ -545,7 +556,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: _primaryColor,
+                        color: AppTheme.primaryColor,
                       ),
                     ),
                   ],
@@ -568,7 +579,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? Colors.white : AppTheme.textPrimaryColor,
             ),
           ),
         ],
@@ -644,7 +655,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? _cardDark.withValues(alpha: 0.5) : cardColor,
+        color: isDark
+            ? AppTheme.cardColorDark.withValues(alpha: 0.5)
+            : cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.transparent),
       ),
@@ -672,7 +685,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   border: Border.all(
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.grey[200]!,
+                        : AppTheme.textHintColorDark,
                     width: 2,
                   ),
                 ),
@@ -717,7 +730,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.05)
-                                : Colors.grey[100],
+                                : AppTheme.textHintColorDark,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -726,7 +739,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                               fontSize: 12,
                               color: isDark
                                   ? Colors.white.withValues(alpha: 0.8)
-                                  : Colors.grey[700],
+                                  : AppTheme.textHintColorDark,
                             ),
                           ),
                         ),
@@ -744,7 +757,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: _primaryColor,
+                            color: AppTheme.primaryColor,
                           ),
                         ),
                       ],
@@ -803,10 +816,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: _primaryColor.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: _primaryColor.withValues(alpha: 0.2),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.2),
                     ),
                   ),
                   child: const Text(
@@ -814,7 +827,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: _primaryColor,
+                      color: AppTheme.primaryColor,
                     ),
                   ),
                 ),
@@ -826,7 +839,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
             margin: const EdgeInsets.symmetric(vertical: 12),
             color: isDark
                 ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[200],
+                : AppTheme.textHintColorDark,
           ),
           // Action Buttons
           Row(
@@ -843,7 +856,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                     decoration: BoxDecoration(
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.grey[100],
+                          : AppTheme.textHintColorDark,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -886,10 +899,14 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: _primaryColor.withValues(alpha: 0.3),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: const Icon(Icons.call, size: 18, color: _primaryColor),
+                  child: const Icon(
+                    Icons.call,
+                    size: 18,
+                    color: AppTheme.primaryColor,
+                  ),
                 ),
               ),
             ],
@@ -915,8 +932,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
           ElevatedButton(
             onPressed: _loadCustomers,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _primaryColor,
-              foregroundColor: _backgroundDark,
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: AppTheme.backgroundColorDark,
             ),
             child: const Text('إعادة المحاولة'),
           ),
@@ -925,3 +942,5 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
     );
   }
 }
+
+

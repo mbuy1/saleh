@@ -298,7 +298,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: Column(
           children: [
@@ -457,10 +457,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             AppIcons.error,
             width: 64,
             height: 64,
-            colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(AppTheme.textHintColorDark, BlendMode.srcIn),
           ),
           SizedBox(height: AppDimensions.spacing16),
-          Text(_error!, style: TextStyle(color: Colors.grey[600])),
+          Text(_error!, style: TextStyle(color: AppTheme.textHintColorDark)),
           SizedBox(height: AppDimensions.spacing16),
           ElevatedButton(
             onPressed: _loadData,
@@ -509,7 +509,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppDimensions.borderRadiusM,
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.textHintColorDark),
       ),
       child: Row(
         children: [
@@ -536,14 +536,14 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                   style: TextStyle(
                     fontSize: AppDimensions.fontDisplay3,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    color: AppTheme.textHintColorDark,
                   ),
                 ),
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: AppDimensions.fontLabel,
-                    color: Colors.grey[600],
+                    color: AppTheme.textHintColorDark,
                   ),
                 ),
               ],
@@ -564,13 +564,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               AppIcons.inventory2,
               width: 64,
               height: 64,
-              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(AppTheme.textHintColorDark, BlendMode.srcIn),
             ),
             SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد منتجات',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: AppTheme.textHintColorDark,
                 fontSize: AppDimensions.fontTitle,
               ),
             ),
@@ -597,7 +597,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppDimensions.borderRadiusM,
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.textHintColorDark),
       ),
       child: ListTile(
         contentPadding: AppDimensions.paddingS,
@@ -605,7 +605,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: AppTheme.textHintColorDark,
             borderRadius: AppDimensions.borderRadiusS,
           ),
           child: product.imageUrl != null
@@ -620,7 +620,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                           width: 24,
                           height: 24,
                           colorFilter: ColorFilter.mode(
-                            Colors.grey[400]!,
+                            AppTheme.textHintColorDark,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -631,7 +631,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                   width: 24,
                   height: 24,
                   colorFilter: ColorFilter.mode(
-                    Colors.grey[400]!,
+                    AppTheme.textHintColorDark,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -701,13 +701,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               AppIcons.history,
               width: 64,
               height: 64,
-              colorFilter: ColorFilter.mode(Colors.grey[400]!, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(AppTheme.textHintColorDark, BlendMode.srcIn),
             ),
             SizedBox(height: AppDimensions.spacing16),
             Text(
               'لا توجد حركات',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: AppTheme.textHintColorDark,
                 fontSize: AppDimensions.fontTitle,
               ),
             ),
@@ -736,7 +736,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppDimensions.borderRadiusM,
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.textHintColorDark),
       ),
       child: ListTile(
         contentPadding: AppDimensions.paddingS,
@@ -777,7 +777,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
                 const SizedBox(width: 8),
                 Text(
                   '${movement.stockBefore} → ${movement.stockAfter}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(color: AppTheme.textHintColorDark, fontSize: 12),
                 ),
               ],
             ),
@@ -785,7 +785,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               const SizedBox(height: 2),
               Text(
                 movement.reason!,
-                style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                style: TextStyle(color: AppTheme.textHintColorDark, fontSize: 11),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -806,7 +806,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             ),
             Text(
               DateFormat('MM/dd HH:mm').format(movement.createdAt),
-              style: TextStyle(color: Colors.grey[500], fontSize: 11),
+              style: TextStyle(color: AppTheme.textHintColorDark, fontSize: 11),
             ),
           ],
         ),
@@ -856,7 +856,7 @@ class _AdjustStockSheetState extends State<_AdjustStockSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppTheme.textHintColorDark,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -872,7 +872,7 @@ class _AdjustStockSheetState extends State<_AdjustStockSheet> {
             const SizedBox(height: 8),
             Text(
               'المخزون الحالي: ${widget.product.stock} وحدة',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppTheme.textHintColorDark),
             ),
             const SizedBox(height: 24),
 
@@ -1012,3 +1012,5 @@ class _AdjustStockSheetState extends State<_AdjustStockSheet> {
     );
   }
 }
+
+

@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/theme/app_theme.dart';
 import '../core/controllers/root_controller.dart';
 import '../core/services/api_service.dart';
+import '../core/services/user_preferences_service.dart';
 import '../apps/merchant/merchant_app.dart';
 import '../features/auth/data/auth_controller.dart';
 import 'screens/login_screen.dart';
@@ -43,7 +44,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     // 1. التحقق من وجود token
     final hasToken = await apiService.hasValidTokens();
-    
+
     if (!hasToken) {
       // لا يوجد token - عرض شاشة تسجيل الدخول
       if (mounted) {
@@ -57,7 +58,8 @@ class _AppShellState extends ConsumerState<AppShell> {
       await authController.checkSession();
       final updatedAuthState = ref.read(authControllerProvider);
 
-      if (updatedAuthState.isAuthenticated && updatedAuthState.userRole != null) {
+      if (updatedAuthState.isAuthenticated &&
+          updatedAuthState.userRole != null) {
         // توجد جلسة صالحة - انتقل لتطبيق التاجر فقط
         // نتحقق من الدور (يجب أن يكون merchant)
         if (updatedAuthState.userRole == 'merchant') {
@@ -83,12 +85,15 @@ class _AppShellState extends ConsumerState<AppShell> {
   @override
   Widget build(BuildContext context) {
     final rootState = ref.watch(rootControllerProvider);
+    final themeMode = ref.watch(preferencesStateProvider).themeMode;
 
     // أثناء التحقق من الجلسة - عرض شاشة تحميل
     if (_isCheckingSession) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeMode,
         home: const Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
@@ -103,6 +108,8 @@ class _AppShellState extends ConsumerState<AppShell> {
         title: 'MBUY',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeMode,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

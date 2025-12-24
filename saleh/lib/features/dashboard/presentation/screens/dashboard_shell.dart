@@ -659,13 +659,17 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
 
   Widget _buildCustomBottomNav(BuildContext context, int currentIndex) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: 70 + bottomPadding, // ارتفاع نحيف + SafeArea
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.backgroundColorDark : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -681,30 +685,35 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               label: 'الرئيسية',
               isSelected: currentIndex == 0,
               onTap: () => _onItemTapped(0, context),
+              isDark: isDark,
             ),
             _buildNavItem(
               icon: AppIcons.orders,
               label: 'الطلبات',
               isSelected: currentIndex == 1,
               onTap: () => _onItemTapped(1, context),
+              isDark: isDark,
             ),
             _buildNavItem(
               icon: AppIcons.product,
               label: 'المنتجات',
               isSelected: currentIndex == 2,
               onTap: () => _onItemTapped(2, context),
+              isDark: isDark,
             ),
             _buildNavItem(
               icon: AppIcons.chat,
               label: 'المحادثات',
               isSelected: currentIndex == 3,
               onTap: () => _onItemTapped(3, context),
+              isDark: isDark,
             ),
             _buildNavItem(
               icon: AppIcons.shipping,
               label: 'دروب شيب',
               isSelected: currentIndex == 4,
               onTap: () => _onItemTapped(4, context),
+              isDark: isDark,
             ),
           ],
         ),
@@ -717,7 +726,14 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
+    required bool isDark,
   }) {
+    // ألوان مخصصة للـ Dark Mode
+    final selectedColor = isDark
+        ? const Color(0xFF4ADE80)
+        : AppTheme.primaryColor;
+    final unselectedColor = isDark ? const Color(0xFF6B8F7A) : Colors.grey[600];
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -729,7 +745,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
             AppIcon(
               icon,
               size: 24,
-              color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
+              color: isSelected ? selectedColor : unselectedColor,
             ),
             const SizedBox(height: 4),
             Text(
@@ -737,7 +753,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               style: TextStyle(
                 fontSize: AppDimensions.fontCaption,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppTheme.primaryColor : Colors.grey[600],
+                color: isSelected ? selectedColor : unselectedColor,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

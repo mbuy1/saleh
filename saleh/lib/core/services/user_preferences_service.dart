@@ -161,14 +161,14 @@ class UserPreferencesService {
   /// الحصول على وضع السمة
   Future<ThemeMode> getThemeMode() async {
     final p = await prefs;
-    final mode = p.getString(keyThemeMode) ?? 'system';
+    final mode = p.getString(keyThemeMode) ?? 'dark'; // ✅ Dark Mode as default
     switch (mode) {
       case 'light':
         return ThemeMode.light;
       case 'dark':
         return ThemeMode.dark;
       default:
-        return ThemeMode.system;
+        return ThemeMode.dark; // ✅ Dark Mode as default
     }
   }
 
@@ -383,7 +383,7 @@ class UserPreferences {
     this.quickActions = const [],
     this.notificationSettings = const NotificationSettings(),
     this.homeLayout = const [],
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.dark, // ✅ Dark Mode as default
     this.language = 'ar',
     this.onboardingComplete = false,
   });

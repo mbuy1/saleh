@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// شاشة محفظة التاجر
 /// ملاحظة: مطلوب ربطها بالبيانات الحقيقية من API مستقبلاً
@@ -10,19 +11,20 @@ class WalletScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Colors from Design
-    const primaryColor = Color(0xFF13EC80);
-    const bgLight = Color(0xFFF6F8F7);
-    const bgDark = Color(0xFF102219);
-    const surfaceLight = Colors.white;
-    const surfaceDark = Color(0xFF1A3325);
-
-    final backgroundColor = isDark ? bgDark : bgLight;
-    final surfaceColor = isDark ? surfaceDark : surfaceLight;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    // Colors - Using AppTheme (Brand Primary #215950)
+    const primaryColor = AppTheme.primaryColor;
+    final backgroundColor = isDark
+        ? AppTheme.backgroundColorDark
+        : AppTheme.backgroundColor;
+    final surfaceColor = isDark
+        ? AppTheme.surfaceColorDark
+        : AppTheme.surfaceColor;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
-        ? const Color(0xFF9CA3AF)
-        : const Color(0xFF64748B);
+        ? AppTheme.textSecondaryColorDark
+        : AppTheme.textSecondaryColor;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -77,7 +79,7 @@ class WalletScreen extends StatelessWidget {
                       surfaceColor,
                       textColor,
                       primaryColor,
-                      bgDark,
+                      backgroundColor,
                     ),
 
                     const SizedBox(height: 8),
@@ -114,7 +116,7 @@ class WalletScreen extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Transform.rotate(
                                   angle: 3.14159,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.arrow_right_alt,
                                     color: primaryColor,
                                     size: 16,
@@ -161,8 +163,8 @@ class WalletScreen extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[200]!,
+                ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                : AppTheme.textHintColor.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -210,7 +212,9 @@ class WalletScreen extends StatelessWidget {
             TextSpan(
               text: 'معرف التاجر: ',
               style: TextStyle(
-                color: isDark ? const Color(0xFF92C9AD) : Colors.grey[500],
+                color: isDark
+                    ? AppTheme.textHintColorDark
+                    : AppTheme.textHintColor,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -218,7 +222,9 @@ class WalletScreen extends StatelessWidget {
             TextSpan(
               text: '8823',
               style: TextStyle(
-                color: isDark ? const Color(0xFF92C9AD) : Colors.grey[500],
+                color: isDark
+                    ? AppTheme.textHintColorDark
+                    : AppTheme.textHintColor,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'monospace',
@@ -244,8 +250,8 @@ class WalletScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -362,8 +368,8 @@ class WalletScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -437,7 +443,9 @@ class WalletScreen extends StatelessWidget {
                     Text(
                       'تعادل ',
                       style: TextStyle(
-                        color: isDark ? Colors.grey[500] : Colors.grey[400],
+                        color: isDark
+                            ? AppTheme.textHintColorDark
+                            : AppTheme.textHintColor,
                         fontSize: 12,
                       ),
                     ),
@@ -478,7 +486,9 @@ class WalletScreen extends StatelessWidget {
               label: 'سحب الرصيد',
               iconBgColor: primaryColor,
               iconColor: bgDark,
-              textColor: isDark ? Colors.grey[200]! : Colors.grey[700]!,
+              textColor: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textSecondaryColor,
             ),
           ),
           const SizedBox(width: 12),
@@ -488,9 +498,11 @@ class WalletScreen extends StatelessWidget {
               surfaceColor: surfaceColor,
               icon: Icons.currency_exchange,
               label: 'استبدال النقاط',
-              iconBgColor: isDark ? const Color(0xFF2A4536) : surfaceColor,
+              iconBgColor: isDark ? AppTheme.iconBgDark : surfaceColor,
               iconColor: textColor,
-              textColor: isDark ? Colors.grey[200]! : Colors.grey[700]!,
+              textColor: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textSecondaryColor,
               hasBorder: true,
             ),
           ),
@@ -501,9 +513,11 @@ class WalletScreen extends StatelessWidget {
               surfaceColor: surfaceColor,
               icon: Icons.tune,
               label: 'تصفية',
-              iconBgColor: isDark ? const Color(0xFF2A4536) : surfaceColor,
+              iconBgColor: isDark ? AppTheme.iconBgDark : surfaceColor,
               iconColor: textColor,
-              textColor: isDark ? Colors.grey[200]! : Colors.grey[700]!,
+              textColor: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textSecondaryColor,
               hasBorder: true,
             ),
           ),
@@ -529,8 +543,8 @@ class WalletScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -551,7 +565,7 @@ class WalletScreen extends StatelessWidget {
               border: hasBorder
                   ? Border.all(
                       color: isDark
-                          ? Colors.white.withValues(alpha: 0.1)
+                          ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
                           : Colors.transparent,
                     )
                   : null,
@@ -616,9 +630,11 @@ class WalletScreen extends StatelessWidget {
             surfaceColor: surfaceColor,
             icon: Icons.arrow_outward,
             iconBgColor: isDark
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.grey[200]!,
-            iconColor: isDark ? Colors.grey[300]! : Colors.grey[600]!,
+                ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                : AppTheme.textHintColor.withValues(alpha: 0.3),
+            iconColor: isDark
+                ? AppTheme.textSecondaryColorDark
+                : AppTheme.textSecondaryColor,
             title: 'سحب إلى البنك',
             subtitle: '12 أغسطس، 09:00 ص',
             amount: '- 2,500.00 ر.س',
@@ -665,8 +681,8 @@ class WalletScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(

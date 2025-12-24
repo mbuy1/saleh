@@ -845,7 +845,7 @@ final List<ShortcutItemData> _availableShortcuts = [
     title: 'رمز QR',
     route: '/dashboard/qrcode-generator',
     icon: Icons.qr_code_outlined,
-    color: Color(0xFF64748B),
+    color: AppTheme.slate500,
   ),
   // الشحن والدفع
   const ShortcutItemData(

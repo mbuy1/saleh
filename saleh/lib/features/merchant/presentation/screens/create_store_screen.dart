@@ -30,11 +30,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   TimeOfDay _closeTime = const TimeOfDay(hour: 22, minute: 0);
   int _selectedDayIndex = 0; // 0 = الكل
 
-  // Colors
-  static const Color _primaryColor = Color(0xFF13EC80);
-  static const Color _backgroundDark = Color(0xFF102219);
-  static const Color _surfaceDark = Color(0xFF193326);
-  static const Color _borderDark = Color(0xFF32674D);
+  // Colors - App Store Design Style
 
   @override
   void initState() {
@@ -128,14 +124,20 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(merchantStoreLoadingProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? _backgroundDark : const Color(0xFFF6F8F7);
-    final surfaceColor = isDark ? _surfaceDark : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final backgroundColor = isDark
+        ? AppTheme.backgroundColorDark
+        : AppTheme.backgroundLight;
+    final surfaceColor = isDark ? AppTheme.surfaceColorDark : Colors.white;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
-        ? Colors.grey[400]!
-        : const Color(0xFF64748B);
-    final borderColor = isDark ? _borderDark : Colors.grey[200]!;
-    final inputBgColor = isDark ? _backgroundDark : Colors.grey[50]!;
+        ? AppTheme.textSecondaryColorDark
+        : AppTheme.textSecondaryColor;
+    final borderColor = isDark ? AppTheme.borderColorDark : Colors.grey[200]!;
+    final inputBgColor = isDark
+        ? AppTheme.backgroundColorDark
+        : Colors.grey[50]!;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -269,13 +271,13 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: _primaryColor,
+                        color: AppTheme.primaryColor,
                       ),
                     )
                   : const Text(
                       'حفظ',
                       style: TextStyle(
-                        color: _primaryColor,
+                        color: AppTheme.primaryColor,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -349,12 +351,12 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                         height: 64,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _primaryColor.withValues(alpha: 0.1),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
                           border: Border.all(color: borderColor, width: 2),
                         ),
                         child: const Icon(
                           Icons.store,
-                          color: _primaryColor,
+                          color: AppTheme.primaryColor,
                           size: 32,
                         ),
                       ),
@@ -364,12 +366,12 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: const BoxDecoration(
-                            color: _primaryColor,
+                            color: AppTheme.primaryColor,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.edit,
-                            color: _backgroundDark,
+                            color: AppTheme.backgroundColorDark,
                             size: 12,
                           ),
                         ),
@@ -444,7 +446,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -499,7 +503,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -581,7 +587,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -639,7 +647,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -678,7 +688,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                       Container(
                         height: 128,
                         width: double.infinity,
-                        color: isDark ? _backgroundDark : Colors.grey[200],
+                        color: isDark
+                            ? AppTheme.backgroundColorDark
+                            : Colors.grey[200],
                         child: Icon(
                           Icons.map_outlined,
                           size: 64,
@@ -694,9 +706,8 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                                 // TODO: Implement location picker
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _surfaceDark.withValues(
-                                  alpha: 0.8,
-                                ),
+                                backgroundColor: AppTheme.surfaceColorDark
+                                    .withValues(alpha: 0.8),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -704,7 +715,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  side: const BorderSide(color: _borderDark),
+                                  side: const BorderSide(
+                                    color: AppTheme.borderColorDark,
+                                  ),
                                 ),
                               ),
                               icon: const Icon(Icons.location_on, size: 18),
@@ -808,7 +821,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -868,7 +883,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: _primaryColor),
+                      borderSide: const BorderSide(
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -905,7 +922,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: _isStoreOpen ? _primaryColor : secondaryTextColor,
+                  color: _isStoreOpen
+                      ? AppTheme.primaryColor
+                      : secondaryTextColor,
                 ),
               ),
               const SizedBox(width: 8),
@@ -920,7 +939,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                   height: 24,
                   decoration: BoxDecoration(
                     color: _isStoreOpen
-                        ? _primaryColor.withValues(alpha: 0.2)
+                        ? AppTheme.primaryColor.withValues(alpha: 0.2)
                         : secondaryTextColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -936,7 +955,7 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                           height: 16,
                           decoration: BoxDecoration(
                             color: _isStoreOpen
-                                ? _primaryColor
+                                ? AppTheme.primaryColor
                                 : secondaryTextColor,
                             shape: BoxShape.circle,
                           ),
@@ -1101,11 +1120,11 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? _primaryColor.withValues(alpha: 0.1)
+                        ? AppTheme.primaryColor.withValues(alpha: 0.1)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: isSelected ? _primaryColor : borderColor,
+                      color: isSelected ? AppTheme.primaryColor : borderColor,
                     ),
                   ),
                   child: Text(
@@ -1115,7 +1134,9 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,
-                      color: isSelected ? _primaryColor : secondaryTextColor,
+                      color: isSelected
+                          ? AppTheme.primaryColor
+                          : secondaryTextColor,
                     ),
                   ),
                 ),

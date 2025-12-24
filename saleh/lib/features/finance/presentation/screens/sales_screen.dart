@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_icons.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// شاشة تقارير المبيعات
 /// ملاحظة: مطلوب ربطها بالبيانات الحقيقية من API مستقبلاً
@@ -22,8 +22,8 @@ class _SalesScreenState extends State<SalesScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF102219)
-          : const Color(0xFFF6F8F7),
+          ? AppTheme.backgroundColorDark
+          : AppTheme.backgroundLight,
       body: SafeArea(
         child: Column(
           children: [
@@ -62,13 +62,13 @@ class _SalesScreenState extends State<SalesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF102219).withValues(alpha: 0.9)
-            : const Color(0xFFF6F8F7).withValues(alpha: 0.9),
+            ? AppTheme.backgroundColorDark.withValues(alpha: 0.9)
+            : AppTheme.backgroundLight.withValues(alpha: 0.9),
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+                ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                : AppTheme.textHintColor.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -81,14 +81,16 @@ class _SalesScreenState extends State<SalesScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.black.withValues(alpha: 0.05),
+                    ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                    : AppTheme.textHintColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: AppIcon(
                 AppIcons.arrowBack,
                 size: 24,
-                color: isDark ? Colors.white : Colors.grey[800],
+                color: isDark
+                    ? AppTheme.textPrimaryColorDark
+                    : AppTheme.textPrimaryColor,
               ),
             ),
           ),
@@ -100,7 +102,9 @@ class _SalesScreenState extends State<SalesScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.grey[900],
+                color: isDark
+                    ? AppTheme.textPrimaryColorDark
+                    : AppTheme.textPrimaryColor,
               ),
             ),
           ),
@@ -117,7 +121,9 @@ class _SalesScreenState extends State<SalesScreen> {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C3026) : Colors.grey[200],
+          color: isDark
+              ? AppTheme.surfaceDarkAccent
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -142,7 +148,9 @@ class _SalesScreenState extends State<SalesScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? (isDark ? const Color(0xFF102219) : Colors.white)
+                ? (isDark
+                      ? AppTheme.backgroundColorDark
+                      : AppTheme.surfaceColor)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             boxShadow: isSelected
@@ -161,8 +169,10 @@ class _SalesScreenState extends State<SalesScreen> {
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: isSelected
-                  ? (isDark ? AppTheme.primaryColor : Colors.black)
-                  : (isDark ? const Color(0xFF92C9AD) : Colors.grey[500]),
+                  ? (isDark ? AppTheme.primaryColor : AppTheme.textPrimaryColor)
+                  : (isDark
+                        ? AppTheme.textSecondaryColorDark
+                        : AppTheme.textHintColor),
             ),
           ),
         ),
@@ -180,7 +190,7 @@ class _SalesScreenState extends State<SalesScreen> {
           _buildKPICard(
             isDark: isDark,
             icon: AppIcons.wallet,
-            iconColor: isDark ? AppTheme.primaryColor : Colors.green[600]!,
+            iconColor: isDark ? AppTheme.primaryColor : AppTheme.successColor,
             title: 'إجمالي المبيعات',
             value: '٥٤,٠٠٠',
             unit: 'ر.س',
@@ -229,12 +239,12 @@ class _SalesScreenState extends State<SalesScreen> {
       width: 160,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C3026) : Colors.white,
+        color: isDark ? AppTheme.surfaceDarkAccent : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              : AppTheme.textHintColorDark,
         ),
         boxShadow: [
           BoxShadow(
@@ -253,7 +263,9 @@ class _SalesScreenState extends State<SalesScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF102219) : Colors.grey[50],
+                  color: isDark
+                      ? AppTheme.backgroundColorDark
+                      : AppTheme.textHintColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: AppIcon(icon, size: 24, color: iconColor),
@@ -264,7 +276,7 @@ class _SalesScreenState extends State<SalesScreen> {
                   color: isPositive
                       ? (isDark
                             ? AppTheme.primaryColor.withValues(alpha: 0.1)
-                            : Colors.green[50])
+                            : AppTheme.successColor.withValues(alpha: 0.1))
                       : (isDark
                             ? Colors.red.withValues(alpha: 0.1)
                             : Colors.red[50]),
@@ -277,7 +289,9 @@ class _SalesScreenState extends State<SalesScreen> {
                       isPositive ? Icons.trending_up : Icons.trending_down,
                       size: 14,
                       color: isPositive
-                          ? (isDark ? AppTheme.primaryColor : Colors.green[600])
+                          ? (isDark
+                                ? AppTheme.primaryColor
+                                : AppTheme.successColor)
                           : (isDark ? Colors.red[400] : Colors.red[500]),
                     ),
                     const SizedBox(width: 2),
@@ -289,7 +303,7 @@ class _SalesScreenState extends State<SalesScreen> {
                         color: isPositive
                             ? (isDark
                                   ? AppTheme.primaryColor
-                                  : Colors.green[600])
+                                  : AppTheme.successColor)
                             : (isDark ? Colors.red[400] : Colors.red[500]),
                       ),
                     ),
@@ -304,7 +318,9 @@ class _SalesScreenState extends State<SalesScreen> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFF92C9AD) : Colors.grey[500],
+              color: isDark
+                  ? AppTheme.textSecondaryColorDark
+                  : AppTheme.textHintColor,
             ),
           ),
           const SizedBox(height: 4),
@@ -317,13 +333,20 @@ class _SalesScreenState extends State<SalesScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.grey[900],
+                  color: isDark
+                      ? AppTheme.textPrimaryColorDark
+                      : AppTheme.textPrimaryColor,
                 ),
               ),
               const SizedBox(width: 4),
               Text(
                 unit,
-                style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppTheme.textHintColorDark
+                      : AppTheme.textHintColor,
+                ),
               ),
             ],
           ),
@@ -338,12 +361,12 @@ class _SalesScreenState extends State<SalesScreen> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C3026) : Colors.white,
+          color: isDark ? AppTheme.surfaceDarkAccent : AppTheme.surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[100]!,
+                ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                : AppTheme.textHintColor.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
@@ -367,7 +390,9 @@ class _SalesScreenState extends State<SalesScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.grey[900],
+                        color: isDark
+                            ? AppTheme.textPrimaryColorDark
+                            : AppTheme.textPrimaryColor,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -376,15 +401,20 @@ class _SalesScreenState extends State<SalesScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFF92C9AD)
-                            : Colors.grey[500],
+                            ? AppTheme.textSecondaryColorDark
+                            : AppTheme.textHintColor,
                       ),
                     ),
                   ],
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(Icons.more_horiz, color: Colors.grey[400]),
+                  icon: Icon(
+                    Icons.more_horiz,
+                    color: isDark
+                        ? AppTheme.textHintColorDark
+                        : AppTheme.textHintColor,
+                  ),
                 ),
               ],
             ),
@@ -423,7 +453,9 @@ class _SalesScreenState extends State<SalesScreen> {
       style: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w500,
-        color: isDark ? const Color(0xFF92C9AD) : Colors.grey[400],
+        color: isDark
+            ? AppTheme.textSecondaryColorDark
+            : AppTheme.textHintColor,
       ),
     );
   }
@@ -447,12 +479,12 @@ class _SalesScreenState extends State<SalesScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C3026) : Colors.white,
+        color: isDark ? AppTheme.surfaceDarkAccent : AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -470,7 +502,9 @@ class _SalesScreenState extends State<SalesScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.grey[900],
+              color: isDark
+                  ? AppTheme.textPrimaryColorDark
+                  : AppTheme.textPrimaryColor,
             ),
           ),
           const SizedBox(height: 24),
@@ -495,7 +529,9 @@ class _SalesScreenState extends State<SalesScreen> {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.grey[900],
+                            color: isDark
+                                ? AppTheme.textPrimaryColorDark
+                                : AppTheme.textPrimaryColor,
                           ),
                         ),
                         Text(
@@ -503,8 +539,8 @@ class _SalesScreenState extends State<SalesScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             color: isDark
-                                ? const Color(0xFF92C9AD)
-                                : Colors.grey[500],
+                                ? AppTheme.textSecondaryColorDark
+                                : AppTheme.textHintColor,
                           ),
                         ),
                       ],
@@ -573,7 +609,9 @@ class _SalesScreenState extends State<SalesScreen> {
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.grey[300] : Colors.grey[600],
+                color: isDark
+                    ? AppTheme.textSecondaryColorDark
+                    : AppTheme.textSecondaryColor,
               ),
             ),
           ],
@@ -583,7 +621,9 @@ class _SalesScreenState extends State<SalesScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.grey[900],
+            color: isDark
+                ? AppTheme.textPrimaryColorDark
+                : AppTheme.textPrimaryColor,
           ),
         ),
       ],
@@ -602,7 +642,9 @@ class _SalesScreenState extends State<SalesScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.grey[900],
+                color: isDark
+                    ? AppTheme.textPrimaryColorDark
+                    : AppTheme.textPrimaryColor,
               ),
             ),
             TextButton(
@@ -665,12 +707,12 @@ class _SalesScreenState extends State<SalesScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C3026) : Colors.white,
+        color: isDark ? AppTheme.surfaceDarkAccent : AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
+              ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+              : AppTheme.textHintColor.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
@@ -688,8 +730,8 @@ class _SalesScreenState extends State<SalesScreen> {
             height: 56,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.grey[100],
+                  ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+                  : AppTheme.textHintColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(
@@ -697,8 +739,12 @@ class _SalesScreenState extends State<SalesScreen> {
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    Icon(Icons.image, color: Colors.grey[400]),
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.image,
+                  color: isDark
+                      ? AppTheme.textHintColorDark
+                      : AppTheme.textHintColor,
+                ),
               ),
             ),
           ),
@@ -713,7 +759,9 @@ class _SalesScreenState extends State<SalesScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : Colors.grey[900],
+                    color: isDark
+                        ? AppTheme.textPrimaryColorDark
+                        : AppTheme.textPrimaryColor,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -730,8 +778,10 @@ class _SalesScreenState extends State<SalesScreen> {
                               ? Colors.red[900]!.withValues(alpha: 0.2)
                               : Colors.red[100])
                         : (isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.grey[100]),
+                              ? AppTheme.textHintColorDark.withValues(
+                                  alpha: 0.2,
+                                )
+                              : AppTheme.textHintColor.withValues(alpha: 0.2)),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -741,8 +791,8 @@ class _SalesScreenState extends State<SalesScreen> {
                       color: isLowStock
                           ? (isDark ? Colors.red[400] : Colors.red[500])
                           : (isDark
-                                ? const Color(0xFF92C9AD)
-                                : Colors.grey[500]),
+                                ? AppTheme.textSecondaryColorDark
+                                : AppTheme.textHintColor),
                     ),
                   ),
                 ),
@@ -758,7 +808,9 @@ class _SalesScreenState extends State<SalesScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.grey[900],
+                  color: isDark
+                      ? AppTheme.textPrimaryColorDark
+                      : AppTheme.textPrimaryColor,
                 ),
               ),
               const SizedBox(height: 4),
@@ -793,7 +845,7 @@ class _SalesScreenState extends State<SalesScreen> {
           // تصدير التقرير
         },
         backgroundColor: AppTheme.primaryColor,
-        foregroundColor: const Color(0xFF102219),
+        foregroundColor: Colors.white,
         elevation: 0,
         icon: const Icon(Icons.download, size: 24),
         label: const Text(
@@ -877,7 +929,7 @@ class _ChartPainter extends CustomPainter {
 
     // رسم نقطة التفاعل
     final dotPaint = Paint()
-      ..color = isDark ? const Color(0xFF102219) : Colors.white
+      ..color = isDark ? AppTheme.backgroundColorDark : AppTheme.surfaceColor
       ..style = PaintingStyle.fill;
 
     final dotBorderPaint = Paint()
@@ -911,8 +963,8 @@ class _DonutChartPainter extends CustomPainter {
     // خلفية الدائرة
     final bgPaint = Paint()
       ..color = isDark
-          ? Colors.white.withValues(alpha: 0.05)
-          : Colors.grey[100]!
+          ? AppTheme.textHintColorDark.withValues(alpha: 0.2)
+          : AppTheme.textHintColor.withValues(alpha: 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 

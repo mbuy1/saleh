@@ -82,10 +82,28 @@ class AppTheme {
     0xFF334155,
   ); // Dark charcoal for ad banners
 
-  // === Background & Surface (Dark Mode) ===
-  static const Color backgroundColorDark = Color(0xFF121212);
-  static const Color surfaceColorDark = Color(0xFF1E1E1E);
-  static const Color cardColorDark = Color(0xFF2D2D2D);
+  // === Background & Surface (Dark Mode) - Green Dark Theme ===
+  static const Color backgroundColorDark = Color(0xFF0D1F17); // أخضر غامق
+  static const Color surfaceColorDark = Color(0xFF152A20); // أخضر غامق للسطح
+  static const Color cardColorDark = Color(0xFF1E3829); // أخضر غامق للكروت
+
+  // === Dark Mode Extended Palette (Single Source of Truth) ===
+  static const Color surfaceDarkAccent = Color(0xFF1A3526); // Dark green accent
+  static const Color iconBgDark = Color(
+    0xFF24402F,
+  ); // Dark green for icon backgrounds
+  static const Color dividerDark = Color(
+    0xFF2A4536,
+  ); // Divider/border for dark mode - أخضر غامق
+  static const Color disabledDark = Color(0xFF5A5A5A); // Disabled elements
+  static const Color textMutedDark = Color(0xFF8A8A8A); // Muted text
+  static const Color iconPrimaryDark = Color(0xFFFFFFFF); // Primary icons
+  static const Color iconSecondaryDark = Color(0xFFB3B3B3); // Secondary icons
+  static const Color shadowDark = Color(0x40000000); // Shadow for dark mode
+  static const Color overlayDark = Color(0x0DFFFFFF); // 5% white overlay
+
+  // === Light Background Variant ===
+  static const Color backgroundLight = Color(0xFFF6F8F7); // Slightly warm slate
 
   // === Text Colors (Light Mode) - Metallic Slate Theme ===
   static const Color textPrimaryColor = Color(
@@ -814,19 +832,20 @@ class AppTheme {
         margin: EdgeInsets.zero,
       ),
 
-      // Bottom Navigation Bar
+      // Bottom Navigation Bar - أخضر غامق
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: surfaceColorDark,
+        backgroundColor:
+            backgroundColorDark, // أخضر غامق بدلاً من surfaceColorDark
         elevation: 8,
-        selectedItemColor: primaryColor,
-        unselectedItemColor: textSecondaryColorDark,
+        selectedItemColor: const Color(0xFF4ADE80), // أخضر فاتح للعنصر المحدد
+        unselectedItemColor: const Color(0xFF6B8F7A), // أخضر رمادي
       ),
 
-      // Navigation Bar (M3)
+      // Navigation Bar (M3) - أخضر غامق
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: surfaceColorDark,
+        backgroundColor: backgroundColorDark, // أخضر غامق
         elevation: 8,
-        indicatorColor: primaryColor.withValues(alpha: 0.2),
+        indicatorColor: const Color(0xFF4ADE80).withValues(alpha: 0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final color = states.contains(WidgetState.selected)
               ? primaryColor
@@ -980,4 +999,40 @@ class AppTheme {
       ),
     ],
   );
+
+  // ============================================================================
+  // Helper Methods for Dark Mode (Theme-Aware Colors)
+  // ============================================================================
+
+  /// Get text primary color based on brightness
+  static Color textPrimary(bool isDark) =>
+      isDark ? textPrimaryColorDark : textPrimaryColor;
+
+  /// Get text secondary color based on brightness
+  static Color textSecondary(bool isDark) =>
+      isDark ? textSecondaryColorDark : textSecondaryColor;
+
+  /// Get text hint/muted color based on brightness
+  static Color textHint(bool isDark) =>
+      isDark ? textHintColorDark : textHintColor;
+
+  /// Get background color based on brightness
+  static Color background(bool isDark) =>
+      isDark ? backgroundColorDark : backgroundColor;
+
+  /// Get surface color based on brightness
+  static Color surface(bool isDark) => isDark ? surfaceColorDark : surfaceColor;
+
+  /// Get card color based on brightness
+  static Color card(bool isDark) => isDark ? cardColorDark : cardColor;
+
+  /// Get border color based on brightness
+  static Color border(bool isDark) => isDark ? borderColorDark : borderColor;
+
+  /// Get divider color based on brightness
+  static Color divider(bool isDark) => isDark ? dividerColorDark : dividerColor;
+
+  /// Get shadow color for cards
+  static Color shadow(bool isDark) =>
+      isDark ? shadowDark : Colors.black.withValues(alpha: 0.05);
 }

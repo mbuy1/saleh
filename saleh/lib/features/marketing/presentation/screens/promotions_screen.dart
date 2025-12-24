@@ -252,7 +252,7 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text(
           'ضاعف ظهورك',

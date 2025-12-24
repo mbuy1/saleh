@@ -152,8 +152,9 @@ class StoreTab extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: Colors.white,
+      color: isDark ? AppTheme.surfaceColorDark : AppTheme.surfaceColor,
       borderRadius: AppDimensions.borderRadiusM,
       child: InkWell(
         onTap: () => _showLogoutDialog(context, ref),
@@ -203,7 +204,9 @@ class StoreTab extends ConsumerWidget {
                       'الخروج من الحساب الحالي',
                       style: TextStyle(
                         fontSize: AppDimensions.fontLabel,
-                        color: Colors.grey[500],
+                        color: isDark
+                            ? AppTheme.textHintColorDark
+                            : AppTheme.textHintColor,
                       ),
                     ),
                   ],
@@ -212,7 +215,9 @@ class StoreTab extends ConsumerWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: AppDimensions.iconXS,
-                color: Colors.grey[400],
+                color: isDark
+                    ? AppTheme.textHintColorDark
+                    : AppTheme.textHintColor,
               ),
             ],
           ),
@@ -266,8 +271,9 @@ class StoreTab extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: Colors.white,
+      color: isDark ? AppTheme.surfaceColorDark : AppTheme.surfaceColor,
       borderRadius: AppDimensions.borderRadiusM,
       child: InkWell(
         onTap: () => _showDeleteStoreDialog(context, ref),
@@ -317,7 +323,9 @@ class StoreTab extends ConsumerWidget {
                       'حذف المتجر وجميع البيانات نهائياً',
                       style: TextStyle(
                         fontSize: AppDimensions.fontLabel,
-                        color: Colors.grey[500],
+                        color: isDark
+                            ? AppTheme.textHintColorDark
+                            : AppTheme.textHintColor,
                       ),
                     ),
                   ],
@@ -326,7 +334,9 @@ class StoreTab extends ConsumerWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: AppDimensions.iconXS,
-                color: Colors.grey[400],
+                color: isDark
+                    ? AppTheme.textHintColorDark
+                    : AppTheme.textHintColor,
               ),
             ],
           ),
@@ -336,13 +346,20 @@ class StoreTab extends ConsumerWidget {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: AppDimensions.fontBody,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey[700],
-      ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Text(
+          title,
+          style: TextStyle(
+            fontSize: AppDimensions.fontBody,
+            fontWeight: FontWeight.bold,
+            color: isDark
+                ? AppTheme.textSecondaryColorDark
+                : AppTheme.textSecondaryColor,
+          ),
+        );
+      },
     );
   }
 
@@ -354,8 +371,9 @@ class StoreTab extends ConsumerWidget {
     required VoidCallback onTap,
     String? badge,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: Colors.white,
+      color: isDark ? AppTheme.surfaceColorDark : AppTheme.surfaceColor,
       borderRadius: AppDimensions.borderRadiusM,
       child: InkWell(
         onTap: onTap,
@@ -399,7 +417,9 @@ class StoreTab extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: AppDimensions.fontSubtitle,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey[800],
+                            color: isDark
+                                ? AppTheme.textPrimaryColorDark
+                                : AppTheme.textPrimaryColor,
                           ),
                         ),
                         if (badge != null) ...[
@@ -430,7 +450,9 @@ class StoreTab extends ConsumerWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: AppDimensions.fontLabel,
-                        color: Colors.grey[500],
+                        color: isDark
+                            ? AppTheme.textHintColorDark
+                            : AppTheme.textHintColor,
                       ),
                     ),
                   ],
@@ -439,7 +461,9 @@ class StoreTab extends ConsumerWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: AppDimensions.iconXS,
-                color: Colors.grey[400],
+                color: isDark
+                    ? AppTheme.textHintColorDark
+                    : AppTheme.textHintColor,
               ),
             ],
           ),

@@ -91,6 +91,11 @@ export 'base_screen.dart';
 export 'error_boundary.dart';
 export 'sub_page_scaffold.dart';
 
+// ============================================================================
+// Design System Widgets - مكونات نظام التصميم الموحد
+// ============================================================================
+export 'design_system_widgets.dart' hide MbuySectionTitle, MbuyBadge;
+
 // Utils
 export '../utils/dialog_helper.dart';
 export '../utils/haptic_helper.dart';

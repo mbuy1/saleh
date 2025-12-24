@@ -5,23 +5,18 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:ui';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/skeleton_loading.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../merchant/domain/models/store.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                    🎨 Glass Design - Oxford Blue Theme                    ║
+// ║                    🎨 Design System - Brand Primary #215950               ║
 // ║                                                                           ║
-// ║   تصميم زجاجي حديث مع ألوان Oxford Blue                                  ║
-// ║   تاريخ التحديث: 19 ديسمبر 2025                                          ║
+// ║   تصميم موحد مع Brand Primary                                             ║
+// ║   تاريخ التحديث: 24 ديسمبر 2025                                          ║
 // ║   ملاحظة: الهيدر العلوي موجود في DashboardShell                          ║
 // ╚═══════════════════════════════════════════════════════════════════════════╝
-
-/// ألوان التصميم الجديد
-class _HomeColors {
-  static const Color primary = Color(0xFF00214A); // Oxford Blue
-  static const Color surfaceLight = Color(0xFFF8FAFC);
-}
 
 /// الصفحة الرئيسية للتاجر - تصميم زجاجي
 class HomeTab extends ConsumerStatefulWidget {
@@ -58,7 +53,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final store = storeState.store;
 
     return Scaffold(
-      backgroundColor: _HomeColors.surfaceLight,
+      backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
           // خلفية الـ Blobs
@@ -66,7 +61,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           // المحتوى الرئيسي
           RefreshIndicator(
             onRefresh: _loadData,
-            color: _HomeColors.primary,
+            color: AppTheme.primaryColor,
             child: _isLoading
                 ? const SkeletonHomeDashboard()
                 : CustomScrollView(
@@ -103,7 +98,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     return Stack(
       children: [
         // خلفية ثابتة
-        Container(color: _HomeColors.surfaceLight),
+        Container(color: AppTheme.backgroundColor),
         // Blob أزرق في الأعلى
         Positioned(
           top: -80,
@@ -154,18 +149,21 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   /// بطاقة رابط المتجر
   Widget _buildStoreLinkCard(String storeName) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final storeSlug = storeName.replaceAll(' ', '-').toLowerCase();
     final storeUrl = 'tabayu.com/$storeSlug';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
+        color: AppTheme.surface(isDark).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: AppTheme.surface(isDark).withValues(alpha: 0.5),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: AppTheme.shadow(isDark),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -188,13 +186,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: _HomeColors.primary.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.share,
                     size: 18,
-                    color: _HomeColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -219,13 +217,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: _HomeColors.primary.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.copy,
                     size: 18,
-                    color: _HomeColors.primary,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
@@ -242,7 +240,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   style: TextStyle(
                     fontSize: AppDimensions.fontCaption,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade500,
+                    color: AppTheme.textHintColorDark,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -252,7 +250,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   style: TextStyle(
                     fontSize: AppDimensions.fontBody2,
                     fontWeight: FontWeight.bold,
-                    color: _HomeColors.primary,
+                    color: AppTheme.primaryColor,
                     fontFamily: 'monospace',
                   ),
                   textDirection: TextDirection.ltr,
@@ -331,6 +329,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     Color? blobColor,
     Alignment? blobAlignment,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -339,12 +338,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       child: Container(
         height: 120,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.8),
+          color: AppTheme.surface(isDark).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+          border: Border.all(
+            color: AppTheme.surface(isDark).withValues(alpha: 0.7),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppTheme.shadow(isDark),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -381,7 +382,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         style: TextStyle(
                           fontSize: AppDimensions.fontDisplay1,
                           fontWeight: FontWeight.w800,
-                          color: _HomeColors.primary,
+                          color: AppTheme.primaryColor,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -392,7 +393,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                           style: TextStyle(
                             fontSize: AppDimensions.fontBody2,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade500,
+                            color: AppTheme.textHint(isDark),
                           ),
                         ),
                       ],
@@ -404,7 +405,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     style: TextStyle(
                       fontSize: AppDimensions.fontCaption,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade500,
+                      color: AppTheme.textHint(isDark),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -487,6 +488,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     required VoidCallback onTap,
     bool showBadge = false,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -499,15 +501,17 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withValues(alpha: 0.9),
-              const Color(0xFFF0F9FF).withValues(alpha: 0.95),
+              AppTheme.surface(isDark).withValues(alpha: 0.9),
+              AppTheme.background(isDark).withValues(alpha: 0.95),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+          border: Border.all(
+            color: AppTheme.surface(isDark).withValues(alpha: 0.8),
+          ),
           boxShadow: [
             BoxShadow(
-              color: _HomeColors.primary.withValues(alpha: 0.05),
+              color: AppTheme.primaryColor.withValues(alpha: 0.05),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -557,13 +561,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: _HomeColors.primary.withValues(alpha: 0.05),
+                      color: AppTheme.primaryColor.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _HomeColors.primary.withValues(alpha: 0.1),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
                       ),
                     ),
-                    child: Icon(icon, size: 22, color: _HomeColors.primary),
+                    child: Icon(icon, size: 22, color: AppTheme.primaryColor),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -571,7 +575,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     style: TextStyle(
                       fontSize: AppDimensions.fontCaption,
                       fontWeight: FontWeight.bold,
-                      color: _HomeColors.primary,
+                      color: AppTheme.primaryColor,
                       height: 1.3,
                     ),
                     textAlign: TextAlign.center,

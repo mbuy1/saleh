@@ -246,7 +246,7 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       body: _isLoading
           ? _buildLoadingState()
           : _error != null
@@ -628,11 +628,11 @@ class _ViewMyStoreScreenState extends ConsumerState<ViewMyStoreScreen>
 
   Widget _buildDefaultCover() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppTheme.primaryColor, Color(0xFF1565C0)],
+          colors: [AppTheme.primaryColor, AppTheme.primaryDark],
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/router/app_router.dart';
+import '../../core/services/user_preferences_service.dart';
 
 /// تطبيق التاجر - لوحة التحكم وإدارة المتجر
 /// منفصل تماماً عن تطبيق العميل
@@ -18,12 +19,16 @@ class _MerchantAppState extends ConsumerState<MerchantApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(preferencesStateProvider).themeMode;
+
     return MaterialApp.router(
       title: 'MBUY Merchant',
       debugShowCheckedModeBanner: false,
 
-      // Theme
+      // Theme - يدعم Light و Dark
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
 
       // Router خاص بالتاجر فقط
       routerConfig: router,

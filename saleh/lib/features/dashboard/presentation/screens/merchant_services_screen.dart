@@ -172,7 +172,7 @@ class _MerchantServicesScreenState
           child: _buildQuickTabItem(
             icon: Icons.info_outline,
             label: 'معلومات المتجر',
-            color: const Color(0xFF13EC80),
+            color: AppTheme.primaryColor,
             onTap: () => context.push('/dashboard/store/create-store'),
           ),
         ),

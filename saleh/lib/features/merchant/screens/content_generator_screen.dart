@@ -299,7 +299,7 @@ class _ContentGeneratorScreenState extends State<ContentGeneratorScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         leading: IconButton(
           icon: Container(
