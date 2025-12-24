@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,29 +7,28 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// شاشة الدعم والمساعدة
+/// Ø´Ø§Ø´Ø© Ø§Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø©
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت في الأعلى
+            // Header Ø«Ø§Ø¨Øª ÙÙŠ Ø§Ù„Ø£Ø¹Ù„Ù‰
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // المحتوى القابل للتمرير
+            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ù„ Ù„Ù„ØªÙ…Ø±ÙŠØ±
             Expanded(
               child: ListView(
                 padding: AppDimensions.paddingM,
                 children: [
-                  // بطاقة الترحيب
+                  // Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„ØªØ±Ø­ÙŠØ¨
                   Container(
                     padding: AppDimensions.paddingL,
                     decoration: BoxDecoration(
@@ -45,7 +44,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'كيف يمكننا مساعدتك؟',
+                          'ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†Ø§ Ù…Ø³Ø§Ø¹Ø¯ØªÙƒØŸ',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -54,7 +53,7 @@ class SupportScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'فريق الدعم متاح على مدار الساعة لمساعدتك',
+                          'ÙØ±ÙŠÙ‚ Ø§Ù„Ø¯Ø¹Ù… Ù…ØªØ§Ø­ Ø¹Ù„Ù‰ Ù…Ø¯Ø§Ø± Ø§Ù„Ø³Ø§Ø¹Ø© Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.9),
@@ -67,9 +66,9 @@ class SupportScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // طرق التواصل
+                  // Ø·Ø±Ù‚ Ø§Ù„ØªÙˆØ§ØµÙ„
                   const Text(
-                    'تواصل معنا',
+                    'ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -81,8 +80,8 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.chat,
-                    title: 'واتساب',
-                    subtitle: 'أسرع طريقة للتواصل',
+                    title: 'ÙˆØ§ØªØ³Ø§Ø¨',
+                    subtitle: 'Ø£Ø³Ø±Ø¹ Ø·Ø±ÙŠÙ‚Ø© Ù„Ù„ØªÙˆØ§ØµÙ„',
                     color: const Color(0xFF25D366),
                     onTap: () => _launchWhatsApp(context),
                   ),
@@ -92,7 +91,7 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.email,
-                    title: 'البريد الإلكتروني',
+                    title: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
                     subtitle: 'support@mbuy.app',
                     color: AppTheme.primaryColor,
                     onTap: () => _launchEmail(context),
@@ -103,7 +102,7 @@ class SupportScreen extends StatelessWidget {
                   _buildContactCard(
                     context,
                     icon: AppIcons.phone,
-                    title: 'الهاتف',
+                    title: 'Ø§Ù„Ù‡Ø§ØªÙ',
                     subtitle: '+966 50 000 0000',
                     color: AppTheme.successColor,
                     onTap: () => _launchPhone(context),
@@ -111,9 +110,9 @@ class SupportScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // الأسئلة الشائعة
+                  // Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©
                   const Text(
-                    'الأسئلة الشائعة',
+                    'Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -124,42 +123,42 @@ class SupportScreen extends StatelessWidget {
 
                   _buildFAQCard([
                     _FAQItem(
-                      question: 'كيف أنشئ متجري؟',
+                      question: 'ÙƒÙŠÙ Ø£Ù†Ø´Ø¦ Ù…ØªØ¬Ø±ÙŠØŸ',
                       answer:
-                          'بعد تسجيل الدخول، اذهب إلى "إدارة المتجر" ثم اضغط على "إنشاء متجر". أدخل اسم المتجر والوصف والشعار، ثم اضغط على "إنشاء".',
+                          'Ø¨Ø¹Ø¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ØŒ Ø§Ø°Ù‡Ø¨ Ø¥Ù„Ù‰ "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…ØªØ¬Ø±" Ø«Ù… Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ "Ø¥Ù†Ø´Ø§Ø¡ Ù…ØªØ¬Ø±". Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…ØªØ¬Ø± ÙˆØ§Ù„ÙˆØµÙ ÙˆØ§Ù„Ø´Ø¹Ø§Ø±ØŒ Ø«Ù… Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ "Ø¥Ù†Ø´Ø§Ø¡".',
                     ),
                     _FAQItem(
-                      question: 'كيف أضيف منتجات؟',
+                      question: 'ÙƒÙŠÙ Ø£Ø¶ÙŠÙ Ù…Ù†ØªØ¬Ø§ØªØŸ',
                       answer:
-                          'اضغط على زر + في الشريط السفلي، ثم أدخل بيانات المنتج (الاسم، السعر، الصور، الوصف) واضغط على "حفظ".',
+                          'Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø± + ÙÙŠ Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ø³ÙÙ„ÙŠØŒ Ø«Ù… Ø£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù†ØªØ¬ (Ø§Ù„Ø§Ø³Ù…ØŒ Ø§Ù„Ø³Ø¹Ø±ØŒ Ø§Ù„ØµÙˆØ±ØŒ Ø§Ù„ÙˆØµÙ) ÙˆØ§Ø¶ØºØ· Ø¹Ù„Ù‰ "Ø­ÙØ¸".',
                     ),
                     _FAQItem(
-                      question: 'كيف أشتري نقاط؟',
+                      question: 'ÙƒÙŠÙ Ø£Ø´ØªØ±ÙŠ Ù†Ù‚Ø§Ø·ØŸ',
                       answer:
-                          'اذهب إلى صفحة "النقاط" من الرئيسية، ثم اختر الباقة المناسبة واتبع خطوات الدفع.',
+                          'Ø§Ø°Ù‡Ø¨ Ø¥Ù„Ù‰ ØµÙØ­Ø© "Ø§Ù„Ù†Ù‚Ø§Ø·" Ù…Ù† Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŒ Ø«Ù… Ø§Ø®ØªØ± Ø§Ù„Ø¨Ø§Ù‚Ø© Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø© ÙˆØ§ØªØ¨Ø¹ Ø®Ø·ÙˆØ§Øª Ø§Ù„Ø¯ÙØ¹.',
                     ),
                     _FAQItem(
-                      question: 'ما هي أدوات AI؟',
+                      question: 'Ù…Ø§ Ù‡ÙŠ Ø£Ø¯ÙˆØ§Øª AIØŸ',
                       answer:
-                          'أدوات الذكاء الاصطناعي تساعدك في توليد صور احترافية للمنتجات، وكتابة أوصاف جذابة، وتحسين متجرك.',
+                          'Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ØªØ³Ø§Ø¹Ø¯Ùƒ ÙÙŠ ØªÙˆÙ„ÙŠØ¯ ØµÙˆØ± Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„Ù„Ù…Ù†ØªØ¬Ø§ØªØŒ ÙˆÙƒØªØ§Ø¨Ø© Ø£ÙˆØµØ§Ù Ø¬Ø°Ø§Ø¨Ø©ØŒ ÙˆØªØ­Ø³ÙŠÙ† Ù…ØªØ¬Ø±Ùƒ.',
                     ),
                     _FAQItem(
-                      question: 'كيف أسحب أرباحي؟',
+                      question: 'ÙƒÙŠÙ Ø£Ø³Ø­Ø¨ Ø£Ø±Ø¨Ø§Ø­ÙŠØŸ',
                       answer:
-                          'اذهب إلى "المحفظة"، ثم اضغط على "سحب"، أدخل المبلغ وبيانات الحساب البنكي، وسيتم التحويل خلال 3-5 أيام عمل.',
+                          'Ø§Ø°Ù‡Ø¨ Ø¥Ù„Ù‰ "Ø§Ù„Ù…Ø­ÙØ¸Ø©"ØŒ Ø«Ù… Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ "Ø³Ø­Ø¨"ØŒ Ø£Ø¯Ø®Ù„ Ø§Ù„Ù…Ø¨Ù„Øº ÙˆØ¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†ÙƒÙŠØŒ ÙˆØ³ÙŠØªÙ… Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ø®Ù„Ø§Ù„ 3-5 Ø£ÙŠØ§Ù… Ø¹Ù…Ù„.',
                     ),
                     _FAQItem(
-                      question: 'كيف ألغي اشتراكي؟',
+                      question: 'ÙƒÙŠÙ Ø£Ù„ØºÙŠ Ø§Ø´ØªØ±Ø§ÙƒÙŠØŸ',
                       answer:
-                          'اذهب إلى "إعدادات الحساب" ثم "الاشتراكات"، واضغط على "إلغاء الاشتراك". سيبقى حسابك فعالاً حتى نهاية الفترة المدفوعة.',
+                          'Ø§Ø°Ù‡Ø¨ Ø¥Ù„Ù‰ "Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨" Ø«Ù… "Ø§Ù„Ø§Ø´ØªØ±Ø§ÙƒØ§Øª"ØŒ ÙˆØ§Ø¶ØºØ· Ø¹Ù„Ù‰ "Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ". Ø³ÙŠØ¨Ù‚Ù‰ Ø­Ø³Ø§Ø¨Ùƒ ÙØ¹Ø§Ù„Ø§Ù‹ Ø­ØªÙ‰ Ù†Ù‡Ø§ÙŠØ© Ø§Ù„ÙØªØ±Ø© Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø©.',
                     ),
                   ]),
 
                   const SizedBox(height: 32),
 
-                  // روابط مفيدة
+                  // Ø±ÙˆØ§Ø¨Ø· Ù…ÙÙŠØ¯Ø©
                   const Text(
-                    'روابط مفيدة',
+                    'Ø±ÙˆØ§Ø¨Ø· Ù…ÙÙŠØ¯Ø©',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -170,17 +169,17 @@ class SupportScreen extends StatelessWidget {
 
                   _buildLinkTile(
                     icon: AppIcons.document,
-                    title: 'دليل المستخدم',
+                    title: 'Ø¯Ù„ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…',
                     onTap: () {},
                   ),
                   _buildLinkTile(
                     icon: AppIcons.playCircle,
-                    title: 'فيديوهات تعليمية',
+                    title: 'ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª ØªØ¹Ù„ÙŠÙ…ÙŠØ©',
                     onTap: () {},
                   ),
                   _buildLinkTile(
                     icon: AppIcons.info,
-                    title: 'عن التطبيق',
+                    title: 'Ø¹Ù† Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
                     onTap: () => context.push('/dashboard/about'),
                   ),
 
@@ -348,7 +347,7 @@ class SupportScreen extends StatelessWidget {
 
   Future<void> _launchWhatsApp(BuildContext context) async {
     final url = Uri.parse(
-      'https://wa.me/966500000000?text=مرحباً، أحتاج مساعدة',
+      'https://wa.me/966500000000?text=Ù…Ø±Ø­Ø¨Ø§Ù‹ØŒ Ø£Ø­ØªØ§Ø¬ Ù…Ø³Ø§Ø¹Ø¯Ø©',
     );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -356,7 +355,7 @@ class SupportScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('لا يمكن فتح واتساب'),
+            content: Text('Ù„Ø§ ÙŠÙ…ÙƒÙ† ÙØªØ­ ÙˆØ§ØªØ³Ø§Ø¨'),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -365,14 +364,14 @@ class SupportScreen extends StatelessWidget {
   }
 
   Future<void> _launchEmail(BuildContext context) async {
-    final url = Uri.parse('mailto:support@mbuy.app?subject=طلب دعم');
+    final url = Uri.parse('mailto:support@mbuy.app?subject=Ø·Ù„Ø¨ Ø¯Ø¹Ù…');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('لا يمكن فتح البريد الإلكتروني'),
+            content: Text('Ù„Ø§ ÙŠÙ…ÙƒÙ† ÙØªØ­ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -388,7 +387,7 @@ class SupportScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('لا يمكن فتح تطبيق الهاتف'),
+            content: Text('Ù„Ø§ ÙŠÙ…ÙƒÙ† ÙØªØ­ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù‡Ø§ØªÙ'),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -416,7 +415,7 @@ class SupportScreen extends StatelessWidget {
         ),
         const Expanded(
           child: Text(
-            'الدعم والمساعدة',
+            'Ø§Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø©',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,

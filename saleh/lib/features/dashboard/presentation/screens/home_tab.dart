@@ -53,7 +53,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final store = storeState.store;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
           // خلفية الـ Blobs

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -82,11 +82,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت مع TabBar
+            // Header Ø«Ø§Ø¨Øª Ù…Ø¹ TabBar
             Container(
               color: AppTheme.primaryColor,
               child: Column(
@@ -117,7 +116,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                         ),
                         const Expanded(
                           child: Text(
-                            'الرسائل المخصصة',
+                            'Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„Ù…Ø®ØµØµØ©',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -138,10 +137,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     unselectedLabelColor: Colors.white70,
                     isScrollable: true,
                     tabs: const [
-                      Tab(text: 'نظرة عامة', icon: Icon(Icons.dashboard)),
-                      Tab(text: 'الحملات', icon: Icon(Icons.campaign)),
-                      Tab(text: 'الأتمتة', icon: Icon(Icons.auto_mode)),
-                      Tab(text: 'القوالب', icon: Icon(Icons.description)),
+                      Tab(text: 'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©', icon: Icon(Icons.dashboard)),
+                      Tab(text: 'Ø§Ù„Ø­Ù…Ù„Ø§Øª', icon: Icon(Icons.campaign)),
+                      Tab(text: 'Ø§Ù„Ø£ØªÙ…ØªØ©', icon: Icon(Icons.auto_mode)),
+                      Tab(text: 'Ø§Ù„Ù‚ÙˆØ§Ù„Ø¨', icon: Icon(Icons.description)),
                     ],
                   ),
                 ],
@@ -169,7 +168,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                           const SizedBox(height: AppDimensions.spacing16),
                           ElevatedButton(
                             onPressed: _loadData,
-                            child: const Text('إعادة المحاولة'),
+                            child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                           ),
                         ],
                       ),
@@ -210,7 +209,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'الحملات النشطة',
+                    'Ø§Ù„Ø­Ù…Ù„Ø§Øª Ø§Ù„Ù†Ø´Ø·Ø©',
                     '${campaignStats['scheduled'] ?? 0}',
                     Icons.campaign,
                     Colors.blue,
@@ -219,7 +218,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'الأتمتة النشطة',
+                    'Ø§Ù„Ø£ØªÙ…ØªØ© Ø§Ù„Ù†Ø´Ø·Ø©',
                     '${automationStats['active'] ?? 0}',
                     Icons.auto_mode,
                     Colors.green,
@@ -232,7 +231,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'رسائل آخر 30 يوم',
+                    'Ø±Ø³Ø§Ø¦Ù„ Ø¢Ø®Ø± 30 ÙŠÙˆÙ…',
                     '${messageStats['total'] ?? 0}',
                     Icons.message,
                     Colors.purple,
@@ -241,7 +240,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'معدل التسليم',
+                    'Ù…Ø¹Ø¯Ù„ Ø§Ù„ØªØ³Ù„ÙŠÙ…',
                     _calculateDeliveryRate(messageStats),
                     Icons.check_circle,
                     Colors.teal,
@@ -254,7 +253,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
             // Quick actions
             const Text(
-              'إجراءات سريعة',
+              'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø³Ø±ÙŠØ¹Ø©',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing12),
@@ -262,14 +261,14 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildQuickAction('حملة جديدة', Icons.add, () {
+                _buildQuickAction('Ø­Ù…Ù„Ø© Ø¬Ø¯ÙŠØ¯Ø©', Icons.add, () {
                   _tabController.animateTo(1);
                 }),
-                _buildQuickAction('قالب جديد', Icons.description, () {
+                _buildQuickAction('Ù‚Ø§Ù„Ø¨ Ø¬Ø¯ÙŠØ¯', Icons.description, () {
                   _tabController.animateTo(3);
                 }),
                 _buildQuickAction(
-                  'رسالة تجريبية',
+                  'Ø±Ø³Ø§Ù„Ø© ØªØ¬Ø±ÙŠØ¨ÙŠØ©',
                   Icons.send,
                   _showTestMessageDialog,
                 ),
@@ -283,12 +282,12 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'آخر الحملات',
+                  'Ø¢Ø®Ø± Ø§Ù„Ø­Ù…Ù„Ø§Øª',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
                   onPressed: () => _tabController.animateTo(1),
-                  child: const Text('عرض الكل'),
+                  child: const Text('Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„'),
                 ),
               ],
             ),
@@ -299,7 +298,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   padding: AppDimensions.paddingXL,
                   child: Center(
                     child: Text(
-                      'لا توجد حملات',
+                      'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­Ù…Ù„Ø§Øª',
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ),
@@ -374,10 +373,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 children: [
                   Icon(Icons.campaign_outlined, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد حملات'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­Ù…Ù„Ø§Øª'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'أنشئ حملة لإرسال رسائل لعملائك',
+                    'Ø£Ù†Ø´Ø¦ Ø­Ù…Ù„Ø© Ù„Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ø¦Ù„ Ù„Ø¹Ù…Ù„Ø§Ø¦Ùƒ',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -473,19 +472,19 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildCampaignStat(
-                    'المستهدف',
+                    'Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù',
                     '${campaign['target_count'] ?? 0}',
                   ),
                   _buildCampaignStat(
-                    'المرسل',
+                    'Ø§Ù„Ù…Ø±Ø³Ù„',
                     '${campaign['sent_count'] ?? 0}',
                   ),
                   _buildCampaignStat(
-                    'المفتوح',
+                    'Ø§Ù„Ù…ÙØªÙˆØ­',
                     '${campaign['opened_count'] ?? 0}',
                   ),
                   _buildCampaignStat(
-                    'التفاعل',
+                    'Ø§Ù„ØªÙØ§Ø¹Ù„',
                     '${campaign['clicked_count'] ?? 0}',
                   ),
                 ],
@@ -498,13 +497,13 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     if (status == 'draft')
                       TextButton(
                         onPressed: () => _sendCampaign(campaign['id']),
-                        child: const Text('إرسال الآن'),
+                        child: const Text('Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¢Ù†'),
                       ),
                     if (status == 'scheduled')
                       TextButton(
                         onPressed: () => _cancelCampaign(campaign['id']),
                         child: const Text(
-                          'إلغاء',
+                          'Ø¥Ù„ØºØ§Ø¡',
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
@@ -536,10 +535,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 children: [
                   Icon(Icons.auto_mode_outlined, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد رسائل تلقائية'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø±Ø³Ø§Ø¦Ù„ ØªÙ„Ù‚Ø§Ø¦ÙŠØ©'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'أنشئ رسالة تلقائية لأحداث معينة',
+                    'Ø£Ù†Ø´Ø¦ Ø±Ø³Ø§Ù„Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ© Ù„Ø£Ø­Ø¯Ø§Ø« Ù…Ø¹ÙŠÙ†Ø©',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -585,7 +584,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           children: [
             Text(_getTriggerLabel(triggerType)),
             Text(
-              'أُرسلت ${automation['sent_count'] ?? 0} مرة',
+              'Ø£ÙØ±Ø³Ù„Øª ${automation['sent_count'] ?? 0} Ù…Ø±Ø©',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
@@ -612,7 +611,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     color: Colors.grey,
                   ),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد قوالب'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù‚ÙˆØ§Ù„Ø¨'),
                 ],
               ),
             )
@@ -663,7 +662,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
-                  'نظام',
+                  'Ù†Ø¸Ø§Ù…',
                   style: TextStyle(fontSize: 10, color: Colors.blue),
                 ),
               ),
@@ -708,16 +707,16 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 Icon(Icons.tips_and_updates, color: Colors.blue[700]),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'نصائح للرسائل',
+                  'Ù†ØµØ§Ø¦Ø­ Ù„Ù„Ø±Ø³Ø§Ø¦Ù„',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: AppDimensions.spacing12),
-            _buildTipItem('استخدم اسم العميل للتخصيص'),
-            _buildTipItem('اختر الوقت المناسب للإرسال'),
-            _buildTipItem('اجعل الرسالة قصيرة ومباشرة'),
-            _buildTipItem('أضف دعوة للإجراء واضحة'),
+            _buildTipItem('Ø§Ø³ØªØ®Ø¯Ù… Ø§Ø³Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„ Ù„Ù„ØªØ®ØµÙŠØµ'),
+            _buildTipItem('Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ‚Øª Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø¥Ø±Ø³Ø§Ù„'),
+            _buildTipItem('Ø§Ø¬Ø¹Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ù‚ØµÙŠØ±Ø© ÙˆÙ…Ø¨Ø§Ø´Ø±Ø©'),
+            _buildTipItem('Ø£Ø¶Ù Ø¯Ø¹ÙˆØ© Ù„Ù„Ø¥Ø¬Ø±Ø§Ø¡ ÙˆØ§Ø¶Ø­Ø©'),
           ],
         ),
       ),
@@ -730,7 +729,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: Colors.blue)),
+          const Text('â€¢ ', style: TextStyle(color: Colors.blue)),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
         ],
       ),
@@ -760,17 +759,17 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   String _getStatusLabel(String status) {
     switch (status) {
       case 'draft':
-        return 'مسودة';
+        return 'Ù…Ø³ÙˆØ¯Ø©';
       case 'scheduled':
-        return 'مجدولة';
+        return 'Ù…Ø¬Ø¯ÙˆÙ„Ø©';
       case 'sending':
-        return 'جاري الإرسال';
+        return 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„';
       case 'completed':
-        return 'مكتملة';
+        return 'Ù…ÙƒØªÙ…Ù„Ø©';
       case 'cancelled':
-        return 'ملغاة';
+        return 'Ù…Ù„ØºØ§Ø©';
       case 'failed':
-        return 'فاشلة';
+        return 'ÙØ§Ø´Ù„Ø©';
       default:
         return status;
     }
@@ -794,13 +793,13 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   String _getChannelLabel(String channel) {
     switch (channel) {
       case 'notification':
-        return 'إشعار';
+        return 'Ø¥Ø´Ø¹Ø§Ø±';
       case 'sms':
         return 'SMS';
       case 'email':
-        return 'بريد إلكتروني';
+        return 'Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
       case 'whatsapp':
-        return 'واتساب';
+        return 'ÙˆØ§ØªØ³Ø§Ø¨';
       default:
         return channel;
     }
@@ -832,21 +831,21 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   String _getTriggerLabel(String trigger) {
     switch (trigger) {
       case 'order_placed':
-        return 'عند إتمام الطلب';
+        return 'Ø¹Ù†Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨';
       case 'order_shipped':
-        return 'عند شحن الطلب';
+        return 'Ø¹Ù†Ø¯ Ø´Ø­Ù† Ø§Ù„Ø·Ù„Ø¨';
       case 'order_delivered':
-        return 'عند توصيل الطلب';
+        return 'Ø¹Ù†Ø¯ ØªÙˆØµÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨';
       case 'cart_abandoned':
-        return 'سلة متروكة';
+        return 'Ø³Ù„Ø© Ù…ØªØ±ÙˆÙƒØ©';
       case 'new_customer':
-        return 'عميل جديد';
+        return 'Ø¹Ù…ÙŠÙ„ Ø¬Ø¯ÙŠØ¯';
       case 'inactive_customer':
-        return 'عميل غير نشط';
+        return 'Ø¹Ù…ÙŠÙ„ ØºÙŠØ± Ù†Ø´Ø·';
       case 'customer_birthday':
-        return 'عيد ميلاد العميل';
+        return 'Ø¹ÙŠØ¯ Ù…ÙŠÙ„Ø§Ø¯ Ø§Ù„Ø¹Ù…ÙŠÙ„';
       case 'review_request':
-        return 'طلب تقييم';
+        return 'Ø·Ù„Ø¨ ØªÙ‚ÙŠÙŠÙ…';
       default:
         return trigger;
     }
@@ -878,13 +877,13 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم بدء إرسال الحملة')));
+      ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø¨Ø¯Ø¡ Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø­Ù…Ù„Ø©')));
       _loadData();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
     }
   }
 
@@ -897,13 +896,13 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم إلغاء الحملة')));
+      ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©')));
       _loadData();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
     }
   }
 
@@ -930,7 +929,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إرسال رسالة تجريبية'),
+          title: const Text('Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø© ØªØ¬Ø±ÙŠØ¨ÙŠØ©'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -938,17 +937,17 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 DropdownButtonFormField<String>(
                   value: selectedChannel,
                   decoration: const InputDecoration(
-                    labelText: 'قناة الإرسال',
+                    labelText: 'Ù‚Ù†Ø§Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„',
                     border: OutlineInputBorder(),
                   ),
                   items: const [
                     DropdownMenuItem(value: 'sms', child: Text('SMS')),
-                    DropdownMenuItem(value: 'whatsapp', child: Text('واتساب')),
+                    DropdownMenuItem(value: 'whatsapp', child: Text('ÙˆØ§ØªØ³Ø§Ø¨')),
                     DropdownMenuItem(
                       value: 'email',
-                      child: Text('البريد الإلكتروني'),
+                      child: Text('Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'),
                     ),
-                    DropdownMenuItem(value: 'push', child: Text('إشعار فوري')),
+                    DropdownMenuItem(value: 'push', child: Text('Ø¥Ø´Ø¹Ø§Ø± ÙÙˆØ±ÙŠ')),
                   ],
                   onChanged: (v) => setDialogState(() => selectedChannel = v!),
                 ),
@@ -957,8 +956,8 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   controller: phoneController,
                   decoration: InputDecoration(
                     labelText: selectedChannel == 'email'
-                        ? 'البريد الإلكتروني'
-                        : 'رقم الهاتف',
+                        ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'
+                        : 'Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ',
                     hintText: selectedChannel == 'email'
                         ? 'example@mail.com'
                         : '+966 5XX XXX XXXX',
@@ -976,14 +975,14 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   DropdownButtonFormField<String>(
                     value: selectedTemplate,
                     decoration: const InputDecoration(
-                      labelText: 'القالب',
+                      labelText: 'Ø§Ù„Ù‚Ø§Ù„Ø¨',
                       border: OutlineInputBorder(),
                     ),
                     items: _templates
                         .map(
                           (t) => DropdownMenuItem(
                             value: t['id'] as String,
-                            child: Text(t['name'] ?? 'قالب'),
+                            child: Text(t['name'] ?? 'Ù‚Ø§Ù„Ø¨'),
                           ),
                         )
                         .toList(),
@@ -996,7 +995,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1015,7 +1014,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                         ),
                         const SizedBox(width: AppDimensions.spacing12),
                         Text(
-                          'جاري إرسال رسالة تجريبية عبر $selectedChannel...',
+                          'Ø¬Ø§Ø±ÙŠ Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø© ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ø¹Ø¨Ø± $selectedChannel...',
                         ),
                       ],
                     ),
@@ -1029,7 +1028,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('✓ تم إرسال الرسالة التجريبية بنجاح'),
+                        content: Text('âœ“ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­'),
                         backgroundColor: AppTheme.successColor,
                       ),
                     );
@@ -1039,7 +1038,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إرسال'),
+              child: const Text('Ø¥Ø±Ø³Ø§Ù„'),
             ),
           ],
         ),
@@ -1058,7 +1057,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إنشاء حملة جديدة'),
+          title: const Text('Ø¥Ù†Ø´Ø§Ø¡ Ø­Ù…Ù„Ø© Ø¬Ø¯ÙŠØ¯Ø©'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1067,37 +1066,37 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم الحملة',
-                      hintText: 'مثال: عروض نهاية الأسبوع',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ø­Ù…Ù„Ø©',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø¹Ø±ÙˆØ¶ Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => campaignName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: channel,
                     decoration: const InputDecoration(
-                      labelText: 'قناة الإرسال',
+                      labelText: 'Ù‚Ù†Ø§Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(value: 'sms', child: Text('SMS')),
                       DropdownMenuItem(
                         value: 'whatsapp',
-                        child: Text('واتساب'),
+                        child: Text('ÙˆØ§ØªØ³Ø§Ø¨'),
                       ),
                       DropdownMenuItem(
                         value: 'email',
-                        child: Text('البريد الإلكتروني'),
+                        child: Text('Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'),
                       ),
                       DropdownMenuItem(
                         value: 'push',
-                        child: Text('إشعار فوري'),
+                        child: Text('Ø¥Ø´Ø¹Ø§Ø± ÙÙˆØ±ÙŠ'),
                       ),
                       DropdownMenuItem(
                         value: 'all',
-                        child: Text('جميع القنوات'),
+                        child: Text('Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù‚Ù†ÙˆØ§Øª'),
                       ),
                     ],
                     onChanged: (v) => setDialogState(() => channel = v!),
@@ -1106,23 +1105,23 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   DropdownButtonFormField<String>(
                     value: targetSegment,
                     decoration: const InputDecoration(
-                      labelText: 'الشريحة المستهدفة',
+                      labelText: 'Ø§Ù„Ø´Ø±ÙŠØ­Ø© Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙØ©',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: 'all',
-                        child: Text('جميع العملاء'),
+                        child: Text('Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'),
                       ),
-                      DropdownMenuItem(value: 'vip', child: Text('عملاء VIP')),
-                      DropdownMenuItem(value: 'new', child: Text('عملاء جدد')),
+                      DropdownMenuItem(value: 'vip', child: Text('Ø¹Ù…Ù„Ø§Ø¡ VIP')),
+                      DropdownMenuItem(value: 'new', child: Text('Ø¹Ù…Ù„Ø§Ø¡ Ø¬Ø¯Ø¯')),
                       DropdownMenuItem(
                         value: 'inactive',
-                        child: Text('عملاء غير نشطين'),
+                        child: Text('Ø¹Ù…Ù„Ø§Ø¡ ØºÙŠØ± Ù†Ø´Ø·ÙŠÙ†'),
                       ),
                       DropdownMenuItem(
                         value: 'cart_abandoners',
-                        child: Text('تاركي السلة'),
+                        child: Text('ØªØ§Ø±ÙƒÙŠ Ø§Ù„Ø³Ù„Ø©'),
                       ),
                     ],
                     onChanged: (v) => setDialogState(() => targetSegment = v!),
@@ -1130,7 +1129,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('موعد الإرسال'),
+                    title: const Text('Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„'),
                     subtitle: Text(
                       '${scheduledDate.day}/${scheduledDate.month}/${scheduledDate.year} - ${scheduledDate.hour}:${scheduledDate.minute.toString().padLeft(2, '0')}',
                     ),
@@ -1169,7 +1168,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1191,7 +1190,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إنشاء حملة "$campaignName" بنجاح'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ù…Ù„Ø© "$campaignName" Ø¨Ù†Ø¬Ø§Ø­'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1200,7 +1199,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -1219,7 +1218,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إنشاء رسالة تلقائية'),
+          title: const Text('Ø¥Ù†Ø´Ø§Ø¡ Ø±Ø³Ø§Ù„Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ©'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1228,44 +1227,44 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم الأتمتة',
-                      hintText: 'مثال: شكر بعد الشراء',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ø£ØªÙ…ØªØ©',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø´ÙƒØ± Ø¨Ø¹Ø¯ Ø§Ù„Ø´Ø±Ø§Ø¡',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => automationName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: trigger,
                     decoration: const InputDecoration(
-                      labelText: 'المحفز',
+                      labelText: 'Ø§Ù„Ù…Ø­ÙØ²',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: 'order_completed',
-                        child: Text('بعد إتمام الطلب'),
+                        child: Text('Ø¨Ø¹Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨'),
                       ),
                       DropdownMenuItem(
                         value: 'order_shipped',
-                        child: Text('بعد الشحن'),
+                        child: Text('Ø¨Ø¹Ø¯ Ø§Ù„Ø´Ø­Ù†'),
                       ),
                       DropdownMenuItem(
                         value: 'order_delivered',
-                        child: Text('بعد التسليم'),
+                        child: Text('Ø¨Ø¹Ø¯ Ø§Ù„ØªØ³Ù„ÙŠÙ…'),
                       ),
                       DropdownMenuItem(
                         value: 'cart_abandoned',
-                        child: Text('سلة متروكة'),
+                        child: Text('Ø³Ù„Ø© Ù…ØªØ±ÙˆÙƒØ©'),
                       ),
                       DropdownMenuItem(
                         value: 'birthday',
-                        child: Text('عيد ميلاد'),
+                        child: Text('Ø¹ÙŠØ¯ Ù…ÙŠÙ„Ø§Ø¯'),
                       ),
                       DropdownMenuItem(
                         value: 'inactive_30days',
-                        child: Text('عدم نشاط 30 يوم'),
+                        child: Text('Ø¹Ø¯Ù… Ù†Ø´Ø§Ø· 30 ÙŠÙˆÙ…'),
                       ),
                     ],
                     onChanged: (v) => setDialogState(() => trigger = v!),
@@ -1274,17 +1273,17 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   DropdownButtonFormField<String>(
                     value: channel,
                     decoration: const InputDecoration(
-                      labelText: 'قناة الإرسال',
+                      labelText: 'Ù‚Ù†Ø§Ø© Ø§Ù„Ø¥Ø±Ø³Ø§Ù„',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(value: 'sms', child: Text('SMS')),
                       DropdownMenuItem(
                         value: 'whatsapp',
-                        child: Text('واتساب'),
+                        child: Text('ÙˆØ§ØªØ³Ø§Ø¨'),
                       ),
-                      DropdownMenuItem(value: 'email', child: Text('البريد')),
-                      DropdownMenuItem(value: 'push', child: Text('إشعار')),
+                      DropdownMenuItem(value: 'email', child: Text('Ø§Ù„Ø¨Ø±ÙŠØ¯')),
+                      DropdownMenuItem(value: 'push', child: Text('Ø¥Ø´Ø¹Ø§Ø±')),
                     ],
                     onChanged: (v) => setDialogState(() => channel = v!),
                   ),
@@ -1292,15 +1291,15 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   DropdownButtonFormField<int>(
                     value: delayMinutes,
                     decoration: const InputDecoration(
-                      labelText: 'التأخير',
+                      labelText: 'Ø§Ù„ØªØ£Ø®ÙŠØ±',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 0, child: Text('فوري')),
-                      DropdownMenuItem(value: 30, child: Text('30 دقيقة')),
-                      DropdownMenuItem(value: 60, child: Text('ساعة')),
-                      DropdownMenuItem(value: 180, child: Text('3 ساعات')),
-                      DropdownMenuItem(value: 1440, child: Text('يوم')),
+                      DropdownMenuItem(value: 0, child: Text('ÙÙˆØ±ÙŠ')),
+                      DropdownMenuItem(value: 30, child: Text('30 Ø¯Ù‚ÙŠÙ‚Ø©')),
+                      DropdownMenuItem(value: 60, child: Text('Ø³Ø§Ø¹Ø©')),
+                      DropdownMenuItem(value: 180, child: Text('3 Ø³Ø§Ø¹Ø§Øª')),
+                      DropdownMenuItem(value: 1440, child: Text('ÙŠÙˆÙ…')),
                     ],
                     onChanged: (v) => setDialogState(() => delayMinutes = v!),
                   ),
@@ -1311,7 +1310,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1333,7 +1332,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إنشاء أتمتة "$automationName" بنجاح'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø£ØªÙ…ØªØ© "$automationName" Ø¨Ù†Ø¬Ø§Ø­'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1342,7 +1341,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -1360,7 +1359,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إنشاء قالب جديد'),
+          title: const Text('Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ù„Ø¨ Ø¬Ø¯ÙŠØ¯'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1369,40 +1368,40 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم القالب',
-                      hintText: 'مثال: رسالة ترحيب',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ù‚Ø§Ù„Ø¨',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø±Ø³Ø§Ù„Ø© ØªØ±Ø­ÙŠØ¨',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => templateName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: category,
                     decoration: const InputDecoration(
-                      labelText: 'التصنيف',
+                      labelText: 'Ø§Ù„ØªØµÙ†ÙŠÙ',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'general', child: Text('عام')),
-                      DropdownMenuItem(value: 'order', child: Text('طلبات')),
+                      DropdownMenuItem(value: 'general', child: Text('Ø¹Ø§Ù…')),
+                      DropdownMenuItem(value: 'order', child: Text('Ø·Ù„Ø¨Ø§Øª')),
                       DropdownMenuItem(
                         value: 'marketing',
-                        child: Text('تسويق'),
+                        child: Text('ØªØ³ÙˆÙŠÙ‚'),
                       ),
-                      DropdownMenuItem(value: 'support', child: Text('دعم')),
+                      DropdownMenuItem(value: 'support', child: Text('Ø¯Ø¹Ù…')),
                     ],
                     onChanged: (v) => setDialogState(() => category = v!),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'محتوى القالب',
-                      hintText: 'استخدم {{customer_name}} للمتغيرات',
+                      labelText: 'Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ù„Ø¨',
+                      hintText: 'Ø§Ø³ØªØ®Ø¯Ù… {{customer_name}} Ù„Ù„Ù…ØªØºÙŠØ±Ø§Øª',
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 4,
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => templateContent = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing8),
@@ -1430,7 +1429,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1450,7 +1449,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إنشاء قالب "$templateName" بنجاح'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ù„Ø¨ "$templateName" Ø¨Ù†Ø¬Ø§Ø­'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1459,7 +1458,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -1497,7 +1496,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               ),
               const SizedBox(height: 24),
               Text(
-                campaign['name'] ?? 'حملة',
+                campaign['name'] ?? 'Ø­Ù…Ù„Ø©',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -1505,11 +1504,11 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               ),
               const SizedBox(height: AppDimensions.spacing8),
               _buildCampaignDetailRow(
-                'الحالة',
-                campaign['status'] ?? 'غير معروف',
+                'Ø§Ù„Ø­Ø§Ù„Ø©',
+                campaign['status'] ?? 'ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ',
               ),
-              _buildCampaignDetailRow('القناة', campaign['channel'] ?? 'SMS'),
-              _buildCampaignDetailRow('الشريحة', campaign['segment'] ?? 'الكل'),
+              _buildCampaignDetailRow('Ø§Ù„Ù‚Ù†Ø§Ø©', campaign['channel'] ?? 'SMS'),
+              _buildCampaignDetailRow('Ø§Ù„Ø´Ø±ÙŠØ­Ø©', campaign['segment'] ?? 'Ø§Ù„ÙƒÙ„'),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -1524,12 +1523,12 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('تم إلغاء الحملة'),
+                            content: Text('ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©'),
                             backgroundColor: Colors.orange,
                           ),
                         );
                       },
-                      child: const Text('إلغاء الحملة'),
+                      child: const Text('Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©'),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing12),
@@ -1539,7 +1538,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),
-                      child: const Text('إغلاق'),
+                      child: const Text('Ø¥ØºÙ„Ø§Ù‚'),
                     ),
                   ),
                 ],
@@ -1568,13 +1567,13 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(template['name'] ?? 'قالب'),
+        title: Text(template['name'] ?? 'Ù‚Ø§Ù„Ø¨'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'المحتوى:',
+              'Ø§Ù„Ù…Ø­ØªÙˆÙ‰:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing8),
@@ -1584,14 +1583,14 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 color: Colors.grey[100],
                 borderRadius: AppDimensions.borderRadiusS,
               ),
-              child: Text(template['content'] ?? 'لا يوجد محتوى'),
+              child: Text(template['content'] ?? 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø­ØªÙˆÙ‰'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: const Text('Ø¥ØºÙ„Ø§Ù‚'),
           ),
         ],
       ),
@@ -1606,7 +1605,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
         children: [
           ListTile(
             leading: const Icon(Icons.visibility),
-            title: const Text('عرض'),
+            title: const Text('Ø¹Ø±Ø¶'),
             onTap: () {
               Navigator.pop(context);
               _showTemplateDetails(template);
@@ -1614,29 +1613,29 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           ),
           ListTile(
             leading: const Icon(Icons.edit),
-            title: const Text('تعديل'),
+            title: const Text('ØªØ¹Ø¯ÙŠÙ„'),
             onTap: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('جاري فتح محرر القالب...')),
+                const SnackBar(content: Text('Ø¬Ø§Ø±ÙŠ ÙØªØ­ Ù…Ø­Ø±Ø± Ø§Ù„Ù‚Ø§Ù„Ø¨...')),
               );
             },
           ),
           ListTile(
             leading: const Icon(Icons.copy),
-            title: const Text('نسخ'),
+            title: const Text('Ù†Ø³Ø®'),
             onTap: () {
               Navigator.pop(context);
               setState(() {
                 _templates.add({
                   ...template,
                   'id': DateTime.now().millisecondsSinceEpoch.toString(),
-                  'name': '${template['name']} (نسخة)',
+                  'name': '${template['name']} (Ù†Ø³Ø®Ø©)',
                 });
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('تم نسخ القالب'),
+                  content: Text('ØªÙ… Ù†Ø³Ø® Ø§Ù„Ù‚Ø§Ù„Ø¨'),
                   backgroundColor: AppTheme.successColor,
                 ),
               );
@@ -1644,7 +1643,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           ),
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text('حذف', style: TextStyle(color: Colors.red)),
+            title: const Text('Ø­Ø°Ù', style: TextStyle(color: Colors.red)),
             onTap: () {
               Navigator.pop(context);
               setState(() {
@@ -1652,7 +1651,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('تم حذف القالب'),
+                  content: Text('ØªÙ… Ø­Ø°Ù Ø§Ù„Ù‚Ø§Ù„Ø¨'),
                   backgroundColor: Colors.orange,
                 ),
               );

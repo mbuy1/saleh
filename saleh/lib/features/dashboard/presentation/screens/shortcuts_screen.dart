@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
@@ -10,12 +10,12 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../ai_studio/data/mbuy_studio_service.dart';
 import '../../../auth/data/auth_controller.dart';
 
-/// صفحة اختصاراتي المُعاد تصميمها
-/// - صفحة فارغة مع نص توضيحي في البداية
-/// - إضافة اختصارات كمربعات أيقونات بنفس مقاس الصفحة الرئيسية
-/// - حفظ التعديلات تلقائياً
-/// - بدون خلفية بيضاء خلف الأيقونات
-/// - إعادة ترتيب الأيقونات بالسحب والإفلات
+/// ØµÙØ­Ø© Ø§Ø®ØªØµØ§Ø±Ø§ØªÙŠ Ø§Ù„Ù…ÙØ¹Ø§Ø¯ ØªØµÙ…ÙŠÙ…Ù‡Ø§
+/// - ØµÙØ­Ø© ÙØ§Ø±ØºØ© Ù…Ø¹ Ù†Øµ ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙŠ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©
+/// - Ø¥Ø¶Ø§ÙØ© Ø§Ø®ØªØµØ§Ø±Ø§Øª ÙƒÙ…Ø±Ø¨Ø¹Ø§Øª Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø¨Ù†ÙØ³ Ù…Ù‚Ø§Ø³ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©
+/// - Ø­ÙØ¸ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
+/// - Ø¨Ø¯ÙˆÙ† Ø®Ù„ÙÙŠØ© Ø¨ÙŠØ¶Ø§Ø¡ Ø®Ù„Ù Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª
+/// - Ø¥Ø¹Ø§Ø¯Ø© ØªØ±ØªÙŠØ¨ Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø¨Ø§Ù„Ø³Ø­Ø¨ ÙˆØ§Ù„Ø¥ÙÙ„Ø§Øª
 class ShortcutsScreen extends ConsumerStatefulWidget {
   const ShortcutsScreen({super.key});
 
@@ -78,7 +78,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم حفظ الاختصارات'),
+            content: Text('ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª'),
             backgroundColor: AppTheme.accentColor,
             duration: Duration(seconds: 1),
           ),
@@ -114,22 +114,21 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header مخصص
+            // Header Ù…Ø®ØµØµ
             _buildHeader(context),
             // TabBar
             _buildTabBar(),
-            // المحتوى
+            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // تبويب اختصاراتي
+                  // ØªØ¨ÙˆÙŠØ¨ Ø§Ø®ØªØµØ§Ø±Ø§ØªÙŠ
                   _buildShortcutsTab(),
-                  // تبويب أدوات AI
+                  // ØªØ¨ÙˆÙŠØ¨ Ø£Ø¯ÙˆØ§Øª AI
                   _buildAiToolsTab(),
                 ],
               ),
@@ -146,7 +145,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                 elevation: 4,
                 icon: const Icon(Icons.add, color: Colors.white, size: 20),
                 label: const Text(
-                  'إضافة اختصار',
+                  'Ø¥Ø¶Ø§ÙØ© Ø§Ø®ØªØµØ§Ø±',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -190,7 +189,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
           ),
           const Spacer(),
           const Text(
-            'اختصاراتي',
+            'Ø§Ø®ØªØµØ§Ø±Ø§ØªÙŠ',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppDimensions.fontHeadline,
@@ -198,7 +197,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
             ),
           ),
           const Spacer(),
-          // زر التعديل
+          // Ø²Ø± Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
           GestureDetector(
             onTap: () {
               if (_isEditing) {
@@ -218,7 +217,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                 borderRadius: AppDimensions.borderRadiusS,
               ),
               child: Text(
-                _isEditing ? 'تم' : 'تعديل',
+                _isEditing ? 'ØªÙ…' : 'ØªØ¹Ø¯ÙŠÙ„',
                 style: TextStyle(
                   color: _isEditing ? Colors.white : AppTheme.primaryColor,
                   fontWeight: FontWeight.bold,
@@ -258,14 +257,14 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
           fontSize: AppDimensions.fontBody,
         ),
         tabs: const [
-          Tab(text: 'اختصاراتي'),
+          Tab(text: 'Ø§Ø®ØªØµØ§Ø±Ø§ØªÙŠ'),
           Tab(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.auto_awesome, size: AppDimensions.iconS),
                 SizedBox(width: AppDimensions.spacing4),
-                Text('أدوات AI'),
+                Text('Ø£Ø¯ÙˆØ§Øª AI'),
               ],
             ),
           ),
@@ -307,7 +306,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
             setState(() => _searchQuery = value);
           },
           decoration: InputDecoration(
-            hintText: 'البحث في الاختصارات...',
+            hintText: 'Ø§Ù„Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª...',
             hintStyle: TextStyle(color: AppTheme.textHintColor),
             prefixIcon: Icon(Icons.search, color: AppTheme.textHintColor),
             border: InputBorder.none,
@@ -343,7 +342,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
             ),
             const SizedBox(height: 32),
             Text(
-              'لا توجد اختصارات',
+              'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø§Ø®ØªØµØ§Ø±Ø§Øª',
               style: TextStyle(
                 fontSize: AppDimensions.fontDisplay2,
                 fontWeight: FontWeight.bold,
@@ -352,7 +351,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              'أضف اختصاراتك المفضلة للوصول السريع\nإلى أهم الصفحات والأدوات',
+              'Ø£Ø¶Ù Ø§Ø®ØªØµØ§Ø±Ø§ØªÙƒ Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹\nØ¥Ù„Ù‰ Ø£Ù‡Ù… Ø§Ù„ØµÙØ­Ø§Øª ÙˆØ§Ù„Ø£Ø¯ÙˆØ§Øª',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontTitle,
@@ -367,7 +366,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                 _showAddShortcutSheet();
               },
               icon: const Icon(Icons.add),
-              label: const Text('إضافة اختصار'),
+              label: const Text('Ø¥Ø¶Ø§ÙØ© Ø§Ø®ØªØµØ§Ø±'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
                 foregroundColor: Colors.white,
@@ -387,7 +386,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
   }
 
   Widget _buildShortcutsGrid() {
-    // فلترة الاختصارات حسب البحث
+    // ÙÙ„ØªØ±Ø© Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª Ø­Ø³Ø¨ Ø§Ù„Ø¨Ø­Ø«
     final filteredShortcuts = _searchQuery.isEmpty
         ? _savedShortcuts
         : _savedShortcuts
@@ -422,7 +421,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'اسحب الاختصار لتغيير مكانه، أو اضغط عليه لحذفه',
+                        'Ø§Ø³Ø­Ø¨ Ø§Ù„Ø§Ø®ØªØµØ§Ø± Ù„ØªØºÙŠÙŠØ± Ù…ÙƒØ§Ù†Ù‡ØŒ Ø£Ùˆ Ø§Ø¶ØºØ· Ø¹Ù„ÙŠÙ‡ Ù„Ø­Ø°ÙÙ‡',
                         style: TextStyle(
                           color: AppTheme.primaryColor,
                           fontSize: AppDimensions.fontBody2,
@@ -482,7 +481,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
     );
   }
 
-  /// بناء عنصر الاختصار - بنفس تصميم الصفحة الرئيسية بدون خلفية بيضاء
+  /// Ø¨Ù†Ø§Ø¡ Ø¹Ù†ØµØ± Ø§Ù„Ø§Ø®ØªØµØ§Ø± - Ø¨Ù†ÙØ³ ØªØµÙ…ÙŠÙ… Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø®Ù„ÙÙŠØ© Ø¨ÙŠØ¶Ø§Ø¡
   Widget _buildShortcutItem(ShortcutItemData shortcut, {Key? key}) {
     return GestureDetector(
       key: key,
@@ -507,7 +506,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // أيقونة بنفس حجم الصفحة الرئيسية
+                // Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø¨Ù†ÙØ³ Ø­Ø¬Ù… Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©
                 Expanded(
                   child: Container(
                     width: double.infinity,
@@ -527,7 +526,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                     child: Center(
                       child: Icon(
                         shortcut.icon,
-                        size: 36, // نفس حجم أيقونات الصفحة الرئيسية
+                        size: 36, // Ù†ÙØ³ Ø­Ø¬Ù… Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©
                         color: AppTheme.darkSlate,
                       ),
                     ),
@@ -577,12 +576,12 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الاختصار'),
-        content: Text('هل تريد حذف "${shortcut.title}" من اختصاراتك؟'),
+        title: const Text('Ø­Ø°Ù Ø§Ù„Ø§Ø®ØªØµØ§Ø±'),
+        content: Text('Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­Ø°Ù "${shortcut.title}" Ù…Ù† Ø§Ø®ØªØµØ§Ø±Ø§ØªÙƒØŸ'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           TextButton(
             onPressed: () {
@@ -590,7 +589,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
               _removeShortcut(shortcut);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('حذف'),
+            child: const Text('Ø­Ø°Ù'),
           ),
         ],
       ),
@@ -626,7 +625,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'اختر اختصاراً',
+                    'Ø§Ø®ØªØ± Ø§Ø®ØªØµØ§Ø±Ø§Ù‹',
                     style: TextStyle(
                       fontSize: AppDimensions.fontDisplay3,
                       fontWeight: FontWeight.bold,
@@ -680,9 +679,9 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
                   ? null
                   : () {
                       _addShortcut(shortcut);
-                      setSheetState(() {}); // تحديث حالة الـ sheet
-                      setState(() {}); // تحديث حالة الشاشة الرئيسية
-                      // لا نغلق الـ sheet - نسمح بإضافة المزيد
+                      setSheetState(() {}); // ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ù€ sheet
+                      setState(() {}); // ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©
+                      // Ù„Ø§ Ù†ØºÙ„Ù‚ Ø§Ù„Ù€ sheet - Ù†Ø³Ù…Ø­ Ø¨Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø²ÙŠØ¯
                     },
               child: Container(
                 width: 80,
@@ -740,7 +739,7 @@ class _ShortcutsScreenState extends ConsumerState<ShortcutsScreen>
 }
 
 // =============================================================================
-// بيانات الاختصارات
+// Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª
 // =============================================================================
 
 class ShortcutItemData {
@@ -766,260 +765,260 @@ class ShortcutCategory {
   const ShortcutCategory({required this.title, required this.shortcuts});
 }
 
-// جميع الاختصارات المتاحة
-// ملاحظة: تم إزالة صفحات البار السفلي (الرئيسية، الطلبات، المحادثات، دروب شيب)
+// Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª Ø§Ù„Ù…ØªØ§Ø­Ø©
+// Ù…Ù„Ø§Ø­Ø¸Ø©: ØªÙ… Ø¥Ø²Ø§Ù„Ø© ØµÙØ­Ø§Øª Ø§Ù„Ø¨Ø§Ø± Ø§Ù„Ø³ÙÙ„ÙŠ (Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŒ Ø§Ù„Ø·Ù„Ø¨Ø§ØªØŒ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§ØªØŒ Ø¯Ø±ÙˆØ¨ Ø´ÙŠØ¨)
 final List<ShortcutItemData> _availableShortcuts = [
   const ShortcutItemData(
     key: 'products',
-    title: 'المنتجات',
+    title: 'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
     route: '/dashboard/products',
     icon: Icons.shopping_bag_outlined,
     color: Color(0xFF10B981),
   ),
   const ShortcutItemData(
     key: 'add_product',
-    title: 'إضافة منتج',
+    title: 'Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬',
     route: '/dashboard/products/add',
     icon: Icons.add_box_outlined,
     color: Color(0xFF8B5CF6),
   ),
   const ShortcutItemData(
     key: 'inventory',
-    title: 'المخزون',
+    title: 'Ø§Ù„Ù…Ø®Ø²ÙˆÙ†',
     route: '/dashboard/inventory',
     icon: Icons.inventory_2_outlined,
     color: Color(0xFFEC4899),
   ),
   const ShortcutItemData(
     key: 'customers',
-    title: 'العملاء',
+    title: 'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
     route: '/dashboard/customers',
     icon: Icons.people_outline,
     color: Color(0xFF06B6D4),
   ),
   const ShortcutItemData(
     key: 'wallet',
-    title: 'المحفظة',
+    title: 'Ø§Ù„Ù…Ø­ÙØ¸Ø©',
     route: '/dashboard/wallet',
     icon: Icons.account_balance_wallet_outlined,
     color: Color(0xFF14B8A6),
   ),
   const ShortcutItemData(
     key: 'marketing',
-    title: 'التسويق',
+    title: 'Ø§Ù„ØªØ³ÙˆÙŠÙ‚',
     route: '/dashboard/marketing',
     icon: Icons.campaign_outlined,
     color: Color(0xFFEF4444),
   ),
   const ShortcutItemData(
     key: 'coupons',
-    title: 'الكوبونات',
+    title: 'Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª',
     route: '/dashboard/coupons',
     icon: Icons.local_offer_outlined,
     color: Color(0xFFF97316),
   ),
-  // المتجر (تمت إزالة المحادثات - موجودة في البار السفلي)
+  // Ø§Ù„Ù…ØªØ¬Ø± (ØªÙ…Øª Ø¥Ø²Ø§Ù„Ø© Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª - Ù…ÙˆØ¬ÙˆØ¯Ø© ÙÙŠ Ø§Ù„Ø¨Ø§Ø± Ø§Ù„Ø³ÙÙ„ÙŠ)
   const ShortcutItemData(
     key: 'store_settings',
-    title: 'إعدادات المتجر',
+    title: 'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±',
     route: '/dashboard/store-management',
     icon: Icons.store_outlined,
     color: Color(0xFF6366F1),
   ),
   const ShortcutItemData(
     key: 'webstore',
-    title: 'المتجر الإلكتروني',
+    title: 'Ø§Ù„Ù…ØªØ¬Ø± Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
     route: '/dashboard/webstore',
     icon: Icons.language_outlined,
     color: Color(0xFF0EA5E9),
   ),
   const ShortcutItemData(
     key: 'whatsapp',
-    title: 'واتساب',
+    title: 'ÙˆØ§ØªØ³Ø§Ø¨',
     route: '/dashboard/whatsapp-integration',
     icon: Icons.chat_outlined,
     color: Color(0xFF22C55E),
   ),
   const ShortcutItemData(
     key: 'qrcode',
-    title: 'رمز QR',
+    title: 'Ø±Ù…Ø² QR',
     route: '/dashboard/qrcode-generator',
     icon: Icons.qr_code_outlined,
     color: AppTheme.slate500,
   ),
-  // الشحن والدفع
+  // Ø§Ù„Ø´Ø­Ù† ÙˆØ§Ù„Ø¯ÙØ¹
   const ShortcutItemData(
     key: 'shipping',
-    title: 'الشحن',
+    title: 'Ø§Ù„Ø´Ø­Ù†',
     route: '/dashboard/shipping-integration',
     icon: Icons.local_shipping_outlined,
     color: Color(0xFF8B5CF6),
   ),
   const ShortcutItemData(
     key: 'delivery',
-    title: 'التوصيل',
+    title: 'Ø§Ù„ØªÙˆØµÙŠÙ„',
     route: '/dashboard/delivery-options',
     icon: Icons.delivery_dining_outlined,
     color: Color(0xFFD946EF),
   ),
   const ShortcutItemData(
     key: 'payments',
-    title: 'المدفوعات',
+    title: 'Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª',
     route: '/dashboard/payment-methods',
     icon: Icons.payment_outlined,
     color: Color(0xFF059669),
   ),
   const ShortcutItemData(
     key: 'cod',
-    title: 'الدفع عند الاستلام',
+    title: 'Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…',
     route: '/dashboard/cod-settings',
     icon: Icons.attach_money_outlined,
     color: Color(0xFFCA8A04),
   ),
-  // الذكاء الاصطناعي
+  // Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ
   const ShortcutItemData(
     key: 'ai_studio',
-    title: 'استديو AI',
+    title: 'Ø§Ø³ØªØ¯ÙŠÙˆ AI',
     route: '/dashboard/studio',
     icon: Icons.auto_awesome_outlined,
     color: Color(0xFFA855F7),
   ),
   const ShortcutItemData(
     key: 'ai_tools',
-    title: 'أدوات AI',
+    title: 'Ø£Ø¯ÙˆØ§Øª AI',
     route: '/dashboard/tools',
     icon: Icons.psychology_outlined,
     color: Color(0xFF7C3AED),
   ),
-  // المنتجات الرقمية
+  // Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ©
   const ShortcutItemData(
     key: 'digital_products',
-    title: 'المنتجات الرقمية',
+    title: 'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ©',
     route: '/dashboard/digital-products',
     icon: Icons.cloud_download_outlined,
     color: Color(0xFF0891B2),
   ),
-  // التقارير
+  // Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±
   const ShortcutItemData(
     key: 'reports',
-    title: 'التقارير',
+    title: 'Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±',
     route: '/dashboard/audit-logs',
     icon: Icons.analytics_outlined,
     color: Color(0xFF4F46E5),
   ),
   const ShortcutItemData(
     key: 'sales',
-    title: 'المبيعات',
+    title: 'Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª',
     route: '/dashboard/sales',
     icon: Icons.trending_up_outlined,
     color: Color(0xFF16A34A),
   ),
-  // === الاختصارات المرجعة من التسويق ===
+  // === Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª Ø§Ù„Ù…Ø±Ø¬Ø¹Ø© Ù…Ù† Ø§Ù„ØªØ³ÙˆÙŠÙ‚ ===
   const ShortcutItemData(
     key: 'flash_sales',
-    title: 'العروض الخاطفة',
+    title: 'Ø§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø§Ø·ÙØ©',
     route: '/dashboard/flash-sales',
     icon: Icons.flash_on_outlined,
     color: Color(0xFFEF4444),
   ),
   const ShortcutItemData(
     key: 'abandoned_cart',
-    title: 'السلات المتروكة',
+    title: 'Ø§Ù„Ø³Ù„Ø§Øª Ø§Ù„Ù…ØªØ±ÙˆÙƒØ©',
     route: '/dashboard/abandoned-cart',
     icon: Icons.shopping_cart_outlined,
     color: Color(0xFFF59E0B),
   ),
   const ShortcutItemData(
     key: 'referral',
-    title: 'برنامج الإحالة',
+    title: 'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„Ø¥Ø­Ø§Ù„Ø©',
     route: '/dashboard/referral',
     icon: Icons.share_outlined,
     color: Color(0xFF10B981),
   ),
   const ShortcutItemData(
     key: 'loyalty_program',
-    title: 'برنامج الولاء',
+    title: 'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡',
     route: '/dashboard/loyalty-program',
     icon: Icons.loyalty_outlined,
     color: Color(0xFF8B5CF6),
   ),
   const ShortcutItemData(
     key: 'smart_analytics',
-    title: 'تحليلات ذكية',
+    title: 'ØªØ­Ù„ÙŠÙ„Ø§Øª Ø°ÙƒÙŠØ©',
     route: '/dashboard/smart-analytics',
     icon: Icons.insights_outlined,
     color: Color(0xFF06B6D4),
   ),
   const ShortcutItemData(
     key: 'auto_reports',
-    title: 'تقارير تلقائية',
+    title: 'ØªÙ‚Ø§Ø±ÙŠØ± ØªÙ„Ù‚Ø§Ø¦ÙŠØ©',
     route: '/dashboard/auto-reports',
     icon: Icons.summarize_outlined,
     color: Color(0xFF14B8A6),
   ),
   const ShortcutItemData(
     key: 'heatmap',
-    title: 'خريطة الحرارة',
+    title: 'Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±Ø©',
     route: '/dashboard/heatmap',
     icon: Icons.grid_view_outlined,
     color: Color(0xFFEC4899),
   ),
   const ShortcutItemData(
     key: 'ai_assistant',
-    title: 'مساعد AI',
+    title: 'Ù…Ø³Ø§Ø¹Ø¯ AI',
     route: '/dashboard/ai-assistant',
     icon: Icons.smart_toy_outlined,
     color: Color(0xFF7C3AED),
   ),
   const ShortcutItemData(
     key: 'content_generator',
-    title: 'مولد المحتوى',
+    title: 'Ù…ÙˆÙ„Ø¯ Ø§Ù„Ù…Ø­ØªÙˆÙ‰',
     route: '/dashboard/content-generator',
     icon: Icons.auto_fix_high_outlined,
     color: Color(0xFFA855F7),
   ),
   const ShortcutItemData(
     key: 'smart_pricing',
-    title: 'تسعير ذكي',
+    title: 'ØªØ³Ø¹ÙŠØ± Ø°ÙƒÙŠ',
     route: '/dashboard/smart-pricing',
     icon: Icons.price_change_outlined,
     color: Color(0xFF059669),
   ),
   const ShortcutItemData(
     key: 'customer_segments',
-    title: 'شرائح العملاء',
+    title: 'Ø´Ø±Ø§Ø¦Ø­ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
     route: '/dashboard/customer-segments',
     icon: Icons.group_work_outlined,
     color: Color(0xFF3B82F6),
   ),
   const ShortcutItemData(
     key: 'custom_messages',
-    title: 'رسائل مخصصة',
+    title: 'Ø±Ø³Ø§Ø¦Ù„ Ù…Ø®ØµØµØ©',
     route: '/dashboard/custom-messages',
     icon: Icons.message_outlined,
     color: Color(0xFF22C55E),
   ),
   const ShortcutItemData(
     key: 'product_variants',
-    title: 'متغيرات المنتج',
+    title: 'Ù…ØªØºÙŠØ±Ø§Øª Ø§Ù„Ù…Ù†ØªØ¬',
     route: '/dashboard/product-variants',
     icon: Icons.style_outlined,
     color: Color(0xFF6366F1),
   ),
   const ShortcutItemData(
     key: 'product_bundles',
-    title: 'حزم المنتجات',
+    title: 'Ø­Ø²Ù… Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
     route: '/dashboard/product-bundles',
     icon: Icons.inventory_outlined,
     color: Color(0xFFD946EF),
   ),
 ];
 
-// تصنيفات الاختصارات
-// ملاحظة: تم إزالة صفحات البار السفلي من التصنيفات
+// ØªØµÙ†ÙŠÙØ§Øª Ø§Ù„Ø§Ø®ØªØµØ§Ø±Ø§Øª
+// Ù…Ù„Ø§Ø­Ø¸Ø©: ØªÙ… Ø¥Ø²Ø§Ù„Ø© ØµÙØ­Ø§Øª Ø§Ù„Ø¨Ø§Ø± Ø§Ù„Ø³ÙÙ„ÙŠ Ù…Ù† Ø§Ù„ØªØµÙ†ÙŠÙØ§Øª
 final List<ShortcutCategory> _shortcutCategories = [
   ShortcutCategory(
-    title: 'الأساسية',
+    title: 'Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1032,7 +1031,7 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'المالية والتسويق',
+    title: 'Ø§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ù„ØªØ³ÙˆÙŠÙ‚',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1049,7 +1048,7 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'المتجر والتواصل',
+    title: 'Ø§Ù„Ù…ØªØ¬Ø± ÙˆØ§Ù„ØªÙˆØ§ØµÙ„',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1062,7 +1061,7 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'الشحن والدفع',
+    title: 'Ø§Ù„Ø´Ø­Ù† ÙˆØ§Ù„Ø¯ÙØ¹',
     shortcuts: _availableShortcuts
         .where(
           (s) => ['shipping', 'delivery', 'payments', 'cod'].contains(s.key),
@@ -1070,7 +1069,7 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'الذكاء الاصطناعي',
+    title: 'Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1084,7 +1083,7 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'التحليلات والتقارير',
+    title: 'Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª ÙˆØ§Ù„ØªÙ‚Ø§Ø±ÙŠØ±',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1097,13 +1096,13 @@ final List<ShortcutCategory> _shortcutCategories = [
         .toList(),
   ),
   ShortcutCategory(
-    title: 'إدارة العملاء',
+    title: 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
     shortcuts: _availableShortcuts
         .where((s) => ['customer_segments', 'custom_messages'].contains(s.key))
         .toList(),
   ),
   ShortcutCategory(
-    title: 'المنتجات المتقدمة',
+    title: 'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©',
     shortcuts: _availableShortcuts
         .where(
           (s) => [
@@ -1120,7 +1119,7 @@ final List<ShortcutCategory> _shortcutCategories = [
 // ReorderableGridView Widget
 // =============================================================================
 
-/// عنصر GridView قابل لإعادة الترتيب
+/// Ø¹Ù†ØµØ± GridView Ù‚Ø§Ø¨Ù„ Ù„Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªØ±ØªÙŠØ¨
 class ReorderableGridView extends StatefulWidget {
   final SliverGridDelegate gridDelegate;
   final int itemCount;
@@ -1194,7 +1193,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
 }
 
 // =============================================================================
-// AI Tools Test Tab - تبويب اختبار أدوات الذكاء الاصطناعي
+// AI Tools Test Tab - ØªØ¨ÙˆÙŠØ¨ Ø§Ø®ØªØ¨Ø§Ø± Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ
 // =============================================================================
 
 class _AiToolsTestTab extends StatefulWidget {
@@ -1210,14 +1209,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   final TextEditingController _promptController = TextEditingController();
   String _result = '';
   bool _isLoading = false;
-  String _selectedTool = 'text'; // الأداة المحددة حالياً
-  String? _generatedImageUrl; // رابط الصورة المولدة
-  String? _currentTaskId; // معرف مهمة NanoBanana
+  String _selectedTool = 'text'; // Ø§Ù„Ø£Ø¯Ø§Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø© Ø­Ø§Ù„ÙŠØ§Ù‹
+  String? _generatedImageUrl; // Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ù…ÙˆÙ„Ø¯Ø©
+  String? _currentTaskId; // Ù…Ø¹Ø±Ù Ù…Ù‡Ù…Ø© NanoBanana
 
-  // إعدادات إضافية لكل أداة
-  String _textTone = 'marketing'; // تسويقي / رسمي / مختصر
-  String _textLength = 'medium'; // قصير / متوسط / طويل
-  String _productTone = 'friendly'; // ودية / احترافية
+  // Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ù„ÙƒÙ„ Ø£Ø¯Ø§Ø©
+  String _textTone = 'marketing'; // ØªØ³ÙˆÙŠÙ‚ÙŠ / Ø±Ø³Ù…ÙŠ / Ù…Ø®ØªØµØ±
+  String _textLength = 'medium'; // Ù‚ØµÙŠØ± / Ù…ØªÙˆØ³Ø· / Ø·ÙˆÙŠÙ„
+  String _productTone = 'friendly'; // ÙˆØ¯ÙŠØ© / Ø§Ø­ØªØ±Ø§ÙÙŠØ©
 
   @override
   void dispose() {
@@ -1229,7 +1228,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     final isAuthenticated = widget.ref.read(isAuthenticatedProvider);
     if (!isAuthenticated) {
       setState(() {
-        _result = '❌ يجب تسجيل الدخول أولاً لاستخدام أدوات AI';
+        _result = 'âŒ ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ø§Ù‹ Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø£Ø¯ÙˆØ§Øª AI';
       });
       return false;
     }
@@ -1239,41 +1238,41 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
   Future<void> _testGenerateText() async {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
-      setState(() => _result = '⚠️ أدخل موضوع النص أولاً');
+      setState(() => _result = 'âš ï¸ Ø£Ø¯Ø®Ù„ Ù…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ù†Øµ Ø£ÙˆÙ„Ø§Ù‹');
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد النص...';
+      _result = 'â³ Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ù†Øµ...';
     });
 
     try {
       final service = widget.ref.read(mbuyStudioServiceProvider);
-      // بناء prompt مناسب لتوليد نص عام
+      // Ø¨Ù†Ø§Ø¡ prompt Ù…Ù†Ø§Ø³Ø¨ Ù„ØªÙˆÙ„ÙŠØ¯ Ù†Øµ Ø¹Ø§Ù…
       final toneMap = {
-        'marketing': 'تسويقي جذاب',
-        'formal': 'رسمي واحترافي',
-        'short': 'مختصر ومباشر',
+        'marketing': 'ØªØ³ÙˆÙŠÙ‚ÙŠ Ø¬Ø°Ø§Ø¨',
+        'formal': 'Ø±Ø³Ù…ÙŠ ÙˆØ§Ø­ØªØ±Ø§ÙÙŠ',
+        'short': 'Ù…Ø®ØªØµØ± ÙˆÙ…Ø¨Ø§Ø´Ø±',
       };
       final lengthMap = {
-        'short': 'جملتين',
-        'medium': '3-4 جمل',
-        'long': 'فقرة كاملة',
+        'short': 'Ø¬Ù…Ù„ØªÙŠÙ†',
+        'medium': '3-4 Ø¬Ù…Ù„',
+        'long': 'ÙÙ‚Ø±Ø© ÙƒØ§Ù…Ù„Ø©',
       };
 
       final fullPrompt =
-          'اكتب نص ${toneMap[_textTone]} عن "${_promptController.text}" بطول ${lengthMap[_textLength]}';
+          'Ø§ÙƒØªØ¨ Ù†Øµ ${toneMap[_textTone]} Ø¹Ù† "${_promptController.text}" Ø¨Ø·ÙˆÙ„ ${lengthMap[_textLength]}';
 
       final response = await service.generateText(fullPrompt);
       setState(() {
         final text =
             response['text'] ?? response['content'] ?? response['data'];
-        _result = '✅ النص المولّد:\n\n$text';
+        _result = 'âœ… Ø§Ù„Ù†Øµ Ø§Ù„Ù…ÙˆÙ„Ù‘Ø¯:\n\n$text';
       });
     } catch (e) {
       setState(() {
-        _result = '❌ فشل: $e';
+        _result = 'âŒ ÙØ´Ù„: $e';
       });
     } finally {
       setState(() => _isLoading = false);
@@ -1285,14 +1284,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     if (_promptController.text.isEmpty) {
       setState(
         () => _result =
-            '⚠️ أدخل اسم المنتج ومميزاته\n(مثال: ساعة ذكية - مقاومة للماء - بطارية طويلة - شاشة AMOLED)',
+            'âš ï¸ Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ù†ØªØ¬ ÙˆÙ…Ù…ÙŠØ²Ø§ØªÙ‡\n(Ù…Ø«Ø§Ù„: Ø³Ø§Ø¹Ø© Ø°ÙƒÙŠØ© - Ù…Ù‚Ø§ÙˆÙ…Ø© Ù„Ù„Ù…Ø§Ø¡ - Ø¨Ø·Ø§Ø±ÙŠØ© Ø·ÙˆÙŠÙ„Ø© - Ø´Ø§Ø´Ø© AMOLED)',
       );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد وصف المنتج...';
+      _result = 'â³ Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ ÙˆØµÙ Ø§Ù„Ù…Ù†ØªØ¬...';
     });
 
     try {
@@ -1309,11 +1308,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           response['text'] ??
           response['data'];
       setState(() {
-        _result = '✅ وصف المنتج:\n\n$description';
+        _result = 'âœ… ÙˆØµÙ Ø§Ù„Ù…Ù†ØªØ¬:\n\n$description';
       });
     } catch (e) {
       setState(() {
-        _result = '❌ فشل: $e';
+        _result = 'âŒ ÙØ´Ù„: $e';
       });
     } finally {
       setState(() => _isLoading = false);
@@ -1324,14 +1323,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     if (!_checkAuth()) return;
     if (_promptController.text.isEmpty) {
       setState(
-        () => _result = '⚠️ أدخل اسم المنتج أو الفئة\n(مثال: حقيبة جلد نسائية)',
+        () => _result = 'âš ï¸ Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ù†ØªØ¬ Ø£Ùˆ Ø§Ù„ÙØ¦Ø©\n(Ù…Ø«Ø§Ù„: Ø­Ù‚ÙŠØ¨Ø© Ø¬Ù„Ø¯ Ù†Ø³Ø§Ø¦ÙŠØ©)',
       );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد الكلمات المفتاحية...';
+      _result = 'â³ Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…ÙØªØ§Ø­ÙŠØ©...';
     });
 
     try {
@@ -1345,14 +1344,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       setState(() {
         if (keywords is List && keywords.isNotEmpty) {
           _result =
-              '✅ الكلمات المفتاحية:\n\n${keywords.map((k) => '• $k').join('\n')}';
+              'âœ… Ø§Ù„ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ù…ÙØªØ§Ø­ÙŠØ©:\n\n${keywords.map((k) => 'â€¢ $k').join('\n')}';
         } else {
-          _result = '✅ ${response['data'] ?? response}';
+          _result = 'âœ… ${response['data'] ?? response}';
         }
       });
     } catch (e) {
       setState(() {
-        _result = '❌ فشل: $e';
+        _result = 'âŒ ÙØ´Ù„: $e';
       });
     } finally {
       setState(() => _isLoading = false);
@@ -1365,14 +1364,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     if (_promptController.text.isEmpty) {
       setState(
         () => _result =
-            '⚠️ أدخل وصف الصورة بالإنجليزية\n(مثال: Professional product photo of a smartwatch on white background)',
+            'âš ï¸ Ø£Ø¯Ø®Ù„ ÙˆØµÙ Ø§Ù„ØµÙˆØ±Ø© Ø¨Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©\n(Ù…Ø«Ø§Ù„: Professional product photo of a smartwatch on white background)',
       );
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري توليد الصورة عبر NanoBanana...';
+      _result = 'â³ Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ±Ø© Ø¹Ø¨Ø± NanoBanana...';
       _generatedImageUrl = null;
       _currentTaskId = null;
     });
@@ -1380,38 +1379,38 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     try {
       final service = widget.ref.read(mbuyStudioServiceProvider);
 
-      // توليد الصورة
+      // ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ±Ø©
       final response = await service.nanoBananaGenerate(_promptController.text);
 
-      // التحقق من النتيجة
+      // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù†ØªÙŠØ¬Ø©
       final status = response['status'];
       final imageUrl = response['image_url'] ?? response['imageUrl'];
 
       if (status == 'completed' && imageUrl != null) {
         setState(() {
           _generatedImageUrl = imageUrl;
-          _result = '✅ تم توليد الصورة بنجاح!';
+          _result = 'âœ… ØªÙ… ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ±Ø© Ø¨Ù†Ø¬Ø§Ø­!';
         });
       } else {
         setState(() {
           _result =
-              '❌ فشل: ${response['error'] ?? response['details'] ?? 'استجابة غير متوقعة'}';
+              'âŒ ÙØ´Ù„: ${response['error'] ?? response['details'] ?? 'Ø§Ø³ØªØ¬Ø§Ø¨Ø© ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹Ø©'}';
         });
       }
     } catch (e) {
       setState(() {
-        _result = '❌ فشل: $e';
+        _result = 'âŒ ÙØ´Ù„: $e';
       });
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  // ignore: unused_element - محفوظة للاستخدام المستقبلي
+  // ignore: unused_element - Ù…Ø­ÙÙˆØ¸Ø© Ù„Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„ÙŠ
   Future<void> _pollTaskStatus(String taskId) async {
     final service = widget.ref.read(mbuyStudioServiceProvider);
     int attempts = 0;
-    const maxAttempts = 30; // 30 محاولة × 2 ثانية = دقيقة واحدة كحد أقصى
+    const maxAttempts = 30; // 30 Ù…Ø­Ø§ÙˆÙ„Ø© Ã— 2 Ø«Ø§Ù†ÙŠØ© = Ø¯Ù‚ÙŠÙ‚Ø© ÙˆØ§Ø­Ø¯Ø© ÙƒØ­Ø¯ Ø£Ù‚ØµÙ‰
 
     while (attempts < maxAttempts) {
       attempts++;
@@ -1422,7 +1421,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         final status = taskResponse['status']?.toString().toLowerCase();
 
         if (status == 'completed' || status == 'success') {
-          // البحث عن رابط الصورة في النتيجة
+          // Ø§Ù„Ø¨Ø­Ø« Ø¹Ù† Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© ÙÙŠ Ø§Ù„Ù†ØªÙŠØ¬Ø©
           final result = taskResponse['result'];
           String? imageUrl;
 
@@ -1434,7 +1433,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             imageUrl = result;
           }
 
-          // أيضاً تحقق من المستوى الأعلى
+          // Ø£ÙŠØ¶Ø§Ù‹ ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø£Ø¹Ù„Ù‰
           imageUrl ??=
               taskResponse['url'] ??
               taskResponse['image_url'] ??
@@ -1443,46 +1442,46 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           setState(() {
             _generatedImageUrl = imageUrl;
             _result = imageUrl != null
-                ? '✅ تم توليد الصورة بنجاح!'
-                : '✅ اكتملت المهمة لكن لم يتم العثور على رابط الصورة\n\nالنتيجة: $taskResponse';
+                ? 'âœ… ØªÙ… ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ±Ø© Ø¨Ù†Ø¬Ø§Ø­!'
+                : 'âœ… Ø§ÙƒØªÙ…Ù„Øª Ø§Ù„Ù…Ù‡Ù…Ø© Ù„ÙƒÙ† Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø©\n\nØ§Ù„Ù†ØªÙŠØ¬Ø©: $taskResponse';
           });
           return;
         } else if (status == 'failed' || status == 'error') {
           final error =
               taskResponse['error'] ??
               taskResponse['message'] ??
-              'خطأ غير معروف';
+              'Ø®Ø·Ø£ ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ';
           setState(() {
-            _result = '❌ فشلت المهمة: $error';
+            _result = 'âŒ ÙØ´Ù„Øª Ø§Ù„Ù…Ù‡Ù…Ø©: $error';
           });
           return;
         } else {
-          // لا زالت قيد التنفيذ
+          // Ù„Ø§ Ø²Ø§Ù„Øª Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°
           setState(() {
             _result =
-                '⏳ حالة المهمة: ${status ?? 'processing'}\nالمحاولة: $attempts/$maxAttempts';
+                'â³ Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ù‡Ù…Ø©: ${status ?? 'processing'}\nØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©: $attempts/$maxAttempts';
           });
         }
       } catch (e) {
         debugPrint('[NanoBanana] Poll error: $e');
-        // استمر في المحاولة
+        // Ø§Ø³ØªÙ…Ø± ÙÙŠ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©
       }
     }
 
     setState(() {
-      _result = '⚠️ انتهت المهلة. يمكنك التحقق لاحقاً من المهمة: $taskId';
+      _result = 'âš ï¸ Ø§Ù†ØªÙ‡Øª Ø§Ù„Ù…Ù‡Ù„Ø©. ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ­Ù‚Ù‚ Ù„Ø§Ø­Ù‚Ø§Ù‹ Ù…Ù† Ø§Ù„Ù…Ù‡Ù…Ø©: $taskId';
     });
   }
 
   Future<void> _checkTaskStatus() async {
     if (_currentTaskId == null) {
-      setState(() => _result = '⚠️ لا توجد مهمة للتحقق منها');
+      setState(() => _result = 'âš ï¸ Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù‡Ù…Ø© Ù„Ù„ØªØ­Ù‚Ù‚ Ù…Ù†Ù‡Ø§');
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _result = '⏳ جاري التحقق من حالة المهمة...';
+      _result = 'â³ Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ù‡Ù…Ø©...';
     });
 
     try {
@@ -1494,9 +1493,9 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
 
       setState(() {
         _result =
-            '📋 حالة المهمة: $status\n\nالتفاصيل:\n${_formatJson(response)}';
+            'ðŸ“‹ Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ù‡Ù…Ø©: $status\n\nØ§Ù„ØªÙØ§ØµÙŠÙ„:\n${_formatJson(response)}';
 
-        // إذا اكتملت، حاول استخراج الصورة
+        // Ø¥Ø°Ø§ Ø§ÙƒØªÙ…Ù„ØªØŒ Ø­Ø§ÙˆÙ„ Ø§Ø³ØªØ®Ø±Ø§Ø¬ Ø§Ù„ØµÙˆØ±Ø©
         if (status == 'completed' || status == 'success') {
           String? imageUrl;
           if (result is List && result.isNotEmpty) {
@@ -1509,7 +1508,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
         }
       });
     } catch (e) {
-      setState(() => _result = '❌ فشل التحقق: $e');
+      setState(() => _result = 'âŒ ÙØ´Ù„ Ø§Ù„ØªØ­Ù‚Ù‚: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -1530,7 +1529,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // حالة تسجيل الدخول
+          // Ø­Ø§Ù„Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -1557,8 +1556,8 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 const SizedBox(width: 8),
                 Text(
                   widget.ref.watch(isAuthenticatedProvider)
-                      ? 'تم تسجيل الدخول ✓'
-                      : 'غير مسجل الدخول - سجل دخولك لاستخدام أدوات AI',
+                      ? 'ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ âœ“'
+                      : 'ØºÙŠØ± Ù…Ø³Ø¬Ù„ Ø§Ù„Ø¯Ø®ÙˆÙ„ - Ø³Ø¬Ù„ Ø¯Ø®ÙˆÙ„Ùƒ Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø£Ø¯ÙˆØ§Øª AI',
                   style: TextStyle(
                     color: widget.ref.watch(isAuthenticatedProvider)
                         ? Colors.green[800]
@@ -1571,9 +1570,9 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           ),
           const SizedBox(height: 16),
 
-          // اختيار الأداة
+          // Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø£Ø¯Ø§Ø©
           Text(
-            'اختر الأداة:',
+            'Ø§Ø®ØªØ± Ø§Ù„Ø£Ø¯Ø§Ø©:',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppDimensions.fontTitle,
@@ -1588,25 +1587,25 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
             children: [
               _buildToolChip(
                 'text',
-                'توليد نص',
+                'ØªÙˆÙ„ÙŠØ¯ Ù†Øµ',
                 Icons.text_fields,
                 Colors.blue,
               ),
               _buildToolChip(
                 'description',
-                'وصف منتج',
+                'ÙˆØµÙ Ù…Ù†ØªØ¬',
                 Icons.description,
                 Colors.teal,
               ),
               _buildToolChip(
                 'keywords',
-                'كلمات مفتاحية',
+                'ÙƒÙ„Ù…Ø§Øª Ù…ÙØªØ§Ø­ÙŠØ©',
                 Icons.key,
                 Colors.indigo,
               ),
               _buildToolChip(
                 'nano_banana',
-                '🍌 صورة AI',
+                'ðŸŒ ØµÙˆØ±Ø© AI',
                 Icons.image,
                 Colors.orange,
               ),
@@ -1614,7 +1613,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           ),
           const SizedBox(height: 16),
 
-          // حقل الإدخال مع تلميح مخصص
+          // Ø­Ù‚Ù„ Ø§Ù„Ø¥Ø¯Ø®Ø§Ù„ Ù…Ø¹ ØªÙ„Ù…ÙŠØ­ Ù…Ø®ØµØµ
           TextField(
             controller: _promptController,
             maxLines: 3,
@@ -1630,11 +1629,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           ),
           const SizedBox(height: 12),
 
-          // خيارات إضافية حسب الأداة
+          // Ø®ÙŠØ§Ø±Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ø­Ø³Ø¨ Ø§Ù„Ø£Ø¯Ø§Ø©
           _buildToolOptions(),
           const SizedBox(height: 16),
 
-          // زر التوليد
+          // Ø²Ø± Ø§Ù„ØªÙˆÙ„ÙŠØ¯
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -1649,7 +1648,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                       ),
                     )
                   : const Icon(Icons.auto_awesome),
-              label: Text(_isLoading ? 'جاري التوليد...' : 'توليد'),
+              label: Text(_isLoading ? 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙˆÙ„ÙŠØ¯...' : 'ØªÙˆÙ„ÙŠØ¯'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _getToolColor(),
                 foregroundColor: Colors.white,
@@ -1662,7 +1661,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           ),
           const SizedBox(height: 24),
 
-          // عرض الصورة المولدة (NanoBanana)
+          // Ø¹Ø±Ø¶ Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ù…ÙˆÙ„Ø¯Ø© (NanoBanana)
           if (_generatedImageUrl != null) ...[
             Container(
               decoration: BoxDecoration(
@@ -1695,7 +1694,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'فشل تحميل الصورة',
+                          'ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙˆØ±Ø©',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                         const SizedBox(height: 4),
@@ -1720,11 +1719,11 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: _generatedImageUrl!));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم نسخ الرابط')),
+                      const SnackBar(content: Text('ØªÙ… Ù†Ø³Ø® Ø§Ù„Ø±Ø§Ø¨Ø·')),
                     );
                   },
                   icon: const Icon(Icons.copy, size: 16),
-                  label: const Text('نسخ الرابط'),
+                  label: const Text('Ù†Ø³Ø® Ø§Ù„Ø±Ø§Ø¨Ø·'),
                 ),
                 const SizedBox(width: 16),
                 TextButton.icon(
@@ -1733,14 +1732,14 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                     _result = '';
                   }),
                   icon: const Icon(Icons.close, size: 16),
-                  label: const Text('إخفاء'),
+                  label: const Text('Ø¥Ø®ÙØ§Ø¡'),
                 ),
               ],
             ),
             const SizedBox(height: 16),
           ],
 
-          // زر التحقق من المهمة (NanoBanana)
+          // Ø²Ø± Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ù‡Ù…Ø© (NanoBanana)
           if (_selectedTool == 'nano_banana' &&
               _currentTaskId != null &&
               !_isLoading)
@@ -1750,7 +1749,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 onPressed: _checkTaskStatus,
                 icon: const Icon(Icons.refresh),
                 label: Text(
-                  'تحقق من المهمة: ${_currentTaskId!.substring(0, 8)}...',
+                  'ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ù‡Ù…Ø©: ${_currentTaskId!.substring(0, 8)}...',
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.orange,
@@ -1759,7 +1758,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
               ),
             ),
 
-          // نتيجة
+          // Ù†ØªÙŠØ¬Ø©
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -1773,7 +1772,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 Row(
                   children: [
                     const Text(
-                      'النتيجة:',
+                      'Ø§Ù„Ù†ØªÙŠØ¬Ø©:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: AppDimensions.fontTitle,
@@ -1790,13 +1789,13 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
                 ),
                 const SizedBox(height: 12),
                 SelectableText(
-                  _result.isEmpty ? 'اضغط على أي أداة للتجربة' : _result,
+                  _result.isEmpty ? 'Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø£ÙŠ Ø£Ø¯Ø§Ø© Ù„Ù„ØªØ¬Ø±Ø¨Ø©' : _result,
                   style: TextStyle(
                     fontSize: AppDimensions.fontBody,
                     height: 1.6,
-                    color: _result.contains('❌')
+                    color: _result.contains('âŒ')
                         ? Colors.red[800]
-                        : _result.contains('✅')
+                        : _result.contains('âœ…')
                         ? Colors.green[800]
                         : Colors.grey[800],
                   ),
@@ -1809,32 +1808,32 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
     );
   }
 
-  // دوال مساعدة للأداة المختارة
+  // Ø¯ÙˆØ§Ù„ Ù…Ø³Ø§Ø¹Ø¯Ø© Ù„Ù„Ø£Ø¯Ø§Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©
   String _getInputLabel() {
     switch (_selectedTool) {
       case 'text':
-        return 'موضوع النص (عربي)';
+        return 'Ù…ÙˆØ¶ÙˆØ¹ Ø§Ù„Ù†Øµ (Ø¹Ø±Ø¨ÙŠ)';
       case 'description':
-        return 'اسم المنتج ومميزاته (عربي)';
+        return 'Ø§Ø³Ù… Ø§Ù„Ù…Ù†ØªØ¬ ÙˆÙ…Ù…ÙŠØ²Ø§ØªÙ‡ (Ø¹Ø±Ø¨ÙŠ)';
       case 'keywords':
-        return 'اسم المنتج/الفئة (عربي)';
+        return 'Ø§Ø³Ù… Ø§Ù„Ù…Ù†ØªØ¬/Ø§Ù„ÙØ¦Ø© (Ø¹Ø±Ø¨ÙŠ)';
       case 'nano_banana':
-        return 'وصف الصورة (إنجليزي أفضل)';
+        return 'ÙˆØµÙ Ø§Ù„ØµÙˆØ±Ø© (Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠ Ø£ÙØ¶Ù„)';
       default:
-        return 'الإدخال';
+        return 'Ø§Ù„Ø¥Ø¯Ø®Ø§Ù„';
     }
   }
 
   String _getInputHint() {
     switch (_selectedTool) {
       case 'text':
-        return 'مثال: منشور ترحيبي بالعملاء الجدد';
+        return 'Ù…Ø«Ø§Ù„: Ù…Ù†Ø´ÙˆØ± ØªØ±Ø­ÙŠØ¨ÙŠ Ø¨Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ø¬Ø¯Ø¯';
       case 'description':
-        return 'مثال: ساعة ذكية - مقاومة للماء - شاشة AMOLED';
+        return 'Ù…Ø«Ø§Ù„: Ø³Ø§Ø¹Ø© Ø°ÙƒÙŠØ© - Ù…Ù‚Ø§ÙˆÙ…Ø© Ù„Ù„Ù…Ø§Ø¡ - Ø´Ø§Ø´Ø© AMOLED';
       case 'keywords':
-        return 'مثال: حقيبة جلد نسائية';
+        return 'Ù…Ø«Ø§Ù„: Ø­Ù‚ÙŠØ¨Ø© Ø¬Ù„Ø¯ Ù†Ø³Ø§Ø¦ÙŠØ©';
       case 'nano_banana':
-        return 'مثال: Professional product photo of a smartwatch on white background';
+        return 'Ù…Ø«Ø§Ù„: Professional product photo of a smartwatch on white background';
       default:
         return '';
     }
@@ -1903,7 +1902,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'نوع النص:',
+              'Ù†ÙˆØ¹ Ø§Ù„Ù†Øµ:',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
@@ -1911,40 +1910,40 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
               spacing: 8,
               children: [
                 ChoiceChip(
-                  label: const Text('تسويقي'),
+                  label: const Text('ØªØ³ÙˆÙŠÙ‚ÙŠ'),
                   selected: _textTone == 'marketing',
                   onSelected: (_) => setState(() => _textTone = 'marketing'),
                 ),
                 ChoiceChip(
-                  label: const Text('رسمي'),
+                  label: const Text('Ø±Ø³Ù…ÙŠ'),
                   selected: _textTone == 'formal',
                   onSelected: (_) => setState(() => _textTone = 'formal'),
                 ),
                 ChoiceChip(
-                  label: const Text('مختصر'),
+                  label: const Text('Ù…Ø®ØªØµØ±'),
                   selected: _textTone == 'short',
                   onSelected: (_) => setState(() => _textTone = 'short'),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const Text('الطول:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const Text('Ø§Ù„Ø·ÙˆÙ„:', style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 ChoiceChip(
-                  label: const Text('قصير'),
+                  label: const Text('Ù‚ØµÙŠØ±'),
                   selected: _textLength == 'short',
                   onSelected: (_) => setState(() => _textLength = 'short'),
                 ),
                 ChoiceChip(
-                  label: const Text('متوسط'),
+                  label: const Text('Ù…ØªÙˆØ³Ø·'),
                   selected: _textLength == 'medium',
                   onSelected: (_) => setState(() => _textLength = 'medium'),
                 ),
                 ChoiceChip(
-                  label: const Text('طويل'),
+                  label: const Text('Ø·ÙˆÙŠÙ„'),
                   selected: _textLength == 'long',
                   onSelected: (_) => setState(() => _textLength = 'long'),
                 ),
@@ -1957,7 +1956,7 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'نبرة الوصف:',
+              'Ù†Ø¨Ø±Ø© Ø§Ù„ÙˆØµÙ:',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
@@ -1965,18 +1964,18 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
               spacing: 8,
               children: [
                 ChoiceChip(
-                  label: const Text('ودية'),
+                  label: const Text('ÙˆØ¯ÙŠØ©'),
                   selected: _productTone == 'friendly',
                   onSelected: (_) => setState(() => _productTone = 'friendly'),
                 ),
                 ChoiceChip(
-                  label: const Text('احترافية'),
+                  label: const Text('Ø§Ø­ØªØ±Ø§ÙÙŠØ©'),
                   selected: _productTone == 'professional',
                   onSelected: (_) =>
                       setState(() => _productTone = 'professional'),
                 ),
                 ChoiceChip(
-                  label: const Text('فاخرة'),
+                  label: const Text('ÙØ§Ø®Ø±Ø©'),
                   selected: _productTone == 'luxury',
                   onSelected: (_) => setState(() => _productTone = 'luxury'),
                 ),
@@ -1989,12 +1988,12 @@ class _AiToolsTestTabState extends State<_AiToolsTestTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '🍌 NanoBanana',
+              'ðŸŒ NanoBanana',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             SizedBox(height: 8),
             Text(
-              'توليد صور بالذكاء الاصطناعي عبر OpenRouter',
+              'ØªÙˆÙ„ÙŠØ¯ ØµÙˆØ± Ø¨Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø¹Ø¨Ø± OpenRouter',
               style: TextStyle(
                 fontSize: AppDimensions.fontLabel,
                 color: Colors.grey,

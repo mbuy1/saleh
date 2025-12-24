@@ -524,7 +524,6 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: Column(
         children: [
           // الهيدر العلوي الثابت

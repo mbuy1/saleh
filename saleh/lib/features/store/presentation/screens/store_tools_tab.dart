@@ -31,7 +31,6 @@ class _StoreToolsTabState extends State<StoreToolsTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: _isLoading
             ? const SkeletonMarketingScreen()

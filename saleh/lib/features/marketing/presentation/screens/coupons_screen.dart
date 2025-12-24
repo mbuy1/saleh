@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +9,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
-/// صفحة إدارة الكوبونات الذكية
+/// ØµÙØ­Ø© Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª Ø§Ù„Ø°ÙƒÙŠØ©
 class CouponsScreen extends ConsumerStatefulWidget {
   const CouponsScreen({super.key});
 
@@ -55,7 +55,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
           _isLoading = false;
         });
       } else {
-        throw Exception(response['error'] ?? 'فشل في جلب الكوبونات');
+        throw Exception(response['error'] ?? 'ÙØ´Ù„ ÙÙŠ Ø¬Ù„Ø¨ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª');
       }
     } catch (e) {
       setState(() {
@@ -77,7 +77,6 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -88,21 +87,21 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('الكوبونات'),
+        title: const Text('Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª'),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: _showCreateCouponSheet,
-            tooltip: 'إنشاء كوبون',
+            tooltip: 'Ø¥Ù†Ø´Ø§Ø¡ ÙƒÙˆØ¨ÙˆÙ†',
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'نشط (${_activeCoupons.length})'),
-            Tab(text: 'ذكي (${_smartCoupons.length})'),
-            Tab(text: 'منتهي (${_expiredCoupons.length})'),
+            Tab(text: 'Ù†Ø´Ø· (${_activeCoupons.length})'),
+            Tab(text: 'Ø°ÙƒÙŠ (${_smartCoupons.length})'),
+            Tab(text: 'Ù…Ù†ØªÙ‡ÙŠ (${_expiredCoupons.length})'),
           ],
         ),
       ),
@@ -121,7 +120,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showCreateCouponSheet,
         icon: const Icon(Icons.add),
-        label: const Text('كوبون جديد'),
+        label: const Text('ÙƒÙˆØ¨ÙˆÙ† Ø¬Ø¯ÙŠØ¯'),
         backgroundColor: AppTheme.primaryColor,
       ),
     );
@@ -134,12 +133,12 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
         children: [
           Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
           SizedBox(height: AppDimensions.spacing16),
-          Text(_error ?? 'حدث خطأ', style: const TextStyle(color: Colors.red)),
+          Text(_error ?? 'Ø­Ø¯Ø« Ø®Ø·Ø£', style: const TextStyle(color: Colors.red)),
           SizedBox(height: AppDimensions.spacing16),
           ElevatedButton.icon(
             onPressed: _loadCoupons,
             icon: const Icon(Icons.refresh),
-            label: const Text('إعادة المحاولة'),
+            label: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
           ),
         ],
       ),
@@ -159,14 +158,14 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
             ),
             SizedBox(height: AppDimensions.spacing16),
             Text(
-              'لا توجد كوبونات',
+              'Ù„Ø§ ØªÙˆØ¬Ø¯ ÙƒÙˆØ¨ÙˆÙ†Ø§Øª',
               style: TextStyle(
                 fontSize: AppDimensions.fontHeadline,
                 color: Colors.grey.shade600,
               ),
             ),
             SizedBox(height: AppDimensions.spacing8),
-            const Text('أنشئ كوبون جديد لجذب المزيد من العملاء'),
+            const Text('Ø£Ù†Ø´Ø¦ ÙƒÙˆØ¨ÙˆÙ† Ø¬Ø¯ÙŠØ¯ Ù„Ø¬Ø°Ø¨ Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'),
           ],
         ),
       );
@@ -190,7 +189,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
         children: [
           // Smart Coupon Types
           Text(
-            'إنشاء كوبون ذكي',
+            'Ø¥Ù†Ø´Ø§Ø¡ ÙƒÙˆØ¨ÙˆÙ† Ø°ÙƒÙŠ',
             style: TextStyle(
               fontSize: AppDimensions.fontHeadline,
               fontWeight: FontWeight.bold,
@@ -199,29 +198,29 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
           SizedBox(height: AppDimensions.spacing16),
           _buildSmartCouponOption(
             'first_order',
-            'خصم الترحيب',
-            'كوبون تلقائي للعملاء الجدد',
+            'Ø®ØµÙ… Ø§Ù„ØªØ±Ø­ÙŠØ¨',
+            'ÙƒÙˆØ¨ÙˆÙ† ØªÙ„Ù‚Ø§Ø¦ÙŠ Ù„Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ø¬Ø¯Ø¯',
             Icons.celebration_outlined,
             Colors.green,
           ),
           _buildSmartCouponOption(
             'abandoned_cart',
-            'استرجاع السلة',
-            'إشعار العملاء الذين تركوا سلتهم',
+            'Ø§Ø³ØªØ±Ø¬Ø§Ø¹ Ø§Ù„Ø³Ù„Ø©',
+            'Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ø°ÙŠÙ† ØªØ±ÙƒÙˆØ§ Ø³Ù„ØªÙ‡Ù…',
             Icons.shopping_cart_outlined,
             Colors.orange,
           ),
           _buildSmartCouponOption(
             'win_back',
-            'استرجاع العملاء',
-            'خصم للعملاء المنقطعين',
+            'Ø§Ø³ØªØ±Ø¬Ø§Ø¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+            'Ø®ØµÙ… Ù„Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ù…Ù†Ù‚Ø·Ø¹ÙŠÙ†',
             Icons.people_outline,
             Colors.blue,
           ),
           _buildSmartCouponOption(
             'social_share',
-            'خصم المشاركة',
-            'كوبون عند مشاركة المتجر',
+            'Ø®ØµÙ… Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ©',
+            'ÙƒÙˆØ¨ÙˆÙ† Ø¹Ù†Ø¯ Ù…Ø´Ø§Ø±ÙƒØ© Ø§Ù„Ù…ØªØ¬Ø±',
             Icons.share_outlined,
             Colors.purple,
           ),
@@ -229,7 +228,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
           if (_smartCoupons.isNotEmpty) ...[
             SizedBox(height: AppDimensions.spacing24),
             Text(
-              'الكوبونات الذكية النشطة',
+              'Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª Ø§Ù„Ø°ÙƒÙŠØ© Ø§Ù„Ù†Ø´Ø·Ø©',
               style: TextStyle(
                 fontSize: AppDimensions.fontHeadline,
                 fontWeight: FontWeight.bold,
@@ -326,7 +325,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              'ذكي',
+                              'Ø°ÙƒÙŠ',
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.purple.shade700,
@@ -342,10 +341,10 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: coupon.code));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('تم نسخ الكود')),
+                        const SnackBar(content: Text('ØªÙ… Ù†Ø³Ø® Ø§Ù„ÙƒÙˆØ¯')),
                       );
                     },
-                    tooltip: 'نسخ الكود',
+                    tooltip: 'Ù†Ø³Ø® Ø§Ù„ÙƒÙˆØ¯',
                   ),
                 ],
               ),
@@ -390,21 +389,21 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
                   _buildStatChip(
                     Icons.check_circle_outline,
                     '${coupon.timesUsed}',
-                    'استخدام',
+                    'Ø§Ø³ØªØ®Ø¯Ø§Ù…',
                   ),
                   SizedBox(width: AppDimensions.spacing12),
                   if (coupon.usageLimit != null)
                     _buildStatChip(
                       Icons.inventory_2_outlined,
                       '${coupon.usageLimit}',
-                      'الحد',
+                      'Ø§Ù„Ø­Ø¯',
                     ),
                   const Spacer(),
                   if (coupon.expiresAt != null)
                     Text(
                       coupon.isExpired
-                          ? 'منتهي'
-                          : 'ينتهي ${_formatDate(coupon.expiresAt!)}',
+                          ? 'Ù…Ù†ØªÙ‡ÙŠ'
+                          : 'ÙŠÙ†ØªÙ‡ÙŠ ${_formatDate(coupon.expiresAt!)}',
                       style: TextStyle(
                         fontSize: AppDimensions.fontLabel,
                         color: coupon.isExpired ? Colors.red : Colors.grey,
@@ -500,7 +499,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إنشاء الكوبون الذكي بنجاح'),
+            content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ† Ø§Ù„Ø°ÙƒÙŠ Ø¨Ù†Ø¬Ø§Ø­'),
             backgroundColor: Colors.green,
           ),
         );
@@ -512,7 +511,7 @@ class _CouponsScreenState extends ConsumerState<CouponsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل في إنشاء الكوبون: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ÙÙŠ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†: $e')));
     }
   }
 }
@@ -587,7 +586,7 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إنشاء الكوبون بنجاح'),
+            content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ† Ø¨Ù†Ø¬Ø§Ø­'),
             backgroundColor: Colors.green,
           ),
         );
@@ -598,7 +597,7 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -630,7 +629,7 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
             child: Row(
               children: [
                 const Text(
-                  'إنشاء كوبون جديد',
+                  'Ø¥Ù†Ø´Ø§Ø¡ ÙƒÙˆØ¨ÙˆÙ† Ø¬Ø¯ÙŠØ¯',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -655,37 +654,37 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                     TextFormField(
                       controller: _codeController,
                       decoration: const InputDecoration(
-                        labelText: 'كود الكوبون *',
-                        hintText: 'مثال: SAVE20',
+                        labelText: 'ÙƒÙˆØ¯ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ† *',
+                        hintText: 'Ù…Ø«Ø§Ù„: SAVE20',
                         prefixIcon: Icon(Icons.confirmation_number_outlined),
                       ),
                       textCapitalization: TextCapitalization.characters,
-                      validator: (v) => v?.isEmpty ?? true ? 'مطلوب' : null,
+                      validator: (v) => v?.isEmpty ?? true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     ),
                     const SizedBox(height: 16),
                     // Title
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
-                        labelText: 'اسم الكوبون',
-                        hintText: 'مثال: خصم العيد',
+                        labelText: 'Ø§Ø³Ù… Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†',
+                        hintText: 'Ù…Ø«Ø§Ù„: Ø®ØµÙ… Ø§Ù„Ø¹ÙŠØ¯',
                         prefixIcon: Icon(Icons.title),
                       ),
                     ),
                     const SizedBox(height: 16),
                     // Discount Type
-                    const Text('نوع الخصم'),
+                    const Text('Ù†ÙˆØ¹ Ø§Ù„Ø®ØµÙ…'),
                     const SizedBox(height: 8),
                     SegmentedButton<String>(
                       segments: const [
                         ButtonSegment(
                           value: 'percentage',
-                          label: Text('نسبة %'),
+                          label: Text('Ù†Ø³Ø¨Ø© %'),
                           icon: Icon(Icons.percent),
                         ),
                         ButtonSegment(
                           value: 'fixed',
-                          label: Text('مبلغ ثابت'),
+                          label: Text('Ù…Ø¨Ù„Øº Ø«Ø§Ø¨Øª'),
                           icon: Icon(Icons.attach_money),
                         ),
                       ],
@@ -698,12 +697,12 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                     TextFormField(
                       controller: _discountController,
                       decoration: InputDecoration(
-                        labelText: 'قيمة الخصم *',
-                        suffixText: _discountType == 'percentage' ? '%' : 'ر.س',
+                        labelText: 'Ù‚ÙŠÙ…Ø© Ø§Ù„Ø®ØµÙ… *',
+                        suffixText: _discountType == 'percentage' ? '%' : 'Ø±.Ø³',
                         prefixIcon: const Icon(Icons.discount_outlined),
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (v) => v?.isEmpty ?? true ? 'مطلوب' : null,
+                      validator: (v) => v?.isEmpty ?? true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     ),
                     const SizedBox(height: 16),
                     // Max Discount (for percentage)
@@ -711,8 +710,8 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                       TextFormField(
                         controller: _maxDiscountController,
                         decoration: const InputDecoration(
-                          labelText: 'الحد الأقصى للخصم (اختياري)',
-                          suffixText: 'ر.س',
+                          labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ù„Ø®ØµÙ… (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
+                          suffixText: 'Ø±.Ø³',
                           prefixIcon: Icon(Icons.vertical_align_top),
                         ),
                         keyboardType: TextInputType.number,
@@ -722,8 +721,8 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                     TextFormField(
                       controller: _minOrderController,
                       decoration: const InputDecoration(
-                        labelText: 'الحد الأدنى للطلب (اختياري)',
-                        suffixText: 'ر.س',
+                        labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù„Ù„Ø·Ù„Ø¨ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
+                        suffixText: 'Ø±.Ø³',
                         prefixIcon: Icon(Icons.shopping_cart_outlined),
                       ),
                       keyboardType: TextInputType.number,
@@ -733,8 +732,8 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                     TextFormField(
                       controller: _usageLimitController,
                       decoration: const InputDecoration(
-                        labelText: 'عدد الاستخدامات (اختياري)',
-                        hintText: 'اتركه فارغاً لغير محدود',
+                        labelText: 'Ø¹Ø¯Ø¯ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…Ø§Øª (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
+                        hintText: 'Ø§ØªØ±ÙƒÙ‡ ÙØ§Ø±ØºØ§Ù‹ Ù„ØºÙŠØ± Ù…Ø­Ø¯ÙˆØ¯',
                         prefixIcon: Icon(Icons.repeat),
                       ),
                       keyboardType: TextInputType.number,
@@ -744,11 +743,11 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.event_outlined),
-                      title: const Text('تاريخ الانتهاء'),
+                      title: const Text('ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡'),
                       subtitle: Text(
                         _expiresAt != null
                             ? '${_expiresAt!.day}/${_expiresAt!.month}/${_expiresAt!.year}'
-                            : 'غير محدد',
+                            : 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯',
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.edit_calendar_outlined),
@@ -794,7 +793,7 @@ class _CreateCouponSheetState extends State<_CreateCouponSheet> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('إنشاء الكوبون'),
+                    : const Text('Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†'),
               ),
             ),
           ),
@@ -863,20 +862,20 @@ class _CouponDetailsSheet extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildDetailRow('الكود', coupon.code),
-                  _buildDetailRow('الخصم', coupon.discountText),
+                  _buildDetailRow('Ø§Ù„ÙƒÙˆØ¯', coupon.code),
+                  _buildDetailRow('Ø§Ù„Ø®ØµÙ…', coupon.discountText),
                   _buildDetailRow(
-                    'الحد الأدنى للطلب',
-                    '${coupon.minOrderAmount} ر.س',
+                    'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù„Ù„Ø·Ù„Ø¨',
+                    '${coupon.minOrderAmount} Ø±.Ø³',
                   ),
                   _buildDetailRow(
-                    'عدد الاستخدامات',
+                    'Ø¹Ø¯Ø¯ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…Ø§Øª',
                     '${coupon.timesUsed}${coupon.usageLimit != null ? ' / ${coupon.usageLimit}' : ''}',
                   ),
-                  _buildDetailRow('الحالة', coupon.isActive ? 'نشط' : 'معطل'),
+                  _buildDetailRow('Ø§Ù„Ø­Ø§Ù„Ø©', coupon.isActive ? 'Ù†Ø´Ø·' : 'Ù…Ø¹Ø·Ù„'),
                   if (coupon.expiresAt != null)
                     _buildDetailRow(
-                      'ينتهي في',
+                      'ÙŠÙ†ØªÙ‡ÙŠ ÙÙŠ',
                       '${coupon.expiresAt!.day}/${coupon.expiresAt!.month}/${coupon.expiresAt!.year}',
                     ),
                 ],
@@ -890,7 +889,7 @@ class _CouponDetailsSheet extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => _toggleActive(context),
-                    child: Text(coupon.isActive ? 'تعطيل' : 'تفعيل'),
+                    child: Text(coupon.isActive ? 'ØªØ¹Ø·ÙŠÙ„' : 'ØªÙØ¹ÙŠÙ„'),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -899,11 +898,11 @@ class _CouponDetailsSheet extends StatelessWidget {
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: coupon.code));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('تم نسخ الكود')),
+                        const SnackBar(content: Text('ØªÙ… Ù†Ø³Ø® Ø§Ù„ÙƒÙˆØ¯')),
                       );
                     },
                     icon: const Icon(Icons.copy),
-                    label: const Text('نسخ الكود'),
+                    label: const Text('Ù†Ø³Ø® Ø§Ù„ÙƒÙˆØ¯'),
                   ),
                 ),
               ],
@@ -939,7 +938,7 @@ class _CouponDetailsSheet extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+        ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
       }
     }
   }
@@ -948,17 +947,17 @@ class _CouponDetailsSheet extends StatelessWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الكوبون'),
-        content: const Text('هل أنت متأكد من حذف هذا الكوبون؟'),
+        title: const Text('Ø­Ø°Ù Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†'),
+        content: const Text('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†ØŸ'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('حذف'),
+            child: const Text('Ø­Ø°Ù'),
           ),
         ],
       ),
@@ -973,7 +972,7 @@ class _CouponDetailsSheet extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+          ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
         }
       }
     }
@@ -999,15 +998,15 @@ class _DiscountInputDialogState extends State<_DiscountInputDialog> {
   String get _title {
     switch (widget.type) {
       case 'first_order':
-        return 'خصم الترحيب';
+        return 'Ø®ØµÙ… Ø§Ù„ØªØ±Ø­ÙŠØ¨';
       case 'abandoned_cart':
-        return 'خصم استرجاع السلة';
+        return 'Ø®ØµÙ… Ø§Ø³ØªØ±Ø¬Ø§Ø¹ Ø§Ù„Ø³Ù„Ø©';
       case 'win_back':
-        return 'خصم استرجاع العملاء';
+        return 'Ø®ØµÙ… Ø§Ø³ØªØ±Ø¬Ø§Ø¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡';
       case 'social_share':
-        return 'خصم المشاركة';
+        return 'Ø®ØµÙ… Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ©';
       default:
-        return 'كوبون ذكي';
+        return 'ÙƒÙˆØ¨ÙˆÙ† Ø°ÙƒÙŠ';
     }
   }
 
@@ -1019,14 +1018,14 @@ class _DiscountInputDialogState extends State<_DiscountInputDialog> {
         controller: _controller,
         keyboardType: TextInputType.number,
         decoration: const InputDecoration(
-          labelText: 'نسبة الخصم',
+          labelText: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ…',
           suffixText: '%',
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('إلغاء'),
+          child: const Text('Ø¥Ù„ØºØ§Ø¡'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -1035,7 +1034,7 @@ class _DiscountInputDialogState extends State<_DiscountInputDialog> {
               Navigator.pop(context, value);
             }
           },
-          child: const Text('إنشاء'),
+          child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
         ),
       ],
     );
@@ -1109,9 +1108,9 @@ class Coupon {
     if (discountType == 'percentage') {
       return '${discountValue.toInt()}%';
     } else if (discountType == 'fixed') {
-      return '${discountValue.toInt()} ر.س';
+      return '${discountValue.toInt()} Ø±.Ø³';
     } else if (discountType == 'free_shipping') {
-      return 'شحن مجاني';
+      return 'Ø´Ø­Ù† Ù…Ø¬Ø§Ù†ÙŠ';
     }
     return '$discountValue';
   }

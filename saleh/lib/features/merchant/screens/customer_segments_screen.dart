@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -81,7 +81,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   Future<void> _recalculateAll() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('جاري إعادة حساب التصنيفات...')),
+        const SnackBar(content: Text('Ø¬Ø§Ø±ÙŠ Ø¥Ø¹Ø§Ø¯Ø© Ø­Ø³Ø§Ø¨ Ø§Ù„ØªØµÙ†ÙŠÙØ§Øª...')),
       );
 
       await _api.post('/secure/segments/analytics/calculate-all', body: {});
@@ -89,24 +89,23 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم إعادة حساب التصنيفات')));
+      ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø¥Ø¹Ø§Ø¯Ø© Ø­Ø³Ø§Ø¨ Ø§Ù„ØªØµÙ†ÙŠÙØ§Øª')));
       _loadData();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت مع TabBar
+            // Header Ø«Ø§Ø¨Øª Ù…Ø¹ TabBar
             Container(
               color: AppTheme.primaryColor,
               child: Column(
@@ -137,7 +136,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                         ),
                         const Expanded(
                           child: Text(
-                            'تصنيف العملاء',
+                            'ØªØµÙ†ÙŠÙ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -149,7 +148,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                         IconButton(
                           icon: const Icon(Icons.refresh, color: Colors.white),
                           onPressed: _recalculateAll,
-                          tooltip: 'إعادة حساب RFM',
+                          tooltip: 'Ø¥Ø¹Ø§Ø¯Ø© Ø­Ø³Ø§Ø¨ RFM',
                         ),
                       ],
                     ),
@@ -161,9 +160,9 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.white70,
                     tabs: const [
-                      Tab(text: 'الشرائح', icon: Icon(Icons.pie_chart)),
-                      Tab(text: 'الوسوم', icon: Icon(Icons.label)),
-                      Tab(text: 'التحليلات', icon: Icon(Icons.analytics)),
+                      Tab(text: 'Ø§Ù„Ø´Ø±Ø§Ø¦Ø­', icon: Icon(Icons.pie_chart)),
+                      Tab(text: 'Ø§Ù„ÙˆØ³ÙˆÙ…', icon: Icon(Icons.label)),
+                      Tab(text: 'Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª', icon: Icon(Icons.analytics)),
                     ],
                   ),
                 ],
@@ -191,7 +190,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                           const SizedBox(height: AppDimensions.spacing16),
                           ElevatedButton(
                             onPressed: _loadData,
-                            child: const Text('إعادة المحاولة'),
+                            child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                           ),
                         ],
                       ),
@@ -220,10 +219,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 children: [
                   Icon(Icons.pie_chart_outline, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد شرائح عملاء'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´Ø±Ø§Ø¦Ø­ Ø¹Ù…Ù„Ø§Ø¡'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'أنشئ شريحة لتصنيف عملائك',
+                    'Ø£Ù†Ø´Ø¦ Ø´Ø±ÙŠØ­Ø© Ù„ØªØµÙ†ÙŠÙ Ø¹Ù…Ù„Ø§Ø¦Ùƒ',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -289,7 +288,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
-                              'تلقائي',
+                              'ØªÙ„Ù‚Ø§Ø¦ÙŠ',
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.blue,
@@ -320,7 +319,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     ),
                   ),
                   Text(
-                    'عميل',
+                    'Ø¹Ù…ÙŠÙ„',
                     style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                   ),
                 ],
@@ -346,10 +345,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 children: [
                   Icon(Icons.label_outline, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد وسوم'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ ÙˆØ³ÙˆÙ…'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'أنشئ وسماً لتمييز عملائك',
+                    'Ø£Ù†Ø´Ø¦ ÙˆØ³Ù…Ø§Ù‹ Ù„ØªÙ…ÙŠÙŠØ² Ø¹Ù…Ù„Ø§Ø¦Ùƒ',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -421,7 +420,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               children: [
                 Expanded(
                   child: _buildSummaryCard(
-                    'إجمالي العملاء',
+                    'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
                     '$total',
                     Colors.blue,
                   ),
@@ -429,7 +428,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildSummaryCard(
-                    'الأبطال',
+                    'Ø§Ù„Ø£Ø¨Ø·Ø§Ù„',
                     '${tiers['champion'] ?? 0}',
                     Colors.purple,
                   ),
@@ -441,7 +440,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               children: [
                 Expanded(
                   child: _buildSummaryCard(
-                    'العملاء المخلصين',
+                    'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ù…Ø®Ù„ØµÙŠÙ†',
                     '${tiers['loyal'] ?? 0}',
                     Colors.green,
                   ),
@@ -449,7 +448,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildSummaryCard(
-                    'معرضين للخسارة',
+                    'Ù…Ø¹Ø±Ø¶ÙŠÙ† Ù„Ù„Ø®Ø³Ø§Ø±Ø©',
                     '${tiers['at_risk'] ?? 0}',
                     Colors.orange,
                   ),
@@ -461,7 +460,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
             // Tier distribution
             const Text(
-              'توزيع العملاء حسب التصنيف',
+              'ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø­Ø³Ø¨ Ø§Ù„ØªØµÙ†ÙŠÙ',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing12),
@@ -474,14 +473,14 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'أفضل العملاء',
+                  'Ø£ÙØ¶Ù„ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
                   onPressed: () {
                     // Show all customers
                   },
-                  child: const Text('عرض الكل'),
+                  child: const Text('Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„'),
                 ),
               ],
             ),
@@ -528,12 +527,12 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
   Widget _buildTierDistribution(Map<String, dynamic> tiers, int total) {
     final tierData = [
-      {'key': 'champion', 'label': 'أبطال', 'color': Colors.purple},
-      {'key': 'loyal', 'label': 'مخلصين', 'color': Colors.green},
-      {'key': 'regular', 'label': 'عاديين', 'color': Colors.blue},
-      {'key': 'new', 'label': 'جدد', 'color': Colors.teal},
-      {'key': 'at_risk', 'label': 'معرضين للخسارة', 'color': Colors.orange},
-      {'key': 'lost', 'label': 'مفقودين', 'color': Colors.red},
+      {'key': 'champion', 'label': 'Ø£Ø¨Ø·Ø§Ù„', 'color': Colors.purple},
+      {'key': 'loyal', 'label': 'Ù…Ø®Ù„ØµÙŠÙ†', 'color': Colors.green},
+      {'key': 'regular', 'label': 'Ø¹Ø§Ø¯ÙŠÙŠÙ†', 'color': Colors.blue},
+      {'key': 'new', 'label': 'Ø¬Ø¯Ø¯', 'color': Colors.teal},
+      {'key': 'at_risk', 'label': 'Ù…Ø¹Ø±Ø¶ÙŠÙ† Ù„Ù„Ø®Ø³Ø§Ø±Ø©', 'color': Colors.orange},
+      {'key': 'lost', 'label': 'Ù…ÙÙ‚ÙˆØ¯ÙŠÙ†', 'color': Colors.red},
     ];
 
     return Card(
@@ -609,19 +608,19 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   style: TextStyle(color: _getTierColor(tier)),
                 ),
         ),
-        title: Text(customer?['full_name'] ?? 'عميل'),
+        title: Text(customer?['full_name'] ?? 'Ø¹Ù…ÙŠÙ„'),
         subtitle: Row(
           children: [
             _buildTierBadge(tier),
             const SizedBox(width: AppDimensions.spacing8),
             Text(
-              '$totalOrders طلب',
+              '$totalOrders Ø·Ù„Ø¨',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
         ),
         trailing: Text(
-          '$totalSpent ريال',
+          '$totalSpent Ø±ÙŠØ§Ù„',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -662,15 +661,15 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 Icon(Icons.info_outline, color: Colors.blue[700]),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'ما هو تحليل RFM؟',
+                  'Ù…Ø§ Ù‡Ùˆ ØªØ­Ù„ÙŠÙ„ RFMØŸ',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: AppDimensions.spacing12),
-            _buildRfmItem('R - Recency', 'متى آخر مرة اشترى فيها العميل'),
-            _buildRfmItem('F - Frequency', 'كم مرة يشتري العميل'),
-            _buildRfmItem('M - Monetary', 'كم ينفق العميل'),
+            _buildRfmItem('R - Recency', 'Ù…ØªÙ‰ Ø¢Ø®Ø± Ù…Ø±Ø© Ø§Ø´ØªØ±Ù‰ ÙÙŠÙ‡Ø§ Ø§Ù„Ø¹Ù…ÙŠÙ„'),
+            _buildRfmItem('F - Frequency', 'ÙƒÙ… Ù…Ø±Ø© ÙŠØ´ØªØ±ÙŠ Ø§Ù„Ø¹Ù…ÙŠÙ„'),
+            _buildRfmItem('M - Monetary', 'ÙƒÙ… ÙŠÙ†ÙÙ‚ Ø§Ù„Ø¹Ù…ÙŠÙ„'),
           ],
         ),
       ),
@@ -684,7 +683,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '• $title: ',
+            'â€¢ $title: ',
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
           Expanded(child: Text(desc, style: const TextStyle(fontSize: 13))),
@@ -713,17 +712,17 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   String _getTierLabel(String tier) {
     switch (tier) {
       case 'champion':
-        return 'بطل';
+        return 'Ø¨Ø·Ù„';
       case 'loyal':
-        return 'مخلص';
+        return 'Ù…Ø®Ù„Øµ';
       case 'new':
-        return 'جديد';
+        return 'Ø¬Ø¯ÙŠØ¯';
       case 'at_risk':
-        return 'معرض للخسارة';
+        return 'Ù…Ø¹Ø±Ø¶ Ù„Ù„Ø®Ø³Ø§Ø±Ø©';
       case 'lost':
-        return 'مفقود';
+        return 'Ù…ÙÙ‚ÙˆØ¯';
       default:
-        return 'عادي';
+        return 'Ø¹Ø§Ø¯ÙŠ';
     }
   }
 
@@ -766,7 +765,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('شريحة جديدة'),
+          title: const Text('Ø´Ø±ÙŠØ­Ø© Ø¬Ø¯ÙŠØ¯Ø©'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -774,7 +773,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 TextField(
                   controller: nameController,
                   decoration: const InputDecoration(
-                    labelText: 'اسم الشريحة',
+                    labelText: 'Ø§Ø³Ù… Ø§Ù„Ø´Ø±ÙŠØ­Ø©',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -782,14 +781,14 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 TextField(
                   controller: descController,
                   decoration: const InputDecoration(
-                    labelText: 'الوصف (اختياري)',
+                    labelText: 'Ø§Ù„ÙˆØµÙ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacing12),
                 SwitchListTile(
-                  title: const Text('تصنيف تلقائي'),
-                  subtitle: const Text('تعبئة العملاء تلقائياً'),
+                  title: const Text('ØªØµÙ†ÙŠÙ ØªÙ„Ù‚Ø§Ø¦ÙŠ'),
+                  subtitle: const Text('ØªØ¹Ø¨Ø¦Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
                   value: isAuto,
                   onChanged: (v) => setDialogState(() => isAuto = v),
                 ),
@@ -833,7 +832,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -856,10 +855,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+                  ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
                 }
               },
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -875,14 +874,14 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('وسم جديد'),
+          title: const Text('ÙˆØ³Ù… Ø¬Ø¯ÙŠØ¯'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: 'اسم الوسم',
+                  labelText: 'Ø§Ø³Ù… Ø§Ù„ÙˆØ³Ù…',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -922,7 +921,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -940,10 +939,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+                  ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
                 }
               },
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -955,17 +954,17 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الوسم'),
-        content: const Text('هل أنت متأكد من حذف هذا الوسم؟'),
+        title: const Text('Ø­Ø°Ù Ø§Ù„ÙˆØ³Ù…'),
+        content: const Text('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„ÙˆØ³Ù…ØŸ'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('حذف'),
+            child: const Text('Ø­Ø°Ù'),
           ),
         ],
       ),
@@ -980,7 +979,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
     }
   }
 
@@ -1023,7 +1022,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                           ),
                         ),
                         Text(
-                          '${segment['customer_count'] ?? 0} عميل',
+                          '${segment['customer_count'] ?? 0} Ø¹Ù…ÙŠÙ„',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ],
@@ -1044,7 +1043,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   }
 
   Widget _buildCustomersList(Map<String, dynamic> segment) {
-    // محاكاة قائمة العملاء بناءً على الشريحة
+    // Ù…Ø­Ø§ÙƒØ§Ø© Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙŠØ­Ø©
     final customers = _generateMockCustomers(segment);
 
     if (customers.isEmpty) {
@@ -1055,7 +1054,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
             Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
             const SizedBox(height: AppDimensions.spacing16),
             Text(
-              'لا يوجد عملاء في هذه الشريحة',
+              'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¹Ù…Ù„Ø§Ø¡ ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø±ÙŠØ­Ø©',
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
@@ -1094,12 +1093,12 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   children: [
                     _buildCustomerStat(
                       Icons.shopping_cart,
-                      '${customer['orders']} طلب',
+                      '${customer['orders']} Ø·Ù„Ø¨',
                     ),
                     const SizedBox(width: AppDimensions.spacing16),
                     _buildCustomerStat(
                       Icons.attach_money,
-                      '${customer['total_spent']} ر.س',
+                      '${customer['total_spent']} Ø±.Ø³',
                     ),
                   ],
                 ),
@@ -1113,7 +1112,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     children: [
                       Icon(Icons.visibility, size: 20),
                       SizedBox(width: AppDimensions.spacing8),
-                      Text('عرض التفاصيل'),
+                      Text('Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„'),
                     ],
                   ),
                 ),
@@ -1123,7 +1122,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     children: [
                       Icon(Icons.message, size: 20),
                       SizedBox(width: AppDimensions.spacing8),
-                      Text('إرسال رسالة'),
+                      Text('Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø©'),
                     ],
                   ),
                 ),
@@ -1133,7 +1132,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     children: [
                       Icon(Icons.label, size: 20),
                       SizedBox(width: AppDimensions.spacing8),
-                      Text('إضافة وسم'),
+                      Text('Ø¥Ø¶Ø§ÙØ© ÙˆØ³Ù…'),
                     ],
                   ),
                 ),
@@ -1190,7 +1189,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
             .subtract(Duration(days: i * 3))
             .toIso8601String(),
         'segment': segment['name'],
-        'tags': i % 3 == 0 ? ['عميل مميز'] : [],
+        'tags': i % 3 == 0 ? ['Ø¹Ù…ÙŠÙ„ Ù…Ù…ÙŠØ²'] : [],
       });
     }
 
@@ -1199,26 +1198,26 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
   String _getRandomName(int index) {
     final names = [
-      'أحمد محمد',
-      'سارة علي',
-      'محمد عبدالله',
-      'فاطمة أحمد',
-      'خالد إبراهيم',
-      'نورة سعد',
-      'عمر يوسف',
-      'ريم خالد',
-      'سلطان فهد',
-      'هدى عبدالرحمن',
-      'فيصل ناصر',
-      'منيرة سليمان',
-      'راشد عبدالعزيز',
-      'عائشة محمد',
-      'بندر صالح',
-      'لطيفة أحمد',
-      'ماجد علي',
-      'أسماء عمر',
-      'تركي فهد',
-      'دانة سعود',
+      'Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯',
+      'Ø³Ø§Ø±Ø© Ø¹Ù„ÙŠ',
+      'Ù…Ø­Ù…Ø¯ Ø¹Ø¨Ø¯Ø§Ù„Ù„Ù‡',
+      'ÙØ§Ø·Ù…Ø© Ø£Ø­Ù…Ø¯',
+      'Ø®Ø§Ù„Ø¯ Ø¥Ø¨Ø±Ø§Ù‡ÙŠÙ…',
+      'Ù†ÙˆØ±Ø© Ø³Ø¹Ø¯',
+      'Ø¹Ù…Ø± ÙŠÙˆØ³Ù',
+      'Ø±ÙŠÙ… Ø®Ø§Ù„Ø¯',
+      'Ø³Ù„Ø·Ø§Ù† ÙÙ‡Ø¯',
+      'Ù‡Ø¯Ù‰ Ø¹Ø¨Ø¯Ø§Ù„Ø±Ø­Ù…Ù†',
+      'ÙÙŠØµÙ„ Ù†Ø§ØµØ±',
+      'Ù…Ù†ÙŠØ±Ø© Ø³Ù„ÙŠÙ…Ø§Ù†',
+      'Ø±Ø§Ø´Ø¯ Ø¹Ø¨Ø¯Ø§Ù„Ø¹Ø²ÙŠØ²',
+      'Ø¹Ø§Ø¦Ø´Ø© Ù…Ø­Ù…Ø¯',
+      'Ø¨Ù†Ø¯Ø± ØµØ§Ù„Ø­',
+      'Ù„Ø·ÙŠÙØ© Ø£Ø­Ù…Ø¯',
+      'Ù…Ø§Ø¬Ø¯ Ø¹Ù„ÙŠ',
+      'Ø£Ø³Ù…Ø§Ø¡ Ø¹Ù…Ø±',
+      'ØªØ±ÙƒÙŠ ÙÙ‡Ø¯',
+      'Ø¯Ø§Ù†Ø© Ø³Ø¹ÙˆØ¯',
     ];
     return names[index % names.length];
   }
@@ -1283,18 +1282,18 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 ),
               ),
               const SizedBox(height: 24),
-              _buildDetailCard('معلومات الاتصال', [
-                _buildDetailRow('البريد', customer['email']),
-                _buildDetailRow('الهاتف', customer['phone']),
+              _buildDetailCard('Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø§ØªØµØ§Ù„', [
+                _buildDetailRow('Ø§Ù„Ø¨Ø±ÙŠØ¯', customer['email']),
+                _buildDetailRow('Ø§Ù„Ù‡Ø§ØªÙ', customer['phone']),
               ]),
               const SizedBox(height: AppDimensions.spacing16),
-              _buildDetailCard('إحصائيات الشراء', [
-                _buildDetailRow('عدد الطلبات', '${customer['orders']}'),
+              _buildDetailCard('Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø§Ù„Ø´Ø±Ø§Ø¡', [
+                _buildDetailRow('Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª', '${customer['orders']}'),
                 _buildDetailRow(
-                  'إجمالي المشتريات',
-                  '${customer['total_spent']} ر.س',
+                  'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø´ØªØ±ÙŠØ§Øª',
+                  '${customer['total_spent']} Ø±.Ø³',
                 ),
-                _buildDetailRow('الشريحة', customer['segment']),
+                _buildDetailRow('Ø§Ù„Ø´Ø±ÙŠØ­Ø©', customer['segment']),
               ]),
               const SizedBox(height: 24),
               Row(
@@ -1306,7 +1305,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                         _sendMessageToCustomer(customer);
                       },
                       icon: const Icon(Icons.message),
-                      label: const Text('رسالة'),
+                      label: const Text('Ø±Ø³Ø§Ù„Ø©'),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing12),
@@ -1314,10 +1313,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
-                        // فتح صفحة طلبات العميل
+                        // ÙØªØ­ ØµÙØ­Ø© Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„
                       },
                       icon: const Icon(Icons.shopping_bag),
-                      label: const Text('الطلبات'),
+                      label: const Text('Ø§Ù„Ø·Ù„Ø¨Ø§Øª'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),
@@ -1370,7 +1369,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   void _sendMessageToCustomer(Map<String, dynamic> customer) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('إرسال رسالة إلى ${customer['name']}...'),
+        content: Text('Ø¥Ø±Ø³Ø§Ù„ Ø±Ø³Ø§Ù„Ø© Ø¥Ù„Ù‰ ${customer['name']}...'),
         backgroundColor: AppTheme.primaryColor,
       ),
     );
@@ -1380,19 +1379,19 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('إضافة وسم'),
+        title: const Text('Ø¥Ø¶Ø§ÙØ© ÙˆØ³Ù…'),
         content: Wrap(
           spacing: 8,
           runSpacing: 8,
           children: _tags.map((tag) {
             return ActionChip(
-              label: Text(tag['name'] ?? 'وسم'),
+              label: Text(tag['name'] ?? 'ÙˆØ³Ù…'),
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'تم إضافة وسم "${tag['name']}" لـ ${customer['name']}',
+                      'ØªÙ… Ø¥Ø¶Ø§ÙØ© ÙˆØ³Ù… "${tag['name']}" Ù„Ù€ ${customer['name']}',
                     ),
                     backgroundColor: AppTheme.successColor,
                   ),
@@ -1404,7 +1403,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
         ],
       ),

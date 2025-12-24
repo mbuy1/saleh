@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/exports.dart';
 
-/// نموذج أداة التسويق
+/// Ù†Ù…ÙˆØ°Ø¬ Ø£Ø¯Ø§Ø© Ø§Ù„ØªØ³ÙˆÙŠÙ‚
 class MarketingTool {
   final String id;
   final String title;
@@ -28,7 +28,7 @@ class MarketingTool {
   });
 }
 
-/// شاشة التسويق المحسنة
+/// Ø´Ø§Ø´Ø© Ø§Ù„ØªØ³ÙˆÙŠÙ‚ Ø§Ù„Ù…Ø­Ø³Ù†Ø©
 class MarketingScreen extends StatefulWidget {
   const MarketingScreen({super.key});
 
@@ -42,7 +42,7 @@ class _MarketingScreenState extends State<MarketingScreen>
   bool _hasError = false;
   late AnimationController _animationController;
 
-  // إحصائيات التسويق
+  // Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø§Ù„ØªØ³ÙˆÙŠÙ‚
   final Map<String, dynamic> _stats = {
     'active_campaigns': 3,
     'active_coupons': 12,
@@ -50,12 +50,12 @@ class _MarketingScreenState extends State<MarketingScreen>
     'loyalty_members': 156,
   };
 
-  // قائمة أدوات التسويق
+  // Ù‚Ø§Ø¦Ù…Ø© Ø£Ø¯ÙˆØ§Øª Ø§Ù„ØªØ³ÙˆÙŠÙ‚
   final List<MarketingTool> _tools = const [
     MarketingTool(
       id: 'coupons',
-      title: 'الكوبونات',
-      description: 'إنشاء وإدارة كوبونات الخصم',
+      title: 'Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª',
+      description: 'Ø¥Ù†Ø´Ø§Ø¡ ÙˆØ¥Ø¯Ø§Ø±Ø© ÙƒÙˆØ¨ÙˆÙ†Ø§Øª Ø§Ù„Ø®ØµÙ…',
       iconPath: AppIcons.discount,
       color: Color(0xFF4CAF50),
       route: '/dashboard/coupons',
@@ -63,8 +63,8 @@ class _MarketingScreenState extends State<MarketingScreen>
     ),
     MarketingTool(
       id: 'flash_sales',
-      title: 'العروض الخاطفة',
-      description: 'عروض محدودة الوقت',
+      title: 'Ø§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø§Ø·ÙØ©',
+      description: 'Ø¹Ø±ÙˆØ¶ Ù…Ø­Ø¯ÙˆØ¯Ø© Ø§Ù„ÙˆÙ‚Øª',
       iconPath: AppIcons.flash,
       color: Color(0xFFEF4444),
       route: '/dashboard/flash-sales',
@@ -72,8 +72,8 @@ class _MarketingScreenState extends State<MarketingScreen>
     ),
     MarketingTool(
       id: 'abandoned_cart',
-      title: 'السلات المتروكة',
-      description: 'استرداد العملاء المترددين',
+      title: 'Ø§Ù„Ø³Ù„Ø§Øª Ø§Ù„Ù…ØªØ±ÙˆÙƒØ©',
+      description: 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ù…ØªØ±Ø¯Ø¯ÙŠÙ†',
       iconPath: AppIcons.cart,
       color: Color(0xFFE91E63),
       route: '/dashboard/abandoned-cart',
@@ -81,16 +81,16 @@ class _MarketingScreenState extends State<MarketingScreen>
     ),
     MarketingTool(
       id: 'referral',
-      title: 'برنامج الإحالة',
-      description: 'كافئ العملاء على الإحالات',
+      title: 'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„Ø¥Ø­Ø§Ù„Ø©',
+      description: 'ÙƒØ§ÙØ¦ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø¹Ù„Ù‰ Ø§Ù„Ø¥Ø­Ø§Ù„Ø§Øª',
       iconPath: AppIcons.share,
       color: Color(0xFF10B981),
       route: '/dashboard/referral',
     ),
     MarketingTool(
       id: 'loyalty',
-      title: 'برنامج الولاء',
-      description: 'نقاط ومكافآت للعملاء',
+      title: 'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡',
+      description: 'Ù†Ù‚Ø§Ø· ÙˆÙ…ÙƒØ§ÙØ¢Øª Ù„Ù„Ø¹Ù…Ù„Ø§Ø¡',
       iconPath: AppIcons.loyalty,
       color: Color(0xFF00BCD4),
       route: '/dashboard/loyalty-program',
@@ -98,8 +98,8 @@ class _MarketingScreenState extends State<MarketingScreen>
     ),
     MarketingTool(
       id: 'segments',
-      title: 'شرائح العملاء',
-      description: 'تصنيف واستهداف العملاء',
+      title: 'Ø´Ø±Ø§Ø¦Ø­ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+      description: 'ØªØµÙ†ÙŠÙ ÙˆØ§Ø³ØªÙ‡Ø¯Ø§Ù Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
       iconPath: AppIcons.users,
       color: Color(0xFF3B82F6),
       route: '/dashboard/customer-segments',
@@ -107,16 +107,16 @@ class _MarketingScreenState extends State<MarketingScreen>
     ),
     MarketingTool(
       id: 'messages',
-      title: 'رسائل مخصصة',
-      description: 'إشعارات وحملات بريدية',
+      title: 'Ø±Ø³Ø§Ø¦Ù„ Ù…Ø®ØµØµØ©',
+      description: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª ÙˆØ­Ù…Ù„Ø§Øª Ø¨Ø±ÙŠØ¯ÙŠØ©',
       iconPath: AppIcons.chat,
       color: Color(0xFF22C55E),
       route: '/dashboard/custom-messages',
     ),
     MarketingTool(
       id: 'pricing',
-      title: 'التسعير الذكي',
-      description: 'تسعير ديناميكي ومرن',
+      title: 'Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø°ÙƒÙŠ',
+      description: 'ØªØ³Ø¹ÙŠØ± Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠ ÙˆÙ…Ø±Ù†',
       iconPath: AppIcons.dollar,
       color: Color(0xFFFF9800),
       route: '/dashboard/smart-pricing',
@@ -147,7 +147,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     });
 
     try {
-      // محاكاة تحميل البيانات
+      // Ù…Ø­Ø§ÙƒØ§Ø© ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         setState(() => _isLoading = false);
@@ -172,7 +172,6 @@ class _MarketingScreenState extends State<MarketingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -194,7 +193,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// بناء الهيدر المحسن
+  /// Ø¨Ù†Ø§Ø¡ Ø§Ù„Ù‡ÙŠØ¯Ø± Ø§Ù„Ù…Ø­Ø³Ù†
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -205,13 +204,13 @@ class _MarketingScreenState extends State<MarketingScreen>
       ),
       child: Column(
         children: [
-          // صف العنوان
+          // ØµÙ Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
           Row(
             children: [
               _buildBackButton(context),
               Expanded(
                 child: Text(
-                  'مركز التسويق',
+                  'Ù…Ø±ÙƒØ² Ø§Ù„ØªØ³ÙˆÙŠÙ‚',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: AppDimensions.fontDisplay2,
@@ -270,7 +269,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// إحصائيات سريعة
+  /// Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø³Ø±ÙŠØ¹Ø©
   Widget _buildQuickStats() {
     return Container(
       padding: AppDimensions.paddingM,
@@ -291,28 +290,28 @@ class _MarketingScreenState extends State<MarketingScreen>
         children: [
           _buildStatItem(
             '${_stats['active_campaigns']}',
-            'حملات نشطة',
+            'Ø­Ù…Ù„Ø§Øª Ù†Ø´Ø·Ø©',
             Icons.campaign_outlined,
             const Color(0xFF4CAF50),
           ),
           _buildStatDivider(),
           _buildStatItem(
             '${_stats['active_coupons']}',
-            'كوبون فعال',
+            'ÙƒÙˆØ¨ÙˆÙ† ÙØ¹Ø§Ù„',
             Icons.local_offer_outlined,
             const Color(0xFFEF4444),
           ),
           _buildStatDivider(),
           _buildStatItem(
             '${_stats['recovery_rate']}%',
-            'استرداد',
+            'Ø§Ø³ØªØ±Ø¯Ø§Ø¯',
             Icons.restore_outlined,
             const Color(0xFFE91E63),
           ),
           _buildStatDivider(),
           _buildStatItem(
             '${_stats['loyalty_members']}',
-            'عضو ولاء',
+            'Ø¹Ø¶Ùˆ ÙˆÙ„Ø§Ø¡',
             Icons.card_membership_outlined,
             const Color(0xFF00BCD4),
           ),
@@ -358,7 +357,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// المحتوى الرئيسي
+  /// Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ
   Widget _buildContent() {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -367,16 +366,16 @@ class _MarketingScreenState extends State<MarketingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: AppDimensions.spacing8),
-          // إحصائيات سريعة
+          // Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø³Ø±ÙŠØ¹Ø©
           _buildQuickStats(),
           SizedBox(height: AppDimensions.spacing20),
-          // الأدوات الشائعة
-          _buildSectionTitle('⭐ الأدوات الشائعة'),
+          // Ø§Ù„Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©
+          _buildSectionTitle('â­ Ø§Ù„Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©'),
           SizedBox(height: AppDimensions.spacing12),
           _buildPopularTools(),
           SizedBox(height: AppDimensions.spacing24),
-          // جميع الأدوات
-          _buildSectionTitle('🛠️ جميع الأدوات'),
+          // Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø¯ÙˆØ§Øª
+          _buildSectionTitle('ðŸ› ï¸ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø¯ÙˆØ§Øª'),
           SizedBox(height: AppDimensions.spacing12),
           _buildToolsGrid(),
           SizedBox(height: AppDimensions.spacing24),
@@ -396,7 +395,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// الأدوات الشائعة (أفقي)
+  /// Ø§Ù„Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø´Ø§Ø¦Ø¹Ø© (Ø£ÙÙ‚ÙŠ)
   Widget _buildPopularTools() {
     final popularTools = _tools.where((t) => t.isPopular).toList();
 
@@ -494,7 +493,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// شبكة الأدوات
+  /// Ø´Ø¨ÙƒØ© Ø§Ù„Ø£Ø¯ÙˆØ§Øª
   Widget _buildToolsGrid() {
     return GridView.builder(
       shrinkWrap: true,
@@ -536,7 +535,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// حالة الخطأ
+  /// Ø­Ø§Ù„Ø© Ø§Ù„Ø®Ø·Ø£
   Widget _buildErrorState() {
     return Center(
       child: Padding(
@@ -558,7 +557,7 @@ class _MarketingScreenState extends State<MarketingScreen>
             ),
             SizedBox(height: AppDimensions.spacing24),
             Text(
-              'حدث خطأ في تحميل البيانات',
+              'Ø­Ø¯Ø« Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª',
               style: TextStyle(
                 fontSize: AppDimensions.fontHeadline,
                 fontWeight: FontWeight.bold,
@@ -567,7 +566,7 @@ class _MarketingScreenState extends State<MarketingScreen>
             ),
             SizedBox(height: AppDimensions.spacing8),
             Text(
-              'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى',
+              'ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ Ø¨Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª ÙˆØ§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰',
               style: TextStyle(
                 fontSize: AppDimensions.fontBody,
                 color: AppTheme.textSecondaryColor,
@@ -578,7 +577,7 @@ class _MarketingScreenState extends State<MarketingScreen>
             ElevatedButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh),
-              label: const Text('إعادة المحاولة'),
+              label: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
                 foregroundColor: Colors.white,
@@ -597,7 +596,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// Skeleton للتحميل
+  /// Skeleton Ù„Ù„ØªØ­Ù…ÙŠÙ„
   Widget _buildSkeletonContent() {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -605,7 +604,7 @@ class _MarketingScreenState extends State<MarketingScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Skeleton للإحصائيات
+          // Skeleton Ù„Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª
           ShimmerEffect(
             child: Container(
               height: 80,
@@ -616,7 +615,7 @@ class _MarketingScreenState extends State<MarketingScreen>
             ),
           ),
           SizedBox(height: AppDimensions.spacing20),
-          // Skeleton للأدوات الشائعة
+          // Skeleton Ù„Ù„Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©
           ShimmerEffect(
             child: Container(
               height: 20,
@@ -647,7 +646,7 @@ class _MarketingScreenState extends State<MarketingScreen>
             ),
           ),
           SizedBox(height: AppDimensions.spacing24),
-          // Skeleton للشبكة
+          // Skeleton Ù„Ù„Ø´Ø¨ÙƒØ©
           ShimmerEffect(
             child: Container(
               height: 20,
@@ -683,7 +682,7 @@ class _MarketingScreenState extends State<MarketingScreen>
     );
   }
 
-  /// عرض نصائح التسويق
+  /// Ø¹Ø±Ø¶ Ù†ØµØ§Ø¦Ø­ Ø§Ù„ØªØ³ÙˆÙŠÙ‚
   void _showMarketingTips() {
     showModalBottomSheet(
       context: context,
@@ -717,7 +716,7 @@ class _MarketingScreenState extends State<MarketingScreen>
                 Icon(Icons.lightbulb, color: Colors.amber),
                 SizedBox(width: AppDimensions.spacing8),
                 Text(
-                  'نصائح تسويقية',
+                  'Ù†ØµØ§Ø¦Ø­ ØªØ³ÙˆÙŠÙ‚ÙŠØ©',
                   style: TextStyle(
                     fontSize: AppDimensions.fontDisplay3,
                     fontWeight: FontWeight.bold,
@@ -727,24 +726,24 @@ class _MarketingScreenState extends State<MarketingScreen>
             ),
             SizedBox(height: AppDimensions.spacing16),
             _buildTipItem(
-              '💡',
-              'استخدم الكوبونات بحكمة',
-              'لا تفرط في الخصومات، اجعلها مميزة ومحدودة',
+              'ðŸ’¡',
+              'Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„ÙƒÙˆØ¨ÙˆÙ†Ø§Øª Ø¨Ø­ÙƒÙ…Ø©',
+              'Ù„Ø§ ØªÙØ±Ø· ÙÙŠ Ø§Ù„Ø®ØµÙˆÙ…Ø§ØªØŒ Ø§Ø¬Ø¹Ù„Ù‡Ø§ Ù…Ù…ÙŠØ²Ø© ÙˆÙ…Ø­Ø¯ÙˆØ¯Ø©',
             ),
             _buildTipItem(
-              '⏰',
-              'العروض الخاطفة فعالة',
-              'الإلحاح يدفع العملاء لاتخاذ قرار الشراء',
+              'â°',
+              'Ø§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø§Ø·ÙØ© ÙØ¹Ø§Ù„Ø©',
+              'Ø§Ù„Ø¥Ù„Ø­Ø§Ø­ ÙŠØ¯ÙØ¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ù„Ø§ØªØ®Ø§Ø° Ù‚Ø±Ø§Ø± Ø§Ù„Ø´Ø±Ø§Ø¡',
             ),
             _buildTipItem(
-              '🎯',
-              'استهدف الشرائح الصحيحة',
-              'رسائل مخصصة لكل فئة تزيد التحويل',
+              'ðŸŽ¯',
+              'Ø§Ø³ØªÙ‡Ø¯Ù Ø§Ù„Ø´Ø±Ø§Ø¦Ø­ Ø§Ù„ØµØ­ÙŠØ­Ø©',
+              'Ø±Ø³Ø§Ø¦Ù„ Ù…Ø®ØµØµØ© Ù„ÙƒÙ„ ÙØ¦Ø© ØªØ²ÙŠØ¯ Ø§Ù„ØªØ­ÙˆÙŠÙ„',
             ),
             _buildTipItem(
-              '❤️',
-              'كافئ العملاء المخلصين',
-              'برنامج الولاء يزيد المبيعات المتكررة',
+              'â¤ï¸',
+              'ÙƒØ§ÙØ¦ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ù…Ø®Ù„ØµÙŠÙ†',
+              'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡ ÙŠØ²ÙŠØ¯ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª Ø§Ù„Ù…ØªÙƒØ±Ø±Ø©',
             ),
             SizedBox(height: AppDimensions.spacing16),
           ],
@@ -788,7 +787,7 @@ class _MarketingScreenState extends State<MarketingScreen>
   }
 }
 
-/// بطاقة أداة التسويق
+/// Ø¨Ø·Ø§Ù‚Ø© Ø£Ø¯Ø§Ø© Ø§Ù„ØªØ³ÙˆÙŠÙ‚
 class _MarketingToolCard extends StatefulWidget {
   final MarketingTool tool;
   final VoidCallback onTap;
@@ -829,7 +828,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // الأيقونة مع الشارة
+              // Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø© Ù…Ø¹ Ø§Ù„Ø´Ø§Ø±Ø©
               Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -859,7 +858,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
                       color: Colors.white,
                     ),
                   ),
-                  // شارة العدد
+                  // Ø´Ø§Ø±Ø© Ø§Ù„Ø¹Ø¯Ø¯
                   if (widget.tool.badge != null)
                     Positioned(
                       top: -6,
@@ -883,7 +882,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
                         ),
                       ),
                     ),
-                  // شارة جديد
+                  // Ø´Ø§Ø±Ø© Ø¬Ø¯ÙŠØ¯
                   if (widget.tool.isNew)
                     Positioned(
                       top: -6,
@@ -898,7 +897,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
                           borderRadius: AppDimensions.borderRadiusS,
                         ),
                         child: Text(
-                          'جديد',
+                          'Ø¬Ø¯ÙŠØ¯',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: AppDimensions.fontCaption - 3,
@@ -910,7 +909,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
                 ],
               ),
               SizedBox(height: AppDimensions.spacing12),
-              // العنوان
+              // Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
               Text(
                 widget.tool.title,
                 style: TextStyle(
@@ -921,7 +920,7 @@ class _MarketingToolCardState extends State<_MarketingToolCard> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: AppDimensions.spacing4),
-              // الوصف
+              // Ø§Ù„ÙˆØµÙ
               Text(
                 widget.tool.description,
                 style: TextStyle(

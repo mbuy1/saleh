@@ -485,10 +485,10 @@ class MbuySearchField extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
-    final borderColor = isDark
-        ? AppTheme.cardBorderDark
-        : AppTheme.borderColor;
-    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
+    final borderColor = isDark ? AppTheme.cardBorderDark : AppTheme.borderColor;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final hintColor = isDark
         ? AppTheme.textHintColorDark
         : AppTheme.textHintColor;
@@ -729,10 +729,10 @@ class MbuyListCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
-    final borderColor = isDark
-        ? AppTheme.cardBorderDark
-        : AppTheme.borderColor;
-    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
+    final borderColor = isDark ? AppTheme.cardBorderDark : AppTheme.borderColor;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
         ? AppTheme.textSecondaryColorDark
         : AppTheme.textSecondaryColor;
@@ -837,10 +837,10 @@ class MbuyStatCard extends StatelessWidget {
     final primaryColor = AppTheme.primaryColor;
 
     final cardColor = isDark ? AppTheme.cardColorDark : Colors.white;
-    final borderColor = isDark
-        ? AppTheme.cardBorderDark
-        : AppTheme.borderColor;
-    final textColor = isDark ? AppTheme.textPrimaryColorDark : AppTheme.textPrimaryColor;
+    final borderColor = isDark ? AppTheme.cardBorderDark : AppTheme.borderColor;
+    final textColor = isDark
+        ? AppTheme.textPrimaryColorDark
+        : AppTheme.textPrimaryColor;
     final secondaryTextColor = isDark
         ? AppTheme.textSecondaryColorDark
         : AppTheme.textSecondaryColor;

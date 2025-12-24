@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// شاشة السجلات والتقارير - تقارير شاملة عن نشاط المتجر
+/// Ø´Ø§Ø´Ø© Ø§Ù„Ø³Ø¬Ù„Ø§Øª ÙˆØ§Ù„ØªÙ‚Ø§Ø±ÙŠØ± - ØªÙ‚Ø§Ø±ÙŠØ± Ø´Ø§Ù…Ù„Ø© Ø¹Ù† Ù†Ø´Ø§Ø· Ø§Ù„Ù…ØªØ¬Ø±
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
 
@@ -42,11 +42,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    // ⚠️ بيانات تجريبية للعرض - سيتم ربطها بـ API لاحقاً
+    // âš ï¸ Ø¨ÙŠØ§Ù†Ø§Øª ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ - Ø³ÙŠØªÙ… Ø±Ø¨Ø·Ù‡Ø§ Ø¨Ù€ API Ù„Ø§Ø­Ù‚Ø§Ù‹
     await Future.delayed(const Duration(milliseconds: 800));
 
     setState(() {
-      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
+      // Ù…Ù„Ø§Ø­Ø¸Ø©: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
       _salesData = {
         'total': 0.0,
         'thisMonth': 0.0,
@@ -56,10 +56,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         'avgOrderValue': 0.0,
         'topProducts': <Map<String, dynamic>>[],
         'chartData': <int>[],
-        'isDemo': true, // علامة البيانات الوهمية
+        'isDemo': true, // Ø¹Ù„Ø§Ù…Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙˆÙ‡Ù…ÙŠØ©
       };
 
-      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
+      // Ù…Ù„Ø§Ø­Ø¸Ø©: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
       _productsData = {
         'total': 0,
         'active': 0,
@@ -69,7 +69,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         'isDemo': true,
       };
 
-      // ملاحظة: هذه بيانات وهمية للعرض التوضيحي فقط
+      // Ù…Ù„Ø§Ø­Ø¸Ø©: Ù‡Ø°Ù‡ Ø¨ÙŠØ§Ù†Ø§Øª ÙˆÙ‡Ù…ÙŠØ© Ù„Ù„Ø¹Ø±Ø¶ Ø§Ù„ØªÙˆØ¶ÙŠØ­ÙŠ ÙÙ‚Ø·
       _customersData = {
         'total': 0,
         'newThisMonth': 0,
@@ -88,7 +88,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         foregroundColor: AppTheme.textPrimaryColor,
@@ -108,7 +107,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'السجلات والتقارير',
+          'Ø§Ù„Ø³Ø¬Ù„Ø§Øª ÙˆØ§Ù„ØªÙ‚Ø§Ø±ÙŠØ±',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: AppDimensions.fontHeadline,
@@ -128,7 +127,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               ),
             ),
             onPressed: _exportReport,
-            tooltip: 'تصدير التقرير',
+            tooltip: 'ØªØµØ¯ÙŠØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±',
           ),
           IconButton(
             icon: SvgPicture.asset(
@@ -141,7 +140,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               ),
             ),
             onPressed: _loadData,
-            tooltip: 'تحديث',
+            tooltip: 'ØªØ­Ø¯ÙŠØ«',
           ),
         ],
         bottom: TabBar(
@@ -150,10 +149,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           unselectedLabelColor: AppTheme.slate600,
           indicatorColor: AppTheme.primaryColor,
           tabs: const [
-            Tab(text: 'المبيعات'),
-            Tab(text: 'المنتجات'),
-            Tab(text: 'العملاء'),
-            Tab(text: 'السجل'),
+            Tab(text: 'Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª'),
+            Tab(text: 'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª'),
+            Tab(text: 'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'),
+            Tab(text: 'Ø§Ù„Ø³Ø¬Ù„'),
           ],
         ),
       ),
@@ -161,7 +160,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // تنبيه البيانات قيد التطوير
+                // ØªÙ†Ø¨ÙŠÙ‡ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù‚ÙŠØ¯ Ø§Ù„ØªØ·ÙˆÙŠØ±
                 Container(
                   width: double.infinity,
                   margin: AppDimensions.paddingS,
@@ -183,7 +182,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                       SizedBox(width: AppDimensions.spacing12),
                       Expanded(
                         child: Text(
-                          'التقارير قيد التطوير - سيتم ربطها بالبيانات الفعلية قريباً',
+                          'Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ± Ù‚ÙŠØ¯ Ø§Ù„ØªØ·ÙˆÙŠØ± - Ø³ÙŠØªÙ… Ø±Ø¨Ø·Ù‡Ø§ Ø¨Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙØ¹Ù„ÙŠØ© Ù‚Ø±ÙŠØ¨Ø§Ù‹',
                           style: TextStyle(
                             color: AppTheme.warningColor,
                             fontSize: AppDimensions.fontBody2,
@@ -213,7 +212,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تصدير التقرير'),
+        title: const Text('ØªØµØ¯ÙŠØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -231,7 +230,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('جاري تصدير PDF...')),
+                  const SnackBar(content: Text('Ø¬Ø§Ø±ÙŠ ØªØµØ¯ÙŠØ± PDF...')),
                 );
               },
             ),
@@ -249,7 +248,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('جاري تصدير Excel...')),
+                  const SnackBar(content: Text('Ø¬Ø§Ø±ÙŠ ØªØµØ¯ÙŠØ± Excel...')),
                 );
               },
             ),
@@ -270,8 +269,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'إجمالي المبيعات',
-                  '${NumberFormat('#,##0.00').format(_salesData['total'])} ر.س',
+                  'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª',
+                  '${NumberFormat('#,##0.00').format(_salesData['total'])} Ø±.Ø³',
                   AppIcons.attachMoney,
                   AppTheme.successColor,
                 ),
@@ -279,8 +278,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'هذا الشهر',
-                  '${NumberFormat('#,##0.00').format(_salesData['thisMonth'])} ر.س',
+                  'Ù‡Ø°Ø§ Ø§Ù„Ø´Ù‡Ø±',
+                  '${NumberFormat('#,##0.00').format(_salesData['thisMonth'])} Ø±.Ø³',
                   AppIcons.trendingUp,
                   AppTheme.primaryColor,
                 ),
@@ -292,7 +291,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'عدد الطلبات',
+                  'Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª',
                   '${_salesData['orders']}',
                   AppIcons.shoppingBag,
                   AppTheme.infoColor,
@@ -301,8 +300,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'متوسط الطلب',
-                  '${NumberFormat('#,##0.00').format(_salesData['avgOrderValue'])} ر.س',
+                  'Ù…ØªÙˆØ³Ø· Ø§Ù„Ø·Ù„Ø¨',
+                  '${NumberFormat('#,##0.00').format(_salesData['avgOrderValue'])} Ø±.Ø³',
                   AppIcons.analytics,
                   AppTheme.accentColor,
                 ),
@@ -337,7 +336,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'إجمالي المنتجات',
+                  'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
                   '${_productsData['total']}',
                   AppIcons.inventory,
                   AppTheme.primaryColor,
@@ -346,7 +345,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'منتجات نشطة',
+                  'Ù…Ù†ØªØ¬Ø§Øª Ù†Ø´Ø·Ø©',
                   '${_productsData['active']}',
                   AppIcons.checkCircle,
                   AppTheme.successColor,
@@ -359,7 +358,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'نفد المخزون',
+                  'Ù†ÙØ¯ Ø§Ù„Ù…Ø®Ø²ÙˆÙ†',
                   '${_productsData['outOfStock']}',
                   AppIcons.removeShoppingCart,
                   AppTheme.errorColor,
@@ -368,7 +367,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'مخزون منخفض',
+                  'Ù…Ø®Ø²ÙˆÙ† Ù…Ù†Ø®ÙØ¶',
                   '${_productsData['lowStock']}',
                   AppIcons.warning,
                   AppTheme.warningColor,
@@ -380,7 +379,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
           // Top Viewed
           _buildSection(
-            'الأكثر مشاهدة',
+            'Ø§Ù„Ø£ÙƒØ«Ø± Ù…Ø´Ø§Ù‡Ø¯Ø©',
             _productsData['topViewed'] as List? ?? [],
             (item) => ListTile(
               leading: CircleAvatar(
@@ -397,7 +396,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               ),
               title: Text(item['name']),
               trailing: Text(
-                '${item['views']} مشاهدة',
+                '${item['views']} Ù…Ø´Ø§Ù‡Ø¯Ø©',
                 style: TextStyle(color: AppTheme.slate600),
               ),
             ),
@@ -418,7 +417,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'إجمالي العملاء',
+                  'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
                   '${_customersData['total']}',
                   AppIcons.people,
                   AppTheme.primaryColor,
@@ -427,7 +426,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'عملاء جدد',
+                  'Ø¹Ù…Ù„Ø§Ø¡ Ø¬Ø¯Ø¯',
                   '${_customersData['newThisMonth']}',
                   AppIcons.personAdd,
                   AppTheme.successColor,
@@ -440,7 +439,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'عملاء عائدون',
+                  'Ø¹Ù…Ù„Ø§Ø¡ Ø¹Ø§Ø¦Ø¯ÙˆÙ†',
                   '${_customersData['returning']}',
                   AppIcons.refresh,
                   AppTheme.infoColor,
@@ -449,8 +448,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               SizedBox(width: AppDimensions.spacing12),
               Expanded(
                 child: _buildStatCard(
-                  'متوسط الإنفاق',
-                  '${NumberFormat('#,##0.00').format(_customersData['avgLifetimeValue'])} ر.س',
+                  'Ù…ØªÙˆØ³Ø· Ø§Ù„Ø¥Ù†ÙØ§Ù‚',
+                  '${NumberFormat('#,##0.00').format(_customersData['avgLifetimeValue'])} Ø±.Ø³',
                   AppIcons.wallet,
                   AppTheme.accentColor,
                 ),
@@ -461,7 +460,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
           // Top Customers
           _buildSection(
-            'أفضل العملاء',
+            'Ø£ÙØ¶Ù„ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
             _customersData['topCustomers'] as List? ?? [],
             (item) => ListTile(
               leading: CircleAvatar(
@@ -477,9 +476,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 ),
               ),
               title: Text(item['name']),
-              subtitle: Text('${item['orders']} طلب'),
+              subtitle: Text('${item['orders']} Ø·Ù„Ø¨'),
               trailing: Text(
-                '${NumberFormat('#,##0').format(item['spent'])} ر.س',
+                '${NumberFormat('#,##0').format(item['spent'])} Ø±.Ø³',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppTheme.successColor,
@@ -595,7 +594,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'نمو المبيعات',
+                  'Ù†Ù…Ùˆ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª',
                   style: TextStyle(
                     color: AppTheme.slate600,
                     fontSize: AppDimensions.fontBody,
@@ -615,7 +614,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
           ),
           Text(
-            'مقارنة بالشهر الماضي',
+            'Ù…Ù‚Ø§Ø±Ù†Ø© Ø¨Ø§Ù„Ø´Ù‡Ø± Ø§Ù„Ù…Ø§Ø¶ÙŠ',
             style: TextStyle(
               color: AppTheme.slate600,
               fontSize: AppDimensions.fontLabel,
@@ -628,7 +627,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
 
   Widget _buildChartPlaceholder() {
     final chartData = _salesData['chartData'] as List? ?? [];
-    final dayLabels = ['س', 'أ', 'ث', 'أ', 'خ', 'ج', 'س'];
+    final dayLabels = ['Ø³', 'Ø£', 'Ø«', 'Ø£', 'Ø®', 'Ø¬', 'Ø³'];
 
     return Container(
       height: 200,
@@ -647,7 +646,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'المبيعات الأسبوعية',
+            'Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹ÙŠØ©',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppDimensions.fontTitle,
@@ -721,7 +720,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'المنتجات الأكثر مبيعاً',
+            'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª Ø§Ù„Ø£ÙƒØ«Ø± Ù…Ø¨ÙŠØ¹Ø§Ù‹',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: AppDimensions.fontTitle,
@@ -744,9 +743,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 ),
               ),
               title: Text(product['name']),
-              subtitle: Text('${product['sales']} مبيعات'),
+              subtitle: Text('${product['sales']} Ù…Ø¨ÙŠØ¹Ø§Øª'),
               trailing: Text(
-                '${NumberFormat('#,##0').format(product['revenue'])} ر.س',
+                '${NumberFormat('#,##0').format(product['revenue'])} Ø±.Ø³',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppTheme.successColor,
@@ -859,11 +858,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   String _formatTimeAgo(DateTime time) {
     final diff = DateTime.now().difference(time);
     if (diff.inMinutes < 60) {
-      return 'منذ ${diff.inMinutes} دقيقة';
+      return 'Ù…Ù†Ø° ${diff.inMinutes} Ø¯Ù‚ÙŠÙ‚Ø©';
     } else if (diff.inHours < 24) {
-      return 'منذ ${diff.inHours} ساعة';
+      return 'Ù…Ù†Ø° ${diff.inHours} Ø³Ø§Ø¹Ø©';
     } else {
-      return 'منذ ${diff.inDays} يوم';
+      return 'Ù…Ù†Ø° ${diff.inDays} ÙŠÙˆÙ…';
     }
   }
 }

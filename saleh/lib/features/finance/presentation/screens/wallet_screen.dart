@@ -16,9 +16,7 @@ class WalletScreen extends StatelessWidget {
     final backgroundColor = isDark
         ? AppTheme.backgroundColorDark
         : AppTheme.backgroundColor;
-    final cardColor = isDark
-        ? AppTheme.cardColorDark
-        : AppTheme.cardColor;
+    final cardColor = isDark ? AppTheme.cardColorDark : AppTheme.cardColor;
     final textColor = isDark
         ? AppTheme.textPrimaryColorDark
         : AppTheme.textPrimaryColor;

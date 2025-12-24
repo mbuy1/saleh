@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -110,7 +110,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل تحميل الخريطة الحرارية: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©: $e')));
     }
   }
 
@@ -130,20 +130,19 @@ class _HeatmapScreenState extends State<HeatmapScreen>
         });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('تم حفظ الإعدادات')));
+        ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª')));
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل حفظ الإعدادات: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -154,7 +153,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('الخريطة الحرارية'),
+        title: const Text('Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -163,15 +162,15 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           tabs: const [
-            Tab(text: 'نظرة عامة', icon: Icon(Icons.dashboard)),
-            Tab(text: 'الصفحات', icon: Icon(Icons.pages)),
-            Tab(text: 'الجلسات', icon: Icon(Icons.videocam)),
+            Tab(text: 'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©', icon: Icon(Icons.dashboard)),
+            Tab(text: 'Ø§Ù„ØµÙØ­Ø§Øª', icon: Icon(Icons.pages)),
+            Tab(text: 'Ø§Ù„Ø¬Ù„Ø³Ø§Øª', icon: Icon(Icons.videocam)),
           ],
         ),
         actions: [
           PopupMenuButton<int>(
             icon: const Icon(Icons.calendar_today),
-            tooltip: 'الفترة الزمنية',
+            tooltip: 'Ø§Ù„ÙØªØ±Ø© Ø§Ù„Ø²Ù…Ù†ÙŠØ©',
             onSelected: (days) {
               setState(() => _selectedDays = days);
               _loadData();
@@ -180,7 +179,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 1,
                 child: Text(
-                  'اليوم',
+                  'Ø§Ù„ÙŠÙˆÙ…',
                   style: TextStyle(
                     fontWeight: _selectedDays == 1
                         ? FontWeight.bold
@@ -191,7 +190,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 7,
                 child: Text(
-                  '7 أيام',
+                  '7 Ø£ÙŠØ§Ù…',
                   style: TextStyle(
                     fontWeight: _selectedDays == 7
                         ? FontWeight.bold
@@ -202,7 +201,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 30,
                 child: Text(
-                  '30 يوم',
+                  '30 ÙŠÙˆÙ…',
                   style: TextStyle(
                     fontWeight: _selectedDays == 30
                         ? FontWeight.bold
@@ -213,7 +212,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 90,
                 child: Text(
-                  '90 يوم',
+                  '90 ÙŠÙˆÙ…',
                   style: TextStyle(
                     fontWeight: _selectedDays == 90
                         ? FontWeight.bold
@@ -225,7 +224,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'الإعدادات',
+            tooltip: 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
             onPressed: _showSettingsDialog,
           ),
         ],
@@ -243,7 +242,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
-                    child: const Text('إعادة المحاولة'),
+                    child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                   ),
                 ],
               ),
@@ -273,7 +272,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'إجمالي التفاعلات',
+                    'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØªÙØ§Ø¹Ù„Ø§Øª',
                     '${_stats['total_events'] ?? 0}',
                     Icons.touch_app,
                     Colors.blue,
@@ -282,7 +281,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'الجلسات الفريدة',
+                    'Ø§Ù„Ø¬Ù„Ø³Ø§Øª Ø§Ù„ÙØ±ÙŠØ¯Ø©',
                     '${_stats['unique_sessions'] ?? 0}',
                     Icons.people,
                     Colors.green,
@@ -295,7 +294,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'الصفحات المتتبعة',
+                    'Ø§Ù„ØµÙØ­Ø§Øª Ø§Ù„Ù…ØªØªØ¨Ø¹Ø©',
                     '${_stats['total_pages'] ?? 0}',
                     Icons.description,
                     Colors.orange,
@@ -304,7 +303,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'إجمالي النقرات',
+                    'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‚Ø±Ø§Øª',
                     '${_stats['total_clicks'] ?? 0}',
                     Icons.mouse,
                     Colors.purple,
@@ -322,7 +321,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
             // Top Pages Preview
             const Text(
-              'أكثر الصفحات تفاعلاً',
+              'Ø£ÙƒØ«Ø± Ø§Ù„ØµÙØ­Ø§Øª ØªÙØ§Ø¹Ù„Ø§Ù‹',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing12),
@@ -340,7 +339,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                         ),
                         SizedBox(height: AppDimensions.spacing8),
                         Text(
-                          'لا توجد بيانات بعد',
+                          'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ø¨Ø¹Ø¯',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -414,7 +413,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 ),
                 const SizedBox(width: AppDimensions.spacing8),
                 Text(
-                  isEnabled ? 'التتبع نشط' : 'التتبع متوقف',
+                  isEnabled ? 'Ø§Ù„ØªØªØ¨Ø¹ Ù†Ø´Ø·' : 'Ø§Ù„ØªØªØ¨Ø¹ Ù…ØªÙˆÙ‚Ù',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: isEnabled ? Colors.green : Colors.red,
@@ -427,9 +426,9 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildFeatureChip('النقرات', trackClicks),
-                _buildFeatureChip('التمرير', trackScrolls),
-                _buildFeatureChip('تسجيل الجلسات', recordSessions),
+                _buildFeatureChip('Ø§Ù„Ù†Ù‚Ø±Ø§Øª', trackClicks),
+                _buildFeatureChip('Ø§Ù„ØªÙ…Ø±ÙŠØ±', trackScrolls),
+                _buildFeatureChip('ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø§Øª', recordSessions),
               ],
             ),
           ],
@@ -461,7 +460,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           child: const Icon(Icons.description, color: AppTheme.primaryColor),
         ),
         title: Text(
-          page['page_title'] ?? page['page_path'] ?? 'صفحة غير معروفة',
+          page['page_title'] ?? page['page_path'] ?? 'ØµÙØ­Ø© ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙØ©',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -475,7 +474,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const Text(
-              'نقرة',
+              'Ù†Ù‚Ø±Ø©',
               style: TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
@@ -501,15 +500,15 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 Icon(Icons.lightbulb, color: Colors.amber[700]),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'نصائح لتحسين التجربة',
+                  'Ù†ØµØ§Ø¦Ø­ Ù„ØªØ­Ø³ÙŠÙ† Ø§Ù„ØªØ¬Ø±Ø¨Ø©',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: AppDimensions.spacing12),
-            _buildTipItem('راقب أماكن النقرات الأكثر شيوعاً'),
-            _buildTipItem('حلل عمق التمرير لفهم اهتمام الزوار'),
-            _buildTipItem('استخدم تسجيلات الجلسات لاكتشاف المشاكل'),
+            _buildTipItem('Ø±Ø§Ù‚Ø¨ Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ù†Ù‚Ø±Ø§Øª Ø§Ù„Ø£ÙƒØ«Ø± Ø´ÙŠÙˆØ¹Ø§Ù‹'),
+            _buildTipItem('Ø­Ù„Ù„ Ø¹Ù…Ù‚ Ø§Ù„ØªÙ…Ø±ÙŠØ± Ù„ÙÙ‡Ù… Ø§Ù‡ØªÙ…Ø§Ù… Ø§Ù„Ø²ÙˆØ§Ø±'),
+            _buildTipItem('Ø§Ø³ØªØ®Ø¯Ù… ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø§Ù„Ø¬Ù„Ø³Ø§Øª Ù„Ø§ÙƒØªØ´Ø§Ù Ø§Ù„Ù…Ø´Ø§ÙƒÙ„'),
           ],
         ),
       ),
@@ -522,7 +521,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: Colors.blue)),
+          const Text('â€¢ ', style: TextStyle(color: Colors.blue)),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
         ],
       ),
@@ -543,10 +542,10 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 children: [
                   Icon(Icons.analytics_outlined, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد صفحات متتبعة بعد'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙØ­Ø§Øª Ù…ØªØªØ¨Ø¹Ø© Ø¨Ø¹Ø¯'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'ستظهر الصفحات هنا عند بدء تتبع تفاعلات الزوار',
+                    'Ø³ØªØ¸Ù‡Ø± Ø§Ù„ØµÙØ­Ø§Øª Ù‡Ù†Ø§ Ø¹Ù†Ø¯ Ø¨Ø¯Ø¡ ØªØªØ¨Ø¹ ØªÙØ§Ø¹Ù„Ø§Øª Ø§Ù„Ø²ÙˆØ§Ø±',
                     style: TextStyle(color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
@@ -584,7 +583,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          page['page_title'] ?? 'بدون عنوان',
+                          page['page_title'] ?? 'Ø¨Ø¯ÙˆÙ† Ø¹Ù†ÙˆØ§Ù†',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -613,17 +612,17 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildPageStat(
-                    'النقرات',
+                    'Ø§Ù„Ù†Ù‚Ø±Ø§Øª',
                     '${page['total_clicks'] ?? 0}',
                     Icons.touch_app,
                   ),
                   _buildPageStat(
-                    'الزوار',
+                    'Ø§Ù„Ø²ÙˆØ§Ø±',
                     '${page['unique_visitors'] ?? 0}',
                     Icons.people,
                   ),
                   _buildPageStat(
-                    'عمق التمرير',
+                    'Ø¹Ù…Ù‚ Ø§Ù„ØªÙ…Ø±ÙŠØ±',
                     '${scrollDepth.toStringAsFixed(0)}%',
                     Icons.swap_vert,
                   ),
@@ -671,7 +670,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _pageHeatmap?['page_title'] ?? 'صفحة',
+                      _pageHeatmap?['page_title'] ?? 'ØµÙØ­Ø©',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -701,7 +700,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                         children: [
                           Expanded(
                             child: _buildMiniStatCard(
-                              'النقرات',
+                              'Ø§Ù„Ù†Ù‚Ø±Ø§Øª',
                               '${_pageHeatmap?['total_clicks'] ?? 0}',
                               Colors.blue,
                             ),
@@ -709,7 +708,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           const SizedBox(width: AppDimensions.spacing8),
                           Expanded(
                             child: _buildMiniStatCard(
-                              'الزوار',
+                              'Ø§Ù„Ø²ÙˆØ§Ø±',
                               '${_pageHeatmap?['unique_visitors'] ?? 0}',
                               Colors.green,
                             ),
@@ -717,7 +716,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                           const SizedBox(width: AppDimensions.spacing8),
                           Expanded(
                             child: _buildMiniStatCard(
-                              'عمق التمرير',
+                              'Ø¹Ù…Ù‚ Ø§Ù„ØªÙ…Ø±ÙŠØ±',
                               '${(_pageHeatmap?['avg_scroll_depth'] ?? 0).toStringAsFixed(0)}%',
                               Colors.orange,
                             ),
@@ -729,7 +728,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
                       // Heatmap visualization
                       const Text(
-                        'الخريطة الحرارية',
+                        'Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -742,7 +741,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
                       // Hot zones
                       const Text(
-                        'المناطق الساخنة',
+                        'Ø§Ù„Ù…Ù†Ø§Ø·Ù‚ Ø§Ù„Ø³Ø§Ø®Ù†Ø©',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -755,7 +754,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
                       // Top clicked elements
                       const Text(
-                        'العناصر الأكثر نقراً',
+                        'Ø§Ù„Ø¹Ù†Ø§ØµØ± Ø§Ù„Ø£ÙƒØ«Ø± Ù†Ù‚Ø±Ø§Ù‹',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -805,7 +804,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           padding: AppDimensions.paddingXXL,
           child: Center(
             child: Text(
-              'لا توجد بيانات نقرات كافية',
+              'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù†Ù‚Ø±Ø§Øª ÙƒØ§ÙÙŠØ©',
               style: TextStyle(color: Colors.grey),
             ),
           ),
@@ -837,7 +836,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
         child: Padding(
           padding: AppDimensions.paddingM,
           child: Text(
-            'لا توجد مناطق ساخنة',
+            'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù†Ø§Ø·Ù‚ Ø³Ø§Ø®Ù†Ø©',
             style: TextStyle(color: Colors.grey),
           ),
         ),
@@ -857,12 +856,12 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 style: const TextStyle(color: Colors.white),
               ),
             ),
-            title: Text('منطقة ${index + 1}'),
+            title: Text('Ù…Ù†Ø·Ù‚Ø© ${index + 1}'),
             subtitle: Text(
               'X: ${zone['x']?.toStringAsFixed(0)}%, Y: ${zone['y']?.toStringAsFixed(0)}%',
             ),
             trailing: Text(
-              '${zone['count']} نقرة',
+              '${zone['count']} Ù†Ù‚Ø±Ø©',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           );
@@ -880,7 +879,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       return const Card(
         child: Padding(
           padding: AppDimensions.paddingM,
-          child: Text('لا توجد عناصر', style: TextStyle(color: Colors.grey)),
+          child: Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¹Ù†Ø§ØµØ±', style: TextStyle(color: Colors.grey)),
         ),
       );
     }
@@ -903,7 +902,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
             ),
             title: Text('<$tag>${id.isNotEmpty ? '#$id' : ''}'),
             trailing: Text(
-              '${elem['clicks']} نقرة',
+              '${elem['clicks']} Ù†Ù‚Ø±Ø©',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           );
@@ -933,10 +932,10 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 children: [
                   Icon(Icons.videocam_off, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد تسجيلات جلسات'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø¬Ù„Ø³Ø§Øª'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'فعّل تسجيل الجلسات من الإعدادات',
+                    'ÙØ¹Ù‘Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø§Øª Ù…Ù† Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -966,15 +965,15 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           child: const Icon(Icons.person, color: AppTheme.primaryColor),
         ),
         title: Text(
-          session['visitor_id']?.toString().substring(0, 8) ?? 'زائر',
+          session['visitor_id']?.toString().substring(0, 8) ?? 'Ø²Ø§Ø¦Ø±',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${_formatDuration(duration)} • $pagesVisited صفحات'),
+            Text('${_formatDuration(duration)} â€¢ $pagesVisited ØµÙØ­Ø§Øª'),
             Text(
-              session['device_type'] ?? 'غير معروف',
+              session['device_type'] ?? 'ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
@@ -998,14 +997,14 @@ class _HeatmapScreenState extends State<HeatmapScreen>
   }
 
   String _formatDuration(int seconds) {
-    if (seconds < 60) return '$secondsث';
+    if (seconds < 60) return '$secondsØ«';
     if (seconds < 3600) {
       final mins = seconds ~/ 60;
-      return '$minsد';
+      return '$minsØ¯';
     }
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
-    return '$hoursس $minutesد';
+    return '$hoursØ³ $minutesØ¯';
   }
 
   Future<void> _toggleSessionStar(String sessionId) async {
@@ -1016,7 +1015,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل تحديث الجلسة: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¬Ù„Ø³Ø©: $e')));
     }
   }
 
@@ -1050,22 +1049,22 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                 ),
               ),
               const Text(
-                'تفاصيل الجلسة',
+                'ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø©',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: AppDimensions.spacing16),
-              _buildDetailRow('معرف الزائر', session['visitor_id'] ?? '-'),
-              _buildDetailRow('الجهاز', session['device_type'] ?? '-'),
+              _buildDetailRow('Ù…Ø¹Ø±Ù Ø§Ù„Ø²Ø§Ø¦Ø±', session['visitor_id'] ?? '-'),
+              _buildDetailRow('Ø§Ù„Ø¬Ù‡Ø§Ø²', session['device_type'] ?? '-'),
               _buildDetailRow(
-                'المدة',
+                'Ø§Ù„Ù…Ø¯Ø©',
                 _formatDuration(session['duration_seconds'] ?? 0),
               ),
-              _buildDetailRow('الصفحات', '${session['pages_visited'] ?? 0}'),
-              _buildDetailRow('الأحداث', '${session['events_count'] ?? 0}'),
+              _buildDetailRow('Ø§Ù„ØµÙØ­Ø§Øª', '${session['pages_visited'] ?? 0}'),
+              _buildDetailRow('Ø§Ù„Ø£Ø­Ø¯Ø§Ø«', '${session['events_count'] ?? 0}'),
               if (session['entry_page'] != null)
-                _buildDetailRow('صفحة الدخول', session['entry_page']),
+                _buildDetailRow('ØµÙØ­Ø© Ø§Ù„Ø¯Ø®ÙˆÙ„', session['entry_page']),
               if (session['exit_page'] != null)
-                _buildDetailRow('صفحة الخروج', session['exit_page']),
+                _buildDetailRow('ØµÙØ­Ø© Ø§Ù„Ø®Ø±ÙˆØ¬', session['exit_page']),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -1075,7 +1074,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                     _showSessionPlayback(session);
                   },
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('تشغيل التسجيل'),
+                  label: const Text('ØªØ´ØºÙŠÙ„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryColor,
                     foregroundColor: Colors.white,
@@ -1109,14 +1108,14 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('إعدادات الخريطة الحرارية'),
+            title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SwitchListTile(
-                    title: const Text('تفعيل التتبع'),
-                    subtitle: const Text('تشغيل/إيقاف تتبع التفاعلات'),
+                    title: const Text('ØªÙØ¹ÙŠÙ„ Ø§Ù„ØªØªØ¨Ø¹'),
+                    subtitle: const Text('ØªØ´ØºÙŠÙ„/Ø¥ÙŠÙ‚Ø§Ù ØªØªØ¨Ø¹ Ø§Ù„ØªÙØ§Ø¹Ù„Ø§Øª'),
                     value: _settings['is_enabled'] ?? true,
                     onChanged: (value) {
                       setDialogState(() {
@@ -1126,7 +1125,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   ),
                   const Divider(),
                   SwitchListTile(
-                    title: const Text('تتبع النقرات'),
+                    title: const Text('ØªØªØ¨Ø¹ Ø§Ù„Ù†Ù‚Ø±Ø§Øª'),
                     value: _settings['track_clicks'] ?? true,
                     onChanged: (value) {
                       setDialogState(() {
@@ -1135,7 +1134,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('تتبع التمرير'),
+                    title: const Text('ØªØªØ¨Ø¹ Ø§Ù„ØªÙ…Ø±ÙŠØ±'),
                     value: _settings['track_scrolls'] ?? true,
                     onChanged: (value) {
                       setDialogState(() {
@@ -1144,8 +1143,8 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('تتبع حركة الماوس'),
-                    subtitle: const Text('قد يزيد استهلاك البيانات'),
+                    title: const Text('ØªØªØ¨Ø¹ Ø­Ø±ÙƒØ© Ø§Ù„Ù…Ø§ÙˆØ³'),
+                    subtitle: const Text('Ù‚Ø¯ ÙŠØ²ÙŠØ¯ Ø§Ø³ØªÙ‡Ù„Ø§Ùƒ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª'),
                     value: _settings['track_moves'] ?? false,
                     onChanged: (value) {
                       setDialogState(() {
@@ -1155,8 +1154,8 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   ),
                   const Divider(),
                   SwitchListTile(
-                    title: const Text('تسجيل الجلسات'),
-                    subtitle: const Text('تسجيل فيديو للجلسات'),
+                    title: const Text('ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø§Øª'),
+                    subtitle: const Text('ØªØ³Ø¬ÙŠÙ„ ÙÙŠØ¯ÙŠÙˆ Ù„Ù„Ø¬Ù„Ø³Ø§Øª'),
                     value: _settings['record_sessions'] ?? false,
                     onChanged: (value) {
                       setDialogState(() {
@@ -1166,15 +1165,15 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('فترة الاحتفاظ بالبيانات'),
+                    title: const Text('ÙØªØ±Ø© Ø§Ù„Ø§Ø­ØªÙØ§Ø¸ Ø¨Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª'),
                     trailing: DropdownButton<int>(
                       value: _settings['data_retention_days'] ?? 30,
                       items: const [
-                        DropdownMenuItem(value: 7, child: Text('7 أيام')),
-                        DropdownMenuItem(value: 14, child: Text('14 يوم')),
-                        DropdownMenuItem(value: 30, child: Text('30 يوم')),
-                        DropdownMenuItem(value: 60, child: Text('60 يوم')),
-                        DropdownMenuItem(value: 90, child: Text('90 يوم')),
+                        DropdownMenuItem(value: 7, child: Text('7 Ø£ÙŠØ§Ù…')),
+                        DropdownMenuItem(value: 14, child: Text('14 ÙŠÙˆÙ…')),
+                        DropdownMenuItem(value: 30, child: Text('30 ÙŠÙˆÙ…')),
+                        DropdownMenuItem(value: 60, child: Text('60 ÙŠÙˆÙ…')),
+                        DropdownMenuItem(value: 90, child: Text('90 ÙŠÙˆÙ…')),
                       ],
                       onChanged: (value) {
                         setDialogState(() {
@@ -1189,14 +1188,14 @@ class _HeatmapScreenState extends State<HeatmapScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
+                child: const Text('Ø¥Ù„ØºØ§Ø¡'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _updateSettings(_settings);
                 },
-                child: const Text('حفظ'),
+                child: const Text('Ø­ÙØ¸'),
               ),
             ],
           );
@@ -1268,7 +1267,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
   int _currentEventIndex = 0;
   double _playbackSpeed = 1.0;
 
-  // محاكاة أحداث الجلسة
+  // Ù…Ø­Ø§ÙƒØ§Ø© Ø£Ø­Ø¯Ø§Ø« Ø§Ù„Ø¬Ù„Ø³Ø©
   late List<Map<String, dynamic>> _events;
 
   @override
@@ -1279,7 +1278,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
       duration: const Duration(seconds: 30),
     );
 
-    // إنشاء أحداث محاكاة بناءً على بيانات الجلسة
+    // Ø¥Ù†Ø´Ø§Ø¡ Ø£Ø­Ø¯Ø§Ø« Ù…Ø­Ø§ÙƒØ§Ø© Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¬Ù„Ø³Ø©
     _events = _generateMockEvents();
 
     _controller.addListener(() {
@@ -1299,7 +1298,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
 
     List<Map<String, dynamic>> events = [];
 
-    // إضافة أحداث تنقل
+    // Ø¥Ø¶Ø§ÙØ© Ø£Ø­Ø¯Ø§Ø« ØªÙ†Ù‚Ù„
     for (int i = 0; i < pagesVisited; i++) {
       events.add({
         'type': 'pageview',
@@ -1308,17 +1307,17 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
       });
     }
 
-    // إضافة أحداث نقر
+    // Ø¥Ø¶Ø§ÙØ© Ø£Ø­Ø¯Ø§Ø« Ù†Ù‚Ø±
     for (int i = 0; i < eventsCount - pagesVisited; i++) {
       events.add({
         'type': 'click',
         'x': (20 + (i * 15) % 60).toDouble(),
         'y': (30 + (i * 20) % 40).toDouble(),
-        'element': ['زر', 'رابط', 'صورة', 'نص'][i % 4],
+        'element': ['Ø²Ø±', 'Ø±Ø§Ø¨Ø·', 'ØµÙˆØ±Ø©', 'Ù†Øµ'][i % 4],
       });
     }
 
-    // إضافة صفحة الخروج
+    // Ø¥Ø¶Ø§ÙØ© ØµÙØ­Ø© Ø§Ù„Ø®Ø±ÙˆØ¬
     if (widget.session['exit_page'] != null) {
       events.add({'type': 'exit', 'page': widget.session['exit_page']});
     }
@@ -1376,7 +1375,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                   const SizedBox(width: AppDimensions.spacing8),
                   Expanded(
                     child: Text(
-                      'تشغيل جلسة: ${widget.session['session_id']?.toString().substring(0, 8) ?? 'غير معروف'}',
+                      'ØªØ´ØºÙŠÙ„ Ø¬Ù„Ø³Ø©: ${widget.session['session_id']?.toString().substring(0, 8) ?? 'ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ'}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1402,7 +1401,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                 ),
                 child: Stack(
                   children: [
-                    // محاكاة صفحة الويب
+                    // Ù…Ø­Ø§ÙƒØ§Ø© ØµÙØ­Ø© Ø§Ù„ÙˆÙŠØ¨
                     Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1412,8 +1411,8 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                           Text(
                             _currentEventIndex < _events.length
                                 ? _events[_currentEventIndex]['page'] ??
-                                      'الصفحة الرئيسية'
-                                : 'انتهى التشغيل',
+                                      'Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'
+                                : 'Ø§Ù†ØªÙ‡Ù‰ Ø§Ù„ØªØ´ØºÙŠÙ„',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 16,
@@ -1423,7 +1422,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                       ),
                     ),
 
-                    // مؤشر النقر
+                    // Ù…Ø¤Ø´Ø± Ø§Ù„Ù†Ù‚Ø±
                     if (_currentEventIndex < _events.length &&
                         _events[_currentEventIndex]['type'] == 'click')
                       Positioned(
@@ -1524,7 +1523,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                   IconButton(
                     icon: const Icon(Icons.replay),
                     onPressed: _resetPlayback,
-                    tooltip: 'إعادة',
+                    tooltip: 'Ø¥Ø¹Ø§Ø¯Ø©',
                   ),
                   const SizedBox(width: AppDimensions.spacing16),
                   FloatingActionButton(
@@ -1546,7 +1545,7 @@ class _SessionPlaybackDialogState extends State<_SessionPlaybackDialog>
                         ),
                       ],
                     ),
-                    tooltip: 'سرعة التشغيل',
+                    tooltip: 'Ø³Ø±Ø¹Ø© Ø§Ù„ØªØ´ØºÙŠÙ„',
                     onSelected: (speed) {
                       setState(() => _playbackSpeed = speed);
                       _controller.duration = Duration(

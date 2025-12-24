@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,8 +8,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../data/onboarding_repository.dart';
 
-/// شاشة الـ Onboarding المحسّنة
-/// تجربة تفاعلية غنية للمستخدم الجديد
+/// Ø´Ø§Ø´Ø© Ø§Ù„Ù€ Onboarding Ø§Ù„Ù…Ø­Ø³Ù‘Ù†Ø©
+/// ØªØ¬Ø±Ø¨Ø© ØªÙØ§Ø¹Ù„ÙŠØ© ØºÙ†ÙŠØ© Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -29,68 +29,68 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   final List<OnboardingPage> _pages = [
     const OnboardingPage(
-      title: 'مرحباً بك في Mbuy',
-      subtitle: 'منصتك المتكاملة لإدارة متجرك الإلكتروني',
-      description: 'أدر منتجاتك، طلباتك، وعملائك من مكان واحد بسهولة تامة',
+      title: 'Ù…Ø±Ø­Ø¨Ø§Ù‹ Ø¨Ùƒ ÙÙŠ Mbuy',
+      subtitle: 'Ù…Ù†ØµØªÙƒ Ø§Ù„Ù…ØªÙƒØ§Ù…Ù„Ø© Ù„Ø¥Ø¯Ø§Ø±Ø© Ù…ØªØ¬Ø±Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+      description: 'Ø£Ø¯Ø± Ù…Ù†ØªØ¬Ø§ØªÙƒØŒ Ø·Ù„Ø¨Ø§ØªÙƒØŒ ÙˆØ¹Ù…Ù„Ø§Ø¦Ùƒ Ù…Ù† Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯ Ø¨Ø³Ù‡ÙˆÙ„Ø© ØªØ§Ù…Ø©',
       icon: AppIcons.store,
       gradient: LinearGradient(
         colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['إدارة المنتجات', 'تتبع الطلبات', 'تحليل العملاء'],
+      features: ['Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª', 'ØªØªØ¨Ø¹ Ø§Ù„Ø·Ù„Ø¨Ø§Øª', 'ØªØ­Ù„ÙŠÙ„ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'],
     ),
     const OnboardingPage(
-      title: 'تسويق ذكي',
-      subtitle: 'أدوات تسويق متقدمة لزيادة مبيعاتك',
+      title: 'ØªØ³ÙˆÙŠÙ‚ Ø°ÙƒÙŠ',
+      subtitle: 'Ø£Ø¯ÙˆØ§Øª ØªØ³ÙˆÙŠÙ‚ Ù…ØªÙ‚Ø¯Ù…Ø© Ù„Ø²ÙŠØ§Ø¯Ø© Ù…Ø¨ÙŠØ¹Ø§ØªÙƒ',
       description:
-          'كوبونات، عروض خاطفة، برامج ولاء، وإحالات - كل ما تحتاجه لجذب العملاء',
+          'ÙƒÙˆØ¨ÙˆÙ†Ø§ØªØŒ Ø¹Ø±ÙˆØ¶ Ø®Ø§Ø·ÙØ©ØŒ Ø¨Ø±Ø§Ù…Ø¬ ÙˆÙ„Ø§Ø¡ØŒ ÙˆØ¥Ø­Ø§Ù„Ø§Øª - ÙƒÙ„ Ù…Ø§ ØªØ­ØªØ§Ø¬Ù‡ Ù„Ø¬Ø°Ø¨ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
       icon: AppIcons.megaphone,
       gradient: LinearGradient(
         colors: [Color(0xFF10B981), Color(0xFF34D399)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['كوبونات خصم', 'عروض خاطفة', 'برنامج إحالة'],
+      features: ['ÙƒÙˆØ¨ÙˆÙ†Ø§Øª Ø®ØµÙ…', 'Ø¹Ø±ÙˆØ¶ Ø®Ø§Ø·ÙØ©', 'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø¥Ø­Ø§Ù„Ø©'],
     ),
     const OnboardingPage(
-      title: 'ذكاء اصطناعي',
-      subtitle: 'استخدم قوة AI لتطوير متجرك',
+      title: 'Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ',
+      subtitle: 'Ø§Ø³ØªØ®Ø¯Ù… Ù‚ÙˆØ© AI Ù„ØªØ·ÙˆÙŠØ± Ù…ØªØ¬Ø±Ùƒ',
       description:
-          'توليد وصف المنتجات، تحليلات ذكية، واقتراحات لتحسين أداء متجرك',
+          'ØªÙˆÙ„ÙŠØ¯ ÙˆØµÙ Ø§Ù„Ù…Ù†ØªØ¬Ø§ØªØŒ ØªØ­Ù„ÙŠÙ„Ø§Øª Ø°ÙƒÙŠØ©ØŒ ÙˆØ§Ù‚ØªØ±Ø§Ø­Ø§Øª Ù„ØªØ­Ø³ÙŠÙ† Ø£Ø¯Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
       icon: AppIcons.bot,
       gradient: LinearGradient(
         colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['توليد المحتوى', 'تحليلات ذكية', 'مساعد AI'],
+      features: ['ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ù…Ø­ØªÙˆÙ‰', 'ØªØ­Ù„ÙŠÙ„Ø§Øª Ø°ÙƒÙŠØ©', 'Ù…Ø³Ø§Ø¹Ø¯ AI'],
     ),
     const OnboardingPage(
-      title: 'اختصارات مخصصة',
-      subtitle: 'وصول سريع لما تحتاجه',
+      title: 'Ø§Ø®ØªØµØ§Ø±Ø§Øª Ù…Ø®ØµØµØ©',
+      subtitle: 'ÙˆØµÙˆÙ„ Ø³Ø±ÙŠØ¹ Ù„Ù…Ø§ ØªØ­ØªØ§Ø¬Ù‡',
       description:
-          'أنشئ اختصاراتك الخاصة للميزات التي تستخدمها كثيراً واستخدم البحث السريع',
+          'Ø£Ù†Ø´Ø¦ Ø§Ø®ØªØµØ§Ø±Ø§ØªÙƒ Ø§Ù„Ø®Ø§ØµØ© Ù„Ù„Ù…ÙŠØ²Ø§Øª Ø§Ù„ØªÙŠ ØªØ³ØªØ®Ø¯Ù…Ù‡Ø§ ÙƒØ«ÙŠØ±Ø§Ù‹ ÙˆØ§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¨Ø­Ø« Ø§Ù„Ø³Ø±ÙŠØ¹',
       icon: AppIcons.shortcuts,
       gradient: LinearGradient(
         colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['اختصارات مخصصة', 'بحث سريع', 'تفضيلات شخصية'],
+      features: ['Ø§Ø®ØªØµØ§Ø±Ø§Øª Ù…Ø®ØµØµØ©', 'Ø¨Ø­Ø« Ø³Ø±ÙŠØ¹', 'ØªÙØ¶ÙŠÙ„Ø§Øª Ø´Ø®ØµÙŠØ©'],
     ),
     const OnboardingPage(
-      title: 'إشعارات ذكية',
-      subtitle: 'ابقَ على اطلاع دائم',
+      title: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø°ÙƒÙŠØ©',
+      subtitle: 'Ø§Ø¨Ù‚ÙŽ Ø¹Ù„Ù‰ Ø§Ø·Ù„Ø§Ø¹ Ø¯Ø§Ø¦Ù…',
       description:
-          'تحكم كامل في إشعاراتك - اختر ما تريد معرفته ومتى',
+          'ØªØ­ÙƒÙ… ÙƒØ§Ù…Ù„ ÙÙŠ Ø¥Ø´Ø¹Ø§Ø±Ø§ØªÙƒ - Ø§Ø®ØªØ± Ù…Ø§ ØªØ±ÙŠØ¯ Ù…Ø¹Ø±ÙØªÙ‡ ÙˆÙ…ØªÙ‰',
       icon: AppIcons.notifications,
       gradient: LinearGradient(
         colors: [Color(0xFFEF4444), Color(0xFFF87171)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['إشعارات الطلبات', 'تنبيهات المخزون', 'وقت الهدوء'],
+      features: ['Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø·Ù„Ø¨Ø§Øª', 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ù…Ø®Ø²ÙˆÙ†', 'ÙˆÙ‚Øª Ø§Ù„Ù‡Ø¯ÙˆØ¡'],
     ),
   ];
   
@@ -159,18 +159,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           borderRadius: BorderRadius.circular(20),
         ),
         title: const Text(
-          'تخطي الجولة التعريفية؟',
+          'ØªØ®Ø·ÙŠ Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„ØªØ¹Ø±ÙŠÙÙŠØ©ØŸ',
           textAlign: TextAlign.center,
         ),
         content: const Text(
-          'يمكنك دائماً إعادة عرض الجولة من الإعدادات',
+          'ÙŠÙ…ÙƒÙ†Ùƒ Ø¯Ø§Ø¦Ù…Ø§Ù‹ Ø¥Ø¹Ø§Ø¯Ø© Ø¹Ø±Ø¶ Ø§Ù„Ø¬ÙˆÙ„Ø© Ù…Ù† Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª',
           textAlign: TextAlign.center,
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -181,7 +181,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
             ),
-            child: const Text('تخطي'),
+            child: const Text('ØªØ®Ø·ÙŠ'),
           ),
         ],
       ),
@@ -202,19 +202,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     final gradientColors = (page.gradient as LinearGradient).colors;
     
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
-          // خلفية متحركة
+          // Ø®Ù„ÙÙŠØ© Ù…ØªØ­Ø±ÙƒØ©
           _buildAnimatedBackground(gradientColors),
           
           SafeArea(
             child: Column(
               children: [
-                // Header مع progress
+                // Header Ù…Ø¹ progress
                 _buildHeader(),
                 
-                // محتوى الصفحات
+                // Ù…Ø­ØªÙˆÙ‰ Ø§Ù„ØµÙØ­Ø§Øª
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
@@ -229,7 +228,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                // أزرار التنقل
+                // Ø£Ø²Ø±Ø§Ø± Ø§Ù„ØªÙ†Ù‚Ù„
                 _buildNavigationButtons(),
               ],
             ),
@@ -262,7 +261,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // زر رجوع
+          // Ø²Ø± Ø±Ø¬ÙˆØ¹
           if (_currentPage > 0)
             GestureDetector(
               onTap: _previousPage,
@@ -315,7 +314,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
           
-          // زر تخطي
+          // Ø²Ø± ØªØ®Ø·ÙŠ
           GestureDetector(
             onTap: _skipOnboarding,
             child: Container(
@@ -326,7 +325,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 border: Border.all(color: AppTheme.dividerColor),
               ),
               child: Text(
-                'تخطي',
+                'ØªØ®Ø·ÙŠ',
                 style: TextStyle(
                   color: AppTheme.textHintColor,
                   fontSize: 14,
@@ -349,7 +348,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // الأيقونة المتحركة
+              // Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø§Ù„Ù…ØªØ­Ø±ÙƒØ©
               Transform.translate(
                 offset: Offset(0, _floatingAnimation.value),
                 child: AnimatedBuilder(
@@ -377,7 +376,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            // تأثير دائري متحرك
+                            // ØªØ£Ø«ÙŠØ± Ø¯Ø§Ø¦Ø±ÙŠ Ù…ØªØ­Ø±Ùƒ
                             ...List.generate(3, (i) {
                               return AnimatedBuilder(
                                 animation: _pulseController,
@@ -412,7 +411,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
               const SizedBox(height: 40),
 
-              // العنوان
+              // Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
               Text(
                 page.title,
                 style: const TextStyle(
@@ -424,7 +423,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
               const SizedBox(height: 12),
 
-              // العنوان الفرعي
+              // Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ÙØ±Ø¹ÙŠ
               Text(
                 page.subtitle,
                 style: TextStyle(
@@ -436,7 +435,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
               const SizedBox(height: 16),
 
-              // الوصف
+              // Ø§Ù„ÙˆØµÙ
               Text(
                 page.description,
                 style: TextStyle(
@@ -448,7 +447,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
               const SizedBox(height: 24),
               
-              // الميزات
+              // Ø§Ù„Ù…ÙŠØ²Ø§Øª
               if (page.features != null)
                 _buildFeaturesList(page.features!, page.gradient),
             ],
@@ -502,7 +501,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Row(
         children: [
-          // مؤشرات الصفحات
+          // Ù…Ø¤Ø´Ø±Ø§Øª Ø§Ù„ØµÙØ­Ø§Øª
           Row(
             children: List.generate(
               _pages.length,
@@ -510,7 +509,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
           const Spacer(),
-          // زر التالي/ابدأ
+          // Ø²Ø± Ø§Ù„ØªØ§Ù„ÙŠ/Ø§Ø¨Ø¯Ø£
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             child: ElevatedButton(
@@ -532,7 +531,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isLastPage ? 'ابدأ الآن' : 'التالي',
+                    isLastPage ? 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¢Ù†' : 'Ø§Ù„ØªØ§Ù„ÙŠ',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -589,7 +588,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 }
 
-/// نموذج صفحة Onboarding محسّن
+/// Ù†Ù…ÙˆØ°Ø¬ ØµÙØ­Ø© Onboarding Ù…Ø­Ø³Ù‘Ù†
 class OnboardingPage {
   final String title;
   final String subtitle;

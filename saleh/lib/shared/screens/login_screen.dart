@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +9,7 @@ import '../../core/controllers/root_controller.dart';
 import '../../features/auth/data/auth_controller.dart';
 import '../../features/merchant/data/merchant_store_provider.dart';
 
-/// شاشة تسجيل الدخول مع اختيار نوع المستخدم (بائع/عميل)
+/// Ø´Ø§Ø´Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù…Ø¹ Ø§Ø®ØªÙŠØ§Ø± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (Ø¨Ø§Ø¦Ø¹/Ø¹Ù…ÙŠÙ„)
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,7 +22,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  // تم تثبيت الدخول كتاجر فقط
+  // ØªÙ… ØªØ«Ø¨ÙŠØª Ø§Ù„Ø¯Ø®ÙˆÙ„ ÙƒØªØ§Ø¬Ø± ÙÙ‚Ø·
   final LoginIntent _selectedIntent = LoginIntent.merchant;
 
   @override
@@ -37,10 +37,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // حفظ النية مؤقتاً
+    // Ø­ÙØ¸ Ø§Ù„Ù†ÙŠØ© Ù…Ø¤Ù‚ØªØ§Ù‹
     ref.read(rootControllerProvider.notifier).setLoginIntent(_selectedIntent);
 
-    // تنفيذ تسجيل الدخول
+    // ØªÙ†ÙÙŠØ° ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
     await ref
         .read(authControllerProvider.notifier)
         .login(
@@ -54,7 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // تحميل بيانات المتجر (دائماً merchant)
+      // ØªØ­Ù…ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…ØªØ¬Ø± (Ø¯Ø§Ø¦Ù…Ø§Ù‹ merchant)
       final storeController = ref.read(
         merchantStoreControllerProvider.notifier,
       );
@@ -64,13 +64,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final hasStore = ref.read(hasMerchantStoreProvider);
 
-      // التهيئة وفتح تطبيق التاجر
+      // Ø§Ù„ØªÙ‡ÙŠØ¦Ø© ÙˆÙØªØ­ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„ØªØ§Ø¬Ø±
       ref.read(rootControllerProvider.notifier).switchToMerchantApp();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            hasStore ? 'مرحباً بعودتك!' : 'مرحباً! يرجى إنشاء متجرك',
+            hasStore ? 'Ù…Ø±Ø­Ø¨Ø§Ù‹ Ø¨Ø¹ÙˆØ¯ØªÙƒ!' : 'Ù…Ø±Ø­Ø¨Ø§Ù‹! ÙŠØ±Ø¬Ù‰ Ø¥Ù†Ø´Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
           ),
           backgroundColor: hasStore
               ? AppTheme.successColor
@@ -82,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       );
     } else if (authState.errorMessage != null) {
-      // مسح النية عند الفشل
+      // Ù…Ø³Ø­ Ø§Ù„Ù†ÙŠØ© Ø¹Ù†Ø¯ Ø§Ù„ÙØ´Ù„
       ref.read(rootControllerProvider.notifier).clearLoginIntent();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -104,7 +104,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = authState.isLoading;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -123,7 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _buildTitle(),
                   const SizedBox(height: AppDimensions.spacing32),
 
-                  // اختيار نوع المستخدم (تم إخفاؤه - الدخول كتاجر فقط)
+                  // Ø§Ø®ØªÙŠØ§Ø± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (ØªÙ… Ø¥Ø®ÙØ§Ø¤Ù‡ - Ø§Ù„Ø¯Ø®ÙˆÙ„ ÙƒØªØ§Ø¬Ø± ÙÙ‚Ø·)
                   // _buildUserTypeSelection(),
                   // const SizedBox(height: AppDimensions.spacing32),
 
@@ -193,7 +192,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: AppDimensions.spacing8),
         Text(
-          'تسجيل الدخول',
+          'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: AppDimensions.fontTitle,
@@ -214,7 +213,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.textPrimaryColor,
       ),
       decoration: InputDecoration(
-        labelText: 'البريد الإلكتروني',
+        labelText: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
         hintText: 'example@domain.com',
         hintStyle: TextStyle(
           color: AppTheme.textHintColor,
@@ -265,10 +264,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'الرجاء إدخال البريد الإلكتروني';
+          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
         }
         if (!value.contains('@')) {
-          return 'الرجاء إدخال بريد إلكتروني صحيح';
+          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ­ÙŠØ­';
         }
         return null;
       },
@@ -284,8 +283,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.textPrimaryColor,
       ),
       decoration: InputDecoration(
-        labelText: 'كلمة المرور',
-        hintText: '••••••••',
+        labelText: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
+        hintText: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
         hintStyle: TextStyle(
           color: AppTheme.textHintColor,
           fontSize: AppDimensions.fontBody,
@@ -349,10 +348,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'الرجاء إدخال كلمة المرور';
+          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
         }
         if (value.length < 6) {
-          return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+          return 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
         }
         return null;
       },
@@ -398,7 +397,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    'دخول كبائع',
+                    'Ø¯Ø®ÙˆÙ„ ÙƒØ¨Ø§Ø¦Ø¹',
                     style: TextStyle(
                       fontSize: AppDimensions.fontTitle,
                       fontWeight: FontWeight.bold,
@@ -455,7 +454,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: Text(
-          'نسيت كلمة المرور؟',
+          'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ',
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppDimensions.fontBody,
@@ -481,7 +480,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                'للتجربة:',
+                'Ù„Ù„ØªØ¬Ø±Ø¨Ø©:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppTheme.infoColor,
@@ -502,7 +501,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           const SizedBox(height: AppDimensions.spacing8),
           Text(
-            'البريد: baharista1@gmail.com',
+            'Ø§Ù„Ø¨Ø±ÙŠØ¯: baharista1@gmail.com',
             style: TextStyle(
               color: AppTheme.infoColor.withValues(alpha: 0.8),
               fontSize: AppDimensions.fontBody2,
@@ -510,7 +509,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             textDirection: TextDirection.ltr,
           ),
           Text(
-            'كلمة المرور: أي شيء (6 أحرف أو أكثر)',
+            'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±: Ø£ÙŠ Ø´ÙŠØ¡ (6 Ø£Ø­Ø±Ù Ø£Ùˆ Ø£ÙƒØ«Ø±)',
             style: TextStyle(
               color: AppTheme.infoColor.withValues(alpha: 0.8),
               fontSize: AppDimensions.fontBody2,

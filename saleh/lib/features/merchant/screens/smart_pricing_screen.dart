@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -98,13 +98,13 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
         setState(() => _settings = data['data']);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('تم حفظ الإعدادات')));
+        ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª')));
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل حفظ الإعدادات: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª: $e')));
     }
   }
 
@@ -118,13 +118,13 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم تطبيق السعر الجديد')));
+      ).showSnackBar(const SnackBar(content: Text('ØªÙ… ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯')));
       _loadData();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل تطبيق السعر: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø³Ø¹Ø±: $e')));
     }
   }
 
@@ -143,7 +143,6 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -154,7 +153,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('التسعير الذكي'),
+        title: const Text('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø°ÙƒÙŠ'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -165,16 +164,16 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           isScrollable: true,
           tabs: [
             Tab(
-              text: 'نظرة عامة',
+              text: 'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©',
               icon: Badge(
                 isLabelVisible: _alerts.isNotEmpty,
                 label: Text('${_alerts.length}'),
                 child: const Icon(Icons.dashboard),
               ),
             ),
-            const Tab(text: 'القواعد', icon: Icon(Icons.rule)),
-            const Tab(text: 'الاقتراحات', icon: Icon(Icons.lightbulb)),
-            const Tab(text: 'السجل', icon: Icon(Icons.history)),
+            const Tab(text: 'Ø§Ù„Ù‚ÙˆØ§Ø¹Ø¯', icon: Icon(Icons.rule)),
+            const Tab(text: 'Ø§Ù„Ø§Ù‚ØªØ±Ø§Ø­Ø§Øª', icon: Icon(Icons.lightbulb)),
+            const Tab(text: 'Ø§Ù„Ø³Ø¬Ù„', icon: Icon(Icons.history)),
           ],
         ),
       ),
@@ -191,7 +190,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
-                    child: const Text('إعادة المحاولة'),
+                    child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                   ),
                 ],
               ),
@@ -227,7 +226,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
               Row(
                 children: [
                   const Text(
-                    'التنبيهات',
+                    'Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: AppDimensions.spacing8),
@@ -256,7 +255,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             // Quick suggestions
             if (_suggestions.isNotEmpty) ...[
               const Text(
-                'اقتراحات تسعير',
+                'Ø§Ù‚ØªØ±Ø§Ø­Ø§Øª ØªØ³Ø¹ÙŠØ±',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: AppDimensions.spacing12),
@@ -290,33 +289,33 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 const Icon(Icons.settings, color: AppTheme.primaryColor),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'إعدادات التسعير',
+                  'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ØªØ³Ø¹ÙŠØ±',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 TextButton(
                   onPressed: _showSettingsDialog,
-                  child: const Text('تعديل'),
+                  child: const Text('ØªØ¹Ø¯ÙŠÙ„'),
                 ),
               ],
             ),
             const Divider(),
-            _buildSettingRow('التسعير التلقائي', autoPricing),
-            _buildSettingRow('مطابقة المنافسين', competitorMatching),
-            _buildSettingRow('تسعير الطلب', demandPricing),
+            _buildSettingRow('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ', autoPricing),
+            _buildSettingRow('Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†', competitorMatching),
+            _buildSettingRow('ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø·Ù„Ø¨', demandPricing),
             const Divider(),
             Row(
               children: [
                 _buildStatItem(
-                  'الهامش الافتراضي',
+                  'Ø§Ù„Ù‡Ø§Ù…Ø´ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ',
                   '${_settings['default_margin_percent'] ?? 30}%',
                 ),
                 _buildStatItem(
-                  'الحد الأدنى',
+                  'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰',
                   '${_settings['min_margin_percent'] ?? 10}%',
                 ),
                 _buildStatItem(
-                  'الحد الأقصى',
+                  'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰',
                   '${_settings['max_margin_percent'] ?? 100}%',
                 ),
               ],
@@ -391,7 +390,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 onPressed: () {
                   // Apply suggested price
                 },
-                child: const Text('تطبيق'),
+                child: const Text('ØªØ·Ø¨ÙŠÙ‚'),
               ),
             IconButton(
               icon: const Icon(Icons.close, size: 18),
@@ -451,7 +450,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product?['name'] ?? 'منتج',
+                        product?['name'] ?? 'Ù…Ù†ØªØ¬',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -474,11 +473,11 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'السعر الحالي',
+                        'Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ',
                         style: TextStyle(fontSize: 11, color: Colors.grey),
                       ),
                       Text(
-                        '$currentPrice ريال',
+                        '$currentPrice Ø±ÙŠØ§Ù„',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -493,11 +492,11 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       const Text(
-                        'السعر المقترح',
+                        'Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ù…Ù‚ØªØ±Ø­',
                         style: TextStyle(fontSize: 11, color: Colors.grey),
                       ),
                       Text(
-                        '$suggestedPrice ريال',
+                        '$suggestedPrice Ø±ÙŠØ§Ù„',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isIncrease ? Colors.green : Colors.red,
@@ -523,7 +522,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    '${isIncrease ? '+' : ''}${difference.toStringAsFixed(2)} ريال',
+                    '${isIncrease ? '+' : ''}${difference.toStringAsFixed(2)} Ø±ÙŠØ§Ù„',
                     style: TextStyle(
                       fontSize: 12,
                       color: isIncrease ? Colors.green : Colors.red,
@@ -534,14 +533,14 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 if (suggestion['confidence_score'] != null) ...[
                   const SizedBox(width: AppDimensions.spacing8),
                   Text(
-                    'ثقة: ${((suggestion['confidence_score'] ?? 0) * 100).toStringAsFixed(0)}%',
+                    'Ø«Ù‚Ø©: ${((suggestion['confidence_score'] ?? 0) * 100).toStringAsFixed(0)}%',
                     style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                   ),
                 ],
                 const Spacer(),
                 TextButton(
                   onPressed: () => _applySuggestion(suggestion),
-                  child: const Text('تطبيق'),
+                  child: const Text('ØªØ·Ø¨ÙŠÙ‚'),
                 ),
               ],
             ),
@@ -560,10 +559,10 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 children: [
                   Icon(Icons.rule, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد قواعد تسعير'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù‚ÙˆØ§Ø¹Ø¯ ØªØ³Ø¹ÙŠØ±'),
                   SizedBox(height: AppDimensions.spacing8),
                   Text(
-                    'أنشئ قاعدة جديدة لأتمتة التسعير',
+                    'Ø£Ù†Ø´Ø¦ Ù‚Ø§Ø¹Ø¯Ø© Ø¬Ø¯ÙŠØ¯Ø© Ù„Ø£ØªÙ…ØªØ© Ø§Ù„ØªØ³Ø¹ÙŠØ±',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -628,10 +627,10 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           children: [
             Icon(Icons.lightbulb_outline, size: 64, color: Colors.grey),
             SizedBox(height: AppDimensions.spacing16),
-            Text('لا توجد اقتراحات حالياً'),
+            Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ø§Ù‚ØªØ±Ø§Ø­Ø§Øª Ø­Ø§Ù„ÙŠØ§Ù‹'),
             SizedBox(height: AppDimensions.spacing8),
             Text(
-              'سيتم تحليل الأسعار وتقديم اقتراحات',
+              'Ø³ÙŠØªÙ… ØªØ­Ù„ÙŠÙ„ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ÙˆØªÙ‚Ø¯ÙŠÙ… Ø§Ù‚ØªØ±Ø§Ø­Ø§Øª',
               style: TextStyle(color: Colors.grey),
             ),
           ],
@@ -656,7 +655,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           children: [
             Icon(Icons.history, size: 64, color: Colors.grey),
             SizedBox(height: AppDimensions.spacing16),
-            Text('لا يوجد سجل تغييرات'),
+            Text('Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø³Ø¬Ù„ ØªØºÙŠÙŠØ±Ø§Øª'),
           ],
         ),
       );
@@ -684,7 +683,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 color: isIncrease ? Colors.green : Colors.red,
               ),
             ),
-            title: Text(product?['name'] ?? 'منتج'),
+            title: Text(product?['name'] ?? 'Ù…Ù†ØªØ¬'),
             subtitle: Text(
               '${item['change_type'] ?? 'manual'} - ${item['change_reason'] ?? ''}',
             ),
@@ -693,14 +692,14 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$oldPrice → $newPrice',
+                  '$oldPrice â†’ $newPrice',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: isIncrease ? Colors.green : Colors.red,
                   ),
                 ),
                 Text(
-                  '${isIncrease ? '+' : ''}${(newPrice - oldPrice).toStringAsFixed(2)} ريال',
+                  '${isIncrease ? '+' : ''}${(newPrice - oldPrice).toStringAsFixed(2)} Ø±ÙŠØ§Ù„',
                   style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
               ],
@@ -724,16 +723,16 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 Icon(Icons.lightbulb, color: Colors.amber[700]),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'نصائح التسعير',
+                  'Ù†ØµØ§Ø¦Ø­ Ø§Ù„ØªØ³Ø¹ÙŠØ±',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: AppDimensions.spacing12),
-            _buildTipItem('راقب أسعار المنافسين بانتظام'),
-            _buildTipItem('احرص على هامش ربح لا يقل عن 15%'),
-            _buildTipItem('استخدم الأسعار النفسية (99 بدل 100)'),
-            _buildTipItem('جرب اختبار A/B للأسعار'),
+            _buildTipItem('Ø±Ø§Ù‚Ø¨ Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ† Ø¨Ø§Ù†ØªØ¸Ø§Ù…'),
+            _buildTipItem('Ø§Ø­Ø±Øµ Ø¹Ù„Ù‰ Ù‡Ø§Ù…Ø´ Ø±Ø¨Ø­ Ù„Ø§ ÙŠÙ‚Ù„ Ø¹Ù† 15%'),
+            _buildTipItem('Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù†ÙØ³ÙŠØ© (99 Ø¨Ø¯Ù„ 100)'),
+            _buildTipItem('Ø¬Ø±Ø¨ Ø§Ø®ØªØ¨Ø§Ø± A/B Ù„Ù„Ø£Ø³Ø¹Ø§Ø±'),
           ],
         ),
       ),
@@ -746,7 +745,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: Colors.blue)),
+          const Text('â€¢ ', style: TextStyle(color: Colors.blue)),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
         ],
       ),
@@ -790,17 +789,17 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
   String _getRuleTypeLabel(String? type) {
     switch (type) {
       case 'markup':
-        return 'نسبة إضافية على التكلفة';
+        return 'Ù†Ø³Ø¨Ø© Ø¥Ø¶Ø§ÙÙŠØ© Ø¹Ù„Ù‰ Ø§Ù„ØªÙƒÙ„ÙØ©';
       case 'margin':
-        return 'هامش ربح ثابت';
+        return 'Ù‡Ø§Ù…Ø´ Ø±Ø¨Ø­ Ø«Ø§Ø¨Øª';
       case 'competitor':
-        return 'مطابقة المنافسين';
+        return 'Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†';
       case 'demand':
-        return 'تسعير حسب الطلب';
+        return 'ØªØ³Ø¹ÙŠØ± Ø­Ø³Ø¨ Ø§Ù„Ø·Ù„Ø¨';
       case 'time_based':
-        return 'تسعير زمني';
+        return 'ØªØ³Ø¹ÙŠØ± Ø²Ù…Ù†ÙŠ';
       case 'bulk':
-        return 'تسعير الجملة';
+        return 'ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø¬Ù…Ù„Ø©';
       default:
         return '';
     }
@@ -812,14 +811,14 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('إعدادات التسعير'),
+            title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ØªØ³Ø¹ÙŠØ±'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SwitchListTile(
-                    title: const Text('التسعير التلقائي'),
-                    subtitle: const Text('تحديث الأسعار تلقائياً'),
+                    title: const Text('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ'),
+                    subtitle: const Text('ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
                     value: _settings['auto_pricing_enabled'] ?? false,
                     onChanged: (value) {
                       setDialogState(() {
@@ -828,8 +827,8 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('مطابقة المنافسين'),
-                    subtitle: const Text('تتبع أسعار المنافسين'),
+                    title: const Text('Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†'),
+                    subtitle: const Text('ØªØªØ¨Ø¹ Ø£Ø³Ø¹Ø§Ø± Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†'),
                     value: _settings['competitor_matching_enabled'] ?? false,
                     onChanged: (value) {
                       setDialogState(() {
@@ -839,7 +838,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text('هامش الربح الافتراضي'),
+                    title: const Text('Ù‡Ø§Ù…Ø´ Ø§Ù„Ø±Ø¨Ø­ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ'),
                     trailing: DropdownButton<int>(
                       value: (_settings['default_margin_percent'] ?? 30)
                           .toInt(),
@@ -862,14 +861,14 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
+                child: const Text('Ø¥Ù„ØºØ§Ø¡'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _updateSettings(_settings);
                 },
-                child: const Text('حفظ'),
+                child: const Text('Ø­ÙØ¸'),
               ),
             ],
           );
@@ -890,7 +889,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إنشاء قاعدة تسعير جديدة'),
+          title: const Text('Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ø¹Ø¯Ø© ØªØ³Ø¹ÙŠØ± Ø¬Ø¯ÙŠØ¯Ø©'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -899,40 +898,40 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم القاعدة',
-                      hintText: 'مثال: خصم نهاية الأسبوع',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ù‚Ø§Ø¹Ø¯Ø©',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø®ØµÙ… Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => ruleName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: ruleType,
                     decoration: const InputDecoration(
-                      labelText: 'نوع القاعدة',
+                      labelText: 'Ù†ÙˆØ¹ Ø§Ù„Ù‚Ø§Ø¹Ø¯Ø©',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: 'time_based',
-                        child: Text('حسب الوقت'),
+                        child: Text('Ø­Ø³Ø¨ Ø§Ù„ÙˆÙ‚Øª'),
                       ),
                       DropdownMenuItem(
                         value: 'quantity_based',
-                        child: Text('حسب الكمية'),
+                        child: Text('Ø­Ø³Ø¨ Ø§Ù„ÙƒÙ…ÙŠØ©'),
                       ),
                       DropdownMenuItem(
                         value: 'customer_based',
-                        child: Text('حسب العميل'),
+                        child: Text('Ø­Ø³Ø¨ Ø§Ù„Ø¹Ù…ÙŠÙ„'),
                       ),
                       DropdownMenuItem(
                         value: 'competitor_based',
-                        child: Text('حسب المنافسين'),
+                        child: Text('Ø­Ø³Ø¨ Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†'),
                       ),
                       DropdownMenuItem(
                         value: 'inventory_based',
-                        child: Text('حسب المخزون'),
+                        child: Text('Ø­Ø³Ø¨ Ø§Ù„Ù…Ø®Ø²ÙˆÙ†'),
                       ),
                     ],
                     onChanged: (v) => setDialogState(() => ruleType = v!),
@@ -940,7 +939,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'الوصف (اختياري)',
+                      labelText: 'Ø§Ù„ÙˆØµÙ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 2,
@@ -950,7 +949,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   Row(
                     children: [
                       Expanded(
-                        child: Text('نسبة الخصم: ${discountPercent.toInt()}%'),
+                        child: Text('Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ…: ${discountPercent.toInt()}%'),
                       ),
                       Expanded(
                         flex: 2,
@@ -968,7 +967,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   ),
                   const SizedBox(height: AppDimensions.spacing8),
                   SwitchListTile(
-                    title: const Text('تفعيل فوري'),
+                    title: const Text('ØªÙØ¹ÙŠÙ„ ÙÙˆØ±ÙŠ'),
                     value: isActive,
                     onChanged: (v) => setDialogState(() => isActive = v),
                     contentPadding: EdgeInsets.zero,
@@ -980,7 +979,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -988,7 +987,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                   formKey.currentState?.save();
                   Navigator.pop(context);
 
-                  // إضافة القاعدة محلياً
+                  // Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù‚Ø§Ø¹Ø¯Ø© Ù…Ø­Ù„ÙŠØ§Ù‹
                   setState(() {
                     _rules.add({
                       'id': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -1003,7 +1002,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إنشاء قاعدة "$ruleName" بنجاح'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ø¹Ø¯Ø© "$ruleName" Ø¨Ù†Ø¬Ø§Ø­'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1012,7 +1011,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إنشاء'),
+              child: const Text('Ø¥Ù†Ø´Ø§Ø¡'),
             ),
           ],
         ),
@@ -1024,21 +1023,21 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(rule['name'] ?? 'قاعدة'),
+        title: Text(rule['name'] ?? 'Ù‚Ø§Ø¹Ø¯Ø©'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('النوع: ${_getRuleTypeLabel(rule['rule_type'])}'),
+            Text('Ø§Ù„Ù†ÙˆØ¹: ${_getRuleTypeLabel(rule['rule_type'])}'),
             if (rule['description'] != null)
-              Text('الوصف: ${rule['description']}'),
-            Text('الحالة: ${rule['is_active'] == true ? 'نشط' : 'متوقف'}'),
+              Text('Ø§Ù„ÙˆØµÙ: ${rule['description']}'),
+            Text('Ø§Ù„Ø­Ø§Ù„Ø©: ${rule['is_active'] == true ? 'Ù†Ø´Ø·' : 'Ù…ØªÙˆÙ‚Ù'}'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: const Text('Ø¥ØºÙ„Ø§Ù‚'),
           ),
         ],
       ),

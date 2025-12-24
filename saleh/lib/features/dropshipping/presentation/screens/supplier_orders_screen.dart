@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/auth_token_storage.dart';
 
-/// نموذج طلب التوريد
+/// Ù†Ù…ÙˆØ°Ø¬ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ±ÙŠØ¯
 class SupplierOrder {
   final String id;
   final String orderId;
@@ -21,7 +21,7 @@ class SupplierOrder {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // بيانات إضافية من JOIN
+  // Ø¨ÙŠØ§Ù†Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ù…Ù† JOIN
   final String? orderNumber;
   final String? orderStatus;
   final double? totalAmount;
@@ -99,7 +99,7 @@ class SupplierOrder {
   }
 }
 
-/// شاشة طلبات التوريد للمورد
+/// Ø´Ø§Ø´Ø© Ø·Ù„Ø¨Ø§Øª Ø§Ù„ØªÙˆØ±ÙŠØ¯ Ù„Ù„Ù…ÙˆØ±Ø¯
 class SupplierOrdersScreen extends ConsumerStatefulWidget {
   const SupplierOrdersScreen({super.key});
 
@@ -181,7 +181,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم تحديث الحالة بنجاح'),
+            content: Text('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø© Ø¨Ù†Ø¬Ø§Ø­'),
             backgroundColor: AppTheme.successColor,
           ),
         );
@@ -189,7 +189,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('فشل تحديث الحالة'),
+            content: Text('ÙØ´Ù„ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø©'),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -198,7 +198,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطأ: $e'),
+          content: Text('Ø®Ø·Ø£: $e'),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -246,7 +246,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'تحديث حالة الطلب',
+                    'ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù„Ø¨',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -257,26 +257,26 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                       DropdownButtonFormField<String>(
                         initialValue: selectedStatus,
                         decoration: const InputDecoration(
-                          labelText: 'الحالة',
+                          labelText: 'Ø§Ù„Ø­Ø§Ù„Ø©',
                           border: OutlineInputBorder(),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'new', child: Text('جديد')),
+                          DropdownMenuItem(value: 'new', child: Text('Ø¬Ø¯ÙŠØ¯')),
                           DropdownMenuItem(
                             value: 'preparing',
-                            child: Text('قيد التجهيز'),
+                            child: Text('Ù‚ÙŠØ¯ Ø§Ù„ØªØ¬Ù‡ÙŠØ²'),
                           ),
                           DropdownMenuItem(
                             value: 'shipped',
-                            child: Text('تم الشحن'),
+                            child: Text('ØªÙ… Ø§Ù„Ø´Ø­Ù†'),
                           ),
                           DropdownMenuItem(
                             value: 'delivered',
-                            child: Text('تم التسليم'),
+                            child: Text('ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…'),
                           ),
                           DropdownMenuItem(
                             value: 'cancelled',
-                            child: Text('ملغي'),
+                            child: Text('Ù…Ù„ØºÙŠ'),
                           ),
                         ],
                         onChanged: (value) {
@@ -289,7 +289,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                         TextField(
                           controller: trackingController,
                           decoration: const InputDecoration(
-                            labelText: 'رقم التتبع',
+                            labelText: 'Ø±Ù‚Ù… Ø§Ù„ØªØªØ¨Ø¹',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -297,7 +297,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                         TextField(
                           controller: shippingController,
                           decoration: const InputDecoration(
-                            labelText: 'شركة الشحن',
+                            labelText: 'Ø´Ø±ÙƒØ© Ø§Ù„Ø´Ø­Ù†',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -325,7 +325,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('حفظ'),
+                          child: const Text('Ø­ÙØ¸'),
                         ),
                       ),
                     ],
@@ -342,7 +342,6 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceColor,
         foregroundColor: AppTheme.textPrimaryColor,
@@ -355,7 +354,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'طلبات التوريد',
+          'Ø·Ù„Ø¨Ø§Øª Ø§Ù„ØªÙˆØ±ÙŠØ¯',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: AppDimensions.fontHeadline,
@@ -378,7 +377,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'لا توجد طلبات توريد',
+                    'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªÙˆØ±ÙŠØ¯',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
@@ -408,11 +407,11 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
       'cancelled': Colors.red,
     };
     final statusLabels = {
-      'new': 'جديد',
-      'preparing': 'قيد التجهيز',
-      'shipped': 'تم الشحن',
-      'delivered': 'تم التسليم',
-      'cancelled': 'ملغي',
+      'new': 'Ø¬Ø¯ÙŠØ¯',
+      'preparing': 'Ù‚ÙŠØ¯ Ø§Ù„ØªØ¬Ù‡ÙŠØ²',
+      'shipped': 'ØªÙ… Ø§Ù„Ø´Ø­Ù†',
+      'delivered': 'ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…',
+      'cancelled': 'Ù…Ù„ØºÙŠ',
     };
 
     return Card(
@@ -446,7 +445,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          order.productTitle ?? 'منتج',
+                          order.productTitle ?? 'Ù…Ù†ØªØ¬',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: AppDimensions.fontBody,
@@ -454,7 +453,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'الكمية: ${order.quantity}',
+                          'Ø§Ù„ÙƒÙ…ÙŠØ©: ${order.quantity}',
                           style: TextStyle(
                             fontSize: AppDimensions.fontBody2,
                             color: Colors.grey[600],
@@ -462,7 +461,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                         ),
                         if (order.orderNumber != null)
                           Text(
-                            'رقم الطلب: ${order.orderNumber}',
+                            'Ø±Ù‚Ù… Ø§Ù„Ø·Ù„Ø¨: ${order.orderNumber}',
                             style: TextStyle(
                               fontSize: AppDimensions.fontBody2,
                               color: Colors.grey[600],
@@ -497,7 +496,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
               if (order.trackingNumber != null) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'رقم التتبع: ${order.trackingNumber}',
+                  'Ø±Ù‚Ù… Ø§Ù„ØªØªØ¨Ø¹: ${order.trackingNumber}',
                   style: TextStyle(
                     fontSize: AppDimensions.fontBody2,
                     color: Colors.grey[600],
@@ -507,7 +506,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
               if (order.customerName != null) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'العميل: ${order.customerName}',
+                  'Ø§Ù„Ø¹Ù…ÙŠÙ„: ${order.customerName}',
                   style: TextStyle(
                     fontSize: AppDimensions.fontBody2,
                     color: Colors.grey[600],
@@ -519,7 +518,7 @@ class _SupplierOrdersScreenState extends ConsumerState<SupplierOrdersScreen> {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => _showUpdateStatusModal(order),
-                  child: const Text('تحديث الحالة'),
+                  child: const Text('ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø©'),
                 ),
               ),
             ],

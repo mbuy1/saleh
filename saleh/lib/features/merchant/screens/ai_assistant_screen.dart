@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -48,19 +48,19 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     setState(() {
       _isLoading = false;
       _error = null;
-      // بدء بدون محادثات - المساعد الشخصي يعمل مباشرة
+      // Ø¨Ø¯Ø¡ Ø¨Ø¯ÙˆÙ† Ù…Ø­Ø§Ø¯Ø«Ø§Øª - Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯ Ø§Ù„Ø´Ø®ØµÙŠ ÙŠØ¹Ù…Ù„ Ù…Ø¨Ø§Ø´Ø±Ø©
       _conversations = [];
       _quickCommands = [
-        {'id': '1', 'title': 'كتابة وصف منتج', 'icon': 'description'},
-        {'id': '2', 'title': 'أفكار تسويقية', 'icon': 'campaign'},
-        {'id': '3', 'title': 'تحسين المبيعات', 'icon': 'trending_up'},
-        {'id': '4', 'title': 'الرد على عميل', 'icon': 'support_agent'},
+        {'id': '1', 'title': 'ÙƒØªØ§Ø¨Ø© ÙˆØµÙ Ù…Ù†ØªØ¬', 'icon': 'description'},
+        {'id': '2', 'title': 'Ø£ÙÙƒØ§Ø± ØªØ³ÙˆÙŠÙ‚ÙŠØ©', 'icon': 'campaign'},
+        {'id': '3', 'title': 'ØªØ­Ø³ÙŠÙ† Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª', 'icon': 'trending_up'},
+        {'id': '4', 'title': 'Ø§Ù„Ø±Ø¯ Ø¹Ù„Ù‰ Ø¹Ù…ÙŠÙ„', 'icon': 'support_agent'},
       ];
     });
   }
 
   Future<void> _loadConversation(String conversationId) async {
-    // المساعد الجديد لا يحتاج تحميل محادثات - يعمل مباشرة
+    // Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯ Ù„Ø§ ÙŠØ­ØªØ§Ø¬ ØªØ­Ù…ÙŠÙ„ Ù…Ø­Ø§Ø¯Ø«Ø§Øª - ÙŠØ¹Ù…Ù„ Ù…Ø¨Ø§Ø´Ø±Ø©
     setState(() {
       _showConversations = false;
     });
@@ -82,7 +82,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     _scrollToBottom();
 
     try {
-      // استخدام المساعد الشخصي الجديد عبر OpenRouter
+      // Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯ Ø§Ù„Ø´Ø®ØµÙŠ Ø§Ù„Ø¬Ø¯ÙŠØ¯ Ø¹Ø¨Ø± OpenRouter
       final response = await _api.post(
         '/api/ai/assistant',
         body: {
@@ -107,7 +107,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         });
         _scrollToBottom();
       } else {
-        throw Exception(data['error'] ?? 'خطأ غير معروف');
+        throw Exception(data['error'] ?? 'Ø®Ø·Ø£ ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ');
       }
     } catch (e) {
       if (!mounted) return;
@@ -115,20 +115,20 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         _isSending = false;
         _messages.add({
           'role': 'assistant',
-          'content': 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.',
+          'content': 'Ø¹Ø°Ø±Ø§Ù‹ØŒ Ø­Ø¯Ø« Ø®Ø·Ø£. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.',
           'created_at': DateTime.now().toIso8601String(),
         });
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل إرسال الرسالة: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø©: $e')));
     }
   }
 
   Future<void> _executeQuickCommand(Map<String, dynamic> command) async {
     final userText = _messageController.text.trim();
     final prompt =
-        '${command['title']}: ${userText.isNotEmpty ? userText : 'ساعدني'}';
+        '${command['title']}: ${userText.isNotEmpty ? userText : 'Ø³Ø§Ø¹Ø¯Ù†ÙŠ'}';
 
     setState(() {
       _isSending = true;
@@ -166,14 +166,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         });
         _scrollToBottom();
       } else {
-        throw Exception(data['error'] ?? 'خطأ غير معروف');
+        throw Exception(data['error'] ?? 'Ø®Ø·Ø£ ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ');
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSending = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل تنفيذ الأمر: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªÙ†ÙÙŠØ° Ø§Ù„Ø£Ù…Ø±: $e')));
     }
   }
 
@@ -200,9 +200,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: Text(_activeConversation?['title'] ?? 'مساعد AI'),
+        title: Text(_activeConversation?['title'] ?? 'Ù…Ø³Ø§Ø¹Ø¯ AI'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         leading: IconButton(
@@ -217,13 +216,13 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.list),
-            tooltip: 'المحادثات',
+            tooltip: 'Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª',
             onPressed: () =>
                 setState(() => _showConversations = !_showConversations),
           ),
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'محادثة جديدة',
+            tooltip: 'Ù…Ø­Ø§Ø¯Ø«Ø© Ø¬Ø¯ÙŠØ¯Ø©',
             onPressed: _startNewConversation,
           ),
           PopupMenuButton<String>(
@@ -238,9 +237,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'commands',
-                child: Text('الأوامر السريعة'),
+                child: Text('Ø§Ù„Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø³Ø±ÙŠØ¹Ø©'),
               ),
-              const PopupMenuItem(value: 'settings', child: Text('الإعدادات')),
+              const PopupMenuItem(value: 'settings', child: Text('Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª')),
             ],
           ),
         ],
@@ -258,7 +257,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   const SizedBox(height: AppDimensions.spacing16),
                   ElevatedButton(
                     onPressed: _loadData,
-                    child: const Text('إعادة المحاولة'),
+                    child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                   ),
                 ],
               ),
@@ -296,7 +295,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             children: [
               const Expanded(
                 child: Text(
-                  'المحادثات',
+                  'Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
@@ -311,7 +310,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           child: _conversations.isEmpty
               ? const Center(
                   child: Text(
-                    'لا توجد محادثات',
+                    'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø­Ø§Ø¯Ø«Ø§Øª',
                     style: TextStyle(color: Colors.grey),
                   ),
                 )
@@ -336,7 +335,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                         ),
                       ),
                       title: Text(
-                        conv['title'] ?? 'محادثة',
+                        conv['title'] ?? 'Ù…Ø­Ø§Ø¯Ø«Ø©',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -346,7 +345,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        '${conv['messages_count'] ?? 0} رسالة',
+                        '${conv['messages_count'] ?? 0} Ø±Ø³Ø§Ù„Ø©',
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       onTap: () => _loadConversation(conv['id']),
@@ -374,13 +373,13 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                             value: 'pin',
                             child: Text(
                               conv['is_pinned'] == true
-                                  ? 'إلغاء التثبيت'
-                                  : 'تثبيت',
+                                  ? 'Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ØªØ«Ø¨ÙŠØª'
+                                  : 'ØªØ«Ø¨ÙŠØª',
                             ),
                           ),
                           const PopupMenuItem(
                             value: 'delete',
-                            child: Text('حذف'),
+                            child: Text('Ø­Ø°Ù'),
                           ),
                         ],
                       ),
@@ -430,7 +429,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           ),
           SizedBox(height: AppDimensions.spacing24),
           Text(
-            'مرحباً! أنا مساعدك الذكي',
+            'Ù…Ø±Ø­Ø¨Ø§Ù‹! Ø£Ù†Ø§ Ù…Ø³Ø§Ø¹Ø¯Ùƒ Ø§Ù„Ø°ÙƒÙŠ',
             style: TextStyle(
               fontSize: AppDimensions.fontDisplay2,
               fontWeight: FontWeight.bold,
@@ -438,7 +437,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           ),
           const SizedBox(height: AppDimensions.spacing8),
           Text(
-            'يمكنني مساعدتك في إدارة متجرك',
+            'ÙŠÙ…ÙƒÙ†Ù†ÙŠ Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ø¥Ø¯Ø§Ø±Ø© Ù…ØªØ¬Ø±Ùƒ',
             style: TextStyle(
               fontSize: AppDimensions.fontTitle,
               color: Colors.grey[600],
@@ -446,7 +445,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           ),
           SizedBox(height: AppDimensions.spacing32),
           const Text(
-            'جرب أن تسألني عن:',
+            'Ø¬Ø±Ø¨ Ø£Ù† ØªØ³Ø£Ù„Ù†ÙŠ Ø¹Ù†:',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppDimensions.spacing16),
@@ -455,16 +454,16 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             runSpacing: AppDimensions.spacing8,
             alignment: WrapAlignment.center,
             children: [
-              _buildSuggestionChip('اكتب وصف لمنتج جديد'),
-              _buildSuggestionChip('أفكار لحملة تسويقية'),
-              _buildSuggestionChip('تحليل مبيعات المتجر'),
-              _buildSuggestionChip('رد على شكوى عميل'),
-              _buildSuggestionChip('اقتراح أسعار منافسة'),
+              _buildSuggestionChip('Ø§ÙƒØªØ¨ ÙˆØµÙ Ù„Ù…Ù†ØªØ¬ Ø¬Ø¯ÙŠØ¯'),
+              _buildSuggestionChip('Ø£ÙÙƒØ§Ø± Ù„Ø­Ù…Ù„Ø© ØªØ³ÙˆÙŠÙ‚ÙŠØ©'),
+              _buildSuggestionChip('ØªØ­Ù„ÙŠÙ„ Ù…Ø¨ÙŠØ¹Ø§Øª Ø§Ù„Ù…ØªØ¬Ø±'),
+              _buildSuggestionChip('Ø±Ø¯ Ø¹Ù„Ù‰ Ø´ÙƒÙˆÙ‰ Ø¹Ù…ÙŠÙ„'),
+              _buildSuggestionChip('Ø§Ù‚ØªØ±Ø§Ø­ Ø£Ø³Ø¹Ø§Ø± Ù…Ù†Ø§ÙØ³Ø©'),
             ],
           ),
           SizedBox(height: AppDimensions.spacing32),
           const Text(
-            'الأوامر السريعة',
+            'Ø§Ù„Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø³Ø±ÙŠØ¹Ø©',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppDimensions.spacing16),
@@ -564,7 +563,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                       onPressed: () {
                         // Copy to clipboard
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('تم النسخ')),
+                          const SnackBar(content: Text('ØªÙ… Ø§Ù„Ù†Ø³Ø®')),
                         );
                       },
                     ),
@@ -662,14 +661,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             IconButton(
               icon: const Icon(Icons.flash_on),
               color: AppTheme.primaryColor,
-              tooltip: 'الأوامر السريعة',
+              tooltip: 'Ø§Ù„Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø³Ø±ÙŠØ¹Ø©',
               onPressed: _showQuickCommandsSheet,
             ),
             Expanded(
               child: TextField(
                 controller: _messageController,
                 decoration: InputDecoration(
-                  hintText: 'اكتب رسالتك...',
+                  hintText: 'Ø§ÙƒØªØ¨ Ø±Ø³Ø§Ù„ØªÙƒ...',
                   border: OutlineInputBorder(
                     borderRadius: AppDimensions.borderRadiusXXL,
                     borderSide: BorderSide.none,
@@ -718,7 +717,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('شكراً على تقييمك!')));
+      ).showSnackBar(const SnackBar(content: Text('Ø´ÙƒØ±Ø§Ù‹ Ø¹Ù„Ù‰ ØªÙ‚ÙŠÙŠÙ…Ùƒ!')));
     } catch (e) {
       // Ignore errors
     }
@@ -754,7 +753,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   Text(
-                    'الأوامر السريعة',
+                    'Ø§Ù„Ø£ÙˆØ§Ù…Ø± Ø§Ù„Ø³Ø±ÙŠØ¹Ø©',
                     style: TextStyle(
                       fontSize: AppDimensions.fontHeadline,
                       fontWeight: FontWeight.bold,
@@ -819,7 +818,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               TextField(
                 controller: _messageController,
                 decoration: const InputDecoration(
-                  labelText: 'أدخل النص',
+                  labelText: 'Ø£Ø¯Ø®Ù„ Ø§Ù„Ù†Øµ',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -830,14 +829,14 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               _executeQuickCommand(command);
             },
-            child: const Text('تنفيذ'),
+            child: const Text('ØªÙ†ÙÙŠØ°'),
           ),
         ],
       ),
@@ -848,26 +847,26 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('إعدادات المساعد'),
+        title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: Icon(Icons.language),
-              title: Text('اللغة'),
-              subtitle: Text('العربية'),
+              title: Text('Ø§Ù„Ù„ØºØ©'),
+              subtitle: Text('Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©'),
             ),
             ListTile(
               leading: Icon(Icons.history),
-              title: Text('حذف المحادثات'),
-              subtitle: Text('حذف جميع المحادثات السابقة'),
+              title: Text('Ø­Ø°Ù Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª'),
+              subtitle: Text('Ø­Ø°Ù Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø§Ù„Ø³Ø§Ø¨Ù‚Ø©'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: const Text('Ø¥ØºÙ„Ø§Ù‚'),
           ),
         ],
       ),

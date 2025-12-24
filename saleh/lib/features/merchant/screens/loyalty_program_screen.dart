@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -96,25 +96,24 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(enabled ? 'تم تفعيل البرنامج' : 'تم إيقاف البرنامج'),
+          content: Text(enabled ? 'ØªÙ… ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬' : 'ØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬'),
         ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+      ).showSnackBar(SnackBar(content: Text('Ø®Ø·Ø£: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت مع TabBar
+            // Header Ø«Ø§Ø¨Øª Ù…Ø¹ TabBar
             Container(
               color: AppTheme.primaryColor,
               child: Column(
@@ -145,7 +144,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                         ),
                         const Expanded(
                           child: Text(
-                            'برنامج الولاء',
+                            'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -173,10 +172,10 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     unselectedLabelColor: Colors.white70,
                     isScrollable: true,
                     tabs: const [
-                      Tab(text: 'نظرة عامة', icon: Icon(Icons.dashboard)),
-                      Tab(text: 'المستويات', icon: Icon(Icons.military_tech)),
-                      Tab(text: 'الأعضاء', icon: Icon(Icons.people)),
-                      Tab(text: 'المكافآت', icon: Icon(Icons.card_giftcard)),
+                      Tab(text: 'Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©', icon: Icon(Icons.dashboard)),
+                      Tab(text: 'Ø§Ù„Ù…Ø³ØªÙˆÙŠØ§Øª', icon: Icon(Icons.military_tech)),
+                      Tab(text: 'Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡', icon: Icon(Icons.people)),
+                      Tab(text: 'Ø§Ù„Ù…ÙƒØ§ÙØ¢Øª', icon: Icon(Icons.card_giftcard)),
                     ],
                   ),
                 ],
@@ -204,7 +203,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                           const SizedBox(height: AppDimensions.spacing16),
                           ElevatedButton(
                             onPressed: _loadData,
-                            child: const Text('إعادة المحاولة'),
+                            child: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                           ),
                         ],
                       ),
@@ -255,11 +254,11 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     const Icon(Icons.warning, color: Colors.orange),
                     const SizedBox(width: AppDimensions.spacing12),
                     const Expanded(
-                      child: Text('برنامج الولاء غير مفعل حالياً'),
+                      child: Text('Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡ ØºÙŠØ± Ù…ÙØ¹Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹'),
                     ),
                     TextButton(
                       onPressed: () => _toggleProgram(true),
-                      child: const Text('تفعيل'),
+                      child: const Text('ØªÙØ¹ÙŠÙ„'),
                     ),
                   ],
                 ),
@@ -270,7 +269,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'الأعضاء',
+                    'Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡',
                     '$totalMembers',
                     Icons.people,
                     Colors.blue,
@@ -279,7 +278,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'النقاط الممنوحة',
+                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ù…Ù†ÙˆØ­Ø©',
                     _formatNumber(totalIssued),
                     Icons.star,
                     Colors.amber,
@@ -292,7 +291,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'النقاط المستبدلة',
+                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
                     _formatNumber(totalRedeemed),
                     Icons.redeem,
                     Colors.green,
@@ -301,7 +300,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'النقاط المعلقة',
+                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø¹Ù„Ù‚Ø©',
                     _formatNumber(outstanding),
                     Icons.pending,
                     Colors.purple,
@@ -314,7 +313,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
             // Program settings summary
             const Text(
-              'إعدادات البرنامج',
+              'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing12),
@@ -324,21 +323,21 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 child: Column(
                   children: [
                     _buildSettingRow(
-                      'نقطة لكل ريال',
+                      'Ù†Ù‚Ø·Ø© Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„',
                       '${_program['points_per_currency'] ?? 1}',
                     ),
                     _buildSettingRow(
-                      'قيمة النقطة',
-                      '${_program['points_value'] ?? 0.01} ريال',
+                      'Ù‚ÙŠÙ…Ø© Ø§Ù„Ù†Ù‚Ø·Ø©',
+                      '${_program['points_value'] ?? 0.01} Ø±ÙŠØ§Ù„',
                     ),
                     _buildSettingRow(
-                      'حد الاستبدال الأدنى',
-                      '${_program['min_points_redeem'] ?? 100} نقطة',
+                      'Ø­Ø¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„ Ø§Ù„Ø£Ø¯Ù†Ù‰',
+                      '${_program['min_points_redeem'] ?? 100} Ù†Ù‚Ø·Ø©',
                     ),
                     if (_program['points_expiry_days'] != null)
                       _buildSettingRow(
-                        'انتهاء الصلاحية',
-                        '${_program['points_expiry_days']} يوم',
+                        'Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©',
+                        '${_program['points_expiry_days']} ÙŠÙˆÙ…',
                       ),
                     const Divider(),
                     Row(
@@ -346,7 +345,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       children: [
                         TextButton(
                           onPressed: _showSettingsDialog,
-                          child: const Text('تعديل الإعدادات'),
+                          child: const Text('ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª'),
                         ),
                       ],
                     ),
@@ -361,7 +360,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             if ((_stats['tier_distribution'] as List?)?.isNotEmpty ??
                 false) ...[
               const Text(
-                'توزيع الأعضاء',
+                'ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: AppDimensions.spacing12),
@@ -495,7 +494,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     color: Colors.grey,
                   ),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد مستويات'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø³ØªÙˆÙŠØ§Øª'),
                 ],
               ),
             )
@@ -566,14 +565,14 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               spacing: 16,
               runSpacing: 8,
               children: [
-                _buildTierBadge('${tier['min_points'] ?? 0} نقطة', Icons.star),
+                _buildTierBadge('${tier['min_points'] ?? 0} Ù†Ù‚Ø·Ø©', Icons.star),
                 _buildTierBadge(
-                  '${tier['min_orders'] ?? 0} طلب',
+                  '${tier['min_orders'] ?? 0} Ø·Ù„Ø¨',
                   Icons.shopping_cart,
                 ),
-                _buildTierBadge('${multiplier}x مضاعف', Icons.bolt),
+                _buildTierBadge('${multiplier}x Ù…Ø¶Ø§Ø¹Ù', Icons.bolt),
                 if (tier['free_shipping'] == true)
-                  _buildTierBadge('شحن مجاني', Icons.local_shipping),
+                  _buildTierBadge('Ø´Ø­Ù† Ù…Ø¬Ø§Ù†ÙŠ', Icons.local_shipping),
               ],
             ),
           ],
@@ -610,7 +609,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 children: [
                   Icon(Icons.people_outline, size: 64, color: Colors.grey),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا يوجد أعضاء'),
+                  Text('Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø£Ø¹Ø¶Ø§Ø¡'),
                 ],
               ),
             )
@@ -653,7 +652,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   ),
                 ),
         ),
-        title: Text(customer?['full_name'] ?? 'عميل'),
+        title: Text(customer?['full_name'] ?? 'Ø¹Ù…ÙŠÙ„'),
         subtitle: Row(
           children: [
             if (tier != null) ...[
@@ -674,7 +673,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               const SizedBox(width: AppDimensions.spacing8),
             ],
             Text(
-              '$lifetimePoints نقطة كلية',
+              '$lifetimePoints Ù†Ù‚Ø·Ø© ÙƒÙ„ÙŠØ©',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
@@ -688,7 +687,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Text(
-              'نقطة',
+              'Ù†Ù‚Ø·Ø©',
               style: TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],
@@ -711,7 +710,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     color: Colors.grey,
                   ),
                   SizedBox(height: AppDimensions.spacing16),
-                  Text('لا توجد مكافآت'),
+                  Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙƒØ§ÙØ¢Øª'),
                 ],
               ),
             )
@@ -761,7 +760,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 ),
               ),
               const Text(
-                'نقطة',
+                'Ù†Ù‚Ø·Ø©',
                 style: TextStyle(fontSize: 10, color: Colors.grey),
               ),
             ],
@@ -785,16 +784,16 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 Icon(Icons.help_outline, color: Colors.blue[700]),
                 const SizedBox(width: AppDimensions.spacing8),
                 const Text(
-                  'كيف يعمل البرنامج؟',
+                  'ÙƒÙŠÙ ÙŠØ¹Ù…Ù„ Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ØŸ',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: AppDimensions.spacing12),
-            _buildStep('1', 'العميل يشتري من متجرك'),
-            _buildStep('2', 'يكسب نقاط على كل ريال'),
-            _buildStep('3', 'يستبدل النقاط بمكافآت وخصومات'),
-            _buildStep('4', 'يرتقي للمستويات الأعلى'),
+            _buildStep('1', 'Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙŠØ´ØªØ±ÙŠ Ù…Ù† Ù…ØªØ¬Ø±Ùƒ'),
+            _buildStep('2', 'ÙŠÙƒØ³Ø¨ Ù†Ù‚Ø§Ø· Ø¹Ù„Ù‰ ÙƒÙ„ Ø±ÙŠØ§Ù„'),
+            _buildStep('3', 'ÙŠØ³ØªØ¨Ø¯Ù„ Ø§Ù„Ù†Ù‚Ø§Ø· Ø¨Ù…ÙƒØ§ÙØ¢Øª ÙˆØ®ØµÙˆÙ…Ø§Øª'),
+            _buildStep('4', 'ÙŠØ±ØªÙ‚ÙŠ Ù„Ù„Ù…Ø³ØªÙˆÙŠØ§Øª Ø§Ù„Ø£Ø¹Ù„Ù‰'),
           ],
         ),
       ),
@@ -824,8 +823,8 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
   // Helper methods
   String _formatNumber(dynamic number) {
     final n = (number ?? 0);
-    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}م';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}ك';
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}Ù…';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}Ùƒ';
     return '$n';
   }
 
@@ -874,15 +873,15 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
   String _getRewardTypeLabel(String? type) {
     switch (type) {
       case 'discount':
-        return 'خصم';
+        return 'Ø®ØµÙ…';
       case 'product':
-        return 'منتج مجاني';
+        return 'Ù…Ù†ØªØ¬ Ù…Ø¬Ø§Ù†ÙŠ';
       case 'shipping':
-        return 'شحن مجاني';
+        return 'Ø´Ø­Ù† Ù…Ø¬Ø§Ù†ÙŠ';
       case 'coupon':
-        return 'كوبون';
+        return 'ÙƒÙˆØ¨ÙˆÙ†';
       case 'gift':
-        return 'هدية';
+        return 'Ù‡Ø¯ÙŠØ©';
       default:
         return '';
     }
@@ -898,31 +897,31 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إعدادات البرنامج'),
+          title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // النقاط لكل ريال
+                // Ø§Ù„Ù†Ù‚Ø§Ø· Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„
                 Row(
                   children: [
-                    Expanded(child: Text('نقطة لكل $pointsPerSar ر.س')),
+                    Expanded(child: Text('Ù†Ù‚Ø·Ø© Ù„ÙƒÙ„ $pointsPerSar Ø±.Ø³')),
                     Slider(
                       value: pointsPerSar.toDouble(),
                       min: 1,
                       max: 10,
                       divisions: 9,
-                      label: '$pointsPerSar ر.س',
+                      label: '$pointsPerSar Ø±.Ø³',
                       onChanged: (v) =>
                           setDialogState(() => pointsPerSar = v.toInt()),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.spacing16),
-                // قيمة النقاط
+                // Ù‚ÙŠÙ…Ø© Ø§Ù„Ù†Ù‚Ø§Ø·
                 Row(
                   children: [
-                    Expanded(child: Text('كل $pointsValue نقطة = 1 ر.س')),
+                    Expanded(child: Text('ÙƒÙ„ $pointsValue Ù†Ù‚Ø·Ø© = 1 Ø±.Ø³')),
                     Slider(
                       value: pointsValue.toDouble(),
                       min: 50,
@@ -936,7 +935,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 ),
                 const SizedBox(height: AppDimensions.spacing16),
                 SwitchListTile(
-                  title: const Text('تسجيل تلقائي عند الشراء'),
+                  title: const Text('ØªØ³Ø¬ÙŠÙ„ ØªÙ„Ù‚Ø§Ø¦ÙŠ Ø¹Ù†Ø¯ Ø§Ù„Ø´Ø±Ø§Ø¡'),
                   value: enrollOnPurchase,
                   onChanged: (v) => setDialogState(() => enrollOnPurchase = v),
                   contentPadding: EdgeInsets.zero,
@@ -947,7 +946,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -959,7 +958,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('تم حفظ الإعدادات'),
+                    content: Text('ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª'),
                     backgroundColor: AppTheme.successColor,
                   ),
                 );
@@ -967,7 +966,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('حفظ'),
+              child: const Text('Ø­ÙØ¸'),
             ),
           ],
         ),
@@ -994,7 +993,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إضافة مستوى جديد'),
+          title: const Text('Ø¥Ø¶Ø§ÙØ© Ù…Ø³ØªÙˆÙ‰ Ø¬Ø¯ÙŠØ¯'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1003,17 +1002,17 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم المستوى',
-                      hintText: 'مثال: الفضي',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªÙˆÙ‰',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø§Ù„ÙØ¶ÙŠ',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => tierName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'الحد الأدنى من النقاط',
+                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ù†Ù‚Ø§Ø·',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1023,7 +1022,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
-                      Text('نسبة الخصم: ${discount.toInt()}%'),
+                      Text('Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ…: ${discount.toInt()}%'),
                       Expanded(
                         child: Slider(
                           value: discount,
@@ -1037,7 +1036,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     ],
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
-                  const Text('لون المستوى'),
+                  const Text('Ù„ÙˆÙ† Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
                   const SizedBox(height: AppDimensions.spacing8),
                   Wrap(
                     spacing: 8,
@@ -1065,7 +1064,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1082,7 +1081,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       'color': tierColor.toARGB32().toRadixString(16),
                       'members_count': 0,
                     });
-                    // ترتيب المستويات حسب النقاط
+                    // ØªØ±ØªÙŠØ¨ Ø§Ù„Ù…Ø³ØªÙˆÙŠØ§Øª Ø­Ø³Ø¨ Ø§Ù„Ù†Ù‚Ø§Ø·
                     _tiers.sort(
                       (a, b) => (a['min_points'] ?? 0).compareTo(
                         b['min_points'] ?? 0,
@@ -1092,7 +1091,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إضافة مستوى "$tierName"'),
+                      content: Text('ØªÙ… Ø¥Ø¶Ø§ÙØ© Ù…Ø³ØªÙˆÙ‰ "$tierName"'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1101,7 +1100,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إضافة'),
+              child: const Text('Ø¥Ø¶Ø§ÙØ©'),
             ),
           ],
         ),
@@ -1119,7 +1118,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text('تعديل مستوى: $tierName'),
+          title: Text('ØªØ¹Ø¯ÙŠÙ„ Ù…Ø³ØªÙˆÙ‰: $tierName'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1128,17 +1127,17 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم المستوى',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªÙˆÙ‰',
                       border: OutlineInputBorder(),
                     ),
                     initialValue: tierName,
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => tierName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'الحد الأدنى من النقاط',
+                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ù†Ù‚Ø§Ø·',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1148,7 +1147,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   Row(
                     children: [
-                      Text('نسبة الخصم: ${discount.toInt()}%'),
+                      Text('Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ…: ${discount.toInt()}%'),
                       Expanded(
                         child: Slider(
                           value: discount,
@@ -1169,16 +1168,16 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                // حذف المستوى
+                // Ø­Ø°Ù Ø§Ù„Ù…Ø³ØªÙˆÙ‰
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('حذف المستوى'),
-                    content: Text('هل تريد حذف مستوى "$tierName"؟'),
+                    title: const Text('Ø­Ø°Ù Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
+                    content: Text('Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ù…Ø³ØªÙˆÙ‰ "$tierName"ØŸ'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text('إلغاء'),
+                        child: const Text('Ø¥Ù„ØºØ§Ø¡'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -1188,7 +1187,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('تم حذف المستوى'),
+                              content: Text('ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
                               backgroundColor: Colors.orange,
                             ),
                           );
@@ -1196,13 +1195,13 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                         ),
-                        child: const Text('حذف'),
+                        child: const Text('Ø­Ø°Ù'),
                       ),
                     ],
                   ),
                 );
               },
-              child: const Text('حذف', style: TextStyle(color: Colors.red)),
+              child: const Text('Ø­Ø°Ù', style: TextStyle(color: Colors.red)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1226,7 +1225,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('تم تحديث المستوى'),
+                      content: Text('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1235,7 +1234,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('حفظ'),
+              child: const Text('Ø­ÙØ¸'),
             ),
           ],
         ),
@@ -1254,7 +1253,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('إضافة مكافأة جديدة'),
+          title: const Text('Ø¥Ø¶Ø§ÙØ© Ù…ÙƒØ§ÙØ£Ø© Ø¬Ø¯ÙŠØ¯Ø©'),
           content: Form(
             key: formKey,
             child: SingleChildScrollView(
@@ -1263,42 +1262,42 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'اسم المكافأة',
-                      hintText: 'مثال: خصم 10%',
+                      labelText: 'Ø§Ø³Ù… Ø§Ù„Ù…ÙƒØ§ÙØ£Ø©',
+                      hintText: 'Ù…Ø«Ø§Ù„: Ø®ØµÙ… 10%',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => v?.isEmpty == true ? 'مطلوب' : null,
+                    validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     onSaved: (v) => rewardName = v ?? '',
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   DropdownButtonFormField<String>(
                     value: rewardType,
                     decoration: const InputDecoration(
-                      labelText: 'نوع المكافأة',
+                      labelText: 'Ù†ÙˆØ¹ Ø§Ù„Ù…ÙƒØ§ÙØ£Ø©',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: 'discount',
-                        child: Text('خصم نسبة مئوية'),
+                        child: Text('Ø®ØµÙ… Ù†Ø³Ø¨Ø© Ù…Ø¦ÙˆÙŠØ©'),
                       ),
                       DropdownMenuItem(
                         value: 'fixed',
-                        child: Text('خصم مبلغ ثابت'),
+                        child: Text('Ø®ØµÙ… Ù…Ø¨Ù„Øº Ø«Ø§Ø¨Øª'),
                       ),
                       DropdownMenuItem(
                         value: 'free_shipping',
-                        child: Text('شحن مجاني'),
+                        child: Text('Ø´Ø­Ù† Ù…Ø¬Ø§Ù†ÙŠ'),
                       ),
-                      DropdownMenuItem(value: 'gift', child: Text('هدية')),
-                      DropdownMenuItem(value: 'coupon', child: Text('كوبون')),
+                      DropdownMenuItem(value: 'gift', child: Text('Ù‡Ø¯ÙŠØ©')),
+                      DropdownMenuItem(value: 'coupon', child: Text('ÙƒÙˆØ¨ÙˆÙ†')),
                     ],
                     onChanged: (v) => setDialogState(() => rewardType = v!),
                   ),
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'النقاط المطلوبة',
+                      labelText: 'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1311,8 +1310,8 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     TextFormField(
                       decoration: InputDecoration(
                         labelText: rewardType == 'discount'
-                            ? 'نسبة الخصم (%)'
-                            : 'قيمة الخصم (ر.س)',
+                            ? 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ… (%)'
+                            : 'Ù‚ÙŠÙ…Ø© Ø§Ù„Ø®ØµÙ… (Ø±.Ø³)',
                         border: const OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -1326,7 +1325,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1348,7 +1347,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إضافة مكافأة "$rewardName"'),
+                      content: Text('ØªÙ… Ø¥Ø¶Ø§ÙØ© Ù…ÙƒØ§ÙØ£Ø© "$rewardName"'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1357,7 +1356,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('إضافة'),
+              child: const Text('Ø¥Ø¶Ø§ÙØ©'),
             ),
           ],
         ),
@@ -1414,7 +1413,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               const SizedBox(height: AppDimensions.spacing16),
               Center(
                 child: Text(
-                  member['name'] ?? 'عضو',
+                  member['name'] ?? 'Ø¹Ø¶Ùˆ',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1433,23 +1432,23 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     borderRadius: AppDimensions.borderRadiusXL,
                   ),
                   child: Text(
-                    member['tier'] ?? 'أساسي',
+                    member['tier'] ?? 'Ø£Ø³Ø§Ø³ÙŠ',
                     style: const TextStyle(color: AppTheme.primaryColor),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-              _buildMemberStatRow('النقاط الحالية', '${member['points'] ?? 0}'),
+              _buildMemberStatRow('Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ø­Ø§Ù„ÙŠØ©', '${member['points'] ?? 0}'),
               _buildMemberStatRow(
-                'إجمالي النقاط المكتسبة',
+                'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…ÙƒØªØ³Ø¨Ø©',
                 '${member['total_earned'] ?? 0}',
               ),
               _buildMemberStatRow(
-                'النقاط المستبدلة',
+                'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
                 '${member['total_redeemed'] ?? 0}',
               ),
               _buildMemberStatRow(
-                'عدد الطلبات',
+                'Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª',
                 '${member['orders_count'] ?? 0}',
               ),
               const SizedBox(height: 24),
@@ -1462,7 +1461,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                         _showAddPointsDialog(member);
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('إضافة نقاط'),
+                      label: const Text('Ø¥Ø¶Ø§ÙØ© Ù†Ù‚Ø§Ø·'),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing12),
@@ -1470,7 +1469,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     child: ElevatedButton.icon(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
-                      label: const Text('إغلاق'),
+                      label: const Text('Ø¥ØºÙ„Ø§Ù‚'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),
@@ -1505,14 +1504,14 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('إضافة نقاط لـ ${member['name']}'),
+        title: Text('Ø¥Ø¶Ø§ÙØ© Ù†Ù‚Ø§Ø· Ù„Ù€ ${member['name']}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: pointsController,
               decoration: const InputDecoration(
-                labelText: 'عدد النقاط',
+                labelText: 'Ø¹Ø¯Ø¯ Ø§Ù„Ù†Ù‚Ø§Ø·',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
@@ -1521,14 +1520,14 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             DropdownButtonFormField<String>(
               value: reason,
               decoration: const InputDecoration(
-                labelText: 'السبب',
+                labelText: 'Ø§Ù„Ø³Ø¨Ø¨',
                 border: OutlineInputBorder(),
               ),
               items: const [
-                DropdownMenuItem(value: 'manual', child: Text('إضافة يدوية')),
-                DropdownMenuItem(value: 'bonus', child: Text('مكافأة')),
-                DropdownMenuItem(value: 'compensation', child: Text('تعويض')),
-                DropdownMenuItem(value: 'promotion', child: Text('عرض ترويجي')),
+                DropdownMenuItem(value: 'manual', child: Text('Ø¥Ø¶Ø§ÙØ© ÙŠØ¯ÙˆÙŠØ©')),
+                DropdownMenuItem(value: 'bonus', child: Text('Ù…ÙƒØ§ÙØ£Ø©')),
+                DropdownMenuItem(value: 'compensation', child: Text('ØªØ¹ÙˆÙŠØ¶')),
+                DropdownMenuItem(value: 'promotion', child: Text('Ø¹Ø±Ø¶ ØªØ±ÙˆÙŠØ¬ÙŠ')),
               ],
               onChanged: (v) => reason = v!,
             ),
@@ -1537,7 +1536,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1557,7 +1556,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('تم إضافة $points نقطة'),
+                    content: Text('ØªÙ… Ø¥Ø¶Ø§ÙØ© $points Ù†Ù‚Ø·Ø©'),
                     backgroundColor: AppTheme.successColor,
                   ),
                 );
@@ -1566,7 +1565,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
             ),
-            child: const Text('إضافة'),
+            child: const Text('Ø¥Ø¶Ø§ÙØ©'),
           ),
         ],
       ),
@@ -1577,23 +1576,23 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(reward['name'] ?? 'مكافأة'),
+        title: Text(reward['name'] ?? 'Ù…ÙƒØ§ÙØ£Ø©'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRewardDetailRow('النوع', _getRewardTypeLabel(reward['type'])),
+            _buildRewardDetailRow('Ø§Ù„Ù†ÙˆØ¹', _getRewardTypeLabel(reward['type'])),
             _buildRewardDetailRow(
-              'النقاط المطلوبة',
+              'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
               '${reward['points_cost'] ?? 0}',
             ),
             _buildRewardDetailRow(
-              'عدد الاستبدالات',
+              'Ø¹Ø¯Ø¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„Ø§Øª',
               '${reward['redemptions_count'] ?? 0}',
             ),
             _buildRewardDetailRow(
-              'الحالة',
-              reward['is_active'] == true ? 'نشط' : 'متوقف',
+              'Ø§Ù„Ø­Ø§Ù„Ø©',
+              reward['is_active'] == true ? 'Ù†Ø´Ø·' : 'Ù…ØªÙˆÙ‚Ù',
             ),
           ],
         ),
@@ -1606,16 +1605,16 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('تم حذف المكافأة'),
+                  content: Text('ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…ÙƒØ§ÙØ£Ø©'),
                   backgroundColor: Colors.orange,
                 ),
               );
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            child: const Text('Ø­Ø°Ù', style: TextStyle(color: Colors.red)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: const Text('Ø¥ØºÙ„Ø§Ù‚'),
           ),
         ],
       ),

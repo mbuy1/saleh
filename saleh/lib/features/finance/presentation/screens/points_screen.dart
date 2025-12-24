@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +8,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../payments/data/payment_repository.dart';
 
-/// شاشة نقاط التاجر - نظام المكافآت والنقاط
+/// Ø´Ø§Ø´Ø© Ù†Ù‚Ø§Ø· Ø§Ù„ØªØ§Ø¬Ø± - Ù†Ø¸Ø§Ù… Ø§Ù„Ù…ÙƒØ§ÙØ¢Øª ÙˆØ§Ù„Ù†Ù‚Ø§Ø·
 class PointsScreen extends ConsumerStatefulWidget {
   const PointsScreen({super.key});
 
@@ -33,7 +33,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
   Future<void> _loadPointsData() async {
     setState(() => _isLoading = true);
 
-    // محاكاة تحميل البيانات (سيتم استبدالها بـ API calls)
+    // Ù…Ø­Ø§ÙƒØ§Ø© ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª (Ø³ÙŠØªÙ… Ø§Ø³ØªØ¨Ø¯Ø§Ù„Ù‡Ø§ Ø¨Ù€ API calls)
     await Future.delayed(const Duration(milliseconds: 800));
 
     setState(() {
@@ -46,35 +46,35 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           id: '1',
           type: PointTransactionType.earned,
           amount: 50,
-          description: 'بيع منتج - طلب #1234',
+          description: 'Ø¨ÙŠØ¹ Ù…Ù†ØªØ¬ - Ø·Ù„Ø¨ #1234',
           date: DateTime.now().subtract(const Duration(hours: 2)),
         ),
         PointTransaction(
           id: '2',
           type: PointTransactionType.earned,
           amount: 100,
-          description: 'إكمال التحدي اليومي',
+          description: 'Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„ØªØ­Ø¯ÙŠ Ø§Ù„ÙŠÙˆÙ…ÙŠ',
           date: DateTime.now().subtract(const Duration(days: 1)),
         ),
         PointTransaction(
           id: '3',
           type: PointTransactionType.redeemed,
           amount: 500,
-          description: 'استبدال - خصم 10% على الباقة',
+          description: 'Ø§Ø³ØªØ¨Ø¯Ø§Ù„ - Ø®ØµÙ… 10% Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø§Ù‚Ø©',
           date: DateTime.now().subtract(const Duration(days: 2)),
         ),
         PointTransaction(
           id: '4',
           type: PointTransactionType.bonus,
           amount: 200,
-          description: 'مكافأة تسجيل متجر جديد',
+          description: 'Ù…ÙƒØ§ÙØ£Ø© ØªØ³Ø¬ÙŠÙ„ Ù…ØªØ¬Ø± Ø¬Ø¯ÙŠØ¯',
           date: DateTime.now().subtract(const Duration(days: 5)),
         ),
         PointTransaction(
           id: '5',
           type: PointTransactionType.earned,
           amount: 30,
-          description: 'إضافة منتج جديد',
+          description: 'Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬ Ø¬Ø¯ÙŠØ¯',
           date: DateTime.now().subtract(const Duration(days: 7)),
         ),
       ];
@@ -82,40 +82,40 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       _availableRewards = [
         PointReward(
           id: '1',
-          title: 'خصم 5%',
-          description: 'خصم على الباقة التالية',
+          title: 'Ø®ØµÙ… 5%',
+          description: 'Ø®ØµÙ… Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø§Ù‚Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©',
           pointsCost: 500,
           iconPath: AppIcons.discount,
           color: Colors.green,
         ),
         PointReward(
           id: '2',
-          title: 'خصم 10%',
-          description: 'خصم على الباقة التالية',
+          title: 'Ø®ØµÙ… 10%',
+          description: 'Ø®ØµÙ… Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø§Ù‚Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©',
           pointsCost: 900,
           iconPath: AppIcons.discount,
           color: Colors.blue,
         ),
         PointReward(
           id: '3',
-          title: '5 صور AI مجانية',
-          description: 'صور إضافية لهذا الشهر',
+          title: '5 ØµÙˆØ± AI Ù…Ø¬Ø§Ù†ÙŠØ©',
+          description: 'ØµÙˆØ± Ø¥Ø¶Ø§ÙÙŠØ© Ù„Ù‡Ø°Ø§ Ø§Ù„Ø´Ù‡Ø±',
           pointsCost: 300,
           iconPath: AppIcons.image,
           color: Colors.purple,
         ),
         PointReward(
           id: '4',
-          title: 'فيديو AI مجاني',
-          description: 'فيديو واحد إضافي',
+          title: 'ÙÙŠØ¯ÙŠÙˆ AI Ù…Ø¬Ø§Ù†ÙŠ',
+          description: 'ÙÙŠØ¯ÙŠÙˆ ÙˆØ§Ø­Ø¯ Ø¥Ø¶Ø§ÙÙŠ',
           pointsCost: 600,
           iconPath: AppIcons.videocam,
           color: Colors.orange,
         ),
         PointReward(
           id: '5',
-          title: 'دعم أولوية',
-          description: 'أسبوع من الدعم المميز',
+          title: 'Ø¯Ø¹Ù… Ø£ÙˆÙ„ÙˆÙŠØ©',
+          description: 'Ø£Ø³Ø¨ÙˆØ¹ Ù…Ù† Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„Ù…Ù…ÙŠØ²',
           pointsCost: 1000,
           iconPath: AppIcons.supportAgent,
           color: Colors.red,
@@ -130,7 +130,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     if (_currentPoints < reward.pointsCost) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('رصيد النقاط غير كافٍ'),
+          content: Text('Ø±ØµÙŠØ¯ Ø§Ù„Ù†Ù‚Ø§Ø· ØºÙŠØ± ÙƒØ§ÙÙ'),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -140,7 +140,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('استبدال ${reward.title}'),
+        title: Text('Ø§Ø³ØªØ¨Ø¯Ø§Ù„ ${reward.title}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -151,10 +151,10 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               colorFilter: ColorFilter.mode(reward.color, BlendMode.srcIn),
             ),
             const SizedBox(height: 16),
-            Text('سيتم خصم ${reward.pointsCost} نقطة من رصيدك'),
+            Text('Ø³ÙŠØªÙ… Ø®ØµÙ… ${reward.pointsCost} Ù†Ù‚Ø·Ø© Ù…Ù† Ø±ØµÙŠØ¯Ùƒ'),
             const SizedBox(height: 8),
             Text(
-              'الرصيد بعد الاستبدال: ${_currentPoints - reward.pointsCost} نقطة',
+              'Ø§Ù„Ø±ØµÙŠØ¯ Ø¨Ø¹Ø¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„: ${_currentPoints - reward.pointsCost} Ù†Ù‚Ø·Ø©',
               style: TextStyle(color: AppTheme.slate600),
             ),
           ],
@@ -162,14 +162,14 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
             ),
-            child: const Text('تأكيد الاستبدال'),
+            child: const Text('ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„'),
           ),
         ],
       ),
@@ -185,7 +185,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             type: PointTransactionType.redeemed,
             amount: reward.pointsCost,
-            description: 'استبدال - ${reward.title}',
+            description: 'Ø§Ø³ØªØ¨Ø¯Ø§Ù„ - ${reward.title}',
             date: DateTime.now(),
           ),
         );
@@ -193,7 +193,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('تم استبدال ${reward.title} بنجاح!'),
+          content: Text('ØªÙ… Ø§Ø³ØªØ¨Ø¯Ø§Ù„ ${reward.title} Ø¨Ù†Ø¬Ø§Ø­!'),
           backgroundColor: AppTheme.successColor,
         ),
       );
@@ -203,17 +203,16 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت في الأعلى
+            // Header Ø«Ø§Ø¨Øª ÙÙŠ Ø§Ù„Ø£Ø¹Ù„Ù‰
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // المحتوى القابل للتمرير
+            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ù„ Ù„Ù„ØªÙ…Ø±ÙŠØ±
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -225,16 +224,16 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // رصيد النقاط الرئيسي
+                            // Ø±ØµÙŠØ¯ Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ
                             _buildPointsCard(),
                             const SizedBox(height: 16),
-                            // إحصائيات سريعة
+                            // Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø³Ø±ÙŠØ¹Ø©
                             _buildStatsRow(),
                             const SizedBox(height: 24),
-                            // المكافآت المتاحة
+                            // Ø§Ù„Ù…ÙƒØ§ÙØ¢Øª Ø§Ù„Ù…ØªØ§Ø­Ø©
                             _buildRewardsSection(),
                             const SizedBox(height: 24),
-                            // سجل المعاملات
+                            // Ø³Ø¬Ù„ Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª
                             _buildTransactionsSection(),
                             const SizedBox(height: 80),
                           ],
@@ -272,7 +271,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         ),
         const Expanded(
           child: Text(
-            'نقاطي',
+            'Ù†Ù‚Ø§Ø·ÙŠ',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -328,7 +327,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'رصيد النقاط',
+                'Ø±ØµÙŠØ¯ Ø§Ù„Ù†Ù‚Ø§Ø·',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: AppDimensions.fontTitle,
@@ -384,7 +383,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  ' نقطة',
+                  ' Ù†Ù‚Ø·Ø©',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: AppDimensions.fontHeadline,
@@ -394,7 +393,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // زر شراء نقاط
+          // Ø²Ø± Ø´Ø±Ø§Ø¡ Ù†Ù‚Ø§Ø·
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -417,7 +416,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 ),
               ),
               label: Text(
-                'شراء نقاط',
+                'Ø´Ø±Ø§Ø¡ Ù†Ù‚Ø§Ø·',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: AppDimensions.fontTitle,
@@ -426,14 +425,14 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          // شريط التقدم للمستوى التالي
+          // Ø´Ø±ÙŠØ· Ø§Ù„ØªÙ‚Ø¯Ù… Ù„Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„ØªØ§Ù„ÙŠ
           Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'المستوى الذهبي',
+                    'Ø§Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø°Ù‡Ø¨ÙŠ',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: AppDimensions.fontLabel,
@@ -457,7 +456,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                '${2000 - _currentPoints} نقطة للمستوى التالي',
+                '${2000 - _currentPoints} Ù†Ù‚Ø·Ø© Ù„Ù„Ù…Ø³ØªÙˆÙ‰ Ø§Ù„ØªØ§Ù„ÙŠ',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: AppDimensions.fontCaption,
@@ -500,7 +499,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text('تأكيد الشراء'),
+            const Text('ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø´Ø±Ø§Ø¡'),
           ],
         ),
         content: Column(
@@ -529,7 +528,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${package.points} نقطة',
+                        '${package.points} Ù†Ù‚Ø·Ø©',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: AppDimensions.fontHeadline,
@@ -537,7 +536,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                       ),
                       if (package.bonus > 0)
                         Text(
-                          '+ ${package.bonus} نقطة هدية',
+                          '+ ${package.bonus} Ù†Ù‚Ø·Ø© Ù‡Ø¯ÙŠØ©',
                           style: TextStyle(
                             color: Colors.green,
                             fontSize: AppDimensions.fontLabel,
@@ -547,7 +546,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    '${package.price} ر.س',
+                    '${package.price} Ø±.Ø³',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: AppDimensions.fontDisplay3,
@@ -559,7 +558,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'سيتم إضافة النقاط فوراً إلى حسابك بعد إتمام الدفع.',
+              'Ø³ÙŠØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù†Ù‚Ø§Ø· ÙÙˆØ±Ø§Ù‹ Ø¥Ù„Ù‰ Ø­Ø³Ø§Ø¨Ùƒ Ø¨Ø¹Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø¯ÙØ¹.',
               style: TextStyle(
                 fontSize: AppDimensions.fontBody2,
                 color: Colors.grey,
@@ -570,14 +569,14 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           ElevatedButton(
             onPressed: () => _processPurchase(context, package),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
             ),
-            child: const Text('الدفع الآن'),
+            child: const Text('Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø¢Ù†'),
           ),
         ],
       ),
@@ -589,7 +588,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       children: [
         Expanded(
           child: _buildStatItem(
-            'إجمالي المكتسب',
+            'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…ÙƒØªØ³Ø¨',
             '$_lifetimePoints',
             AppIcons.trendingUp,
             AppTheme.successColor,
@@ -598,7 +597,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatItem(
-            'تم استبداله',
+            'ØªÙ… Ø§Ø³ØªØ¨Ø¯Ø§Ù„Ù‡',
             '$_redeemedPoints',
             AppIcons.gift,
             AppTheme.primaryColor,
@@ -674,7 +673,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'المكافآت المتاحة',
+              'Ø§Ù„Ù…ÙƒØ§ÙØ¢Øª Ø§Ù„Ù…ØªØ§Ø­Ø©',
               style: TextStyle(
                 fontSize: AppDimensions.fontHeadline,
                 fontWeight: FontWeight.bold,
@@ -682,14 +681,14 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             ),
             TextButton(
               onPressed: () {
-                // عرض جميع المكافآت
+                // Ø¹Ø±Ø¶ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…ÙƒØ§ÙØ¢Øª
               },
-              child: const Text('عرض الكل'),
+              child: const Text('Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„'),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        // تم إصلاح المقاس - استخدام GridView بدلاً من ListView الأفقي
+        // ØªÙ… Ø¥ØµÙ„Ø§Ø­ Ø§Ù„Ù…Ù‚Ø§Ø³ - Ø§Ø³ØªØ®Ø¯Ø§Ù… GridView Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù† ListView Ø§Ù„Ø£ÙÙ‚ÙŠ
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -697,7 +696,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             crossAxisCount: 2,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 0.65, // تم تعديل النسبة لتناسب المحتوى
+            childAspectRatio: 0.65, // ØªÙ… ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù†Ø³Ø¨Ø© Ù„ØªÙ†Ø§Ø³Ø¨ Ø§Ù„Ù…Ø­ØªÙˆÙ‰
           ),
           itemCount: _availableRewards.length > 4
               ? 4
@@ -807,7 +806,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                canRedeem ? 'استبدال' : 'غير كافٍ',
+                canRedeem ? 'Ø§Ø³ØªØ¨Ø¯Ø§Ù„' : 'ØºÙŠØ± ÙƒØ§ÙÙ',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: canRedeem ? Colors.white : AppTheme.slate600,
@@ -827,7 +826,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'سجل المعاملات',
+          'Ø³Ø¬Ù„ Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª',
           style: TextStyle(
             fontSize: AppDimensions.fontHeadline,
             fontWeight: FontWeight.bold,
@@ -916,11 +915,11 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     final diff = now.difference(date);
 
     if (diff.inMinutes < 60) {
-      return 'منذ ${diff.inMinutes} دقيقة';
+      return 'Ù…Ù†Ø° ${diff.inMinutes} Ø¯Ù‚ÙŠÙ‚Ø©';
     } else if (diff.inHours < 24) {
-      return 'منذ ${diff.inHours} ساعة';
+      return 'Ù…Ù†Ø° ${diff.inHours} Ø³Ø§Ø¹Ø©';
     } else if (diff.inDays < 7) {
-      return 'منذ ${diff.inDays} يوم';
+      return 'Ù…Ù†Ø° ${diff.inDays} ÙŠÙˆÙ…';
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }
@@ -932,7 +931,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
   ) async {
     Navigator.pop(dialogContext);
 
-    // عرض مؤشر التحميل
+    // Ø¹Ø±Ø¶ Ù…Ø¤Ø´Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -942,26 +941,26 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     try {
       final paymentRepo = ref.read(paymentRepositoryProvider);
 
-      // محاولة إنشاء نية دفع حقيقية
-      // إذا فشل (لعدم وجود Moyasar keys)، استخدم المحاكاة
+      // Ù…Ø­Ø§ÙˆÙ„Ø© Ø¥Ù†Ø´Ø§Ø¡ Ù†ÙŠØ© Ø¯ÙØ¹ Ø­Ù‚ÙŠÙ‚ÙŠØ©
+      // Ø¥Ø°Ø§ ÙØ´Ù„ (Ù„Ø¹Ø¯Ù… ÙˆØ¬ÙˆØ¯ Moyasar keys)ØŒ Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù…Ø­Ø§ÙƒØ§Ø©
       try {
         final intent = await paymentRepo.createPaymentIntent(
           packageId: 'pkg_${package.points}',
         );
 
-        // إغلاق مؤشر التحميل
+        // Ø¥ØºÙ„Ø§Ù‚ Ù…Ø¤Ø´Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„
         if (mounted) Navigator.pop(context);
 
-        // فتح صفحة الدفع
+        // ÙØªØ­ ØµÙØ­Ø© Ø§Ù„Ø¯ÙØ¹
         final url = Uri.parse(intent.invoiceUrl);
         if (await canLaunchUrl(url)) {
           await launchUrl(url, mode: LaunchMode.externalApplication);
 
-          // عرض رسالة
+          // Ø¹Ø±Ø¶ Ø±Ø³Ø§Ù„Ø©
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('أكمل الدفع في المتصفح، ستُضاف النقاط تلقائياً'),
+                content: Text('Ø£ÙƒÙ…Ù„ Ø§Ù„Ø¯ÙØ¹ ÙÙŠ Ø§Ù„Ù…ØªØµÙØ­ØŒ Ø³ØªÙØ¶Ø§Ù Ø§Ù„Ù†Ù‚Ø§Ø· ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
                 backgroundColor: AppTheme.infoColor,
                 behavior: SnackBarBehavior.floating,
                 duration: Duration(seconds: 5),
@@ -970,12 +969,12 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
           }
         }
       } catch (e) {
-        // إذا فشل الدفع الحقيقي، استخدم المحاكاة
+        // Ø¥Ø°Ø§ ÙØ´Ù„ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØŒ Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù…Ø­Ø§ÙƒØ§Ø©
         final result = await paymentRepo.simulatePayment(
           packageId: 'pkg_${package.points}',
         );
 
-        // إغلاق مؤشر التحميل
+        // Ø¥ØºÙ„Ø§Ù‚ Ù…Ø¤Ø´Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„
         if (mounted) Navigator.pop(context);
 
         if (result.success) {
@@ -988,7 +987,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
                 id: DateTime.now().toString(),
                 type: PointTransactionType.bonus,
                 amount: result.pointsAdded,
-                description: 'شراء ${package.points} نقطة',
+                description: 'Ø´Ø±Ø§Ø¡ ${package.points} Ù†Ù‚Ø·Ø©',
                 date: DateTime.now(),
               ),
             );
@@ -1006,10 +1005,10 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         }
       }
     } catch (e) {
-      // إغلاق مؤشر التحميل في حالة الخطأ
+      // Ø¥ØºÙ„Ø§Ù‚ Ù…Ø¤Ø´Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„ ÙÙŠ Ø­Ø§Ù„Ø© Ø§Ù„Ø®Ø·Ø£
       if (mounted) Navigator.pop(context);
 
-      // عند فشل كل شيء، استخدم المحاكاة المحلية
+      // Ø¹Ù†Ø¯ ÙØ´Ù„ ÙƒÙ„ Ø´ÙŠØ¡ØŒ Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù…Ø­Ø§ÙƒØ§Ø© Ø§Ù„Ù…Ø­Ù„ÙŠØ©
       setState(() {
         _currentPoints += package.points + package.bonus;
         _lifetimePoints += package.points + package.bonus;
@@ -1019,7 +1018,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             id: DateTime.now().toString(),
             type: PointTransactionType.bonus,
             amount: package.points + package.bonus,
-            description: 'شراء ${package.points} نقطة',
+            description: 'Ø´Ø±Ø§Ø¡ ${package.points} Ù†Ù‚Ø·Ø©',
             date: DateTime.now(),
           ),
         );
@@ -1029,7 +1028,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'تم إضافة ${package.points + package.bonus} نقطة! (محاكاة)',
+              'ØªÙ… Ø¥Ø¶Ø§ÙØ© ${package.points + package.bonus} Ù†Ù‚Ø·Ø©! (Ù…Ø­Ø§ÙƒØ§Ø©)',
             ),
             backgroundColor: AppTheme.successColor,
             behavior: SnackBarBehavior.floating,
@@ -1043,7 +1042,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('كيف تكسب النقاط؟'),
+        title: const Text('ÙƒÙŠÙ ØªÙƒØ³Ø¨ Ø§Ù„Ù†Ù‚Ø§Ø·ØŸ'),
         content: const SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1051,32 +1050,32 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
             children: [
               _HelpItem(
                 iconPath: AppIcons.cart,
-                title: 'المبيعات',
-                description: 'اكسب 1 نقطة عن كل ريال مبيعات',
+                title: 'Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª',
+                description: 'Ø§ÙƒØ³Ø¨ 1 Ù†Ù‚Ø·Ø© Ø¹Ù† ÙƒÙ„ Ø±ÙŠØ§Ù„ Ù…Ø¨ÙŠØ¹Ø§Øª',
               ),
               SizedBox(height: 12),
               _HelpItem(
                 iconPath: AppIcons.add,
-                title: 'إضافة منتجات',
-                description: '30 نقطة عن كل منتج جديد',
+                title: 'Ø¥Ø¶Ø§ÙØ© Ù…Ù†ØªØ¬Ø§Øª',
+                description: '30 Ù†Ù‚Ø·Ø© Ø¹Ù† ÙƒÙ„ Ù…Ù†ØªØ¬ Ø¬Ø¯ÙŠØ¯',
               ),
               SizedBox(height: 12),
               _HelpItem(
                 iconPath: AppIcons.checkCircle,
-                title: 'التحديات اليومية',
-                description: 'أكمل التحديات واكسب حتى 100 نقطة',
+                title: 'Ø§Ù„ØªØ­Ø¯ÙŠØ§Øª Ø§Ù„ÙŠÙˆÙ…ÙŠØ©',
+                description: 'Ø£ÙƒÙ…Ù„ Ø§Ù„ØªØ­Ø¯ÙŠØ§Øª ÙˆØ§ÙƒØ³Ø¨ Ø­ØªÙ‰ 100 Ù†Ù‚Ø·Ø©',
               ),
               SizedBox(height: 12),
               _HelpItem(
                 iconPath: AppIcons.share,
-                title: 'دعوة أصدقاء',
-                description: '500 نقطة عن كل صديق يسجل',
+                title: 'Ø¯Ø¹ÙˆØ© Ø£ØµØ¯Ù‚Ø§Ø¡',
+                description: '500 Ù†Ù‚Ø·Ø© Ø¹Ù† ÙƒÙ„ ØµØ¯ÙŠÙ‚ ÙŠØ³Ø¬Ù„',
               ),
               SizedBox(height: 12),
               _HelpItem(
                 iconPath: AppIcons.star,
-                title: 'التقييمات',
-                description: '10 نقاط عن كل تقييم 5 نجوم',
+                title: 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª',
+                description: '10 Ù†Ù‚Ø§Ø· Ø¹Ù† ÙƒÙ„ ØªÙ‚ÙŠÙŠÙ… 5 Ù†Ø¬ÙˆÙ…',
               ),
             ],
           ),
@@ -1084,7 +1083,7 @@ class _PointsScreenState extends ConsumerState<PointsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('فهمت'),
+            child: const Text('ÙÙ‡Ù…Øª'),
           ),
         ],
       ),
@@ -1144,7 +1143,7 @@ class _HelpItem extends StatelessWidget {
   }
 }
 
-// نماذج البيانات
+// Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
 enum PointTransactionType { earned, redeemed, bonus, expired }
 
 class PointTransaction {
@@ -1182,7 +1181,7 @@ class PointReward {
 }
 
 // ============================================================================
-// شراء النقاط
+// Ø´Ø±Ø§Ø¡ Ø§Ù„Ù†Ù‚Ø§Ø·
 // ============================================================================
 
 class PointsPackage {
@@ -1271,14 +1270,14 @@ class _BuyPointsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'شراء نقاط',
+                      'Ø´Ø±Ø§Ø¡ Ù†Ù‚Ø§Ø·',
                       style: TextStyle(
                         fontSize: AppDimensions.fontDisplay3,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'اختر الباقة المناسبة لك',
+                      'Ø§Ø®ØªØ± Ø§Ù„Ø¨Ø§Ù‚Ø© Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø© Ù„Ùƒ',
                       style: TextStyle(
                         fontSize: AppDimensions.fontBody2,
                         color: Colors.grey,
@@ -1319,7 +1318,7 @@ class _BuyPointsSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'دفع آمن ومشفر',
+                  'Ø¯ÙØ¹ Ø¢Ù…Ù† ÙˆÙ…Ø´ÙØ±',
                   style: TextStyle(
                     fontSize: AppDimensions.fontLabel,
                     color: Colors.grey[600],
@@ -1372,7 +1371,7 @@ class _BuyPointsSheet extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            ' نقطة',
+                            ' Ù†Ù‚Ø·Ø©',
                             style: TextStyle(
                               fontSize: AppDimensions.fontBody,
                               color: Colors.grey,
@@ -1390,7 +1389,7 @@ class _BuyPointsSheet extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                'الأكثر مبيعاً',
+                                'Ø§Ù„Ø£ÙƒØ«Ø± Ù…Ø¨ÙŠØ¹Ø§Ù‹',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: AppDimensions.fontCaption,
@@ -1415,7 +1414,7 @@ class _BuyPointsSheet extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '+${package.bonus} نقطة هدية',
+                              '+${package.bonus} Ù†Ù‚Ø·Ø© Ù‡Ø¯ÙŠØ©',
                               style: TextStyle(
                                 color: Colors.green,
                                 fontSize: AppDimensions.fontLabel,
@@ -1433,7 +1432,7 @@ class _BuyPointsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${package.price.toInt()} ر.س',
+                      '${package.price.toInt()} Ø±.Ø³',
                       style: TextStyle(
                         fontSize: AppDimensions.fontHeadline,
                         fontWeight: FontWeight.bold,
@@ -1443,7 +1442,7 @@ class _BuyPointsSheet extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${package.pricePerPoint.toStringAsFixed(2)} ر.س/نقطة',
+                      '${package.pricePerPoint.toStringAsFixed(2)} Ø±.Ø³/Ù†Ù‚Ø·Ø©',
                       style: TextStyle(
                         fontSize: AppDimensions.fontCaption,
                         color: Colors.grey[600],

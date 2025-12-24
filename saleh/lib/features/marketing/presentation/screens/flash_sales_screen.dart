@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,10 +6,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/api_service.dart';
 
-/// صفحة إدارة العروض الخاطفة
+/// ØµÙØ­Ø© Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø§Ø·ÙØ©
 class FlashSalesScreen extends ConsumerStatefulWidget {
   const FlashSalesScreen({super.key});
 
@@ -55,7 +54,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
           _isLoading = false;
         });
       } else {
-        throw Exception(response['error'] ?? 'فشل في جلب العروض');
+        throw Exception(response['error'] ?? 'ÙØ´Ù„ ÙÙŠ Ø¬Ù„Ø¨ Ø§Ù„Ø¹Ø±ÙˆØ¶');
       }
     } catch (e) {
       setState(() {
@@ -79,7 +78,6 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(
@@ -90,13 +88,13 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('العروض الخاطفة'),
+        title: const Text('Ø§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø§Ø·ÙØ©'),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: _showCreateFlashSaleSheet,
-            tooltip: 'إنشاء عرض',
+            tooltip: 'Ø¥Ù†Ø´Ø§Ø¡ Ø¹Ø±Ø¶',
           ),
         ],
         bottom: TabBar(
@@ -104,15 +102,15 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
           tabs: [
             Tab(
               icon: const Icon(Icons.flash_on, size: 20),
-              text: 'نشط (${_activeSales.length})',
+              text: 'Ù†Ø´Ø· (${_activeSales.length})',
             ),
             Tab(
               icon: const Icon(Icons.schedule, size: 20),
-              text: 'مجدول (${_scheduledSales.length})',
+              text: 'Ù…Ø¬Ø¯ÙˆÙ„ (${_scheduledSales.length})',
             ),
             Tab(
               icon: const Icon(Icons.history, size: 20),
-              text: 'منتهي (${_endedSales.length})',
+              text: 'Ù…Ù†ØªÙ‡ÙŠ (${_endedSales.length})',
             ),
           ],
         ),
@@ -132,7 +130,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showCreateFlashSaleSheet,
         icon: const Icon(Icons.flash_on),
-        label: const Text('عرض جديد'),
+        label: const Text('Ø¹Ø±Ø¶ Ø¬Ø¯ÙŠØ¯'),
         backgroundColor: Colors.orange,
       ),
     );
@@ -145,12 +143,12 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
         children: [
           Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
           SizedBox(height: AppDimensions.spacing16),
-          Text(_error ?? 'حدث خطأ', style: const TextStyle(color: Colors.red)),
+          Text(_error ?? 'Ø­Ø¯Ø« Ø®Ø·Ø£', style: const TextStyle(color: Colors.red)),
           SizedBox(height: AppDimensions.spacing16),
           ElevatedButton.icon(
             onPressed: _loadFlashSales,
             icon: const Icon(Icons.refresh),
-            label: const Text('إعادة المحاولة'),
+            label: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
           ),
         ],
       ),
@@ -170,14 +168,14 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
             ),
             SizedBox(height: AppDimensions.spacing16),
             Text(
-              'لا توجد عروض',
+              'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¹Ø±ÙˆØ¶',
               style: TextStyle(
                 fontSize: AppDimensions.fontHeadline,
                 color: Colors.grey.shade600,
               ),
             ),
             SizedBox(height: AppDimensions.spacing8),
-            const Text('أنشئ عرضاً خاطفاً لزيادة مبيعاتك'),
+            const Text('Ø£Ù†Ø´Ø¦ Ø¹Ø±Ø¶Ø§Ù‹ Ø®Ø§Ø·ÙØ§Ù‹ Ù„Ø²ÙŠØ§Ø¯Ø© Ù…Ø¨ÙŠØ¹Ø§ØªÙƒ'),
           ],
         ),
       );
@@ -309,7 +307,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
                       ),
                       SizedBox(width: AppDimensions.spacing4),
                       Text(
-                        '${sale.productsCount} منتج',
+                        '${sale.productsCount} Ù…Ù†ØªØ¬',
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                       SizedBox(width: AppDimensions.spacing16),
@@ -346,7 +344,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
                           ),
                           SizedBox(width: AppDimensions.spacing4),
                           Text(
-                            'عرض مميز',
+                            'Ø¹Ø±Ø¶ Ù…Ù…ÙŠØ²',
                             style: TextStyle(
                               fontSize: AppDimensions.fontLabel,
                               color: Colors.amber.shade700,
@@ -403,15 +401,15 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
   String _getStatusText(String status) {
     switch (status) {
       case 'active':
-        return 'نشط';
+        return 'Ù†Ø´Ø·';
       case 'scheduled':
-        return 'مجدول';
+        return 'Ù…Ø¬Ø¯ÙˆÙ„';
       case 'draft':
-        return 'مسودة';
+        return 'Ù…Ø³ÙˆØ¯Ø©';
       case 'ended':
-        return 'منتهي';
+        return 'Ù…Ù†ØªÙ‡ÙŠ';
       case 'cancelled':
-        return 'ملغي';
+        return 'Ù…Ù„ØºÙŠ';
       default:
         return status;
     }
@@ -601,7 +599,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إنشاء العرض بنجاح'),
+            content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¹Ø±Ø¶ Ø¨Ù†Ø¬Ø§Ø­'),
             backgroundColor: Colors.green,
           ),
         );
@@ -612,7 +610,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -644,7 +642,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                 const Icon(Icons.flash_on, color: Colors.orange),
                 const SizedBox(width: 8),
                 const Text(
-                  'إنشاء عرض خاطف',
+                  'Ø¥Ù†Ø´Ø§Ø¡ Ø¹Ø±Ø¶ Ø®Ø§Ø·Ù',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -667,17 +665,17 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
-                        labelText: 'اسم العرض *',
-                        hintText: 'مثال: تخفيضات نهاية الأسبوع',
+                        labelText: 'Ø§Ø³Ù… Ø§Ù„Ø¹Ø±Ø¶ *',
+                        hintText: 'Ù…Ø«Ø§Ù„: ØªØ®ÙÙŠØ¶Ø§Øª Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹',
                         prefixIcon: Icon(Icons.title),
                       ),
-                      validator: (v) => v?.isEmpty ?? true ? 'مطلوب' : null,
+                      validator: (v) => v?.isEmpty ?? true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _discountController,
                       decoration: const InputDecoration(
-                        labelText: 'نسبة الخصم الافتراضية',
+                        labelText: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ… Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ©',
                         suffixText: '%',
                         prefixIcon: Icon(Icons.discount_outlined),
                       ),
@@ -685,7 +683,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      'وقت البداية',
+                      'ÙˆÙ‚Øª Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
@@ -734,7 +732,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'وقت النهاية',
+                      'ÙˆÙ‚Øª Ø§Ù„Ù†Ù‡Ø§ÙŠØ©',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
@@ -781,8 +779,8 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                     SwitchListTile(
                       value: _isFeatured,
                       onChanged: (v) => setState(() => _isFeatured = v),
-                      title: const Text('عرض مميز'),
-                      subtitle: const Text('يظهر في أعلى الصفحة الرئيسية'),
+                      title: const Text('Ø¹Ø±Ø¶ Ù…Ù…ÙŠØ²'),
+                      subtitle: const Text('ÙŠØ¸Ù‡Ø± ÙÙŠ Ø£Ø¹Ù„Ù‰ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'),
                       secondary: const Icon(Icons.star_outline),
                     ),
                   ],
@@ -809,7 +807,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('إنشاء العرض'),
+                    : const Text('Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¹Ø±Ø¶'),
               ),
             ),
           ),
@@ -873,25 +871,25 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildInfoRow('الحالة', sale.status),
+                  _buildInfoRow('Ø§Ù„Ø­Ø§Ù„Ø©', sale.status),
                   _buildInfoRow(
-                    'البداية',
+                    'Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©',
                     '${sale.startsAt.day}/${sale.startsAt.month}/${sale.startsAt.year}',
                   ),
                   _buildInfoRow(
-                    'النهاية',
+                    'Ø§Ù„Ù†Ù‡Ø§ÙŠØ©',
                     '${sale.endsAt.day}/${sale.endsAt.month}/${sale.endsAt.year}',
                   ),
-                  _buildInfoRow('عدد المنتجات', '${sale.productsCount}'),
-                  _buildInfoRow('المشاهدات', '${sale.viewsCount}'),
+                  _buildInfoRow('Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª', '${sale.productsCount}'),
+                  _buildInfoRow('Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯Ø§Øª', '${sale.viewsCount}'),
                   const SizedBox(height: 24),
                   const Text(
-                    'المنتجات',
+                    'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   if (sale.products.isEmpty)
-                    const Text('لا توجد منتجات - أضف منتجات للعرض')
+                    const Text('Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù†ØªØ¬Ø§Øª - Ø£Ø¶Ù Ù…Ù†ØªØ¬Ø§Øª Ù„Ù„Ø¹Ø±Ø¶')
                   else
                     ...sale.products.map((p) => _buildProductTile(p)),
                 ],
@@ -907,7 +905,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => _activateSale(context),
                       icon: const Icon(Icons.flash_on),
-                      label: const Text('تفعيل العرض'),
+                      label: const Text('ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø¹Ø±Ø¶'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -919,7 +917,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => _endSale(context),
                       icon: const Icon(Icons.stop),
-                      label: const Text('إنهاء العرض'),
+                      label: const Text('Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø¹Ø±Ø¶'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -951,11 +949,11 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
   Widget _buildProductTile(FlashSaleProduct product) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(product.productName ?? 'منتج'),
+      title: Text(product.productName ?? 'Ù…Ù†ØªØ¬'),
       subtitle: Row(
         children: [
           Text(
-            '${product.originalPrice} ر.س',
+            '${product.originalPrice} Ø±.Ø³',
             style: const TextStyle(
               decoration: TextDecoration.lineThrough,
               color: Colors.grey,
@@ -963,7 +961,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '${product.salePrice} ر.س',
+            '${product.salePrice} Ø±.Ø³',
             style: const TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -997,7 +995,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
     }
   }
 
@@ -1013,7 +1011,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
     }
   }
 
@@ -1021,17 +1019,17 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف العرض'),
-        content: const Text('هل أنت متأكد من حذف هذا العرض؟'),
+        title: const Text('Ø­Ø°Ù Ø§Ù„Ø¹Ø±Ø¶'),
+        content: const Text('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ø¹Ø±Ø¶ØŸ'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('حذف'),
+            child: const Text('Ø­Ø°Ù'),
           ),
         ],
       ),
@@ -1046,7 +1044,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
         if (!context.mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('فشل: $e')));
+        ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„: $e')));
       }
     }
   }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_theme.dart';
@@ -6,13 +6,13 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_icons.dart';
 
 /// ============================================================================
-/// Error Boundary - معالج الأخطاء الشامل
+/// Error Boundary - Ù…Ø¹Ø§Ù„Ø¬ Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ Ø§Ù„Ø´Ø§Ù…Ù„
 /// ============================================================================
 ///
-/// يلتقط الأخطاء غير المعالجة في التطبيق ويعرض واجهة بديلة
-/// بدلاً من crash التطبيق
+/// ÙŠÙ„ØªÙ‚Ø· Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ ØºÙŠØ± Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø© ÙÙŠ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ ÙˆÙŠØ¹Ø±Ø¶ ÙˆØ§Ø¬Ù‡Ø© Ø¨Ø¯ÙŠÙ„Ø©
+/// Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù† crash Ø§Ù„ØªØ·Ø¨ÙŠÙ‚
 ///
-/// الاستخدام:
+/// Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…:
 /// ```dart
 /// ErrorBoundary(
 ///   child: MyWidget(),
@@ -79,7 +79,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   }
 }
 
-/// Error Widget Builder - يلتقط الأخطاء من الـ Widget Tree
+/// Error Widget Builder - ÙŠÙ„ØªÙ‚Ø· Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ Ù…Ù† Ø§Ù„Ù€ Widget Tree
 class ErrorWidgetBuilder extends StatefulWidget {
   final Widget child;
   final void Function(Object error, StackTrace? stackTrace) onError;
@@ -97,19 +97,19 @@ class ErrorWidgetBuilder extends StatefulWidget {
 class _ErrorWidgetBuilderState extends State<ErrorWidgetBuilder> {
   @override
   Widget build(BuildContext context) {
-    // في Debug mode، لا نلتقط الأخطاء لنرى الـ Red Screen
+    // ÙÙŠ Debug modeØŒ Ù„Ø§ Ù†Ù„ØªÙ‚Ø· Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ Ù„Ù†Ø±Ù‰ Ø§Ù„Ù€ Red Screen
     if (kDebugMode) {
       return widget.child;
     }
 
-    // في Production، نستخدم ErrorWidget.builder
+    // ÙÙŠ ProductionØŒ Ù†Ø³ØªØ®Ø¯Ù… ErrorWidget.builder
     ErrorWidget.builder = (FlutterErrorDetails details) {
       widget.onError(details.exception, details.stack);
       return _DefaultErrorWidget(
         error: details.exception,
         stackTrace: details.stack,
         onRetry: () {
-          // يمكن للمستخدم الضغط للعودة
+          // ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¶ØºØ· Ù„Ù„Ø¹ÙˆØ¯Ø©
         },
       );
     };
@@ -118,7 +118,7 @@ class _ErrorWidgetBuilderState extends State<ErrorWidgetBuilder> {
   }
 }
 
-/// واجهة الخطأ الافتراضية
+/// ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ø®Ø·Ø£ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ©
 class _DefaultErrorWidget extends StatelessWidget {
   final Object error;
   final StackTrace? stackTrace;
@@ -133,7 +133,6 @@ class _DefaultErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.spacing24),
@@ -158,7 +157,7 @@ class _DefaultErrorWidget extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.spacing24),
               const Text(
-                'حدث خطأ غير متوقع',
+                'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹',
                 style: TextStyle(
                   fontSize: AppDimensions.fontHeadline,
                   fontWeight: FontWeight.bold,
@@ -168,7 +167,7 @@ class _DefaultErrorWidget extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.spacing12),
               const Text(
-                'نأسف لهذا الخطأ. يرجى المحاولة مرة أخرى\nأو التواصل مع الدعم إذا استمرت المشكلة.',
+                'Ù†Ø£Ø³Ù Ù„Ù‡Ø°Ø§ Ø§Ù„Ø®Ø·Ø£. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰\nØ£Ùˆ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ø¯Ø¹Ù… Ø¥Ø°Ø§ Ø§Ø³ØªÙ…Ø±Øª Ø§Ù„Ù…Ø´ÙƒÙ„Ø©.',
                 style: TextStyle(
                   fontSize: AppDimensions.fontBody,
                   color: AppTheme.textSecondaryColor,
@@ -211,7 +210,7 @@ class _DefaultErrorWidget extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                       ),
-                      label: const Text('إعادة المحاولة'),
+                      label: const Text('Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                         foregroundColor: Colors.white,
@@ -238,7 +237,7 @@ class _DefaultErrorWidget extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: const Text('الرئيسية'),
+                    label: const Text('Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.primaryColor,
                       side: const BorderSide(color: AppTheme.primaryColor),
@@ -261,8 +260,8 @@ class _DefaultErrorWidget extends StatelessWidget {
   }
 }
 
-/// Global Error Handler - معالج أخطاء عام
-/// يُستخدم لتسجيل الأخطاء وإرسالها لخدمة مراقبة
+/// Global Error Handler - Ù…Ø¹Ø§Ù„Ø¬ Ø£Ø®Ø·Ø§Ø¡ Ø¹Ø§Ù…
+/// ÙŠÙØ³ØªØ®Ø¯Ù… Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ ÙˆØ¥Ø±Ø³Ø§Ù„Ù‡Ø§ Ù„Ø®Ø¯Ù…Ø© Ù…Ø±Ø§Ù‚Ø¨Ø©
 class GlobalErrorHandler {
   static final GlobalErrorHandler _instance = GlobalErrorHandler._internal();
   factory GlobalErrorHandler() => _instance;
@@ -271,32 +270,32 @@ class GlobalErrorHandler {
   final List<void Function(Object error, StackTrace? stackTrace)> _listeners =
       [];
 
-  /// تهيئة معالج الأخطاء
+  /// ØªÙ‡ÙŠØ¦Ø© Ù…Ø¹Ø§Ù„Ø¬ Ø§Ù„Ø£Ø®Ø·Ø§Ø¡
   void initialize() {
-    // التقاط أخطاء Flutter
+    // Ø§Ù„ØªÙ‚Ø§Ø· Ø£Ø®Ø·Ø§Ø¡ Flutter
     FlutterError.onError = (FlutterErrorDetails details) {
       _handleError(details.exception, details.stack);
-      // في Debug، نطبع الخطأ
+      // ÙÙŠ DebugØŒ Ù†Ø·Ø¨Ø¹ Ø§Ù„Ø®Ø·Ø£
       if (kDebugMode) {
         FlutterError.dumpErrorToConsole(details);
       }
     };
 
-    // التقاط أخطاء Dart غير المعالجة
+    // Ø§Ù„ØªÙ‚Ø§Ø· Ø£Ø®Ø·Ø§Ø¡ Dart ØºÙŠØ± Ø§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø©
     PlatformDispatcher.instance.onError = (error, stack) {
       _handleError(error, stack);
       return true;
     };
   }
 
-  /// إضافة مستمع للأخطاء
+  /// Ø¥Ø¶Ø§ÙØ© Ù…Ø³ØªÙ…Ø¹ Ù„Ù„Ø£Ø®Ø·Ø§Ø¡
   void addListener(
     void Function(Object error, StackTrace? stackTrace) listener,
   ) {
     _listeners.add(listener);
   }
 
-  /// إزالة مستمع
+  /// Ø¥Ø²Ø§Ù„Ø© Ù…Ø³ØªÙ…Ø¹
   void removeListener(
     void Function(Object error, StackTrace? stackTrace) listener,
   ) {
@@ -304,34 +303,34 @@ class GlobalErrorHandler {
   }
 
   void _handleError(Object error, StackTrace? stackTrace) {
-    // تسجيل الخطأ
-    debugPrint('🔴 Error: $error');
+    // ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø·Ø£
+    debugPrint('ðŸ”´ Error: $error');
     if (stackTrace != null) {
-      debugPrint('📍 StackTrace: $stackTrace');
+      debugPrint('ðŸ“ StackTrace: $stackTrace');
     }
 
-    // إخطار المستمعين
+    // Ø¥Ø®Ø·Ø§Ø± Ø§Ù„Ù…Ø³ØªÙ…Ø¹ÙŠÙ†
     for (final listener in _listeners) {
       listener(error, stackTrace);
     }
 
-    // NOTE: يمكن إضافة تكامل مع خدمات المراقبة مثل:
+    // NOTE: ÙŠÙ…ÙƒÙ† Ø¥Ø¶Ø§ÙØ© ØªÙƒØ§Ù…Ù„ Ù…Ø¹ Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ù…Ø±Ø§Ù‚Ø¨Ø© Ù…Ø«Ù„:
     // - Firebase Crashlytics
     // - Sentry
     // _sendToMonitoringService(error, stackTrace);
   }
 }
 
-/// App Error Reporter - لتسجيل الأخطاء المخصصة
+/// App Error Reporter - Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®Ø·Ø§Ø¡ Ø§Ù„Ù…Ø®ØµØµØ©
 class AppErrorReporter {
-  /// تسجيل خطأ مخصص
+  /// ØªØ³Ø¬ÙŠÙ„ Ø®Ø·Ø£ Ù…Ø®ØµØµ
   static void reportError(
     Object error, {
     StackTrace? stackTrace,
     String? context,
     Map<String, dynamic>? extras,
   }) {
-    debugPrint('🔴 [Error Report] ${context ?? 'Unknown context'}');
+    debugPrint('ðŸ”´ [Error Report] ${context ?? 'Unknown context'}');
     debugPrint('   Error: $error');
     if (extras != null) {
       debugPrint('   Extras: $extras');
@@ -340,20 +339,20 @@ class AppErrorReporter {
       debugPrint('   Stack: $stackTrace');
     }
 
-    // NOTE: يمكن إضافة تكامل مع خدمات المراقبة هنا
+    // NOTE: ÙŠÙ…ÙƒÙ† Ø¥Ø¶Ø§ÙØ© ØªÙƒØ§Ù…Ù„ Ù…Ø¹ Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ù…Ø±Ø§Ù‚Ø¨Ø© Ù‡Ù†Ø§
   }
 
-  /// تسجيل تحذير
+  /// ØªØ³Ø¬ÙŠÙ„ ØªØ­Ø°ÙŠØ±
   static void reportWarning(String message, {Map<String, dynamic>? extras}) {
-    debugPrint('🟡 [Warning] $message');
+    debugPrint('ðŸŸ¡ [Warning] $message');
     if (extras != null) {
       debugPrint('   Extras: $extras');
     }
   }
 
-  /// تسجيل معلومة
+  /// ØªØ³Ø¬ÙŠÙ„ Ù…Ø¹Ù„ÙˆÙ…Ø©
   static void reportInfo(String message, {Map<String, dynamic>? extras}) {
-    debugPrint('🔵 [Info] $message');
+    debugPrint('ðŸ”µ [Info] $message');
     if (extras != null) {
       debugPrint('   Extras: $extras');
     }

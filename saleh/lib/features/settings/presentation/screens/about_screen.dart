@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -6,21 +6,20 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// شاشة من نحن
+/// Ø´Ø§Ø´Ø© Ù…Ù† Ù†Ø­Ù†
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SingleChildScrollView(
         padding: AppDimensions.paddingL,
         child: Column(
           children: [
             const SizedBox(height: 20),
 
-            // الشعار
+            // Ø§Ù„Ø´Ø¹Ø§Ø±
             Container(
               width: 100,
               height: 100,
@@ -42,7 +41,7 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // اسم التطبيق
+            // Ø§Ø³Ù… Ø§Ù„ØªØ·Ø¨ÙŠÙ‚
             const Text(
               'Mbuy',
               style: TextStyle(
@@ -54,15 +53,15 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // الوصف القصير
+            // Ø§Ù„ÙˆØµÙ Ø§Ù„Ù‚ØµÙŠØ±
             Text(
-              'منصة التجارة الإلكترونية الذكية',
+              'Ù…Ù†ØµØ© Ø§Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ© Ø§Ù„Ø°ÙƒÙŠØ©',
               style: TextStyle(fontSize: 16, color: AppTheme.mutedSlate),
             ),
 
             const SizedBox(height: 8),
 
-            // الإصدار
+            // Ø§Ù„Ø¥ØµØ¯Ø§Ø±
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -70,7 +69,7 @@ class AboutScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
-                'الإصدار 1.0.0',
+                'Ø§Ù„Ø¥ØµØ¯Ø§Ø± 1.0.0',
                 style: TextStyle(
                   fontSize: 12,
                   color: AppTheme.primaryColor,
@@ -81,29 +80,29 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // قصتنا
+            // Ù‚ØµØªÙ†Ø§
             _buildSection(
-              title: 'قصتنا',
+              title: 'Ù‚ØµØªÙ†Ø§',
               content: '''
-بدأت Mbuy من فكرة بسيطة: تمكين كل شخص من امتلاك متجره الإلكتروني بسهولة.
+Ø¨Ø¯Ø£Øª Mbuy Ù…Ù† ÙÙƒØ±Ø© Ø¨Ø³ÙŠØ·Ø©: ØªÙ…ÙƒÙŠÙ† ÙƒÙ„ Ø´Ø®Øµ Ù…Ù† Ø§Ù…ØªÙ„Ø§Ùƒ Ù…ØªØ¬Ø±Ù‡ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø¨Ø³Ù‡ÙˆÙ„Ø©.
 
-نؤمن بأن التجارة الإلكترونية يجب أن تكون متاحة للجميع، وليس فقط للشركات الكبيرة. لذلك أنشأنا منصة تجمع بين السهولة والقوة، مع أدوات ذكاء اصطناعي متقدمة لمساعدة التجار على النجاح.
+Ù†Ø¤Ù…Ù† Ø¨Ø£Ù† Ø§Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ© ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¬Ù…ÙŠØ¹ØŒ ÙˆÙ„ÙŠØ³ ÙÙ‚Ø· Ù„Ù„Ø´Ø±ÙƒØ§Øª Ø§Ù„ÙƒØ¨ÙŠØ±Ø©. Ù„Ø°Ù„Ùƒ Ø£Ù†Ø´Ø£Ù†Ø§ Ù…Ù†ØµØ© ØªØ¬Ù…Ø¹ Ø¨ÙŠÙ† Ø§Ù„Ø³Ù‡ÙˆÙ„Ø© ÙˆØ§Ù„Ù‚ÙˆØ©ØŒ Ù…Ø¹ Ø£Ø¯ÙˆØ§Øª Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù…ØªÙ‚Ø¯Ù…Ø© Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© Ø§Ù„ØªØ¬Ø§Ø± Ø¹Ù„Ù‰ Ø§Ù„Ù†Ø¬Ø§Ø­.
 
-اليوم، يستخدم آلاف التجار Mbuy لإدارة متاجرهم وتنمية أعمالهم.
+Ø§Ù„ÙŠÙˆÙ…ØŒ ÙŠØ³ØªØ®Ø¯Ù… Ø¢Ù„Ø§Ù Ø§Ù„ØªØ¬Ø§Ø± Mbuy Ù„Ø¥Ø¯Ø§Ø±Ø© Ù…ØªØ§Ø¬Ø±Ù‡Ù… ÙˆØªÙ†Ù…ÙŠØ© Ø£Ø¹Ù…Ø§Ù„Ù‡Ù….
 ''',
             ),
 
-            // رؤيتنا
+            // Ø±Ø¤ÙŠØªÙ†Ø§
             _buildSection(
-              title: 'رؤيتنا',
+              title: 'Ø±Ø¤ÙŠØªÙ†Ø§',
               content: '''
-أن نكون المنصة الأولى للتجارة الإلكترونية في المنطقة العربية، ونمكّن مليون تاجر من تحقيق أحلامهم التجارية بحلول 2030.
+Ø£Ù† Ù†ÙƒÙˆÙ† Ø§Ù„Ù…Ù†ØµØ© Ø§Ù„Ø£ÙˆÙ„Ù‰ Ù„Ù„ØªØ¬Ø§Ø±Ø© Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ© ÙÙŠ Ø§Ù„Ù…Ù†Ø·Ù‚Ø© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©ØŒ ÙˆÙ†Ù…ÙƒÙ‘Ù† Ù…Ù„ÙŠÙˆÙ† ØªØ§Ø¬Ø± Ù…Ù† ØªØ­Ù‚ÙŠÙ‚ Ø£Ø­Ù„Ø§Ù…Ù‡Ù… Ø§Ù„ØªØ¬Ø§Ø±ÙŠØ© Ø¨Ø­Ù„ÙˆÙ„ 2030.
 ''',
             ),
 
-            // مميزاتنا
+            // Ù…Ù…ÙŠØ²Ø§ØªÙ†Ø§
             const Text(
-              'لماذا Mbuy؟',
+              'Ù„Ù…Ø§Ø°Ø§ MbuyØŸ',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -114,34 +113,34 @@ class AboutScreen extends StatelessWidget {
 
             _buildFeatureCard(
               icon: AppIcons.bot,
-              title: 'ذكاء اصطناعي متقدم',
-              description: 'أدوات AI لتوليد الصور والمحتوى وتحسين المبيعات',
+              title: 'Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ù…ØªÙ‚Ø¯Ù…',
+              description: 'Ø£Ø¯ÙˆØ§Øª AI Ù„ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØªØ­Ø³ÙŠÙ† Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª',
               color: const Color(0xFF8B5CF6),
             ),
             _buildFeatureCard(
               icon: AppIcons.chart,
-              title: 'تحليلات شاملة',
-              description: 'رؤى عميقة لفهم عملائك وتحسين أدائك',
+              title: 'ØªØ­Ù„ÙŠÙ„Ø§Øª Ø´Ø§Ù…Ù„Ø©',
+              description: 'Ø±Ø¤Ù‰ Ø¹Ù…ÙŠÙ‚Ø© Ù„ÙÙ‡Ù… Ø¹Ù…Ù„Ø§Ø¦Ùƒ ÙˆØªØ­Ø³ÙŠÙ† Ø£Ø¯Ø§Ø¦Ùƒ',
               color: const Color(0xFF10B981),
             ),
             _buildFeatureCard(
               icon: AppIcons.shield,
-              title: 'أمان عالي',
-              description: 'حماية بياناتك ومعاملاتك بأعلى المعايير',
+              title: 'Ø£Ù…Ø§Ù† Ø¹Ø§Ù„ÙŠ',
+              description: 'Ø­Ù…Ø§ÙŠØ© Ø¨ÙŠØ§Ù†Ø§ØªÙƒ ÙˆÙ…Ø¹Ø§Ù…Ù„Ø§ØªÙƒ Ø¨Ø£Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø¹Ø§ÙŠÙŠØ±',
               color: const Color(0xFFEF4444),
             ),
             _buildFeatureCard(
               icon: AppIcons.supportAgent,
-              title: 'دعم متواصل',
-              description: 'فريق دعم متاح 24/7 لمساعدتك',
+              title: 'Ø¯Ø¹Ù… Ù…ØªÙˆØ§ØµÙ„',
+              description: 'ÙØ±ÙŠÙ‚ Ø¯Ø¹Ù… Ù…ØªØ§Ø­ 24/7 Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ',
               color: const Color(0xFF3B82F6),
             ),
 
             const SizedBox(height: 32),
 
-            // تواصل معنا
+            // ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§
             const Text(
-              'تواصل معنا',
+              'ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -155,19 +154,19 @@ class AboutScreen extends StatelessWidget {
               children: [
                 _buildSocialButton(
                   icon: AppIcons.globe,
-                  label: 'الموقع',
+                  label: 'Ø§Ù„Ù…ÙˆÙ‚Ø¹',
                   onTap: () => _launchUrl('https://mbuy.app'),
                 ),
                 const SizedBox(width: 16),
                 _buildSocialButton(
                   icon: AppIcons.chat,
-                  label: 'تويتر',
+                  label: 'ØªÙˆÙŠØªØ±',
                   onTap: () => _launchUrl('https://twitter.com/mbuyapp'),
                 ),
                 const SizedBox(width: 16),
                 _buildSocialButton(
                   icon: AppIcons.camera,
-                  label: 'انستقرام',
+                  label: 'Ø§Ù†Ø³ØªÙ‚Ø±Ø§Ù…',
                   onTap: () => _launchUrl('https://instagram.com/mbuyapp'),
                 ),
               ],
@@ -175,16 +174,16 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // حقوق النشر
+            // Ø­Ù‚ÙˆÙ‚ Ø§Ù„Ù†Ø´Ø±
             Text(
-              '© 2025 Mbuy. جميع الحقوق محفوظة.',
+              'Â© 2025 Mbuy. Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ‚ Ù…Ø­ÙÙˆØ¸Ø©.',
               style: TextStyle(fontSize: 12, color: AppTheme.mutedSlate),
             ),
 
             const SizedBox(height: 8),
 
             Text(
-              'صنع بـ ❤️ في المملكة العربية السعودية',
+              'ØµÙ†Ø¹ Ø¨Ù€ â¤ï¸ ÙÙŠ Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©',
               style: TextStyle(fontSize: 12, color: AppTheme.mutedSlate),
             ),
 

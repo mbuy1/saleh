@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -7,7 +7,7 @@ import '../../../../core/services/user_preferences_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// شاشة إعدادات المظهر
+/// Ø´Ø§Ø´Ø© Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø¸Ù‡Ø±
 class AppearanceSettingsScreen extends ConsumerWidget {
   const AppearanceSettingsScreen({super.key});
 
@@ -16,29 +16,28 @@ class AppearanceSettingsScreen extends ConsumerWidget {
     final currentThemeMode = ref.watch(preferencesStateProvider).themeMode;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header ثابت في الأعلى
+            // Header Ø«Ø§Ø¨Øª ÙÙŠ Ø§Ù„Ø£Ø¹Ù„Ù‰
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // المحتوى القابل للتمرير
+            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ù„ Ù„Ù„ØªÙ…Ø±ÙŠØ±
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
                   Text(
-                    'اختر المظهر المناسب لك',
+                    'Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¸Ù‡Ø± Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ Ù„Ùƒ',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   _ThemeOptionCard(
-                    title: 'فاتح',
-                    subtitle: 'تجربة كلاسيكية وواضحة.',
+                    title: 'ÙØ§ØªØ­',
+                    subtitle: 'ØªØ¬Ø±Ø¨Ø© ÙƒÙ„Ø§Ø³ÙŠÙƒÙŠØ© ÙˆÙˆØ§Ø¶Ø­Ø©.',
                     icon: AppIcons.sun,
                     isSelected: currentThemeMode == ThemeMode.light,
                     onTap: () {
@@ -49,8 +48,8 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _ThemeOptionCard(
-                    title: 'داكن',
-                    subtitle: 'مريح للعين في الإضاءة المنخفضة.',
+                    title: 'Ø¯Ø§ÙƒÙ†',
+                    subtitle: 'Ù…Ø±ÙŠØ­ Ù„Ù„Ø¹ÙŠÙ† ÙÙŠ Ø§Ù„Ø¥Ø¶Ø§Ø¡Ø© Ø§Ù„Ù…Ù†Ø®ÙØ¶Ø©.',
                     icon: AppIcons.moon,
                     isSelected: currentThemeMode == ThemeMode.dark,
                     onTap: () {
@@ -61,8 +60,8 @@ class AppearanceSettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _ThemeOptionCard(
-                    title: 'افتراضي النظام',
-                    subtitle: 'يتكيف مع إعدادات جهازك.',
+                    title: 'Ø§ÙØªØ±Ø§Ø¶ÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…',
+                    subtitle: 'ÙŠØªÙƒÙŠÙ Ù…Ø¹ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¬Ù‡Ø§Ø²Ùƒ.',
                     icon: AppIcons.monitor,
                     isSelected: currentThemeMode == ThemeMode.system,
                     onTap: () {
@@ -181,7 +180,7 @@ Widget _buildHeader(BuildContext context) {
       ),
       Expanded(
         child: Text(
-          'المظهر',
+          'Ø§Ù„Ù…Ø¸Ù‡Ø±',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.bold,
