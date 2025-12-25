@@ -212,24 +212,6 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       keywords: ['notifications', 'إشعارات', 'تنبيهات'],
     ),
 
-    // الدروب شيبنج
-    SearchItem(
-      title: 'دروب شيبنج',
-      subtitle: 'إدارة الدروب شيبنج',
-      icon: AppIcons.shipping,
-      route: '/dashboard/dropshipping',
-      category: 'الدروب شيبنج',
-      keywords: ['dropshipping', 'دروب', 'شيبنج', 'موردين'],
-    ),
-    SearchItem(
-      title: 'طلبات الموردين',
-      subtitle: 'طلبات من الموردين',
-      icon: AppIcons.orders,
-      route: '/dashboard/supplier-orders',
-      category: 'الدروب شيبنج',
-      keywords: ['supplier', 'موردين', 'طلبات'],
-    ),
-
     // المتجر
     SearchItem(
       title: 'عرض متجري',

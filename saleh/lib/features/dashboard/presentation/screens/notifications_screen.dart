@@ -84,7 +84,10 @@ class NotificationItem {
 
 /// شاشة الإشعارات
 class NotificationsScreen extends ConsumerStatefulWidget {
-  const NotificationsScreen({super.key});
+  /// إذا كانت true، لا تعرض AppBar (للاستخدام داخل تبويب)
+  final bool showAppBar;
+
+  const NotificationsScreen({super.key, this.showAppBar = true});
 
   @override
   ConsumerState<NotificationsScreen> createState() =>
@@ -363,6 +366,47 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // إذا كانت الشاشة مستخدمة داخل تبويب، لا نعرض AppBar
+    if (!widget.showAppBar) {
+      return DefaultTabController(
+        length: 3,
+        child: Column(
+          children: [
+            TabBar(
+              isScrollable: true,
+              labelColor: AppTheme.primaryColor,
+              unselectedLabelColor: AppTheme.textSecondaryColor,
+              indicatorColor: AppTheme.primaryColor,
+              indicatorWeight: 3,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+              tabs: const [
+                Tab(text: 'الحديثة'),
+                Tab(text: 'إشعارات المنصة'),
+                Tab(text: 'أنشطة العملاء'),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildBody(filter: 'all'),
+                  _buildBody(filter: 'platform'),
+                  _buildBody(filter: 'customer'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // عرض كامل مع AppBar للاستخدام المستقل
     return DefaultTabController(
       length: 4,
       child: Scaffold(

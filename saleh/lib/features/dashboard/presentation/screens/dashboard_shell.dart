@@ -13,13 +13,14 @@ import '../../../merchant/data/merchant_store_provider.dart';
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
 // ║                                                                           ║
 // ║   شريط التنقل السفلي + الهيدر العلوي - التصميم مثبت ومعتمد                ║
-// ║   تاريخ التثبيت: 24 ديسمبر 2025                                           ║
+// ║   تاريخ التثبيت: 25 ديسمبر 2025                                           ║
 // ║                                                                           ║
 // ║   العناصر المثبتة:                                                        ║
-// ║   • 5 تبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، استديو AI         ║
+// ║   • 4 تبويبات: الرئيسية، الطلبات، المنتجات، استديو AI                   ║
 // ║   • الأيقونة النشطة: primaryColor (Oxford Blue #00214A)                   ║
 // ║   • الهيدر العلوي الثابت مع Oxford Blue                                   ║
 // ║   • شريط الحالة بأيقونات بيضاء                                            ║
+// ║   • المحادثات: الوصول عبر أيقونة الإشعارات في الهيدر                     ║
 // ║                                                                           ║
 // ║   ⛔ ممنوع تعديل التصميم إلا بطلب صريح وواضح من المالك                     ║
 // ║   ⛔ DO NOT MODIFY design without EXPLICIT owner request                  ║
@@ -28,11 +29,12 @@ import '../../../merchant/data/merchant_store_provider.dart';
 
 /// Dashboard Shell - يحتوي على البار السفلي الثابت والهيدر العلوي
 /// يعرض الصفحات الفرعية داخله مع إبقاء البار السفلي والهيدر العلوي ظاهراً
-/// التبويبات: الرئيسية، الطلبات، المنتجات، المحادثات، استديو AI
+/// التبويبات: الرئيسية، الطلبات، المنتجات، استديو AI
+/// المحادثات: متاحة عبر أيقونة الإشعارات في الهيدر العلوي
 ///
 /// 🔒 LOCKED DESIGN - تصميم مثبت
-/// Last updated: 2025-12-24
-/// تم إضافة الهيدر العلوي الثابت مع Oxford Blue
+/// Last updated: 2025-12-25
+/// تم تقليص البار السفلي إلى 4 تبويبات ونقل المحادثات للهيدر
 class DashboardShell extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -44,7 +46,8 @@ class DashboardShell extends ConsumerStatefulWidget {
 
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   /// الحصول على الـ index الحالي بناءً على المسار
-  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، المحادثات(3)، استديو AI(4)
+  /// الترتيب: الرئيسية(0)، الطلبات(1)، المنتجات(2)، استديو AI(3)
+  /// المحادثات: لا تظهر في البار السفلي (الوصول عبر الإشعارات)
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
 
@@ -52,11 +55,11 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     if (location.startsWith('/dashboard/products')) {
       return 2; // صفحة المنتجات
     }
-    if (location.startsWith('/dashboard/conversations')) return 3;
     if (location.startsWith('/dashboard/studio') ||
         location.startsWith('/dashboard/content-studio')) {
-      return 4; // استديو AI في البار السفلي
+      return 3; // استديو AI في البار السفلي
     }
+    // المحادثات لا تظهر في البار السفلي
     return 0; // home
   }
 
@@ -73,9 +76,6 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
         context.go('/dashboard/products');
         break;
       case 3:
-        context.go('/dashboard/conversations');
-        break;
-      case 4:
         // استديو AI في البار السفلي
         context.go('/dashboard/studio');
         break;
@@ -565,7 +565,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               ),
               _buildHeaderButton(
                 Icons.notifications_outlined,
-                () => context.push('/notification-settings'),
+                () => context.push('/dashboard/inbox'),
               ),
               _buildHeaderButton(
                 Icons.bolt,
@@ -702,17 +702,10 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
               isDark: isDark,
             ),
             _buildNavItem(
-              icon: AppIcons.chat,
-              label: 'المحادثات',
-              isSelected: currentIndex == 3,
-              onTap: () => _onItemTapped(3, context),
-              isDark: isDark,
-            ),
-            _buildNavItem(
               icon: AppIcons.studio,
               label: 'استديو AI',
-              isSelected: currentIndex == 4,
-              onTap: () => _onItemTapped(4, context),
+              isSelected: currentIndex == 3,
+              onTap: () => _onItemTapped(3, context),
               isDark: isDark,
             ),
           ],

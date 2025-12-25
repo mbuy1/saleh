@@ -12,7 +12,7 @@
 | البند | الحالة | التفاصيل |
 |-------|--------|----------|
 | **إجمالي الشاشات** | **85+** | شاشات/صفحات/تبويبات |
-| **Routes مسجلة** | **56+** | في GoRouter |
+| **Routes مسجلة** | **54+** | في GoRouter |
 | **Entry Points** | **1** | `main.dart` → `AppShell` |
 | **MaterialApp instances** | **3** | (1 للـ Router + 2 للحالات الخاصة) |
 | **شاشات مكررة** | **2** | يحتاج مراجعة |
@@ -24,6 +24,11 @@
 2. **2 ملفات مكررة (backup)**
 3. **2 شاشات LoginScreen متطابقة** (shared vs auth)
 4. **1 Route redirect** (`/dashboard/promotions` → `/dashboard`)
+
+### ✅ آخر التحديثات (25 ديسمبر 2025):
+1. **البار السفلي:** تم تثبيته على 4 تبويبات فقط (الرئيسية، الطلبات، المنتجات، استديو AI)
+2. **المحادثات:** تم نقلها من البار السفلي - الوصول عبر أيقونة الإشعارات في الهيدر
+3. **Dropshipping:** تم حذف الميزة نهائياً (Routes، Screens، References)
 
 ---
 
@@ -77,11 +82,8 @@
 | `BoostSalesScreen` | `boost_sales_screen.dart` | ✅ مستخدم في Route `/dashboard/boost-sales` |
 | `PromotionsScreen` | `promotions_screen.dart` | ⚠️ **Route redirect** - Route موجود لكن redirect لـ `/dashboard` |
 
-### 📂 features/dropshipping/presentation/screens/ (2 ملف)
-| الكلاس | الملف | الحالة |
-|--------|-------|--------|
-| `DropshippingScreen` | `dropshipping_screen.dart` | ✅ مستخدم في Route `/dashboard/dropshipping` |
-| `SupplierOrdersScreen` | `supplier_orders_screen.dart` | ✅ مستخدم في Route `/dashboard/supplier-orders` |
+### 📂 features/dropshipping/presentation/screens/ (تم حذفها ✅)
+**تم حذف ميزة Dropshipping بالكامل - 25 ديسمبر 2025**
 
 ### 📂 features/products/presentation/screens/ (3 ملفات)
 | الكلاس | الملف | الحالة |
@@ -392,14 +394,15 @@ main.dart (line 15)
 
 ### 📱 شجرة التنقل الأساسية:
 
-#### Bottom Navigation Bar (5 تبويبات):
+#### Bottom Navigation Bar (4 تبويبات):
 ```
 DashboardShell
 ├── [0] الرئيسية → /dashboard → HomeTab
 ├── [1] الطلبات → /dashboard/orders → OrdersTab  
 ├── [2] المنتجات → /dashboard/products → ProductsTab
-├── [3] المحادثات → /dashboard/conversations → ConversationsScreen
-└── [4] دروب شيب → /dashboard/dropshipping → DropshippingScreen
+└── [3] استديو AI → /dashboard/studio → StudioMainPage
+
+ملاحظة: المحادثات متاحة عبر أيقونة الإشعارات في الهيدر العلوي
 ```
 
 #### Nested Routes من الرئيسية (/dashboard):
@@ -526,17 +529,22 @@ GoRoute(
 
 | الفئة | العدد |
 |-------|------|
-| **إجمالي الشاشات** | 85+ |
-| **Routes مسجلة** | 56+ |
+| **إجمالي الشاشات** | 83 |
+| **Routes مسجلة** | 54 |
 | **Nested Routes** | 5 |
 | **Shell Routes** | 1 (DashboardShell) |
 | **Auth Routes** | 3 |
 | **Settings Routes** | 6 |
-| **Dashboard Routes** | 45+ |
+| **Dashboard Routes** | 43 |
 | **Dead Screens** | 8 |
 | **Duplicate Files** | 2 |
 | **MaterialApp Instances** | 3 (1 router + 2 temp) |
 | **Entry Points** | 1 |
+
+**التحديثات الأخيرة (25 ديسمبر 2025):**
+- ✅ تم تقليص البار السفلي من 5 إلى 4 تبويبات
+- ✅ تم حذف ميزة Dropshipping كاملةً (2 screens، 2 routes)
+- ✅ تم نقل المحادثات من البار السفلي إلى الهيدر العلوي
 
 ---
 

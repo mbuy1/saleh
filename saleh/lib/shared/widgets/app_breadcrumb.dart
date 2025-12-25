@@ -291,11 +291,6 @@ class BreadcrumbHelper {
       route: '/dashboard/customers',
       icon: AppIcons.people,
     ),
-    '/dashboard/dropshipping': const BreadcrumbItem(
-      label: 'دروب شيبنج',
-      route: '/dashboard/dropshipping',
-      icon: AppIcons.shipping,
-    ),
     '/dashboard/inventory': const BreadcrumbItem(
       label: 'المخزون',
       route: '/dashboard/inventory',

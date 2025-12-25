@@ -16,6 +16,7 @@ import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
 import '../../features/dashboard/presentation/screens/shortcuts_screen.dart';
 import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
 import '../../features/dashboard/presentation/screens/notifications_screen.dart';
+import '../../features/dashboard/presentation/screens/inbox_screen.dart';
 import '../../features/dashboard/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/reports_screen.dart';
 // Finance
@@ -31,9 +32,6 @@ import '../../features/store/presentation/screens/store_tools_tab.dart';
 import '../../apps/merchant/features/webstore/webstore_screen.dart';
 import '../../apps/merchant/features/shipping/shipping_screen.dart';
 import '../../apps/merchant/features/payments/payment_methods_screen.dart';
-// Dropshipping
-import '../../features/dropshipping/presentation/screens/dropshipping_screen.dart';
-import '../../features/dropshipping/presentation/screens/supplier_orders_screen.dart';
 // Marketing
 import '../../features/marketing/presentation/screens/marketing_screen.dart';
 import '../../features/marketing/presentation/screens/coupons_screen.dart';
@@ -284,14 +282,9 @@ class AppRouter {
                   builder: (context, state) => const NotificationsScreen(),
                 ),
                 GoRoute(
-                  path: 'dropshipping',
-                  name: 'dropshipping',
-                  builder: (context, state) => const DropshippingScreen(),
-                ),
-                GoRoute(
-                  path: 'supplier-orders',
-                  name: 'supplier-orders',
-                  builder: (context, state) => const SupplierOrdersScreen(),
+                  path: 'inbox',
+                  name: 'inbox',
+                  builder: (context, state) => const InboxScreen(),
                 ),
                 GoRoute(
                   path: 'packages',
