@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -27,11 +29,11 @@ void main() async {
 
   for (final file in dartFiles) {
     final filePath = file.path.replaceAll('\\', '/');
-    
+
     try {
       // قراءة البايتات الخام
       final bytes = await file.readAsBytes();
-      
+
       // محاولة فك الترميز كـ Latin-1
       String content;
       try {
@@ -40,10 +42,13 @@ void main() async {
         // إذا فشل Latin-1، نستخدم UTF-8 مباشرة
         content = utf8.decode(bytes, allowMalformed: true);
       }
-      
+
       // إعادة ترميز كـ UTF-8
-      final fixedContent = utf8.decode(latin1.encode(content), allowMalformed: true);
-      
+      final fixedContent = utf8.decode(
+        latin1.encode(content),
+        allowMalformed: true,
+      );
+
       // حساب الفروقات
       int diffs = 0;
       for (int i = 0; i < content.length && i < fixedContent.length; i++) {
@@ -51,12 +56,12 @@ void main() async {
           diffs++;
         }
       }
-      
+
       if (diffs > 0) {
         // حفظ مع ضمان UTF-8
         final outputBytes = utf8.encode(fixedContent);
         await file.writeAsBytes(outputBytes, flush: true);
-        
+
         print('✅ ${filePath.split('/').last.padRight(40)} - $diffs حرف');
         totalFixed++;
         totalChars += diffs;
@@ -77,7 +82,7 @@ void main() async {
   print('   • الملفات السليمة: $totalSkipped');
   print('   • إجمالي الأحرف المستبدلة: $totalChars');
   print('=' * 70);
-  
+
   if (totalFixed > 0) {
     print('\n⚠️  تحذير: تم إصلاح $totalFixed ملف!');
     print('   يجب الآن:');
