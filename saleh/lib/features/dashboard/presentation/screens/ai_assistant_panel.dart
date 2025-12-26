@@ -180,7 +180,7 @@ class _AIAssistantPanelState extends State<AIAssistantPanel> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppTheme.primaryColor.withOpacity(0.3),
+            color: AppTheme.primaryColor.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -249,7 +249,7 @@ class _AIAssistantPanelState extends State<AIAssistantPanel> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -283,7 +283,7 @@ class _AIAssistantPanelState extends State<AIAssistantPanel> {
             onPressed: _sendMessage,
             icon: const Icon(Icons.send, color: AppTheme.primaryColor),
             style: IconButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+              backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
             ),
           ),
         ],

@@ -41,7 +41,7 @@ class _SearchPanelState extends State<SearchPanel> {
           style: const TextStyle(color: Colors.white, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'ابحث عن منتجات، طلبات، عملاء...',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             border: InputBorder.none,
             prefixIcon: const Icon(Icons.search, color: Colors.white),
             suffixIcon: _searchController.text.isNotEmpty

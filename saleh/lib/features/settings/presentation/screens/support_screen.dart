@@ -7,7 +7,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// Ø´Ø§Ø´Ø© الØ¯Ø¹Ù… ÙˆالÙ…Ø³Ø§Ø¹Ø¯Ø©
+/// شاشة الØ¯Ø¹Ù… ÙˆالÙ…Ø³Ø§Ø¹Ø¯Ø©
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
 
@@ -133,9 +133,9 @@ class SupportScreen extends StatelessWidget {
                           'Ø§Ø¶ØºØ· على Ø²Ø± + ÙÙŠ الØ´Ø±ÙŠØ· الØ³ÙÙ„ÙŠØŒ Ø«Ù… Ø£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§Øª المنØªØ¬ (الØ§Ø³Ù…ØŒ الØ³Ø¹Ø±ØŒ الØµÙˆØ±ØŒ الÙˆØµÙ) ÙˆØ§Ø¶ØºØ· على "Ø­ÙØ¸".',
                     ),
                     _FAQItem(
-                      question: 'ÙƒÙŠÙ Ø£Ø´ØªØ±ÙŠ Ù†Ù‚Ø§Ø·ØŸ',
+                      question: 'ÙƒÙŠÙ Ø£Ø´ØªØ±ÙŠ نقاطØŸ',
                       answer:
-                          'Ø§Ø°Ù‡Ø¨ إلى ØµÙØ­Ø© "الÙ†Ù‚Ø§Ø·" من الرئيسيةØŒ Ø«Ù… Ø§Ø®ØªØ± الØ¨Ø§Ù‚Ø© المنØ§Ø³Ø¨Ø© ÙˆØ§ØªØ¨Ø¹ Ø®Ø·ÙˆØ§Øª الØ¯ÙØ¹.',
+                          'Ø§Ø°Ù‡Ø¨ إلى ØµÙØ­Ø© "النقاط" من الرئيسيةØŒ Ø«Ù… Ø§Ø®ØªØ± الØ¨Ø§Ù‚Ø© المنØ§Ø³Ø¨Ø© ÙˆØ§ØªØ¨Ø¹ Ø®Ø·ÙˆØ§Øª الØ¯ÙØ¹.',
                     ),
                     _FAQItem(
                       question: 'Ù…Ø§ Ù‡ÙŠ أدوات AIØŸ',
@@ -347,7 +347,7 @@ class SupportScreen extends StatelessWidget {
 
   Future<void> _launchWhatsApp(BuildContext context) async {
     final url = Uri.parse(
-      'https://wa.me/966500000000?text=Ù…Ø±Ø­Ø¨Ø§Ù‹ØŒ Ø£Ø­ØªØ§Ø¬ Ù…Ø³Ø§Ø¹Ø¯Ø©',
+      'https://wa.me/966500000000?text=مرحباًØŒ Ø£Ø­ØªØ§Ø¬ Ù…Ø³Ø§Ø¹Ø¯Ø©',
     );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -364,7 +364,7 @@ class SupportScreen extends StatelessWidget {
   }
 
   Future<void> _launchEmail(BuildContext context) async {
-    final url = Uri.parse('mailto:support@mbuy.app?subject=Ø·Ù„Ø¨ Ø¯Ø¹Ù…');
+    final url = Uri.parse('mailto:support@mbuy.app?subject=طلب Ø¯Ø¹Ù…');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {

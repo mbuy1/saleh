@@ -51,7 +51,7 @@ class _NotificationsPanelState extends State<NotificationsPanel>
           controller: _tabController,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
           tabs: const [
             Tab(text: 'الكل'),
             Tab(text: 'غير مقروءة'),
@@ -79,7 +79,7 @@ class _NotificationsPanelState extends State<NotificationsPanel>
             Icon(
               Icons.notifications_outlined,
               size: 80,
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -118,7 +118,7 @@ class _NotificationsPanelState extends State<NotificationsPanel>
         decoration: BoxDecoration(
           color: notification.isRead
               ? Colors.white
-              : AppTheme.primaryColor.withOpacity(0.05),
+              : AppTheme.primaryColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.grey.withValues(alpha: 0.2),

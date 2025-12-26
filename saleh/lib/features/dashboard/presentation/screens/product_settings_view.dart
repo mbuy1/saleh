@@ -33,10 +33,11 @@ class _ProductSettingsViewState extends ConsumerState<ProductSettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    final storeState = ref.watch(merchantStoreControllerProvider);
-    final settings = storeState.store?.settings ?? {};
+    final storeAsync = ref.watch(merchantStoreControllerProvider);
+    final store = storeAsync.hasValue ? storeAsync.value : null;
+    final settings = store?.settings ?? {};
 
-    if (storeState.isLoading) {
+    if (storeAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 

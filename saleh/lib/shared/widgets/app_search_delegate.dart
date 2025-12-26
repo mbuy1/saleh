@@ -222,12 +222,12 @@ class AppSearchDelegate extends SearchDelegate<String?> {
       keywords: ['store', 'متجر', 'معاينة', 'عرض'],
     ),
     SearchItem(
-      title: 'حزم التوفير',
-      subtitle: 'باقات وحزم الاشتراك',
+      title: 'المشاريع',
+      subtitle: 'إدارة مشاريعك',
       icon: AppIcons.package,
-      route: '/dashboard/packages',
+      route: '/dashboard/projects',
       category: 'المتجر',
-      keywords: ['packages', 'حزم', 'باقات', 'اشتراك'],
+      keywords: ['projects', 'مشاريع', 'مشروع'],
     ),
     SearchItem(
       title: 'متجرك الإلكتروني',

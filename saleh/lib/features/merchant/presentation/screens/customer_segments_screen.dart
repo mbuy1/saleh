@@ -4,8 +4,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class CustomerSegmentsScreen extends StatefulWidget {
   const CustomerSegmentsScreen({super.key});
@@ -136,7 +136,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                         ),
                         const Expanded(
                           child: Text(
-                            'ØªØµÙ†ÙŠÙ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+                            'ØªØµÙ†ÙŠÙ العملاء',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -420,7 +420,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               children: [
                 Expanded(
                   child: _buildSummaryCard(
-                    'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+                    'Ø¥Ø¬Ù…Ø§Ù„ÙŠ العملاء',
                     '$total',
                     Colors.blue,
                   ),
@@ -440,7 +440,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               children: [
                 Expanded(
                   child: _buildSummaryCard(
-                    'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø§Ù„Ù…Ø®Ù„ØµÙŠÙ†',
+                    'العملاء Ø§Ù„Ù…Ø®Ù„ØµÙŠÙ†',
                     '${tiers['loyal'] ?? 0}',
                     Colors.green,
                   ),
@@ -460,7 +460,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
 
             // Tier distribution
             const Text(
-              'ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø­Ø³Ø¨ Ø§Ù„ØªØµÙ†ÙŠÙ',
+              'ØªÙˆØ²ÙŠØ¹ العملاء Ø­Ø³Ø¨ Ø§Ù„ØªØµÙ†ÙŠÙ',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppDimensions.spacing12),
@@ -473,14 +473,14 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Ø£ÙØ¶Ù„ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+                  'Ø£ÙØ¶Ù„ العملاء',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
                   onPressed: () {
                     // Show all customers
                   },
-                  child: const Text('Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„'),
+                  child: const Text('عرض الكل'),
                 ),
               ],
             ),
@@ -614,7 +614,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
             _buildTierBadge(tier),
             const SizedBox(width: AppDimensions.spacing8),
             Text(
-              '$totalOrders Ø·Ù„Ø¨',
+              '$totalOrders طلب',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
@@ -788,7 +788,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                 const SizedBox(height: AppDimensions.spacing12),
                 SwitchListTile(
                   title: const Text('ØªØµÙ†ÙŠÙ ØªÙ„Ù‚Ø§Ø¦ÙŠ'),
-                  subtitle: const Text('ØªØ¹Ø¨Ø¦Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
+                  subtitle: const Text('ØªØ¹Ø¨Ø¦Ø© العملاء ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
                   value: isAuto,
                   onChanged: (v) => setDialogState(() => isAuto = v),
                 ),
@@ -832,7 +832,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -921,7 +921,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -959,7 +959,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -1043,7 +1043,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
   }
 
   Widget _buildCustomersList(Map<String, dynamic> segment) {
-    // Ù…Ø­Ø§ÙƒØ§Ø© Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙŠØ­Ø©
+    // Ù…Ø­Ø§ÙƒØ§Ø© Ù‚Ø§Ø¦Ù…Ø© العملاء Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙŠØ­Ø©
     final customers = _generateMockCustomers(segment);
 
     if (customers.isEmpty) {
@@ -1093,12 +1093,12 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                   children: [
                     _buildCustomerStat(
                       Icons.shopping_cart,
-                      '${customer['orders']} Ø·Ù„Ø¨',
+                      '${customer['orders']} طلب',
                     ),
                     const SizedBox(width: AppDimensions.spacing16),
                     _buildCustomerStat(
                       Icons.attach_money,
-                      '${customer['total_spent']} Ø±.Ø³',
+                      '${customer['total_spent']} ر.س',
                     ),
                   ],
                 ),
@@ -1288,10 +1288,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
               ]),
               const SizedBox(height: AppDimensions.spacing16),
               _buildDetailCard('Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø§Ù„Ø´Ø±Ø§Ø¡', [
-                _buildDetailRow('Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª', '${customer['orders']}'),
+                _buildDetailRow('عدد الطلبات', '${customer['orders']}'),
                 _buildDetailRow(
                   'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø´ØªØ±ÙŠØ§Øª',
-                  '${customer['total_spent']} Ø±.Ø³',
+                  '${customer['total_spent']} ر.س',
                 ),
                 _buildDetailRow('Ø§Ù„Ø´Ø±ÙŠØ­Ø©', customer['segment']),
               ]),
@@ -1313,10 +1313,10 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
-                        // ÙØªØ­ ØµÙØ­Ø© Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„
+                        // ÙØªØ­ ØµÙØ­Ø© طلبØ§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„
                       },
                       icon: const Icon(Icons.shopping_bag),
-                      label: const Text('Ø§Ù„Ø·Ù„Ø¨Ø§Øª'),
+                      label: const Text('Ø§Ù„طلبØ§Øª'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),
@@ -1403,7 +1403,7 @@ class _CustomerSegmentsScreenState extends State<CustomerSegmentsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
         ],
       ),

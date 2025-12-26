@@ -5,8 +5,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class CustomMessagesScreen extends StatefulWidget {
   const CustomMessagesScreen({super.key});
@@ -231,7 +231,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'Ø±Ø³Ø§Ø¦Ù„ Ø¢Ø®Ø± 30 ÙŠÙˆÙ…',
+                    'Ø±Ø³Ø§Ø¦Ù„ Ø¢Ø®Ø± 30 يوم',
                     '${messageStats['total'] ?? 0}',
                     Icons.message,
                     Colors.purple,
@@ -287,7 +287,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                 ),
                 TextButton(
                   onPressed: () => _tabController.animateTo(1),
-                  child: const Text('Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„'),
+                  child: const Text('عرض الكل'),
                 ),
               ],
             ),
@@ -503,7 +503,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       TextButton(
                         onPressed: () => _cancelCampaign(campaign['id']),
                         child: const Text(
-                          'Ø¥Ù„ØºØ§Ø¡',
+                          'إلغاء',
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
@@ -831,11 +831,11 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
   String _getTriggerLabel(String trigger) {
     switch (trigger) {
       case 'order_placed':
-        return 'Ø¹Ù†Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨';
+        return 'Ø¹Ù†Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„طلب';
       case 'order_shipped':
-        return 'Ø¹Ù†Ø¯ Ø´Ø­Ù† Ø§Ù„Ø·Ù„Ø¨';
+        return 'Ø¹Ù†Ø¯ Ø´Ø­Ù† Ø§Ù„طلب';
       case 'order_delivered':
-        return 'Ø¹Ù†Ø¯ ØªÙˆØµÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨';
+        return 'Ø¹Ù†Ø¯ ØªÙˆØµÙŠÙ„ Ø§Ù„طلب';
       case 'cart_abandoned':
         return 'Ø³Ù„Ø© Ù…ØªØ±ÙˆÙƒØ©';
       case 'new_customer':
@@ -845,7 +845,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       case 'customer_birthday':
         return 'Ø¹ÙŠØ¯ Ù…ÙŠÙ„Ø§Ø¯ Ø§Ù„Ø¹Ù…ÙŠÙ„';
       case 'review_request':
-        return 'Ø·Ù„Ø¨ ØªÙ‚ÙŠÙŠÙ…';
+        return 'طلب ØªÙ‚ÙŠÙŠÙ…';
       default:
         return trigger;
     }
@@ -896,7 +896,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©')));
+      ).showSnackBar(const SnackBar(content: Text('ØªÙ… إلغاء Ø§Ù„Ø­Ù…Ù„Ø©')));
       _loadData();
     } catch (e) {
       if (!mounted) return;
@@ -945,7 +945,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     DropdownMenuItem(value: 'whatsapp', child: Text('ÙˆØ§ØªØ³Ø§Ø¨')),
                     DropdownMenuItem(
                       value: 'email',
-                      child: Text('Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'),
+                      child: Text('البريد الإلكتروني'),
                     ),
                     DropdownMenuItem(value: 'push', child: Text('Ø¥Ø´Ø¹Ø§Ø± ÙÙˆØ±ÙŠ')),
                   ],
@@ -956,8 +956,8 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                   controller: phoneController,
                   decoration: InputDecoration(
                     labelText: selectedChannel == 'email'
-                        ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'
-                        : 'Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ',
+                        ? 'البريد الإلكتروني'
+                        : 'رقم الهاتف',
                     hintText: selectedChannel == 'email'
                         ? 'example@mail.com'
                         : '+966 5XX XXX XXXX',
@@ -995,7 +995,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1028,7 +1028,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     // ignore: use_build_context_synchronously
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('âœ“ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­'),
+                        content: Text('âœ“ ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ© بنجاح'),
                         backgroundColor: AppTheme.successColor,
                       ),
                     );
@@ -1088,7 +1088,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       ),
                       DropdownMenuItem(
                         value: 'email',
-                        child: Text('Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'),
+                        child: Text('البريد الإلكتروني'),
                       ),
                       DropdownMenuItem(
                         value: 'push',
@@ -1111,10 +1111,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     items: const [
                       DropdownMenuItem(
                         value: 'all',
-                        child: Text('Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'),
+                        child: Text('Ø¬Ù…ÙŠØ¹ العملاء'),
                       ),
                       DropdownMenuItem(value: 'vip', child: Text('Ø¹Ù…Ù„Ø§Ø¡ VIP')),
-                      DropdownMenuItem(value: 'new', child: Text('Ø¹Ù…Ù„Ø§Ø¡ Ø¬Ø¯Ø¯')),
+                      DropdownMenuItem(value: 'new', child: Text('عملاء جدد')),
                       DropdownMenuItem(
                         value: 'inactive',
                         child: Text('Ø¹Ù…Ù„Ø§Ø¡ ØºÙŠØ± Ù†Ø´Ø·ÙŠÙ†'),
@@ -1168,7 +1168,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1190,7 +1190,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ù…Ù„Ø© "$campaignName" Ø¨Ù†Ø¬Ø§Ø­'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ù…Ù„Ø© "$campaignName" بنجاح'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1244,7 +1244,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     items: const [
                       DropdownMenuItem(
                         value: 'order_completed',
-                        child: Text('Ø¨Ø¹Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø·Ù„Ø¨'),
+                        child: Text('Ø¨Ø¹Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„طلب'),
                       ),
                       DropdownMenuItem(
                         value: 'order_shipped',
@@ -1264,7 +1264,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                       ),
                       DropdownMenuItem(
                         value: 'inactive_30days',
-                        child: Text('Ø¹Ø¯Ù… Ù†Ø´Ø§Ø· 30 ÙŠÙˆÙ…'),
+                        child: Text('Ø¹Ø¯Ù… Ù†Ø´Ø§Ø· 30 يوم'),
                       ),
                     ],
                     onChanged: (v) => setDialogState(() => trigger = v!),
@@ -1296,10 +1296,10 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ),
                     items: const [
                       DropdownMenuItem(value: 0, child: Text('ÙÙˆØ±ÙŠ')),
-                      DropdownMenuItem(value: 30, child: Text('30 Ø¯Ù‚ÙŠÙ‚Ø©')),
-                      DropdownMenuItem(value: 60, child: Text('Ø³Ø§Ø¹Ø©')),
+                      DropdownMenuItem(value: 30, child: Text('30 دقيقة')),
+                      DropdownMenuItem(value: 60, child: Text('ساعة')),
                       DropdownMenuItem(value: 180, child: Text('3 Ø³Ø§Ø¹Ø§Øª')),
-                      DropdownMenuItem(value: 1440, child: Text('ÙŠÙˆÙ…')),
+                      DropdownMenuItem(value: 1440, child: Text('يوم')),
                     ],
                     onChanged: (v) => setDialogState(() => delayMinutes = v!),
                   ),
@@ -1310,7 +1310,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1332,7 +1332,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø£ØªÙ…ØªØ© "$automationName" Ø¨Ù†Ø¬Ø§Ø­'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø£ØªÙ…ØªØ© "$automationName" بنجاح'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1384,7 +1384,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                     ),
                     items: const [
                       DropdownMenuItem(value: 'general', child: Text('Ø¹Ø§Ù…')),
-                      DropdownMenuItem(value: 'order', child: Text('Ø·Ù„Ø¨Ø§Øª')),
+                      DropdownMenuItem(value: 'order', child: Text('طلبØ§Øª')),
                       DropdownMenuItem(
                         value: 'marketing',
                         child: Text('ØªØ³ÙˆÙŠÙ‚'),
@@ -1429,7 +1429,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1449,7 +1449,7 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ù„Ø¨ "$templateName" Ø¨Ù†Ø¬Ø§Ø­'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ù„Ø¨ "$templateName" بنجاح'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1523,12 +1523,12 @@ class _CustomMessagesScreenState extends State<CustomMessagesScreen>
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©'),
+                            content: Text('ØªÙ… إلغاء Ø§Ù„Ø­Ù…Ù„Ø©'),
                             backgroundColor: Colors.orange,
                           ),
                         );
                       },
-                      child: const Text('Ø¥Ù„ØºØ§Ø¡ Ø§Ù„Ø­Ù…Ù„Ø©'),
+                      child: const Text('إلغاء Ø§Ù„Ø­Ù…Ù„Ø©'),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing12),

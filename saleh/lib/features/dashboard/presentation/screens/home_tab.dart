@@ -18,76 +18,94 @@ import '../../../merchant/domain/models/store.dart';
 // ╚═══════════════════════════════════════════════════════════════════════════╝
 
 /// الصفحة الرئيسية للتاجر - تصميم زجاجي
-class HomeTab extends ConsumerStatefulWidget {
+/// تستخدم ConsumerWidget مع AsyncNotifier لتحميل البيانات تلقائياً
+class HomeTab extends ConsumerWidget {
   const HomeTab({super.key});
 
   @override
-  ConsumerState<HomeTab> createState() => _HomeTabState();
-}
-
-class _HomeTabState extends ConsumerState<HomeTab> {
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadData();
-    });
-  }
-
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    await ref
-        .read(merchantStoreControllerProvider.notifier)
-        .loadMerchantStore();
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final storeState = ref.watch(merchantStoreControllerProvider);
-    final store = storeState.store;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storeAsync = ref.watch(merchantStoreControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: AppTheme.background(isDark),
       body: RefreshIndicator(
-        onRefresh: _loadData,
+        onRefresh: () => ref.read(merchantStoreControllerProvider.notifier).refresh(),
         color: AppTheme.primaryColor,
-        child: _isLoading
-            ? const SkeletonHomeDashboard()
-            : CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        const SizedBox(height: 16),
-                        // رابط المتجر
-                        _buildStoreLinkCard(store?.name ?? 'mbuy'),
-                        const SizedBox(height: 16),
-                        // شبكة الإحصائيات 2×2
-                        _buildStatsGrid(context, store),
-                        const SizedBox(height: 16),
-                        // شبكة الأيقونات المربعة
-                        _buildFeaturesGrid(context),
-                        const SizedBox(height: 100),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
+        child: storeAsync.when(
+          loading: () => const SkeletonHomeDashboard(),
+          error: (error, stack) => _buildErrorView(context, ref, error, isDark),
+          data: (store) => _buildContent(context, ref, store, isDark),
+        ),
       ),
     );
   }
 
+  /// عرض الخطأ
+  Widget _buildErrorView(BuildContext context, WidgetRef ref, Object error, bool isDark) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverFillRemaining(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppTheme.errorColor.withValues(alpha: 0.5),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'حدث خطأ في تحميل البيانات',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppTheme.textSecondary(isDark),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () => ref.read(merchantStoreControllerProvider.notifier).refresh(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('إعادة المحاولة'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// المحتوى الرئيسي
+  Widget _buildContent(BuildContext context, WidgetRef ref, Store? store, bool isDark) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              const SizedBox(height: 16),
+              // رابط المتجر
+              _buildStoreLinkCard(context, store?.name ?? 'mbuy', isDark),
+              const SizedBox(height: 16),
+              // شبكة الإحصائيات 2×2
+              _buildStatsGrid(context, store, isDark),
+              const SizedBox(height: 16),
+              // شبكة الأيقونات المربعة
+              _buildFeaturesGrid(context, isDark),
+              const SizedBox(height: 100),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
   /// بطاقة رابط المتجر
-  Widget _buildStoreLinkCard(String storeName) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildStoreLinkCard(BuildContext context, String storeName, bool isDark) {
     final storeSlug = storeName.replaceAll(' ', '-').toLowerCase();
     final storeUrl = 'tabayu.com/$storeSlug';
 
@@ -204,19 +222,18 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   /// شبكة الإحصائيات 2×2 - Minimal Design
-  Widget _buildStatsGrid(BuildContext context, Store? store) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+  Widget _buildStatsGrid(BuildContext context, Store? store, bool isDark) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
+                context: context,
                 icon: Icons.account_balance_wallet_outlined,
                 value: '0.00',
                 suffix: 'ر.س',
-                label: 'الرصيد',
+                label: 'المحفظة',
                 onTap: () => context.push('/dashboard/wallet'),
                 isDark: isDark,
               ),
@@ -224,10 +241,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
+                context: context,
                 icon: Icons.stars_outlined,
                 value: '0',
                 suffix: 'نقطة',
-                label: 'النقاط',
+                label: 'نقاط الولاء',
                 onTap: () => context.push('/dashboard/points'),
                 isDark: isDark,
               ),
@@ -239,6 +257,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           children: [
             Expanded(
               child: _buildStatCard(
+                context: context,
                 icon: Icons.people_outline,
                 value: '${store?.followersCount ?? 0}',
                 suffix: '',
@@ -250,6 +269,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
+                context: context,
                 icon: Icons.shopping_bag_outlined,
                 value: '0',
                 suffix: '',
@@ -266,6 +286,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   /// كارت إحصائية - Minimal مع أيقونة مربعة
   Widget _buildStatCard({
+    required BuildContext context,
     required IconData icon,
     required String value,
     required String suffix,
@@ -351,17 +372,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 
   /// شبكة الميزات - أيقونات مربعة Minimal
-  Widget _buildFeaturesGrid(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+  Widget _buildFeaturesGrid(BuildContext context, bool isDark) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.info_outline,
-                label: 'من نحن',
+                label: 'عن التطبيق',
                 onTap: () => context.push('/dashboard/about'),
                 isDark: isDark,
               ),
@@ -369,8 +389,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.receipt_long_outlined,
-                label: 'السجلات',
+                label: 'التقارير',
                 onTap: () => context.push('/dashboard/reports'),
                 isDark: isDark,
               ),
@@ -378,8 +399,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.campaign_outlined,
-                label: 'التسويق',
+                label: 'الحملات',
                 onTap: () => context.push('/dashboard/marketing'),
                 isDark: isDark,
               ),
@@ -391,6 +413,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           children: [
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.store_outlined,
                 label: 'التطبيقات',
                 onTap: () => context.push('/dashboard/store'),
@@ -400,6 +423,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.trending_up_outlined,
                 label: 'ضاعف ظهورك',
                 onTap: () => context.push('/dashboard/boost-sales'),
@@ -410,9 +434,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildFeatureCard(
+                context: context,
                 icon: Icons.card_giftcard_outlined,
-                label: 'حزم التوفير',
-                onTap: () => context.push('/dashboard/packages'),
+                label: 'المشاريع',
+                onTap: () => context.push('/dashboard/projects'),
                 isDark: isDark,
               ),
             ),
@@ -424,6 +449,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   /// كارت ميزة - أيقونة مربعة Minimal
   Widget _buildFeatureCard({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,

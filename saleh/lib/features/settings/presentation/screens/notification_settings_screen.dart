@@ -7,7 +7,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../core/services/user_preferences_service.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// Ø´Ø§Ø´Ø© Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØ¥Ø´Ø¹Ø§Ø±Ø§Øª
+/// شاشة Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الØ¥Ø´Ø¹Ø§Ø±Ø§Øª
 /// ØªØªÙŠØ­ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… الØªØ­ÙƒÙ… الÙƒØ§Ù…Ù„ ÙÙŠ Ø¥Ø´Ø¹Ø§Ø±Ø§ØªÙ‡
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -145,22 +145,22 @@ class _NotificationSettingsScreenState
           _buildMasterSwitch(),
           const SizedBox(height: 24),
 
-          // Ø¥Ø´Ø¹Ø§Ø±Ø§Øª الØ·Ù„Ø¨Ø§Øª
+          // Ø¥Ø´Ø¹Ø§Ø±Ø§Øª الطلبØ§Øª
           _buildSection(
-            title: 'الØ·Ù„Ø¨Ø§Øª',
+            title: 'الطلبØ§Øª',
             icon: AppIcons.shoppingBagOutlined,
             color: AppTheme.primaryColor,
             children: [
               _buildSwitchTile(
-                'الØ·Ù„Ø¨Ø§Øª الØ¬Ø¯ÙŠØ¯Ø©',
-                'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ù†Ø¯ Ø§Ø³ØªلاÙ… Ø·Ù„Ø¨ Ø¬Ø¯ÙŠØ¯',
+                'الطلبØ§Øª الØ¬Ø¯ÙŠØ¯Ø©',
+                'Ø¥Ø´Ø¹Ø§Ø± Ø¹Ù†Ø¯ Ø§Ø³ØªلاÙ… طلب Ø¬Ø¯ÙŠØ¯',
                 AppIcons.add, // Ø£Ùˆ Ø£ÙŠÙ‚ÙˆÙ†Ø© منØ§Ø³Ø¨Ø© Ø£Ø®Ø±Ù‰
                 _settings.newOrders,
                 (v) => _updateSetting(_settings.copyWith(newOrders: v)),
               ),
               _buildSwitchTile(
-                'Ø­الØ© الØ·Ù„Ø¨Ø§Øª',
-                'ØªØ­Ø¯ÙŠØ«Ø§Øª Ø­الØ© الØ·Ù„Ø¨Ø§Øª',
+                'Ø­الØ© الطلبØ§Øª',
+                'تحديثØ§Øª Ø­الØ© الطلبØ§Øª',
                 AppIcons.shipping,
                 _settings.orderStatus,
                 (v) => _updateSetting(_settings.copyWith(orderStatus: v)),
@@ -214,7 +214,7 @@ class _NotificationSettingsScreenState
                 (v) => _updateSetting(_settings.copyWith(promotions: v)),
               ),
               _buildSwitchTile(
-                'ØªØ­Ø¯ÙŠØ«Ø§Øª الÙ†Ø¸Ø§Ù…',
+                'تحديثØ§Øª الÙ†Ø¸Ø§Ù…',
                 'Ù…ÙŠØ²Ø§Øª Ø¬Ø¯ÙŠØ¯Ø© ÙˆØªØ­Ø³ÙŠÙ†Ø§Øª',
                 AppIcons.sync,
                 _settings.systemUpdates,

@@ -219,7 +219,10 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Colors.grey.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
             child: Row(
               textDirection: TextDirection.rtl,
@@ -264,8 +267,11 @@ class _AllMenuPanelState extends ConsumerState<AllMenuPanel> {
             '/dashboard/feature/الصفحات التعريفية',
           ),
           _MenuItem('SEO', '/dashboard/feature/SEO'),
-          _MenuItem('باقة المتجر', '/dashboard/packages'),
+          _MenuItem('المشاريع', '/dashboard/projects'),
           _MenuItem('الإشعارات', '/dashboard/inbox'),
+          _MenuItem('إعدادات الإشعارات', '/notification-settings'),
+          _MenuItem('إعدادات المظهر', '/appearance-settings'),
+          _MenuItem('إعدادات الحساب', '/settings'),
         ],
       ),
       _TabSection(

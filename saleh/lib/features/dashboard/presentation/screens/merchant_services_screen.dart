@@ -16,26 +16,18 @@ class MerchantServicesScreen extends ConsumerStatefulWidget {
 
 class _MerchantServicesScreenState
     extends ConsumerState<MerchantServicesScreen> {
-  bool _isLoading = false;
-
   Future<void> _refreshData() async {
     HapticFeedback.lightImpact();
-    setState(() => _isLoading = true);
-    await ref
-        .read(merchantStoreControllerProvider.notifier)
-        .loadMerchantStore();
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+    await ref.read(merchantStoreControllerProvider.notifier).refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    final storeState = ref.watch(merchantStoreControllerProvider);
-    final store = storeState.store;
+    final storeAsync = ref.watch(merchantStoreControllerProvider);
+    final store = storeAsync.hasValue ? storeAsync.value : null;
 
     // التحقق من وجود متجر
-    if (store == null && !storeState.isLoading && !_isLoading) {
+    if (store == null && !storeAsync.isLoading) {
       return Scaffold(
         body: SafeArea(
           child: Column(
@@ -93,7 +85,7 @@ class _MerchantServicesScreenState
         child: RefreshIndicator(
           onRefresh: _refreshData,
           color: AppTheme.accentColor,
-          child: _isLoading
+          child: storeAsync.isLoading
               ? const SkeletonMerchantServices()
               : SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -108,10 +100,6 @@ class _MerchantServicesScreenState
                       const MbuySectionTitle(title: 'إعدادات المتجر'),
                       const SizedBox(height: 12),
                       _buildSettingsList(),
-                      const SizedBox(height: 24),
-                      const MbuySectionTitle(title: 'خدمات إضافية'),
-                      const SizedBox(height: 12),
-                      _buildServicesGrid(),
                       const SizedBox(height: 24),
                       const MbuySectionTitle(title: 'الحساب'),
                       const SizedBox(height: 12),
@@ -274,21 +262,21 @@ class _MerchantServicesScreenState
       {
         'icon': Icons.notifications_outlined,
         'title': 'إعدادات الإشعارات',
-        'subtitle': 'تنبيهات الطلبات والرسائل',
+        'subtitle': 'إدارة التنبيهات والإشعارات الواردة',
         'onTap': () => context.push('/notification-settings'),
         'enabled': true,
       },
       {
         'icon': Icons.palette_outlined,
         'title': 'إعدادات المظهر',
-        'subtitle': 'اللغة والثيم والألوان',
+        'subtitle': 'تخصيص الثيم والألوان واللغة',
         'onTap': () => context.push('/appearance-settings'),
         'enabled': true,
       },
       {
         'icon': Icons.person_outline,
         'title': 'إعدادات الحساب',
-        'subtitle': 'البريد الإلكتروني وكلمة المرور',
+        'subtitle': 'إدارة معلومات الحساب والأمان',
         'onTap': () => context.push('/settings'),
         'enabled': true,
       },
@@ -376,95 +364,6 @@ class _MerchantServicesScreenState
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildServicesGrid() {
-    final services = [
-      {
-        'icon': Icons.account_balance_outlined,
-        'title': 'التمويل',
-        'color': const Color(0xFF4CAF50),
-        'route': '/dashboard/wallet',
-      },
-      {
-        'icon': Icons.support_agent_outlined,
-        'title': 'الدعم',
-        'color': const Color(0xFF2196F3),
-        'route': '/dashboard/support',
-      },
-      {
-        'icon': Icons.analytics_outlined,
-        'title': 'التحليلات',
-        'color': const Color(0xFF9C27B0),
-        'route': '/dashboard/reports',
-      },
-      {
-        'icon': Icons.school_outlined,
-        'title': 'التدريب',
-        'color': const Color(0xFFFF9800),
-        'route': null, // قريباً
-      },
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: services.length,
-      itemBuilder: (context, index) {
-        final service = services[index];
-        final route = service['route'] as String?;
-        return GestureDetector(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            if (route != null) {
-              context.push(route);
-            } else {
-              _showComingSoon(service['title'] as String);
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade100),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: (service['color'] as Color).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    service['icon'] as IconData,
-                    color: service['color'] as Color,
-                    size: AppDimensions.iconM,
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.spacing8),
-                Text(
-                  service['title'] as String,
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontLabel,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -661,14 +560,6 @@ class _MerchantServicesScreenState
           ),
         ],
       ),
-    );
-  }
-
-  void _showComingSoon(String feature) {
-    MbuySnackBar.show(
-      context,
-      message: '$feature - قريباً',
-      type: MbuySnackBarType.info,
     );
   }
 }

@@ -5,8 +5,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class LoyaltyProgramScreen extends StatefulWidget {
   const LoyaltyProgramScreen({super.key});
@@ -144,7 +144,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                         ),
                         const Expanded(
                           child: Text(
-                            'Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡',
+                            'برنامج الولاء',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -254,7 +254,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     const Icon(Icons.warning, color: Colors.orange),
                     const SizedBox(width: AppDimensions.spacing12),
                     const Expanded(
-                      child: Text('Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ÙˆÙ„Ø§Ø¡ ØºÙŠØ± Ù…ÙØ¹Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹'),
+                      child: Text('برنامج الولاء ØºÙŠØ± Ù…ÙØ¹Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹'),
                     ),
                     TextButton(
                       onPressed: () => _toggleProgram(true),
@@ -278,7 +278,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ù…Ù†ÙˆØ­Ø©',
+                    'Ø§Ù„نقاط Ø§Ù„Ù…Ù…Ù†ÙˆØ­Ø©',
                     _formatNumber(totalIssued),
                     Icons.star,
                     Colors.amber,
@@ -291,7 +291,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
+                    'Ø§Ù„نقاط Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
                     _formatNumber(totalRedeemed),
                     Icons.redeem,
                     Colors.green,
@@ -300,7 +300,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 const SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: _buildStatCard(
-                    'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø¹Ù„Ù‚Ø©',
+                    'Ø§Ù„نقاط Ø§Ù„Ù…Ø¹Ù„Ù‚Ø©',
                     _formatNumber(outstanding),
                     Icons.pending,
                     Colors.purple,
@@ -323,21 +323,21 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 child: Column(
                   children: [
                     _buildSettingRow(
-                      'Ù†Ù‚Ø·Ø© Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„',
+                      'نقطة Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„',
                       '${_program['points_per_currency'] ?? 1}',
                     ),
                     _buildSettingRow(
-                      'Ù‚ÙŠÙ…Ø© Ø§Ù„Ù†Ù‚Ø·Ø©',
+                      'Ù‚ÙŠÙ…Ø© Ø§Ù„نقطة',
                       '${_program['points_value'] ?? 0.01} Ø±ÙŠØ§Ù„',
                     ),
                     _buildSettingRow(
-                      'Ø­Ø¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„ Ø§Ù„Ø£Ø¯Ù†Ù‰',
-                      '${_program['min_points_redeem'] ?? 100} Ù†Ù‚Ø·Ø©',
+                      'Ø­Ø¯ Ø§Ù„استبدال Ø§Ù„Ø£Ø¯Ù†Ù‰',
+                      '${_program['min_points_redeem'] ?? 100} نقطة',
                     ),
                     if (_program['points_expiry_days'] != null)
                       _buildSettingRow(
                         'Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©',
-                        '${_program['points_expiry_days']} ÙŠÙˆÙ…',
+                        '${_program['points_expiry_days']} يوم',
                       ),
                     const Divider(),
                     Row(
@@ -565,9 +565,9 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               spacing: 16,
               runSpacing: 8,
               children: [
-                _buildTierBadge('${tier['min_points'] ?? 0} Ù†Ù‚Ø·Ø©', Icons.star),
+                _buildTierBadge('${tier['min_points'] ?? 0} نقطة', Icons.star),
                 _buildTierBadge(
-                  '${tier['min_orders'] ?? 0} Ø·Ù„Ø¨',
+                  '${tier['min_orders'] ?? 0} طلب',
                   Icons.shopping_cart,
                 ),
                 _buildTierBadge('${multiplier}x Ù…Ø¶Ø§Ø¹Ù', Icons.bolt),
@@ -673,7 +673,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               const SizedBox(width: AppDimensions.spacing8),
             ],
             Text(
-              '$lifetimePoints Ù†Ù‚Ø·Ø© ÙƒÙ„ÙŠØ©',
+              '$lifetimePoints نقطة ÙƒÙ„ÙŠØ©',
               style: TextStyle(fontSize: 11, color: Colors.grey[600]),
             ),
           ],
@@ -687,7 +687,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Text(
-              'Ù†Ù‚Ø·Ø©',
+              'نقطة',
               style: TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],
@@ -760,7 +760,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 ),
               ),
               const Text(
-                'Ù†Ù‚Ø·Ø©',
+                'نقطة',
                 style: TextStyle(fontSize: 10, color: Colors.grey),
               ),
             ],
@@ -791,8 +791,8 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             ),
             const SizedBox(height: AppDimensions.spacing12),
             _buildStep('1', 'Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙŠØ´ØªØ±ÙŠ Ù…Ù† Ù…ØªØ¬Ø±Ùƒ'),
-            _buildStep('2', 'ÙŠÙƒØ³Ø¨ Ù†Ù‚Ø§Ø· Ø¹Ù„Ù‰ ÙƒÙ„ Ø±ÙŠØ§Ù„'),
-            _buildStep('3', 'ÙŠØ³ØªØ¨Ø¯Ù„ Ø§Ù„Ù†Ù‚Ø§Ø· Ø¨Ù…ÙƒØ§ÙØ¢Øª ÙˆØ®ØµÙˆÙ…Ø§Øª'),
+            _buildStep('2', 'ÙŠÙƒØ³Ø¨ نقاط Ø¹Ù„Ù‰ ÙƒÙ„ Ø±ÙŠØ§Ù„'),
+            _buildStep('3', 'ÙŠØ³ØªØ¨Ø¯Ù„ Ø§Ù„نقاط Ø¨Ù…ÙƒØ§ÙØ¢Øª ÙˆØ®ØµÙˆÙ…Ø§Øª'),
             _buildStep('4', 'ÙŠØ±ØªÙ‚ÙŠ Ù„Ù„Ù…Ø³ØªÙˆÙŠØ§Øª Ø§Ù„Ø£Ø¹Ù„Ù‰'),
           ],
         ),
@@ -902,26 +902,26 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Ø§Ù„Ù†Ù‚Ø§Ø· Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„
+                // Ø§Ù„نقاط Ù„ÙƒÙ„ Ø±ÙŠØ§Ù„
                 Row(
                   children: [
-                    Expanded(child: Text('Ù†Ù‚Ø·Ø© Ù„ÙƒÙ„ $pointsPerSar Ø±.Ø³')),
+                    Expanded(child: Text('نقطة Ù„ÙƒÙ„ $pointsPerSar ر.س')),
                     Slider(
                       value: pointsPerSar.toDouble(),
                       min: 1,
                       max: 10,
                       divisions: 9,
-                      label: '$pointsPerSar Ø±.Ø³',
+                      label: '$pointsPerSar ر.س',
                       onChanged: (v) =>
                           setDialogState(() => pointsPerSar = v.toInt()),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.spacing16),
-                // Ù‚ÙŠÙ…Ø© Ø§Ù„Ù†Ù‚Ø§Ø·
+                // Ù‚ÙŠÙ…Ø© Ø§Ù„نقاط
                 Row(
                   children: [
-                    Expanded(child: Text('ÙƒÙ„ $pointsValue Ù†Ù‚Ø·Ø© = 1 Ø±.Ø³')),
+                    Expanded(child: Text('ÙƒÙ„ $pointsValue نقطة = 1 ر.س')),
                     Slider(
                       value: pointsValue.toDouble(),
                       min: 50,
@@ -946,7 +946,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1012,7 +1012,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ù†Ù‚Ø§Ø·',
+                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„نقاط',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1064,7 +1064,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1081,7 +1081,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       'color': tierColor.toARGB32().toRadixString(16),
                       'members_count': 0,
                     });
-                    // ØªØ±ØªÙŠØ¨ Ø§Ù„Ù…Ø³ØªÙˆÙŠØ§Øª Ø­Ø³Ø¨ Ø§Ù„Ù†Ù‚Ø§Ø·
+                    // ØªØ±ØªÙŠØ¨ Ø§Ù„Ù…Ø³ØªÙˆÙŠØ§Øª Ø­Ø³Ø¨ Ø§Ù„نقاط
                     _tiers.sort(
                       (a, b) => (a['min_points'] ?? 0).compareTo(
                         b['min_points'] ?? 0,
@@ -1137,7 +1137,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„Ù†Ù‚Ø§Ø·',
+                      labelText: 'Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ø¯Ù†Ù‰ Ù…Ù† Ø§Ù„نقاط',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1177,7 +1177,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+                        child: const Text('إلغاء'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -1225,7 +1225,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
+                      content: Text('ØªÙ… تحديث Ø§Ù„Ù…Ø³ØªÙˆÙ‰'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );
@@ -1263,7 +1263,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Ø§Ø³Ù… Ø§Ù„Ù…ÙƒØ§ÙØ£Ø©',
-                      hintText: 'Ù…Ø«Ø§Ù„: Ø®ØµÙ… 10%',
+                      hintText: 'Ù…Ø«Ø§Ù„: خصم 10%',
                       border: OutlineInputBorder(),
                     ),
                     validator: (v) => v?.isEmpty == true ? 'Ù…Ø·Ù„ÙˆØ¨' : null,
@@ -1297,7 +1297,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                   const SizedBox(height: AppDimensions.spacing16),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
+                      labelText: 'Ø§Ù„نقاط Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
@@ -1311,7 +1311,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                       decoration: InputDecoration(
                         labelText: rewardType == 'discount'
                             ? 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø®ØµÙ… (%)'
-                            : 'Ù‚ÙŠÙ…Ø© Ø§Ù„Ø®ØµÙ… (Ø±.Ø³)',
+                            : 'Ù‚ÙŠÙ…Ø© Ø§Ù„Ø®ØµÙ… (ر.س)',
                         border: const OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
@@ -1325,7 +1325,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -1438,17 +1438,17 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 ),
               ),
               const SizedBox(height: 24),
-              _buildMemberStatRow('Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ø­Ø§Ù„ÙŠØ©', '${member['points'] ?? 0}'),
+              _buildMemberStatRow('Ø§Ù„نقاط Ø§Ù„Ø­Ø§Ù„ÙŠØ©', '${member['points'] ?? 0}'),
               _buildMemberStatRow(
-                'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…ÙƒØªØ³Ø¨Ø©',
+                'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„نقاط Ø§Ù„Ù…ÙƒØªØ³Ø¨Ø©',
                 '${member['total_earned'] ?? 0}',
               ),
               _buildMemberStatRow(
-                'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
+                'Ø§Ù„نقاط Ø§Ù„Ù…Ø³ØªØ¨Ø¯Ù„Ø©',
                 '${member['total_redeemed'] ?? 0}',
               ),
               _buildMemberStatRow(
-                'Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª',
+                'عدد الطلبات',
                 '${member['orders_count'] ?? 0}',
               ),
               const SizedBox(height: 24),
@@ -1461,7 +1461,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                         _showAddPointsDialog(member);
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('Ø¥Ø¶Ø§ÙØ© Ù†Ù‚Ø§Ø·'),
+                      label: const Text('Ø¥Ø¶Ø§ÙØ© نقاط'),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing12),
@@ -1504,14 +1504,14 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Ø¥Ø¶Ø§ÙØ© Ù†Ù‚Ø§Ø· Ù„Ù€ ${member['name']}'),
+        title: Text('Ø¥Ø¶Ø§ÙØ© نقاط Ù„Ù€ ${member['name']}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: pointsController,
               decoration: const InputDecoration(
-                labelText: 'Ø¹Ø¯Ø¯ Ø§Ù„Ù†Ù‚Ø§Ø·',
+                labelText: 'Ø¹Ø¯Ø¯ Ø§Ù„نقاط',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
@@ -1536,7 +1536,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1556,7 +1556,7 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('ØªÙ… Ø¥Ø¶Ø§ÙØ© $points Ù†Ù‚Ø·Ø©'),
+                    content: Text('ØªÙ… Ø¥Ø¶Ø§ÙØ© $points نقطة'),
                     backgroundColor: AppTheme.successColor,
                   ),
                 );
@@ -1583,11 +1583,11 @@ class _LoyaltyProgramScreenState extends State<LoyaltyProgramScreen>
           children: [
             _buildRewardDetailRow('Ø§Ù„Ù†ÙˆØ¹', _getRewardTypeLabel(reward['type'])),
             _buildRewardDetailRow(
-              'Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
+              'Ø§Ù„نقاط Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©',
               '${reward['points_cost'] ?? 0}',
             ),
             _buildRewardDetailRow(
-              'Ø¹Ø¯Ø¯ Ø§Ù„Ø§Ø³ØªØ¨Ø¯Ø§Ù„Ø§Øª',
+              'Ø¹Ø¯Ø¯ Ø§Ù„استبدالØ§Øª',
               '${reward['redemptions_count'] ?? 0}',
             ),
             _buildRewardDetailRow(

@@ -41,14 +41,14 @@ class ShortcutsPanel extends StatelessWidget {
             icon: Icons.add_box,
             title: 'منتج جديد',
             color: AppTheme.primaryColor,
-            onTap: () => context.push('/dashboard/products/create'),
+            onTap: () => context.push('/dashboard/products/add'),
           ),
           _buildShortcutCard(
             context,
             icon: Icons.receipt_long,
             title: 'طلب جديد',
             color: AppTheme.successColor,
-            onTap: () => context.push('/dashboard/orders/create'),
+            onTap: () => context.push('/dashboard/orders'),
           ),
           _buildShortcutCard(
             context,
@@ -69,7 +69,7 @@ class ShortcutsPanel extends StatelessWidget {
             icon: Icons.settings,
             title: 'الإعدادات',
             color: AppTheme.slate600,
-            onTap: () => context.push('/dashboard/settings'),
+            onTap: () => context.push('/settings'),
           ),
           _buildShortcutCard(
             context,

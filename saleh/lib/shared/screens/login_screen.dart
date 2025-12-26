@@ -9,7 +9,7 @@ import '../../core/controllers/root_controller.dart';
 import '../../features/auth/data/auth_controller.dart';
 import '../../features/merchant/data/merchant_store_provider.dart';
 
-/// Ø´Ø§Ø´Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù…Ø¹ Ø§Ø®ØªÙŠØ§Ø± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (Ø¨Ø§Ø¦Ø¹/Ø¹Ù…ÙŠÙ„)
+/// شاشة تسجيل الدخول Ù…Ø¹ Ø§Ø®ØªÙŠØ§Ø± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… (Ø¨Ø§Ø¦Ø¹/Ø¹Ù…ÙŠÙ„)
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -40,7 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Ø­ÙØ¸ Ø§Ù„Ù†ÙŠØ© Ù…Ø¤Ù‚ØªØ§Ù‹
     ref.read(rootControllerProvider.notifier).setLoginIntent(_selectedIntent);
 
-    // ØªÙ†ÙÙŠØ° ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
+    // ØªÙ†ÙÙŠØ° تسجيل الدخول
     await ref
         .read(authControllerProvider.notifier)
         .login(
@@ -54,11 +54,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // ØªØ­Ù…ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…ØªØ¬Ø± (Ø¯Ø§Ø¦Ù…Ø§Ù‹ merchant)
+      // تحميل بيانات المتجر (دائماً merchant)
       final storeController = ref.read(
         merchantStoreControllerProvider.notifier,
       );
-      await storeController.loadMerchantStore();
+      await storeController.refresh();
 
       if (!mounted) return;
 
@@ -70,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            hasStore ? 'Ù…Ø±Ø­Ø¨Ø§Ù‹ Ø¨Ø¹ÙˆØ¯ØªÙƒ!' : 'Ù…Ø±Ø­Ø¨Ø§Ù‹! ÙŠØ±Ø¬Ù‰ Ø¥Ù†Ø´Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
+            hasStore ? 'مرحباً Ø¨Ø¹ÙˆØ¯ØªÙƒ!' : 'مرحباً! ÙŠØ±Ø¬Ù‰ Ø¥Ù†Ø´Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
           ),
           backgroundColor: hasStore
               ? AppTheme.successColor
@@ -192,7 +192,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         const SizedBox(height: AppDimensions.spacing8),
         Text(
-          'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„',
+          'تسجيل الدخول',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: AppDimensions.fontTitle,
@@ -213,7 +213,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.textPrimaryColor,
       ),
       decoration: InputDecoration(
-        labelText: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+        labelText: 'البريد الإلكتروني',
         hintText: 'example@domain.com',
         hintStyle: TextStyle(
           color: AppTheme.textHintColor,
@@ -264,7 +264,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
+          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ البريد الإلكتروني';
         }
         if (!value.contains('@')) {
           return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ­ÙŠØ­';
@@ -283,7 +283,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: AppTheme.textPrimaryColor,
       ),
       decoration: InputDecoration(
-        labelText: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
+        labelText: 'كلمة المرور',
         hintText: 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢',
         hintStyle: TextStyle(
           color: AppTheme.textHintColor,
@@ -348,10 +348,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
+          return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ كلمة المرور';
         }
         if (value.length < 6) {
-          return 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
+          return 'كلمة المرور ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
         }
         return null;
       },
@@ -454,7 +454,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: Text(
-          'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ',
+          'نسيت كلمة المرورØŸ',
           style: TextStyle(
             color: AppTheme.primaryColor,
             fontSize: AppDimensions.fontBody,
@@ -509,7 +509,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             textDirection: TextDirection.ltr,
           ),
           Text(
-            'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±: Ø£ÙŠ Ø´ÙŠØ¡ (6 Ø£Ø­Ø±Ù Ø£Ùˆ Ø£ÙƒØ«Ø±)',
+            'كلمة المرور: Ø£ÙŠ Ø´ÙŠØ¡ (6 Ø£Ø­Ø±Ù Ø£Ùˆ Ø£ÙƒØ«Ø±)',
             style: TextStyle(
               color: AppTheme.infoColor.withValues(alpha: 0.8),
               fontSize: AppDimensions.fontBody2,

@@ -5,8 +5,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class SmartPricingScreen extends StatefulWidget {
   const SmartPricingScreen({super.key});
@@ -153,7 +153,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø°ÙƒÙŠ'),
+        title: const Text('التسعير الذكي'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -173,7 +173,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             ),
             const Tab(text: 'Ø§Ù„Ù‚ÙˆØ§Ø¹Ø¯', icon: Icon(Icons.rule)),
             const Tab(text: 'Ø§Ù„Ø§Ù‚ØªØ±Ø§Ø­Ø§Øª', icon: Icon(Icons.lightbulb)),
-            const Tab(text: 'Ø§Ù„Ø³Ø¬Ù„', icon: Icon(Icons.history)),
+            const Tab(text: 'السجل', icon: Icon(Icons.history)),
           ],
         ),
       ),
@@ -302,7 +302,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             const Divider(),
             _buildSettingRow('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ', autoPricing),
             _buildSettingRow('Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†', competitorMatching),
-            _buildSettingRow('ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø·Ù„Ø¨', demandPricing),
+            _buildSettingRow('ØªØ³Ø¹ÙŠØ± Ø§Ù„طلب', demandPricing),
             const Divider(),
             Row(
               children: [
@@ -795,7 +795,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
       case 'competitor':
         return 'Ù…Ø·Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ù†Ø§ÙØ³ÙŠÙ†';
       case 'demand':
-        return 'ØªØ³Ø¹ÙŠØ± Ø­Ø³Ø¨ Ø§Ù„Ø·Ù„Ø¨';
+        return 'ØªØ³Ø¹ÙŠØ± Ø­Ø³Ø¨ Ø§Ù„طلب';
       case 'time_based':
         return 'ØªØ³Ø¹ÙŠØ± Ø²Ù…Ù†ÙŠ';
       case 'bulk':
@@ -818,7 +818,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
                 children: [
                   SwitchListTile(
                     title: const Text('Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ'),
-                    subtitle: const Text('ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
+                    subtitle: const Text('تحديث Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹'),
                     value: _settings['auto_pricing_enabled'] ?? false,
                     onChanged: (value) {
                       setDialogState(() {
@@ -861,7 +861,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+                child: const Text('إلغاء'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -979,7 +979,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+              child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -1002,7 +1002,7 @@ class _SmartPricingScreenState extends State<SmartPricingScreen>
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ø¹Ø¯Ø© "$ruleName" Ø¨Ù†Ø¬Ø§Ø­'),
+                      content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ù‚Ø§Ø¹Ø¯Ø© "$ruleName" بنجاح'),
                       backgroundColor: AppTheme.successColor,
                     ),
                   );

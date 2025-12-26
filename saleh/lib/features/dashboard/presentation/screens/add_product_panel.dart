@@ -176,7 +176,7 @@ class _AddProductPanelState extends State<AddProductPanel> {
       child: InkWell(
         onTap: () {
           HapticFeedback.lightImpact();
-          context.push('/dashboard/products/create?type=$type');
+          context.push('/dashboard/products/add', extra: {'productType': type});
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(

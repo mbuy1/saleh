@@ -30,10 +30,10 @@ class AppTheme {
 
   // === Primary Colors (Teal Green - الأخضر الفيروزي) ===
   static const Color primaryColor = Color(
-    0xFF215950,
-  ); // Teal Green - اللون الأساسي
-  static const Color primaryLight = Color(0xFF2D7A6E); // Teal Green Light
-  static const Color primaryDark = Color(0xFF153B35); // Teal Green Dark
+    0xFF00B4B4,
+  ); // Teal Light - اللون الأساسي الفاتح
+  static const Color primaryLight = Color(0xFF4DD4D4); // Teal Green Light
+  static const Color primaryDark = Color(0xFF215950); // Teal Green Dark
 
   // === Purple Colors (Reduced Usage) ===
   static const Color purpleColor = Color(

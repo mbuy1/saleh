@@ -12,14 +12,14 @@ class BoostSalesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storeState = ref.watch(merchantStoreControllerProvider);
-    final store = storeState.store;
+    final storeAsync = ref.watch(merchantStoreControllerProvider);
+    final store = storeAsync.hasValue ? storeAsync.value : null;
     final storeName = store?.name ?? 'متجري';
     final storeSlug = storeName.replaceAll(' ', '-');
     final storeUrl = 'https://tabayu.com/$storeSlug';
 
     // التحقق من وجود متجر
-    if (store == null && !storeState.isLoading) {
+    if (store == null && !storeAsync.isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(

@@ -8,7 +8,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../data/onboarding_repository.dart';
 
-/// Ø´Ø§Ø´Ø© Ø§Ù„Ù€ Onboarding Ø§Ù„Ù…Ø­Ø³Ù‘Ù†Ø©
+/// شاشة Ø§Ù„Ù€ Onboarding Ø§Ù„Ù…Ø­Ø³Ù‘Ù†Ø©
 /// ØªØ¬Ø±Ø¨Ø© ØªÙØ§Ø¹Ù„ÙŠØ© ØºÙ†ÙŠØ© Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -29,22 +29,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   final List<OnboardingPage> _pages = [
     const OnboardingPage(
-      title: 'Ù…Ø±Ø­Ø¨Ø§Ù‹ Ø¨Ùƒ ÙÙŠ Mbuy',
+      title: 'مرحباً Ø¨Ùƒ ÙÙŠ Mbuy',
       subtitle: 'Ù…Ù†ØµØªÙƒ Ø§Ù„Ù…ØªÙƒØ§Ù…Ù„Ø© Ù„Ø¥Ø¯Ø§Ø±Ø© Ù…ØªØ¬Ø±Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
-      description: 'Ø£Ø¯Ø± Ù…Ù†ØªØ¬Ø§ØªÙƒØŒ Ø·Ù„Ø¨Ø§ØªÙƒØŒ ÙˆØ¹Ù…Ù„Ø§Ø¦Ùƒ Ù…Ù† Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯ Ø¨Ø³Ù‡ÙˆÙ„Ø© ØªØ§Ù…Ø©',
+      description: 'Ø£Ø¯Ø± Ù…Ù†ØªØ¬Ø§ØªÙƒØŒ طلبØ§ØªÙƒØŒ ÙˆØ¹Ù…Ù„Ø§Ø¦Ùƒ Ù…Ù† Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯ Ø¨Ø³Ù‡ÙˆÙ„Ø© ØªØ§Ù…Ø©',
       icon: AppIcons.store,
       gradient: LinearGradient(
         colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª', 'ØªØªØ¨Ø¹ Ø§Ù„Ø·Ù„Ø¨Ø§Øª', 'ØªØ­Ù„ÙŠÙ„ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'],
+      features: ['Ø¥Ø¯Ø§Ø±Ø© المنتجات', 'ØªØªØ¨Ø¹ Ø§Ù„طلبØ§Øª', 'ØªØ­Ù„ÙŠÙ„ العملاء'],
     ),
     const OnboardingPage(
       title: 'ØªØ³ÙˆÙŠÙ‚ Ø°ÙƒÙŠ',
-      subtitle: 'Ø£Ø¯ÙˆØ§Øª ØªØ³ÙˆÙŠÙ‚ Ù…ØªÙ‚Ø¯Ù…Ø© Ù„Ø²ÙŠØ§Ø¯Ø© Ù…Ø¨ÙŠØ¹Ø§ØªÙƒ',
+      subtitle: 'Ø£Ø¯ÙˆØ§Øª ØªØ³ÙˆÙŠÙ‚ Ù…ØªÙ‚Ø¯Ù…Ø© Ù„Ø²ÙŠØ§Ø¯Ø© مبيعاتÙƒ',
       description:
-          'ÙƒÙˆØ¨ÙˆÙ†Ø§ØªØŒ Ø¹Ø±ÙˆØ¶ Ø®Ø§Ø·ÙØ©ØŒ Ø¨Ø±Ø§Ù…Ø¬ ÙˆÙ„Ø§Ø¡ØŒ ÙˆØ¥Ø­Ø§Ù„Ø§Øª - ÙƒÙ„ Ù…Ø§ ØªØ­ØªØ§Ø¬Ù‡ Ù„Ø¬Ø°Ø¨ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡',
+          'ÙƒÙˆØ¨ÙˆÙ†Ø§ØªØŒ Ø¹Ø±ÙˆØ¶ Ø®Ø§Ø·ÙØ©ØŒ Ø¨Ø±Ø§Ù…Ø¬ ÙˆÙ„Ø§Ø¡ØŒ ÙˆØ¥Ø­Ø§Ù„Ø§Øª - ÙƒÙ„ Ù…Ø§ ØªØ­ØªØ§Ø¬Ù‡ Ù„Ø¬Ø°Ø¨ العملاء',
       icon: AppIcons.megaphone,
       gradient: LinearGradient(
         colors: [Color(0xFF10B981), Color(0xFF34D399)],
@@ -57,7 +57,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       title: 'Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ',
       subtitle: 'Ø§Ø³ØªØ®Ø¯Ù… Ù‚ÙˆØ© AI Ù„ØªØ·ÙˆÙŠØ± Ù…ØªØ¬Ø±Ùƒ',
       description:
-          'ØªÙˆÙ„ÙŠØ¯ ÙˆØµÙ Ø§Ù„Ù…Ù†ØªØ¬Ø§ØªØŒ ØªØ­Ù„ÙŠÙ„Ø§Øª Ø°ÙƒÙŠØ©ØŒ ÙˆØ§Ù‚ØªØ±Ø§Ø­Ø§Øª Ù„ØªØ­Ø³ÙŠÙ† Ø£Ø¯Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
+          'ØªÙˆÙ„ÙŠØ¯ ÙˆØµÙ المنتجاتØŒ ØªØ­Ù„ÙŠÙ„Ø§Øª Ø°ÙƒÙŠØ©ØŒ ÙˆØ§Ù‚ØªØ±Ø§Ø­Ø§Øª Ù„ØªØ­Ø³ÙŠÙ† Ø£Ø¯Ø§Ø¡ Ù…ØªØ¬Ø±Ùƒ',
       icon: AppIcons.bot,
       gradient: LinearGradient(
         colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
@@ -90,7 +90,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      features: ['Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø·Ù„Ø¨Ø§Øª', 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ù…Ø®Ø²ÙˆÙ†', 'ÙˆÙ‚Øª Ø§Ù„Ù‡Ø¯ÙˆØ¡'],
+      features: ['Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„طلبØ§Øª', 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª Ø§Ù„Ù…Ø®Ø²ÙˆÙ†', 'ÙˆÙ‚Øª Ø§Ù„Ù‡Ø¯ÙˆØ¡'],
     ),
   ];
   
@@ -159,7 +159,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           borderRadius: BorderRadius.circular(20),
         ),
         title: const Text(
-          'ØªØ®Ø·ÙŠ Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„ØªØ¹Ø±ÙŠÙÙŠØ©ØŸ',
+          'تخطي Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„ØªØ¹Ø±ÙŠÙÙŠØ©ØŸ',
           textAlign: TextAlign.center,
         ),
         content: const Text(
@@ -170,7 +170,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -181,7 +181,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
             ),
-            child: const Text('ØªØ®Ø·ÙŠ'),
+            child: const Text('تخطي'),
           ),
         ],
       ),
@@ -261,7 +261,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // Ø²Ø± Ø±Ø¬ÙˆØ¹
+          // Ø²Ø± رجوع
           if (_currentPage > 0)
             GestureDetector(
               onTap: _previousPage,
@@ -314,7 +314,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
           
-          // Ø²Ø± ØªØ®Ø·ÙŠ
+          // Ø²Ø± تخطي
           GestureDetector(
             onTap: _skipOnboarding,
             child: Container(
@@ -325,7 +325,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 border: Border.all(color: AppTheme.dividerColor),
               ),
               child: Text(
-                'ØªØ®Ø·ÙŠ',
+                'تخطي',
                 style: TextStyle(
                   color: AppTheme.textHintColor,
                   fontSize: 14,
@@ -509,7 +509,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
           const Spacer(),
-          // Ø²Ø± Ø§Ù„ØªØ§Ù„ÙŠ/Ø§Ø¨Ø¯Ø£
+          // Ø²Ø± التالي/Ø§Ø¨Ø¯Ø£
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             child: ElevatedButton(
@@ -531,7 +531,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isLastPage ? 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¢Ù†' : 'Ø§Ù„ØªØ§Ù„ÙŠ',
+                    isLastPage ? 'ابدأ الآن' : 'التالي',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

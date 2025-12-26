@@ -144,7 +144,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
           Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
           SizedBox(height: AppDimensions.spacing16),
           Text(
-            _error ?? 'Ø­Ø¯Ø« Ø®Ø·Ø£',
+            _error ?? 'حدث خطأ',
             style: const TextStyle(color: Colors.red),
           ),
           SizedBox(height: AppDimensions.spacing16),
@@ -179,7 +179,7 @@ class _FlashSalesScreenState extends ConsumerState<FlashSalesScreen>
             ),
             SizedBox(height: AppDimensions.spacing8),
             const Text(
-              'Ø£Ù†Ø´Ø¦ Ø¹Ø±Ø¶Ø§Ù‹ Ø®Ø§Ø·ÙØ§Ù‹ Ù„Ø²ÙŠØ§Ø¯Ø© Ù…Ø¨ÙŠØ¹Ø§ØªÙƒ',
+              'Ø£Ù†Ø´Ø¦ Ø¹Ø±Ø¶Ø§Ù‹ Ø®Ø§Ø·ÙØ§Ù‹ Ù„Ø²ÙŠØ§Ø¯Ø© مبيعاتÙƒ',
             ),
           ],
         ),
@@ -604,7 +604,7 @@ class _CreateFlashSaleSheetState extends State<_CreateFlashSaleSheet> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¹Ø±Ø¶ Ø¨Ù†Ø¬Ø§Ø­'),
+            content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø¹Ø±Ø¶ بنجاح'),
             backgroundColor: Colors.green,
           ),
         );
@@ -890,13 +890,13 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
                     '${sale.endsAt.day}/${sale.endsAt.month}/${sale.endsAt.year}',
                   ),
                   _buildInfoRow(
-                    'Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
+                    'Ø¹Ø¯Ø¯ المنتجات',
                     '${sale.productsCount}',
                   ),
                   _buildInfoRow('Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯Ø§Øª', '${sale.viewsCount}'),
                   const SizedBox(height: 24),
                   const Text(
-                    'Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª',
+                    'المنتجات',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -967,7 +967,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
       subtitle: Row(
         children: [
           Text(
-            '${product.originalPrice} Ø±.Ø³',
+            '${product.originalPrice} ر.س',
             style: const TextStyle(
               decoration: TextDecoration.lineThrough,
               color: Colors.grey,
@@ -975,7 +975,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '${product.salePrice} Ø±.Ø³',
+            '${product.salePrice} ر.س',
             style: const TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -1040,7 +1040,7 @@ class _FlashSaleDetailsSheet extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),

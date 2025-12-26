@@ -161,14 +161,15 @@ class UserPreferencesService {
   /// الحصول على وضع السمة
   Future<ThemeMode> getThemeMode() async {
     final p = await prefs;
-    final mode = p.getString(keyThemeMode) ?? 'dark'; // ✅ Dark Mode as default
+    final mode =
+        p.getString(keyThemeMode) ?? 'light'; // ✅ Light Mode as default
     switch (mode) {
       case 'light':
         return ThemeMode.light;
       case 'dark':
         return ThemeMode.dark;
       default:
-        return ThemeMode.dark; // ✅ Dark Mode as default
+        return ThemeMode.light; // ✅ Light Mode as default
     }
   }
 

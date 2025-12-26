@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class ContentGeneratorScreen extends StatefulWidget {
   const ContentGeneratorScreen({super.key});

@@ -7,7 +7,7 @@ import '../../../../core/services/user_preferences_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 
-/// Ø´Ø§Ø´Ø© Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø¸Ù‡Ø±
+/// شاشة إعدادات المظهر
 class AppearanceSettingsScreen extends ConsumerWidget {
   const AppearanceSettingsScreen({super.key});
 
@@ -25,7 +25,7 @@ class AppearanceSettingsScreen extends ConsumerWidget {
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ù„ Ù„Ù„ØªÙ…Ø±ÙŠØ±
+            // المحتوى القابل للتمرير
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(16),

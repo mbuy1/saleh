@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 
-/// A shimmer effect widget for skeleton loading
-class ShimmerEffect extends StatefulWidget {
+/// Shared Shimmer Controller Provider
+/// يوفر AnimationController مشترك لجميع ShimmerEffect widgets
+/// لتقليل استهلاك الموارد
+class ShimmerControllerProvider extends StatefulWidget {
   final Widget child;
-  final Color? baseColor;
-  final Color? highlightColor;
 
-  const ShimmerEffect({
-    super.key,
-    required this.child,
-    this.baseColor,
-    this.highlightColor,
-  });
+  const ShimmerControllerProvider({super.key, required this.child});
 
   @override
-  State<ShimmerEffect> createState() => _ShimmerEffectState();
+  State<ShimmerControllerProvider> createState() =>
+      _ShimmerControllerProviderState();
+
+  /// الحصول على الـ animation من الـ context
+  static Animation<double>? of(BuildContext context) {
+    final inherited =
+        context.dependOnInheritedWidgetOfExactType<_ShimmerAnimation>();
+    return inherited?.animation;
+  }
 }
 
-class _ShimmerEffectState extends State<ShimmerEffect>
+class _ShimmerControllerProviderState extends State<ShimmerControllerProvider>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -43,6 +46,76 @@ class _ShimmerEffectState extends State<ShimmerEffect>
 
   @override
   Widget build(BuildContext context) {
+    return _ShimmerAnimation(animation: _animation, child: widget.child);
+  }
+}
+
+class _ShimmerAnimation extends InheritedWidget {
+  final Animation<double> animation;
+
+  const _ShimmerAnimation({required this.animation, required super.child});
+
+  @override
+  bool updateShouldNotify(_ShimmerAnimation oldWidget) => false;
+}
+
+/// A shimmer effect widget for skeleton loading
+/// يستخدم AnimationController مشترك إذا كان متوفراً
+class ShimmerEffect extends StatefulWidget {
+  final Widget child;
+  final Color? baseColor;
+  final Color? highlightColor;
+
+  const ShimmerEffect({
+    super.key,
+    required this.child,
+    this.baseColor,
+    this.highlightColor,
+  });
+
+  @override
+  State<ShimmerEffect> createState() => _ShimmerEffectState();
+}
+
+class _ShimmerEffectState extends State<ShimmerEffect>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _localController;
+  Animation<double>? _localAnimation;
+  bool _useSharedController = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // التحقق من وجود controller مشترك
+    final sharedAnimation = ShimmerControllerProvider.of(context);
+    if (sharedAnimation != null) {
+      _useSharedController = true;
+      // التخلص من الـ controller المحلي إذا كان موجوداً
+      _localController?.dispose();
+      _localController = null;
+      _localAnimation = null;
+    } else if (_localController == null) {
+      // إنشاء controller محلي فقط إذا لم يكن هناك controller مشترك
+      _useSharedController = false;
+      _localController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1500),
+      )..repeat();
+
+      _localAnimation = Tween<double>(begin: -2, end: 2).animate(
+        CurvedAnimation(parent: _localController!, curve: Curves.easeInOutSine),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _localController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor =
         widget.baseColor ?? (isDark ? Colors.grey[800]! : Colors.grey[300]!);
@@ -50,8 +123,13 @@ class _ShimmerEffectState extends State<ShimmerEffect>
         widget.highlightColor ??
         (isDark ? Colors.grey[700]! : Colors.grey[100]!);
 
+    // استخدام الـ animation المشترك أو المحلي
+    final animation = _useSharedController
+        ? ShimmerControllerProvider.of(context)!
+        : _localAnimation!;
+
     return AnimatedBuilder(
-      animation: _animation,
+      animation: animation,
       builder: (context, child) {
         return ShaderMask(
           shaderCallback: (bounds) {
@@ -59,8 +137,8 @@ class _ShimmerEffectState extends State<ShimmerEffect>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [baseColor, highlightColor, baseColor],
-              stops: [0.0, 0.5 + (_animation.value * 0.25), 1.0],
-              transform: _SlidingGradientTransform(_animation.value),
+              stops: [0.0, 0.5 + (animation.value * 0.25), 1.0],
+              transform: _SlidingGradientTransform(animation.value),
             ).createShader(bounds);
           },
           blendMode: BlendMode.srcATop,
@@ -380,12 +458,14 @@ class SkeletonConversationItem extends StatelessWidget {
 }
 
 /// Skeleton for home tab dashboard
+/// يستخدم ShimmerControllerProvider لمشاركة AnimationController
 class SkeletonHomeDashboard extends StatelessWidget {
   const SkeletonHomeDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return ShimmerControllerProvider(
+      child: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,6 +540,7 @@ class SkeletonHomeDashboard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

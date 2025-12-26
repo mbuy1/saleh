@@ -377,4 +377,208 @@ class AppStrings {
   static const String from = 'من';
   static const String to = 'إلى';
   static const String dateRange = 'نطاق التاريخ';
+
+  // =========================================================================
+  // Screen Titles (Page Headers)
+  // =========================================================================
+
+  static const String reportsScreenTitle = 'التقارير';
+  static const String reportsScreenDescription = 'تقارير شاملة عن نشاط المتجر';
+  static const String walletScreenTitle = 'المحفظة';
+  static const String walletScreenDescription = 'محفظة التاجر';
+  static const String pointsScreenTitle = 'نقاط الولاء';
+  static const String pointsScreenDescription = 'نظام المكافآت والنقاط';
+  static const String marketingScreenTitle = 'الحملات التسويقية';
+  static const String marketingScreenDescription = 'أدوات التسويق والترويج';
+  static const String aboutScreenTitle = 'عن التطبيق';
+  static const String aboutScreenDescription = 'معلومات التطبيق';
+  static const String loginScreenTitle = 'تسجيل الدخول';
+  static const String registerScreenTitle = 'إنشاء حساب جديد';
+  static const String forgotPasswordScreenTitle = 'استعادة كلمة المرور';
+  static const String onboardingScreenTitle = 'مرحباً بك';
+  static const String accountSettingsScreenTitle = 'إعدادات الحساب';
+  static const String appearanceSettingsScreenTitle = 'إعدادات المظهر';
+  static const String notificationSettingsScreenTitle = 'إعدادات الإشعارات';
+  static const String privacyPolicyScreenTitle = 'سياسة الخصوصية';
+  static const String termsScreenTitle = 'الشروط والأحكام';
+  static const String supportScreenTitle = 'الدعم الفني';
+  static const String couponsScreenTitle = 'الكوبونات';
+  static const String flashSalesScreenTitle = 'العروض الخاطفة';
+  static const String loyaltyProgramScreenTitle = 'برنامج الولاء';
+  static const String customerSegmentsScreenTitle = 'شرائح العملاء';
+  static const String customMessagesScreenTitle = 'رسائل مخصصة';
+  static const String heatmapScreenTitle = 'الخريطة الحرارية';
+  static const String smartPricingScreenTitle = 'التسعير الذكي';
+  static const String aiAssistantScreenTitle = 'المساعد الذكي';
+  static const String shortcutsScreenTitle = 'اختصاراتي';
+
+  // =========================================================================
+  // Reports Screen
+  // =========================================================================
+
+  static const String exportReport = 'تصدير التقرير';
+  static const String exportingPdf = 'جاري تصدير PDF...';
+  static const String exportingExcel = 'جاري تصدير Excel...';
+  static const String salesReport = 'تقرير المبيعات';
+  static const String productsReport = 'تقرير المنتجات';
+  static const String customersReport = 'تقرير العملاء';
+  static const String activityLog = 'سجل النشاط';
+  static const String order = 'طلب';
+  static const String sales = 'مبيعات';
+  static const String demoData = 'بيانات تجريبية للعرض';
+  static const String connectApiLater = 'سيتم ربطها بـ API لاحقاً';
+
+  // =========================================================================
+  // Wallet Screen
+  // =========================================================================
+
+  static const String merchantWallet = 'محفظة التاجر';
+  static const String recentTransactions = 'أحدث المعاملات';
+  static const String viewAll = 'عرض الكل';
+  static const String withdrawMoney = 'سحب المبلغ';
+  static const String addMoney = 'إضافة رصيد';
+  static const String transferMoney = 'تحويل';
+  static const String merchantId = 'معرف التاجر';
+
+  // =========================================================================
+  // Points Screen
+  // =========================================================================
+
+  static const String currentPoints = 'النقاط الحالية';
+  static const String lifetimePoints = 'النقاط الكلية';
+  static const String redeemedPointsLabel = 'النقاط المستبدلة';
+  static const String pointsTransactions = 'سجل النقاط';
+  static const String availableRewards = 'المكافآت المتاحة';
+  static const String redeemReward = 'استبدال المكافأة';
+  static const String insufficientPoints = 'رصيد النقاط غير كافٍ';
+  static const String pointsEarned = 'نقاط مكتسبة';
+  static const String pointsSpent = 'نقاط مستخدمة';
+  static const String fivePercentDiscount = 'خصم 5%';
+  static const String tenPercentDiscount = 'خصم 10%';
+  static const String discountOnNextPackage = 'خصم على الباقة التالية';
+  static const String freeAiImages = '5 صور AI مجانية';
+  static const String extraImagesThisMonth = 'صور إضافية لهذا الشهر';
+  static const String freeAiVideo = 'فيديو AI مجاني';
+  static const String extraVideoThisMonth = 'فيديو واحد إضافي';
+  static const String prioritySupport = 'دعم أولوية';
+  static const String weekOfPrioritySupport = 'أسبوع من الدعم المميز';
+  static const String productSaleOrder = 'بيع منتج - طلب';
+
+  // =========================================================================
+  // Marketing Screen
+  // =========================================================================
+
+  static const String marketingTools = 'أدوات التسويق';
+  static const String activeCampaigns = 'حملات نشطة';
+  static const String activeCouponsCount = 'كوبونات فعالة';
+  static const String recoveryRate = 'نسبة الاسترداد';
+  static const String loyaltyMembers = 'أعضاء الولاء';
+  static const String flashSalesLabel = 'العروض الخاطفة';
+  static const String limitedTimeOffers = 'عروض محدودة الوقت';
+  static const String abandonedCartsLabel = 'السلات المتروكة';
+  static const String recoverHesitantCustomers = 'استرداد العملاء المترددين';
+  static const String referralProgram = 'برنامج الإحالة';
+  static const String rewardCustomersForReferrals = 'كافئ العملاء على الإحالات';
+  static const String loyaltyProgram = 'برنامج الولاء';
+  static const String pointsAndRewardsForCustomers = 'نقاط ومكافآت للعملاء';
+  static const String customerSegmentsLabel = 'شرائح العملاء';
+  static const String classifyAndTargetCustomers = 'تصنيف واستهداف العملاء';
+  static const String customMessagesLabel = 'رسائل مخصصة';
+  static const String notificationsAndEmailCampaigns = 'إشعارات وحملات بريدية';
+  static const String smartPricingLabel = 'التسعير الذكي';
+  static const String dynamicAndFlexiblePricing = 'تسعير ديناميكي ومرن';
+
+  // =========================================================================
+  // Auth Screens
+  // =========================================================================
+
+  static const String enterYourEmail = 'أدخل بريدك الإلكتروني';
+  static const String enterYourPassword = 'أدخل كلمة المرور';
+  static const String enterYourName = 'أدخل اسمك';
+  static const String fullName = 'الاسم الكامل';
+  static const String phoneNumber = 'رقم الهاتف';
+  static const String sendResetLink = 'إرسال رابط الاستعادة';
+  static const String resetLinkSent = 'تم إرسال رابط الاستعادة';
+  static const String checkYourEmail = 'تحقق من بريدك الإلكتروني';
+  static const String backToLogin = 'العودة لتسجيل الدخول';
+  static const String orLoginWith = 'أو سجل دخول باستخدام';
+  static const String orRegisterWith = 'أو سجل باستخدام';
+  static const String agreeToTerms = 'أوافق على الشروط والأحكام';
+  static const String byRegisteringYouAgree = 'بالتسجيل أنت توافق على';
+
+  // =========================================================================
+  // Settings Screens
+  // =========================================================================
+
+  static const String changePassword = 'تغيير كلمة المرور';
+  static const String currentPassword = 'كلمة المرور الحالية';
+  static const String newPassword = 'كلمة المرور الجديدة';
+  static const String confirmNewPassword = 'تأكيد كلمة المرور الجديدة';
+  static const String updateProfile = 'تحديث الملف الشخصي';
+  static const String deleteAccount = 'حذف الحساب';
+  static const String deleteAccountWarning =
+      'سيتم حذف حسابك وجميع بياناتك نهائياً';
+  static const String theme = 'المظهر';
+  static const String selectTheme = 'اختر المظهر';
+  static const String selectLanguage = 'اختر اللغة';
+  static const String notificationPreferences = 'تفضيلات الإشعارات';
+  static const String orderNotifications = 'إشعارات الطلبات';
+  static const String promotionalNotifications = 'الإشعارات الترويجية';
+  static const String soundEnabled = 'تفعيل الصوت';
+  static const String vibrationEnabled = 'تفعيل الاهتزاز';
+
+  // =========================================================================
+  // Support Screen
+  // =========================================================================
+
+  static const String helpCenter = 'مركز المساعدة';
+  static const String faq = 'الأسئلة الشائعة';
+  static const String contactSupportTeam = 'تواصل مع فريق الدعم';
+  static const String sendMessage = 'إرسال رسالة';
+  static const String yourMessage = 'رسالتك';
+  static const String messageSubject = 'موضوع الرسالة';
+  static const String attachScreenshot = 'إرفاق صورة';
+  static const String submitTicket = 'إرسال التذكرة';
+  static const String ticketSubmitted = 'تم إرسال التذكرة';
+  static const String weWillRespondSoon = 'سنرد عليك في أقرب وقت';
+
+  // =========================================================================
+  // Onboarding
+  // =========================================================================
+
+  static const String skip = 'تخطي';
+  static const String getStarted = 'ابدأ الآن';
+  static const String onboardingTitle1 = 'أنشئ متجرك';
+  static const String onboardingDesc1 =
+      'ابدأ رحلتك في التجارة الإلكترونية بسهولة';
+  static const String onboardingTitle2 = 'أدر منتجاتك';
+  static const String onboardingDesc2 = 'أضف وعدل منتجاتك بضغطة زر';
+  static const String onboardingTitle3 = 'تابع مبيعاتك';
+  static const String onboardingDesc3 = 'راقب طلباتك وأرباحك في الوقت الفعلي';
+
+  // =========================================================================
+  // Misc
+  // =========================================================================
+
+  static const String refresh = 'تحديث';
+  static const String noInternetConnection = 'لا يوجد اتصال بالإنترنت';
+  static const String pullToRefresh = 'اسحب للتحديث';
+  static const String loadingMore = 'جاري تحميل المزيد...';
+  static const String endOfList = 'نهاية القائمة';
+  static const String itemsCount = 'عدد العناصر';
+  static const String total = 'الإجمالي';
+  static const String subtotal = 'المجموع الفرعي';
+  static const String tax = 'الضريبة';
+  static const String shipping = 'الشحن';
+  static const String free = 'مجاني';
+  static const String paid = 'مدفوع';
+  static const String unpaid = 'غير مدفوع';
+  static const String active = 'نشط';
+  static const String inactive = 'غير نشط';
+  static const String enabled = 'مفعل';
+  static const String disabled = 'معطل';
+  static const String required = 'مطلوب';
+  static const String optional = 'اختياري';
+  static const String point = 'نقطة';
+  static const String sar = 'ر.س';
 }

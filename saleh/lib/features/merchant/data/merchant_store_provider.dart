@@ -2,56 +2,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/models/store.dart';
 import 'merchant_repository.dart';
 
-/// Merchant Store State
-/// حالة المتجر مع التحميل والأخطاء
-class MerchantStoreState {
-  final Store? store;
-  final bool isLoading;
-  final String? errorMessage;
-
-  MerchantStoreState({this.store, this.isLoading = false, this.errorMessage});
-
-  MerchantStoreState copyWith({
-    Store? store,
-    bool? isLoading,
-    String? errorMessage,
-  }) {
-    return MerchantStoreState(
-      store: store ?? this.store,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
-
-  bool get hasStore => store != null;
-  bool get hasError => errorMessage != null;
-}
-
 /// Merchant Store Controller
-/// يدير حالة المتجر باستخدام Notifier
-class MerchantStoreController extends Notifier<MerchantStoreState> {
+/// يدير حالة المتجر باستخدام AsyncNotifier
+/// يستخدم AsyncValue للتعامل مع loading/error/data
+class MerchantStoreController extends AsyncNotifier<Store?> {
   late MerchantRepository _repository;
 
   @override
-  MerchantStoreState build() {
+  Future<Store?> build() async {
     _repository = ref.watch(merchantRepositoryProvider);
-    return MerchantStoreState(isLoading: false);
+    // تحميل المتجر تلقائياً عند الإنشاء
+    return await _loadStore();
   }
 
   /// جلب متجر التاجر
-  Future<void> loadMerchantStore() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
-
+  Future<Store?> _loadStore() async {
     try {
-      final store = await _repository.getMerchantStore();
-      state = MerchantStoreState(store: store, isLoading: false);
+      return await _repository.getMerchantStore();
     } catch (e) {
-      state = MerchantStoreState(
-        store: null,
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+      // في حالة عدم وجود متجر، نعيد null بدلاً من رمي خطأ
+      if (e.toString().contains('not found') ||
+          e.toString().contains('NO_STORE')) {
+        return null;
+      }
+      rethrow;
     }
+  }
+
+  /// إعادة تحميل المتجر
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => _loadStore());
   }
 
   /// إنشاء متجر جديد
@@ -60,7 +41,7 @@ class MerchantStoreController extends Notifier<MerchantStoreState> {
     String? description,
     String? city,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = const AsyncLoading();
 
     try {
       final newStore = await _repository.createStore(
@@ -69,10 +50,10 @@ class MerchantStoreController extends Notifier<MerchantStoreState> {
         city: city,
       );
 
-      state = MerchantStoreState(store: newStore, isLoading: false);
+      state = AsyncData(newStore);
       return true;
-    } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    } catch (e, st) {
+      state = AsyncError(e, st);
       return false;
     }
   }
@@ -85,7 +66,8 @@ class MerchantStoreController extends Notifier<MerchantStoreState> {
     String? city,
     Map<String, dynamic>? settings,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final previousState = state;
+    state = const AsyncLoading();
 
     try {
       final updatedStore = await _repository.updateStore(
@@ -96,50 +78,50 @@ class MerchantStoreController extends Notifier<MerchantStoreState> {
         settings: settings,
       );
 
-      state = MerchantStoreState(store: updatedStore, isLoading: false);
+      state = AsyncData(updatedStore);
       return true;
-    } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    } catch (e, st) {
+      // استعادة الحالة السابقة مع إضافة الخطأ
+      state = previousState.hasValue
+          ? AsyncData(previousState.value)
+          : AsyncError(e, st);
       return false;
     }
   }
 
   /// تحديث إعدادات المتجر فقط
   Future<bool> updateStoreSettings(Map<String, dynamic> newSettings) async {
-    if (state.store == null) return false;
+    final currentStore = state.hasValue ? state.value : null;
+    if (currentStore == null) return false;
 
     // دمج الإعدادات الجديدة مع القديمة
-    final currentSettings = state.store!.settings ?? {};
+    final currentSettings = currentStore.settings ?? {};
     final mergedSettings = {...currentSettings, ...newSettings};
 
-    return updateStoreInfo(storeId: state.store!.id, settings: mergedSettings);
+    return updateStoreInfo(storeId: currentStore.id, settings: mergedSettings);
   }
 
   /// تحديث المتجر المحلي (بعد التعديل)
   void updateStore(Store store) {
-    state = state.copyWith(store: store);
+    state = AsyncData(store);
   }
 
   /// مسح حالة المتجر
   void clearStore() {
-    state = MerchantStoreState(isLoading: false);
-  }
-
-  /// مسح رسالة الخطأ
-  void clearError() {
-    state = state.copyWith(errorMessage: null);
+    state = const AsyncData(null);
   }
 }
 
 /// Provider للـ MerchantStoreController
 final merchantStoreControllerProvider =
-    NotifierProvider<MerchantStoreController, MerchantStoreState>(
+    AsyncNotifierProvider<MerchantStoreController, Store?>(
       MerchantStoreController.new,
     );
 
 /// Provider لحالة المتجر فقط
 final merchantStoreProvider = Provider<Store?>((ref) {
-  return ref.watch(merchantStoreControllerProvider).store;
+  final state = ref.watch(merchantStoreControllerProvider);
+  return state.hasValue ? state.value : null;
 });
 
 /// Provider لحالة التحميل
@@ -149,10 +131,12 @@ final merchantStoreLoadingProvider = Provider<bool>((ref) {
 
 /// Provider لرسالة الخطأ
 final merchantStoreErrorProvider = Provider<String?>((ref) {
-  return ref.watch(merchantStoreControllerProvider).errorMessage;
+  final state = ref.watch(merchantStoreControllerProvider);
+  return state.hasError ? state.error.toString() : null;
 });
 
 /// Provider للتحقق من وجود متجر
 final hasMerchantStoreProvider = Provider<bool>((ref) {
-  return ref.watch(merchantStoreControllerProvider).hasStore;
+  final state = ref.watch(merchantStoreControllerProvider);
+  return state.hasValue && state.value != null;
 });

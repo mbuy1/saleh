@@ -8,7 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../auth/data/auth_controller.dart';
 
-/// Ø´Ø§Ø´Ø© Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø´Ø®ØµÙŠ
+/// شاشة إعدادات الحساب Ø§Ù„Ø´Ø®ØµÙŠ
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
 
@@ -37,7 +37,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               child: _buildHeader(context),
             ),
             const SizedBox(height: 16),
-            // Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù‚Ø§Ø¨Ù„ Ù„Ù„ØªÙ…Ø±ÙŠØ±
+            // المحتوى القابل للتمرير
             Expanded(
               child: ListView(
                 padding: AppDimensions.paddingM,
@@ -47,7 +47,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   _buildSettingsCard([
                     _buildInfoTile(
                       icon: AppIcons.email,
-                      title: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+                      title: 'البريد الإلكتروني',
                       subtitle: authState.userEmail ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯',
                     ),
                     const Divider(height: 1),
@@ -67,7 +67,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.lock,
-                      title: 'ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
+                      title: 'ØªØºÙŠÙŠØ± كلمة المرور',
                       onTap: () => _showChangePasswordDialog(),
                     ),
                   ]),
@@ -79,14 +79,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.notifications,
-                      title: 'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©',
+                      title: 'إعدادات الإشعارات Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©',
                       onTap: () => context.push('/notification-settings'),
                     ),
                     const Divider(height: 1),
                     _buildSwitchTile(
                       icon: AppIcons.notifications,
                       title: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
-                      subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙˆØ§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª',
+                      subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„طلبØ§Øª ÙˆØ§Ù„تحديثØ§Øª',
                       value: _notificationsEnabled,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -97,7 +97,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     _buildSwitchTile(
                       icon: AppIcons.email,
                       title: 'Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø¨Ø±ÙŠØ¯',
-                      subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… ØªØ­Ø¯ÙŠØ«Ø§Øª Ø¹Ø¨Ø± Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+                      subtitle: 'Ø§Ø³ØªÙ„Ø§Ù… تحديثØ§Øª Ø¹Ø¨Ø± البريد الإلكتروني',
                       value: _emailNotifications,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -124,7 +124,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.sun,
-                      title: 'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø¸Ù‡Ø±',
+                      title: 'إعدادات المظهر',
                       onTap: () => context.push('/appearance-settings'),
                     ),
                     const Divider(height: 1),
@@ -164,7 +164,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   _buildSettingsCard([
                     _buildActionTile(
                       icon: AppIcons.document,
-                      title: 'Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ø®ØµÙˆØµÙŠØ©',
+                      title: 'سياسة الخصوصية',
                       onTap: () => context.push('/privacy-policy'),
                     ),
                     const Divider(height: 1),
@@ -416,7 +416,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'),
+        title: const Text('ØªØºÙŠÙŠØ± كلمة المرور'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -424,7 +424,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               controller: currentPasswordController,
               obscureText: true,
               decoration: const InputDecoration(
-                labelText: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø­Ø§Ù„ÙŠØ©',
+                labelText: 'كلمة المرور Ø§Ù„Ø­Ø§Ù„ÙŠØ©',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -433,7 +433,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               controller: newPasswordController,
               obscureText: true,
               decoration: const InputDecoration(
-                labelText: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©',
+                labelText: 'كلمة المرور Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -442,7 +442,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               controller: confirmPasswordController,
               obscureText: true,
               decoration: const InputDecoration(
-                labelText: 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
+                labelText: 'تأكيد كلمة المرور',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -451,7 +451,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -459,7 +459,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   confirmPasswordController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©'),
+                    content: Text('كلمة المرور ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©'),
                     backgroundColor: AppTheme.errorColor,
                   ),
                 );
@@ -468,7 +468,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('ØªÙ… ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¨Ù†Ø¬Ø§Ø­'),
+                  content: Text('ØªÙ… ØªØºÙŠÙŠØ± كلمة المرور بنجاح'),
                   backgroundColor: AppTheme.successColor,
                 ),
               );
@@ -492,7 +492,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -523,7 +523,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+            child: const Text('إلغاء'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -531,7 +531,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text(
-                    'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø­Ø°Ù Ø§Ù„Ø­Ø³Ø§Ø¨. Ø³ÙŠØªÙ… Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ùƒ Ø®Ù„Ø§Ù„ 24 Ø³Ø§Ø¹Ø©.',
+                    'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ طلب Ø­Ø°Ù Ø§Ù„Ø­Ø³Ø§Ø¨. Ø³ÙŠØªÙ… Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ùƒ Ø®Ù„Ø§Ù„ 24 ساعة.',
                   ),
                   backgroundColor: AppTheme.infoColor,
                 ),
@@ -567,7 +567,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         ),
         const Expanded(
           child: Text(
-            'Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨',
+            'إعدادات الحساب',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.bold,

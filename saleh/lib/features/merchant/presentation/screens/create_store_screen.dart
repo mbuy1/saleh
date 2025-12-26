@@ -37,8 +37,8 @@ class _CreateStoreScreenState extends ConsumerState<CreateStoreScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
-        final storeState = ref.read(merchantStoreControllerProvider);
-        final store = storeState.store;
+        final storeAsync = ref.read(merchantStoreControllerProvider);
+        final store = storeAsync.hasValue ? storeAsync.value : null;
 
         if (store != null) {
           setState(() {

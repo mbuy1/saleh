@@ -54,6 +54,19 @@ enum ScreenSize {
 class _DashboardShellState extends ConsumerState<DashboardShell> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    // ضبط ألوان شريط الحالة مرة واحدة عند الإنشاء
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light, // أيقونات بيضاء
+        statusBarBrightness: Brightness.dark, // للـ iOS
+      ),
+    );
+  }
+
   /// تحديد حجم الشاشة الحالي
   ScreenSize _getScreenSize(double width) {
     if (width < 600) return ScreenSize.mobile;
@@ -155,185 +168,11 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     context.push('/dashboard/add-product');
   }
 
-  /// نافذة الإدراج السريع
-  void _showQuickAddDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final priceController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accentColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.flash_on,
-                    color: AppTheme.accentColor,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Text('إدراج سريع'),
-              ],
-            ),
-            content: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // اسم المنتج
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'اسم المنتج *',
-                        hintText: 'مثال: هاتف آيفون 15',
-                        prefixIcon: const Icon(Icons.inventory_2),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'الرجاء إدخال اسم المنتج';
-                        }
-                        return null;
-                      },
-                      textInputAction: TextInputAction.next,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // السعر
-                    TextFormField(
-                      controller: priceController,
-                      decoration: InputDecoration(
-                        labelText: 'السعر *',
-                        hintText: '0.00',
-                        prefixIcon: const Icon(Icons.attach_money),
-                        suffixText: 'ر.س',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'الرجاء إدخال السعر';
-                        }
-                        final price = double.tryParse(value);
-                        if (price == null || price <= 0) {
-                          return 'سعر غير صالح';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // صورة المنتج (اختياري)
-                    InkWell(
-                      onTap: () async {
-                        // TODO: إضافة اختيار الصورة
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('اختيار الصورة قريباً')),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add_photo_alternate,
-                                size: 32,
-                                color: AppTheme.textHintColor,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'إضافة صورة (اختياري)',
-                                style: TextStyle(
-                                  color: AppTheme.textHintColor,
-                                  fontSize: AppDimensions.fontLabel,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('إلغاء'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    Navigator.pop(context);
-                    // الانتقال لصفحة إضافة منتج مع البيانات المدخلة
-                    context.push(
-                      '/dashboard/products/add',
-                      extra: {
-                        'productType': 'physical',
-                        'quickAdd': true,
-                        'name': nameController.text.trim(),
-                        'price': priceController.text.trim(),
-                      },
-                    );
-                  }
-                },
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('إضافة'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentColor,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateSelectedIndex(context);
-    final storeState = ref.watch(merchantStoreControllerProvider);
-    final store = storeState.store;
-
-    // جعل أيقونات شريط الحالة بيضاء (لأن الهيدر داكن)
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light, // أيقونات بيضاء
-        statusBarBrightness: Brightness.dark, // للـ iOS
-      ),
-    );
+    final storeAsync = ref.watch(merchantStoreControllerProvider);
+    final store = storeAsync.hasValue ? storeAsync.value : null;
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenSize = _getScreenSize(screenWidth);

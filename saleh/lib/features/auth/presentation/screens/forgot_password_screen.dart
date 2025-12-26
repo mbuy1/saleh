@@ -8,8 +8,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../data/auth_repository.dart';
 
-/// Ø´Ø§Ø´Ø© Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±
-/// ØªØ±Ø³Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù„Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
+/// شاشة نسيت كلمة المرور
+/// ØªØ±Ø³Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور Ù„Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -123,7 +123,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           // Ø§Ù„Ø¹Ù†ÙˆØ§Ù†
           const Text(
-            'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ',
+            'نسيت كلمة المرورØŸ',
             style: TextStyle(
               fontSize: AppDimensions.fontDisplay1,
               fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           const SizedBox(height: AppDimensions.spacing12),
 
           Text(
-            'Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØ³Ù†Ø±Ø³Ù„ Ù„Ùƒ Ø±Ø§Ø¨Ø· Ù„Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
+            'Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØ³Ù†Ø±Ø³Ù„ Ù„Ùƒ Ø±Ø§Ø¨Ø· Ù„Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور',
             style: TextStyle(
               fontSize: AppDimensions.fontBody,
               color: AppTheme.mutedSlate,
@@ -153,7 +153,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _handleSubmit(),
             decoration: InputDecoration(
-              labelText: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
+              labelText: 'البريد الإلكتروني',
               hintText: 'example@email.com',
               prefixIcon: Padding(
                 padding: AppDimensions.paddingS,
@@ -182,11 +182,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
+                return 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ البريد الإلكتروني';
               }
               final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
               if (!emailRegex.hasMatch(value)) {
-                return 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ­ÙŠØ­';
+                return 'البريد الإلكتروني ØºÙŠØ± ØµØ­ÙŠØ­';
               }
               return null;
             },
@@ -239,11 +239,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
           const SizedBox(height: AppDimensions.spacing24),
 
-          // Ø±Ø§Ø¨Ø· Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
+          // Ø±Ø§Ø¨Ø· Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول
           TextButton(
             onPressed: () => context.pop(),
             child: Text(
-              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„',
+              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول',
               style: TextStyle(
                 color: AppTheme.primaryColor,
                 fontWeight: FontWeight.w600,
@@ -297,7 +297,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: AppDimensions.spacing16),
 
         Text(
-          'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¥Ù„Ù‰\n${_emailController.text}',
+          'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† كلمة المرور Ø¥Ù„Ù‰\n${_emailController.text}',
           style: TextStyle(
             fontSize: AppDimensions.fontBody,
             color: AppTheme.mutedSlate,
@@ -341,7 +341,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Text(
                 'â€¢ ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„ÙˆØ§Ø±Ø¯ ÙÙŠ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ\n'
                 'â€¢ Ù‚Ø¯ ÙŠØµÙ„ Ø§Ù„Ø±Ø§Ø¨Ø· Ø¥Ù„Ù‰ Ù…Ø¬Ù„Ø¯ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ ØºÙŠØ± Ø§Ù„Ù…Ø±ØºÙˆØ¨ ÙÙŠÙ‡Ø§\n'
-                'â€¢ Ø§Ù„Ø±Ø§Ø¨Ø· ØµØ§Ù„Ø­ Ù„Ù…Ø¯Ø© 24 Ø³Ø§Ø¹Ø©',
+                'â€¢ Ø§Ù„Ø±Ø§Ø¨Ø· ØµØ§Ù„Ø­ Ù„Ù…Ø¯Ø© 24 ساعة',
                 style: TextStyle(
                   fontSize: AppDimensions.fontBody2,
                   color: AppTheme.infoColor.withValues(alpha: 0.9),
@@ -368,7 +368,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               elevation: 0,
             ),
             child: Text(
-              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„',
+              'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„تسجيل الدخول',
               style: TextStyle(
                 fontSize: AppDimensions.fontTitle,
                 fontWeight: FontWeight.bold,

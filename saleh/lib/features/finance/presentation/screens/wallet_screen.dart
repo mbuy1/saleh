@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// Ø´Ø§Ø´Ø© Ù…Ø­ÙØ¸Ø© Ø§Ù„ØªØ§Ø¬Ø±
-/// Ù…Ù„Ø§Ø­Ø¸Ø©: Ù…Ø·Ù„ÙˆØ¨ Ø±Ø¨Ø·Ù‡Ø§ Ø¨Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ© Ù…Ù† API Ù…Ø³ØªÙ‚Ø¨Ù„Ø§Ù‹
+/// شاشة محفظة التاجر
+/// ملاحظة: مطلوب ربطها بالبيانات الحقيقية من API مستقبلاً
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
 
@@ -92,7 +92,7 @@ class WalletScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Ø£Ø­Ø¯Ø« Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª',
+                            'أحدث المعاملات',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class WalletScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 Text(
-                                  'Ø¹Ø±Ø¶ Ø§Ù„ÙƒÙ„',
+                                  'عرض الكل',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -184,7 +184,7 @@ class WalletScreen extends StatelessWidget {
           // Title
           Expanded(
             child: Text(
-              'Ø§Ù„Ù…Ø­ÙØ¸Ø©',
+              'المحفظة',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
@@ -208,7 +208,7 @@ class WalletScreen extends StatelessWidget {
         TextSpan(
           children: [
             TextSpan(
-              text: 'Ù…Ø¹Ø±Ù Ø§Ù„ØªØ§Ø¬Ø±: ',
+              text: 'معرف التاجر: ',
               style: TextStyle(
                 color: isDark
                     ? AppTheme.textHintColorDark
@@ -283,7 +283,7 @@ class WalletScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù…ØªØ§Ø­',
+                      'الرصيد المتاح',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 14,
@@ -308,7 +308,7 @@ class WalletScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Ø±.Ø³',
+                      'ر.س',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 14,
@@ -337,7 +337,7 @@ class WalletScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '+Ù¡Ù¢Ùª Ø¹Ù† Ø§Ù„Ø´Ù‡Ø± Ø§Ù„Ù…Ø§Ø¶ÙŠ',
+                      '+12% عن الشهر الماضي',
                       style: TextStyle(
                         color: primaryColor,
                         fontSize: 12,
@@ -401,7 +401,7 @@ class WalletScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Ù†Ù‚Ø§Ø· Ø§Ù„ÙˆÙ„Ø§Ø¡',
+                      'نقاط الولاء',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 14,
@@ -426,7 +426,7 @@ class WalletScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Ù†Ù‚Ø·Ø©',
+                      'نقطة',
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 14,
@@ -439,7 +439,7 @@ class WalletScreen extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'ØªØ¹Ø§Ø¯Ù„ ',
+                      'تعادل ',
                       style: TextStyle(
                         color: isDark
                             ? AppTheme.textHintColorDark
@@ -448,7 +448,7 @@ class WalletScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Ù¥Ù£.Ù Ù  Ø±.Ø³',
+                      '53.00 ر.س',
                       style: TextStyle(
                         color: textColor,
                         fontSize: 12,
@@ -481,7 +481,7 @@ class WalletScreen extends StatelessWidget {
               isDark: isDark,
               cardColor: cardColor,
               icon: Icons.payments,
-              label: 'Ø³Ø­Ø¨ Ø§Ù„Ø±ØµÙŠØ¯',
+              label: 'سحب الرصيد',
               iconBgColor: primaryColor,
               iconColor: bgDark,
               textColor: isDark
@@ -495,7 +495,7 @@ class WalletScreen extends StatelessWidget {
               isDark: isDark,
               cardColor: cardColor,
               icon: Icons.currency_exchange,
-              label: 'Ø§Ø³ØªØ¨Ø¯Ø§Ù„ Ø§Ù„Ù†Ù‚Ø§Ø·',
+              label: 'استبدال النقاط',
               iconBgColor: isDark ? AppTheme.iconBgDark : cardColor,
               iconColor: textColor,
               textColor: isDark
@@ -510,7 +510,7 @@ class WalletScreen extends StatelessWidget {
               isDark: isDark,
               cardColor: cardColor,
               icon: Icons.tune,
-              label: 'ØªØµÙÙŠØ©',
+              label: 'تصفية',
               iconBgColor: isDark ? AppTheme.iconBgDark : cardColor,
               iconColor: textColor,
               textColor: isDark
@@ -601,9 +601,9 @@ class WalletScreen extends StatelessWidget {
             icon: Icons.shopping_cart,
             iconBgColor: primaryColor.withValues(alpha: 0.2),
             iconColor: primaryColor,
-            title: 'Ø·Ù„Ø¨ #9921',
-            subtitle: 'Ø§Ù„ÙŠÙˆÙ…ØŒ 10:30 Øµ',
-            amount: '+ 150.00 Ø±.Ø³',
+            title: 'طلب #9921',
+            subtitle: 'اليوم، 10:30 ص',
+            amount: '+ 150.00 ر.س',
             amountColor: primaryColor,
             textColor: textColor,
             secondaryTextColor: secondaryTextColor,
@@ -615,9 +615,9 @@ class WalletScreen extends StatelessWidget {
             icon: Icons.percent,
             iconBgColor: Colors.red.withValues(alpha: 0.1),
             iconColor: isDark ? Colors.red[400]! : Colors.red,
-            title: 'Ø±Ø³ÙˆÙ… Ø§Ù„Ù…Ù†ØµØ©',
-            subtitle: 'Ø£Ù…Ø³ØŒ 04:15 Ù…',
-            amount: '- 15.00 Ø±.Ø³',
+            title: 'رسوم المنصة',
+            subtitle: 'أمس، 04:15 م',
+            amount: '- 15.00 ر.س',
             amountColor: textColor,
             textColor: textColor,
             secondaryTextColor: secondaryTextColor,
@@ -633,9 +633,9 @@ class WalletScreen extends StatelessWidget {
             iconColor: isDark
                 ? AppTheme.textSecondaryColorDark
                 : AppTheme.textSecondaryColor,
-            title: 'Ø³Ø­Ø¨ Ø¥Ù„Ù‰ Ø§Ù„Ø¨Ù†Ùƒ',
-            subtitle: '12 Ø£ØºØ³Ø·Ø³ØŒ 09:00 Øµ',
-            amount: '- 2,500.00 Ø±.Ø³',
+            title: 'سحب إلى البنك',
+            subtitle: '12 أغسطس، 09:00 ص',
+            amount: '- 2,500.00 ر.س',
             amountColor: textColor,
             textColor: textColor,
             secondaryTextColor: secondaryTextColor,
@@ -647,9 +647,9 @@ class WalletScreen extends StatelessWidget {
             icon: Icons.star,
             iconBgColor: Colors.blue.withValues(alpha: 0.1),
             iconColor: isDark ? Colors.blue[400]! : Colors.blue,
-            title: 'Ù…ÙƒØ§ÙØ£Ø© Ø£Ø¯Ø§Ø¡',
-            subtitle: '10 Ø£ØºØ³Ø·Ø³',
-            amount: '+ 50 Ù†Ù‚Ø·Ø©',
+            title: 'مكافأة أداء',
+            subtitle: '10 أغسطس',
+            amount: '+ 50 نقطة',
             amountColor: isDark ? Colors.blue[400]! : Colors.blue,
             textColor: textColor,
             secondaryTextColor: secondaryTextColor,

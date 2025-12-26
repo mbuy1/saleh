@@ -4,8 +4,8 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class HeatmapScreen extends StatefulWidget {
   const HeatmapScreen({super.key});
@@ -110,7 +110,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ الخريطة الحرارية: $e')));
     }
   }
 
@@ -153,7 +153,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           ),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©'),
+        title: const Text('الخريطة الحرارية'),
         backgroundColor: AppTheme.primaryColor,
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -179,7 +179,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 1,
                 child: Text(
-                  'Ø§Ù„ÙŠÙˆÙ…',
+                  'Ø§Ù„يوم',
                   style: TextStyle(
                     fontWeight: _selectedDays == 1
                         ? FontWeight.bold
@@ -201,7 +201,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 30,
                 child: Text(
-                  '30 ÙŠÙˆÙ…',
+                  '30 يوم',
                   style: TextStyle(
                     fontWeight: _selectedDays == 30
                         ? FontWeight.bold
@@ -212,7 +212,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
               PopupMenuItem(
                 value: 90,
                 child: Text(
-                  '90 ÙŠÙˆÙ…',
+                  '90 يوم',
                   style: TextStyle(
                     fontWeight: _selectedDays == 90
                         ? FontWeight.bold
@@ -339,7 +339,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                         ),
                         SizedBox(height: AppDimensions.spacing8),
                         Text(
-                          'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ø¨Ø¹Ø¯',
+                          'لا توجد بيانات Ø¨Ø¹Ø¯',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -728,7 +728,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
 
                       // Heatmap visualization
                       const Text(
-                        'Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©',
+                        'الخريطة الحرارية',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -804,7 +804,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
           padding: AppDimensions.paddingXXL,
           child: Center(
             child: Text(
-              'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù†Ù‚Ø±Ø§Øª ÙƒØ§ÙÙŠØ©',
+              'لا توجد بيانات Ù†Ù‚Ø±Ø§Øª ÙƒØ§ÙÙŠØ©',
               style: TextStyle(color: Colors.grey),
             ),
           ),
@@ -1015,7 +1015,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¬Ù„Ø³Ø©: $e')));
+      ).showSnackBar(SnackBar(content: Text('ÙØ´Ù„ تحديث Ø§Ù„Ø¬Ù„Ø³Ø©: $e')));
     }
   }
 
@@ -1108,7 +1108,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ø§Ù„Ø­Ø±Ø§Ø±ÙŠØ©'),
+            title: const Text('Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª الخريطة الحرارية'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1170,10 +1170,10 @@ class _HeatmapScreenState extends State<HeatmapScreen>
                       value: _settings['data_retention_days'] ?? 30,
                       items: const [
                         DropdownMenuItem(value: 7, child: Text('7 Ø£ÙŠØ§Ù…')),
-                        DropdownMenuItem(value: 14, child: Text('14 ÙŠÙˆÙ…')),
-                        DropdownMenuItem(value: 30, child: Text('30 ÙŠÙˆÙ…')),
-                        DropdownMenuItem(value: 60, child: Text('60 ÙŠÙˆÙ…')),
-                        DropdownMenuItem(value: 90, child: Text('90 ÙŠÙˆÙ…')),
+                        DropdownMenuItem(value: 14, child: Text('14 يوم')),
+                        DropdownMenuItem(value: 30, child: Text('30 يوم')),
+                        DropdownMenuItem(value: 60, child: Text('60 يوم')),
+                        DropdownMenuItem(value: 90, child: Text('90 يوم')),
                       ],
                       onChanged: (value) {
                         setDialogState(() {
@@ -1188,7 +1188,7 @@ class _HeatmapScreenState extends State<HeatmapScreen>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Ø¥Ù„ØºØ§Ø¡'),
+                child: const Text('إلغاء'),
               ),
               ElevatedButton(
                 onPressed: () {
