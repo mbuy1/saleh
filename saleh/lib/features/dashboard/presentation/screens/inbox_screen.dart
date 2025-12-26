@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_icons.dart';
-import '../../../../core/theme/app_theme.dart';
-import 'notifications_screen.dart';
-import '../../../conversations/presentation/screens/conversations_screen.dart';
+import '../../../../shared/widgets/exports.dart';
 
 /// شاشة الوارد الموحدة - تجمع الإشعارات والمحادثات
 ///
 /// تحتوي على تبويبين:
-/// 1. الإشعارات - عرض الإشعارات من NotificationsScreen
-/// 2. المحادثات - عرض المحادثات من ConversationsScreen
+/// 1. الإشعارات - عرض الإشعارات
+/// 2. المحادثات - عرض المحادثات
 class InboxScreen extends ConsumerStatefulWidget {
   const InboxScreen({super.key});
 
@@ -125,11 +122,84 @@ class _InboxScreenState extends ConsumerState<InboxScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          // تبويب الإشعارات - نستخدم محتوى NotificationsScreen بدون AppBar
-          NotificationsScreen(showAppBar: false),
-          // تبويب المحادثات - نستخدم محتوى ConversationsScreen
-          ConversationsScreen(),
+        children: [
+          // تبويب الإشعارات
+          _buildNotificationsTab(),
+          // تبويب المحادثات
+          _buildConversationsTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationsTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.notifications_outlined,
+              size: 64,
+              color: AppTheme.primaryColor.withValues(alpha: 0.5),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'لا توجد إشعارات',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'ستظهر إشعاراتك هنا',
+            style: TextStyle(color: AppTheme.textSecondaryColor, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConversationsTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.chat_bubble_outline,
+              size: 64,
+              color: AppTheme.primaryColor.withValues(alpha: 0.5),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'لا توجد محادثات',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'ستظهر المحادثات هنا عند التواصل مع العملاء',
+            style: TextStyle(color: AppTheme.textSecondaryColor, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

@@ -15,7 +15,6 @@ import '../../features/dashboard/presentation/screens/merchant_services_screen.d
 import '../../features/dashboard/presentation/screens/mbuy_tools_screen.dart';
 import '../../features/dashboard/presentation/screens/shortcuts_screen.dart';
 import '../../features/dashboard/presentation/screens/audit_logs_screen.dart';
-import '../../features/dashboard/presentation/screens/notifications_screen.dart';
 import '../../features/dashboard/presentation/screens/inbox_screen.dart';
 import '../../features/dashboard/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/reports_screen.dart';
@@ -27,7 +26,6 @@ import '../../features/finance/presentation/screens/sales_screen.dart';
 import '../../features/store/presentation/screens/app_store_screen.dart';
 import '../../features/store/presentation/screens/inventory_screen.dart';
 import '../../features/store/presentation/screens/view_my_store_screen.dart';
-import '../../features/store/presentation/screens/store_tools_tab.dart';
 // Webstore & Settings
 import '../../apps/merchant/features/webstore/webstore_screen.dart';
 import '../../apps/merchant/features/shipping/shipping_screen.dart';
@@ -39,7 +37,6 @@ import '../../features/marketing/presentation/screens/flash_sales_screen.dart';
 import '../../features/marketing/presentation/screens/boost_sales_screen.dart';
 // Other features
 import '../../shared/widgets/base_screen.dart';
-import '../../features/conversations/presentation/screens/conversations_screen.dart';
 import '../../features/products/presentation/screens/add_product_screen.dart';
 import '../../features/products/presentation/screens/product_details_screen.dart';
 import '../../features/merchant/presentation/screens/create_store_screen.dart';
@@ -203,6 +200,48 @@ class AppRouter {
                   path: 'studio',
                   name: 'mbuy-studio',
                   builder: (context, state) => const StudioMainPage(),
+                  routes: [
+                    GoRoute(
+                      path: 'script-generator',
+                      name: 'studio-script',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final template = extra?['template'] as StudioTemplate?;
+                        return ScriptGeneratorScreen(template: template);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'editor',
+                      name: 'studio-editor',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final projectId = extra?['projectId'] as String? ?? '';
+                        final script = extra?['script'] as ScriptData?;
+                        return SceneEditorScreen(
+                          projectId: projectId,
+                          initialScript: script,
+                        );
+                      },
+                    ),
+                    GoRoute(
+                      path: 'canvas',
+                      name: 'studio-canvas',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final scene = extra?['scene'] as Scene;
+                        return CanvasEditorScreen(scene: scene);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'export',
+                      name: 'studio-export',
+                      builder: (context, state) {
+                        final extra = state.extra as Map<String, dynamic>?;
+                        final projectId = extra?['projectId'] as String? ?? '';
+                        return ExportScreen(projectId: projectId);
+                      },
+                    ),
+                  ],
                 ),
                 GoRoute(
                   path: 'tools',
@@ -275,11 +314,6 @@ class AppRouter {
                   path: 'view-store',
                   name: 'view-store',
                   builder: (context, state) => const ViewMyStoreScreen(),
-                ),
-                GoRoute(
-                  path: 'notifications',
-                  name: 'notifications',
-                  builder: (context, state) => const NotificationsScreen(),
                 ),
                 GoRoute(
                   path: 'inbox',
@@ -358,73 +392,6 @@ class AppRouter {
                   name: 'smart-pricing',
                   builder: (context, state) => const SmartPricingScreen(),
                 ),
-                // صفحة المتجر الجديدة (تسويق + أدوات AI)
-                GoRoute(
-                  path: 'store-tools',
-                  name: 'store-tools',
-                  builder: (context, state) => const StoreToolsTab(),
-                ),
-                // صفحة توليد AI (للتوافق - تحويل للصفحة الجديدة)
-                GoRoute(
-                  path: 'ai-generation',
-                  name: 'ai-generation',
-                  builder: (context, state) => const StudioMainPage(),
-                ),
-                // ====== استوديو المحتوى AI ======
-                GoRoute(
-                  path: 'content-studio',
-                  name: 'content-studio',
-                  builder: (context, state) => const StudioHomeScreen(),
-                  routes: [
-                    GoRoute(
-                      path: 'script-generator',
-                      name: 'studio-script',
-                      builder: (context, state) {
-                        final extra = state.extra as Map<String, dynamic>?;
-                        final template = extra?['template'] as StudioTemplate?;
-                        return ScriptGeneratorScreen(template: template);
-                      },
-                    ),
-                    GoRoute(
-                      path: 'editor',
-                      name: 'studio-editor',
-                      builder: (context, state) {
-                        final extra = state.extra as Map<String, dynamic>?;
-                        final projectId = extra?['projectId'] as String? ?? '';
-                        final script = extra?['script'] as ScriptData?;
-                        return SceneEditorScreen(
-                          projectId: projectId,
-                          initialScript: script,
-                        );
-                      },
-                    ),
-                    GoRoute(
-                      path: 'canvas',
-                      name: 'studio-canvas',
-                      builder: (context, state) {
-                        final extra = state.extra as Map<String, dynamic>?;
-                        final scene = extra?['scene'] as Scene;
-                        return CanvasEditorScreen(scene: scene);
-                      },
-                    ),
-                    GoRoute(
-                      path: 'preview',
-                      name: 'studio-preview',
-                      builder: (context, state) {
-                        return ComingSoonScreen(title: 'معاينة الفيديو');
-                      },
-                    ),
-                    GoRoute(
-                      path: 'export',
-                      name: 'studio-export',
-                      builder: (context, state) {
-                        final extra = state.extra as Map<String, dynamic>?;
-                        final projectId = extra?['projectId'] as String? ?? '';
-                        return ExportScreen(projectId: projectId);
-                      },
-                    ),
-                  ],
-                ),
                 // ====== أدوات AI الإضافية ======
                 GoRoute(
                   path: 'ai-assistant',
@@ -492,12 +459,6 @@ class AppRouter {
                   },
                 ),
               ],
-            ),
-            // تبويب المحادثات
-            GoRoute(
-              path: '/dashboard/conversations',
-              name: 'conversations',
-              builder: (context, state) => const ConversationsScreen(),
             ),
             // تبويب المتجر
             GoRoute(

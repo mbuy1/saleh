@@ -8,6 +8,7 @@ import '../../../../core/constants/app_icons.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../../shared/widgets/app_search_delegate.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
+import 'all_menu_drawer.dart';
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
 // ║                    ⚠️ تحذير مهم - DESIGN FROZEN ⚠️                        ║
@@ -523,16 +524,20 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
       ),
     );
 
-    return Scaffold(
-      body: Column(
-        children: [
-          // الهيدر العلوي الثابت
-          _buildPersistentHeader(context, store?.name ?? 'mbuy'),
-          // المحتوى
-          Expanded(child: widget.child),
-        ],
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        drawer: const AllMenuDrawer(),
+        body: Column(
+          children: [
+            // الهيدر العلوي الثابت
+            _buildPersistentHeader(context, store?.name ?? 'mbuy'),
+            // المحتوى
+            Expanded(child: widget.child),
+          ],
+        ),
+        bottomNavigationBar: _buildCustomBottomNav(context, currentIndex),
       ),
-      bottomNavigationBar: _buildCustomBottomNav(context, currentIndex),
     );
   }
 
@@ -617,23 +622,26 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
                 ],
               ),
               const SizedBox(width: 8),
-              // أيقونة المتجر - قابلة للضغط
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  context.push('/dashboard/store-management');
-                },
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.storefront,
-                    color: Colors.white,
-                    size: 20,
+              // أيقونة المتجر - تفتح قائمة "الكل"
+              Builder(
+                builder: (scaffoldContext) => GestureDetector(
+                  onTap: () {
+                    debugPrint('🔵 STORE_ICON_TAPPED');
+                    HapticFeedback.lightImpact();
+                    Scaffold.of(scaffoldContext).openDrawer();
+                  },
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.storefront,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
