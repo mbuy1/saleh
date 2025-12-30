@@ -8,9 +8,9 @@ class PermissionsHelper {
   /// Check if user can add products to cart (customers only)
   static Future<bool> canAddToCart() async {
     try {
-      final role = await _storage.read(key: AppConfig.userRoleKey);
+      final userType = await _storage.read(key: AppConfig.userTypeKey);
       // Only customers can add to cart, merchants cannot
-      return role == 'customer';
+      return userType == 'customer';
     } catch (e) {
       return false;
     }

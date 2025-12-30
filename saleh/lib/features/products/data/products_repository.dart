@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/app_config.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/auth_token_storage.dart';
 import '../domain/models/product.dart';
 
-/// Products Repository
+/// Products Repository (Worker v2.0)
 /// يتعامل مع جميع عمليات API الخاصة بالمنتجات
 class ProductsRepository {
   final ApiService _apiService;
@@ -14,8 +15,7 @@ class ProductsRepository {
   ProductsRepository(this._apiService, this._tokenStorage);
 
   /// جلب جميع منتجات التاجر
-  /// المسار: GET /secure/merchant/products
-  /// Worker يستدعي Edge Function: merchant_products
+  /// المسار: GET /api/merchant/products
   ///
   /// إذا لم يوجد متجر أو منتجات، يرجع قائمة فارغة بدلاً من Exception
   Future<List<Product>> getMerchantProducts() async {
@@ -26,7 +26,7 @@ class ProductsRepository {
       }
 
       final response = await _apiService.get(
-        '/secure/merchant/products',
+        AppConfig.merchantProductsEndpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -43,7 +43,7 @@ class ProductsRepository {
             '🔍 [getMerchantProducts] Response data: ${jsonEncode(data)}',
           );
 
-          if (data['ok'] == true) {
+          if (data['success'] == true) {
             final List productsList = data['data'] ?? [];
 
             debugPrint(
@@ -60,8 +60,10 @@ class ProductsRepository {
 
             return productsList.map((json) => Product.fromJson(json)).toList();
           } else {
-            // Worker returned ok:false - treat as empty for now
-            debugPrint('⚠️ [getMerchantProducts] Worker returned ok:false');
+            // Worker returned success:false - treat as empty for now
+            debugPrint(
+              '⚠️ [getMerchantProducts] Worker returned success:false',
+            );
             return [];
           }
         } catch (parseError) {
@@ -83,7 +85,7 @@ class ProductsRepository {
   }
 
   /// طلب روابط رفع الوسائط من Worker
-  /// المسار: POST /secure/media/upload-urls
+  /// المسار: POST /api/merchant/media/upload-urls
   Future<List<Map<String, dynamic>>> getUploadUrls({
     required List<Map<String, String>> files,
   }) async {
@@ -96,14 +98,14 @@ class ProductsRepository {
       final body = {'files': files};
 
       final response = await _apiService.post(
-        '/secure/media/upload-urls',
+        '/api/merchant/media/upload-urls',
         body: body,
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = jsonDecode(response.body);
-        if (data['ok'] == true && data['uploadUrls'] != null) {
+        if (data['success'] == true && data['uploadUrls'] != null) {
           return List<Map<String, dynamic>>.from(data['uploadUrls']);
         }
         throw Exception('Upload URLs response missing data: ${response.body}');
@@ -119,8 +121,7 @@ class ProductsRepository {
   }
 
   /// إضافة منتج جديد
-  /// المسار: POST /secure/products
-  /// Worker يستدعي Edge Function: product_create
+  /// المسار: POST /api/merchant/products
   Future<Product> createProduct({
     required String name,
     required double price,
@@ -152,7 +153,7 @@ class ProductsRepository {
       };
 
       final response = await _apiService.post(
-        '/secure/products',
+        AppConfig.merchantProductsEndpoint,
         body: body,
         headers: {'Authorization': 'Bearer $token'},
       );
@@ -161,7 +162,7 @@ class ProductsRepository {
         try {
           final data = jsonDecode(response.body);
 
-          if (data['ok'] == true && data['data'] != null) {
+          if (data['success'] == true && data['data'] != null) {
             // DEBUG: Print server debug info
             if (data['debug'] != null) {
               debugPrint(
@@ -236,14 +237,14 @@ class ProductsRepository {
       if (extraData != null) body['extra_data'] = extraData;
 
       final response = await _apiService.put(
-        '/secure/products/$productId',
+        '${AppConfig.merchantProductsEndpoint}/$productId',
         body: body,
         headers: {'Authorization': 'Bearer $token'},
       );
 
       final data = jsonDecode(response.body);
 
-      if (data['ok'] == true) {
+      if (data['success'] == true) {
         return Product.fromJson(data['data']);
       } else {
         throw Exception(data['error'] ?? 'فشل تحديث المنتج');
@@ -262,13 +263,13 @@ class ProductsRepository {
       }
 
       final response = await _apiService.delete(
-        '/secure/products/$productId',
+        '${AppConfig.merchantProductsEndpoint}/$productId',
         headers: {'Authorization': 'Bearer $token'},
       );
 
       final data = jsonDecode(response.body);
 
-      if (data['ok'] != true) {
+      if (data['success'] != true) {
         throw Exception(data['error'] ?? 'فشل حذف المنتج');
       }
     } catch (e) {
@@ -293,7 +294,7 @@ class ProductsRepository {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['ok'] == true && data['data'] != null) {
+        if (data['success'] == true && data['data'] != null) {
           final List productsList = data['data'] as List;
           return productsList
               .map((json) => json as Map<String, dynamic>)
@@ -325,7 +326,7 @@ class ProductsRepository {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['ok'] == true && data['data'] != null) {
+        if (data['success'] == true && data['data'] != null) {
           final List listings = data['data'] as List;
           return listings.map((json) => json as Map<String, dynamic>).toList();
         }
@@ -366,7 +367,7 @@ class ProductsRepository {
 
       final data = jsonDecode(response.body);
 
-      if (response.statusCode == 201 && data['ok'] == true) {
+      if (response.statusCode == 201 && data['success'] == true) {
         return data['data'] as Map<String, dynamic>;
       }
 

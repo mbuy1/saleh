@@ -197,7 +197,7 @@ class ApiService {
     throw Exception('Max retries exceeded');
   }
 
-  /// Refresh authentication token using Supabase refresh endpoint
+  /// Refresh authentication token using Worker v2.0 refresh endpoint
   Future<bool> _refreshToken() async {
     try {
       debugPrint('[ApiService] Attempting to refresh token');
@@ -208,15 +208,14 @@ class ApiService {
 
       if (refreshToken == null || refreshToken.isEmpty) {
         debugPrint('[ApiService] No refresh token found');
-        // ✅ Clear all tokens when no refresh token exists
         await _clearAllTokens();
         return false;
       }
 
-      // Call Worker /auth/supabase/refresh endpoint
+      // Call Worker /auth/refresh endpoint (v2.0)
       final response = await http
           .post(
-            Uri.parse('$baseUrl/auth/supabase/refresh'),
+            Uri.parse('$baseUrl${AppConfig.refreshEndpoint}'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'refresh_token': refreshToken}),
           )
@@ -225,14 +224,14 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        // Worker returns: { success: true, access_token: "...", refresh_token: "...", expires_in: 3600 }
-        if (data['access_token'] != null) {
+        // Worker v2.0 returns: { success: true, token: "...", refresh_token: "...", expires_in: 3600 }
+        if (data['token'] != null) {
           debugPrint('[ApiService] Token refresh successful');
 
           // Save new access token
           await _secureStorage.write(
             key: AppConfig.accessTokenKey,
-            value: data['access_token'],
+            value: data['token'],
           );
 
           // Save new refresh token if provided
@@ -243,32 +242,40 @@ class ApiService {
             );
           }
 
+          // Update expiry time
+          if (data['expires_in'] != null) {
+            final expiresAt = DateTime.now()
+                .add(Duration(seconds: data['expires_in'] as int))
+                .toIso8601String();
+            await _secureStorage.write(key: 'expires_at', value: expiresAt);
+          }
+
           return true;
         }
       }
 
-      // ✅ Refresh failed - clear all tokens to force re-login
       debugPrint('[ApiService] Token refresh failed: ${response.statusCode}');
       debugPrint('[ApiService] Clearing all tokens - user needs to re-login');
       await _clearAllTokens();
       return false;
     } catch (e) {
       debugPrint('[ApiService] Token refresh error: $e');
-      // ✅ On any error, clear tokens to ensure clean state
       await _clearAllTokens();
       return false;
     }
   }
 
   /// Clear all authentication tokens from secure storage
-  /// Called when refresh fails or user logs out
   Future<void> _clearAllTokens() async {
     try {
       await _secureStorage.delete(key: AppConfig.accessTokenKey);
       await _secureStorage.delete(key: AppConfig.refreshTokenKey);
       await _secureStorage.delete(key: 'user_id');
-      await _secureStorage.delete(key: 'user_role');
+      await _secureStorage.delete(key: 'user_type');
       await _secureStorage.delete(key: 'user_email');
+      await _secureStorage.delete(key: 'merchant_id');
+      await _secureStorage.delete(key: 'display_name');
+      await _secureStorage.delete(key: 'expires_at');
       debugPrint('[ApiService] All tokens cleared successfully');
     } catch (e) {
       debugPrint('[ApiService] Error clearing tokens: $e');

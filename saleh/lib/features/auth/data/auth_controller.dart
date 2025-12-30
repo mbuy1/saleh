@@ -1,44 +1,56 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_repository.dart';
 
-/// حالة المصادقة
+/// حالة المصادقة (Worker v2.0)
 class AuthState {
   final bool isLoading;
   final bool isAuthenticated;
   final String? errorMessage;
-  final String? userRole;
+  final String? userType; // تغيير من userRole
   final String? userId;
   final String? userEmail;
+  final String? merchantId; // جديد
+  final String? displayName; // جديد
 
   const AuthState({
     this.isLoading = false,
     this.isAuthenticated = false,
     this.errorMessage,
-    this.userRole,
+    this.userType,
     this.userId,
     this.userEmail,
+    this.merchantId,
+    this.displayName,
   });
+
+  /// للتوافق مع الكود القديم
+  @Deprecated('Use userType instead')
+  String? get userRole => userType;
 
   AuthState copyWith({
     bool? isLoading,
     bool? isAuthenticated,
     String? errorMessage,
-    String? userRole,
+    String? userType,
     String? userId,
     String? userEmail,
+    String? merchantId,
+    String? displayName,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       errorMessage: errorMessage,
-      userRole: userRole ?? this.userRole,
+      userType: userType ?? this.userType,
       userId: userId ?? this.userId,
       userEmail: userEmail ?? this.userEmail,
+      merchantId: merchantId ?? this.merchantId,
+      displayName: displayName ?? this.displayName,
     );
   }
 }
 
-/// Auth Controller - يدير حالة المصادقة باستخدام Riverpod
+/// Auth Controller - يدير حالة المصادقة باستخدام Riverpod (Worker v2.0)
 class AuthController extends Notifier<AuthState> {
   late AuthRepository _authRepository;
 
@@ -54,30 +66,23 @@ class AuthController extends Notifier<AuthState> {
   Future<void> _checkInitialSession() async {
     try {
       final hasSession = await _authRepository.hasValidSession();
-      // التحقق من أن الـ provider لم يتم التخلص منه
       if (!ref.mounted) return;
 
       if (hasSession) {
-        final userRole = await _authRepository.getUserRole();
-        if (!ref.mounted) return;
-
-        final userId = await _authRepository.getUserId();
-        if (!ref.mounted) return;
-
-        final userEmail = await _authRepository.getUserEmail();
+        final userData = await _authRepository.getAllUserData();
         if (!ref.mounted) return;
 
         state = state.copyWith(
           isAuthenticated: true,
-          userRole: userRole,
-          userId: userId,
-          userEmail: userEmail,
+          userType: userData['userType'],
+          userId: userData['userId'],
+          userEmail: userData['userEmail'],
+          merchantId: userData['merchantId'],
+          displayName: userData['displayName'],
         );
       }
     } catch (e) {
-      // التحقق من أن الـ provider لم يتم التخلص منه
       if (!ref.mounted) return;
-      // في حالة وجود خطأ، نعتبر المستخدم غير مسجل
       state = state.copyWith(isAuthenticated: false);
     }
   }
@@ -87,12 +92,12 @@ class AuthController extends Notifier<AuthState> {
   /// [email] البريد الإلكتروني
   /// [password] كلمة المرور
   /// [fullName] الاسم الكامل
-  /// [role] الدور: merchant أو customer
+  /// [userType] نوع المستخدم: merchant أو customer
   Future<void> register({
     required String email,
     required String password,
     String? fullName,
-    String role = 'merchant',
+    String userType = 'merchant',
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -101,24 +106,22 @@ class AuthController extends Notifier<AuthState> {
         email: email,
         password: password,
         fullName: fullName,
-        role: role,
+        userType: userType,
       );
 
       if (!ref.mounted) return;
 
       final user = result['user'] as Map<String, dynamic>;
-      final profile = result['profile'] as Map<String, dynamic>?;
-
-      final userRole =
-          user['role'] as String? ?? profile?['role'] as String? ?? role;
 
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: true,
         errorMessage: null,
-        userRole: userRole,
+        userType: user['user_type'] as String? ?? userType,
         userId: user['id'] as String?,
         userEmail: user['email'] as String?,
+        merchantId: user['merchant_id'] as String?,
+        displayName: user['full_name'] as String? ?? fullName,
       );
     } on Exception catch (e) {
       if (!ref.mounted) return;
@@ -143,17 +146,15 @@ class AuthController extends Notifier<AuthState> {
   ///
   /// [identifier] الإيميل
   /// [password] كلمة المرور
-  /// [loginAs] اختياري: "merchant" أو "customer"
+  /// [loginAs] اختياري: غير مستخدم (للتوافق)
   Future<void> login({
     required String identifier,
     required String password,
     String? loginAs,
   }) async {
-    // تعيين حالة التحميل
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      // محاولة تسجيل الدخول
       final result = await _authRepository.signIn(
         identifier: identifier,
         password: password,
@@ -162,30 +163,20 @@ class AuthController extends Notifier<AuthState> {
 
       if (!ref.mounted) return;
 
-      // استخراج معلومات المستخدم
       final user = result['user'] as Map<String, dynamic>;
 
-      // Profile قد يكون null
-      final profile = result['profile'] != null
-          ? result['profile'] as Map<String, dynamic>
-          : null;
-
-      // Role من user له الأولوية، ثم profile
-      final userRole =
-          user['role'] as String? ?? profile?['role'] as String? ?? 'customer';
-
-      // تحديث الحالة - نجح تسجيل الدخول
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: true,
         errorMessage: null,
-        userRole: userRole,
+        userType: user['user_type'] as String? ?? 'customer',
         userId: user['id'] as String?,
         userEmail: user['email'] as String?,
+        merchantId: user['merchant_id'] as String?,
+        displayName: user['full_name'] as String?,
       );
     } on Exception catch (e) {
       if (!ref.mounted) return;
-      // فشل تسجيل الدخول
       String errorMsg = e.toString().replaceFirst('Exception: ', '');
 
       state = state.copyWith(
@@ -195,7 +186,6 @@ class AuthController extends Notifier<AuthState> {
       );
     } catch (e) {
       if (!ref.mounted) return;
-      // خطأ غير متوقع
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: false,
@@ -210,11 +200,9 @@ class AuthController extends Notifier<AuthState> {
       await _authRepository.signOut();
       if (!ref.mounted) return;
 
-      // إعادة تعيين الحالة
       state = const AuthState(isLoading: false, isAuthenticated: false);
     } catch (e) {
       if (!ref.mounted) return;
-      // حتى لو فشل، نعتبر المستخدم خرج
       state = const AuthState(isLoading: false, isAuthenticated: false);
     }
   }
@@ -231,20 +219,16 @@ class AuthController extends Notifier<AuthState> {
       if (!ref.mounted) return;
 
       if (hasSession) {
-        final userRole = await _authRepository.getUserRole();
-        if (!ref.mounted) return;
-
-        final userId = await _authRepository.getUserId();
-        if (!ref.mounted) return;
-
-        final userEmail = await _authRepository.getUserEmail();
+        final userData = await _authRepository.getAllUserData();
         if (!ref.mounted) return;
 
         state = state.copyWith(
           isAuthenticated: true,
-          userRole: userRole,
-          userId: userId,
-          userEmail: userEmail,
+          userType: userData['userType'],
+          userId: userData['userId'],
+          userEmail: userData['userEmail'],
+          merchantId: userData['merchantId'],
+          displayName: userData['displayName'],
         );
       } else {
         state = state.copyWith(isAuthenticated: false);
@@ -257,7 +241,7 @@ class AuthController extends Notifier<AuthState> {
 }
 
 // ==========================================================================
-// Riverpod Provider
+// Riverpod Providers
 // ==========================================================================
 
 /// Provider لـ AuthController
@@ -270,12 +254,28 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
   return ref.watch(authControllerProvider).isAuthenticated;
 });
 
-/// Provider للحصول على دور المستخدم
+/// Provider للحصول على نوع المستخدم
+final userTypeProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).userType;
+});
+
+/// للتوافق مع الكود القديم
+@Deprecated('Use userTypeProvider instead')
 final userRoleProvider = Provider<String?>((ref) {
-  return ref.watch(authControllerProvider).userRole;
+  return ref.watch(authControllerProvider).userType;
 });
 
 /// Provider للحصول على إيميل المستخدم
 final userEmailProvider = Provider<String?>((ref) {
   return ref.watch(authControllerProvider).userEmail;
+});
+
+/// Provider للحصول على معرف التاجر
+final merchantIdProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).merchantId;
+});
+
+/// Provider للحصول على اسم العرض
+final displayNameProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).displayName;
 });

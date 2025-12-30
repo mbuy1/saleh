@@ -38,7 +38,7 @@ class AppRouter {
       redirect: (context, state) {
         final authState = ref.read(authControllerProvider);
         final isAuthenticated = authState.isAuthenticated;
-        final userRole = authState.userRole;
+        final userType = authState.userType;
         final isLoggingIn = state.matchedLocation == '/login';
         final isDashboardRoute = state.matchedLocation.startsWith('/dashboard');
 
@@ -47,8 +47,8 @@ class AppRouter {
           return '/login';
         }
 
-        // Role-based protection: فقط merchant يمكنه الوصول لـ dashboard
-        if (isAuthenticated && isDashboardRoute && userRole != 'merchant') {
+        // Type-based protection: فقط merchant يمكنه الوصول لـ dashboard
+        if (isAuthenticated && isDashboardRoute && userType != 'merchant') {
           // إذا كان المستخدم ليس merchant، نعيده لصفحة تسجيل الدخول
           return '/login';
         }

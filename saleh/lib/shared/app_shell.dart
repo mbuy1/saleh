@@ -59,13 +59,13 @@ class _AppShellState extends ConsumerState<AppShell> {
       final updatedAuthState = ref.read(authControllerProvider);
 
       if (updatedAuthState.isAuthenticated &&
-          updatedAuthState.userRole != null) {
+          updatedAuthState.userType != null) {
         // توجد جلسة صالحة - انتقل لتطبيق التاجر فقط
-        // نتحقق من الدور (يجب أن يكون merchant)
-        if (updatedAuthState.userRole == 'merchant') {
+        // نتحقق من نوع المستخدم (يجب أن يكون merchant)
+        if (updatedAuthState.userType == 'merchant') {
           rootController.switchToMerchantApp();
         } else {
-          // إذا كان دور المستخدم ليس merchant، نعتبره merchant (للتوافق)
+          // إذا كان نوع المستخدم ليس merchant، نعتبره merchant (للتوافق)
           rootController.switchToMerchantApp();
         }
       } else {

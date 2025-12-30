@@ -34,11 +34,11 @@ void main() {
         expect(fullName.split(' ').length >= 2, isTrue);
       });
 
-      test('يقبل أدوار صالحة', () {
-        final validRoles = ['merchant', 'customer'];
-        expect(validRoles.contains('merchant'), isTrue);
-        expect(validRoles.contains('customer'), isTrue);
-        expect(validRoles.contains('admin'), isFalse);
+      test('يقبل أنواع مستخدمين صالحة', () {
+        final validUserTypes = ['merchant', 'customer'];
+        expect(validUserTypes.contains('merchant'), isTrue);
+        expect(validUserTypes.contains('customer'), isTrue);
+        expect(validUserTypes.contains('admin'), isFalse);
       });
     });
   });
@@ -50,7 +50,7 @@ void main() {
         expect(state.isLoading, isFalse);
         expect(state.isAuthenticated, isFalse);
         expect(state.errorMessage, isNull);
-        expect(state.userRole, isNull);
+        expect(state.userType, isNull);
       });
 
       test('copyWith يعمل بشكل صحيح', () {
@@ -58,25 +58,25 @@ void main() {
         final newState = state.copyWith(
           isLoading: true,
           isAuthenticated: true,
-          userRole: 'merchant',
+          userType: 'merchant',
         );
 
         expect(newState.isLoading, isTrue);
         expect(newState.isAuthenticated, isTrue);
-        expect(newState.userRole, equals('merchant'));
+        expect(newState.userType, equals('merchant'));
       });
 
       test('copyWith يحافظ على القيم غير المتغيرة', () {
         const state = AuthState(
           isAuthenticated: true,
-          userRole: 'merchant',
+          userType: 'merchant',
           userId: '123',
         );
         final newState = state.copyWith(isLoading: true);
 
         expect(newState.isLoading, isTrue);
         expect(newState.isAuthenticated, isTrue);
-        expect(newState.userRole, equals('merchant'));
+        expect(newState.userType, equals('merchant'));
         expect(newState.userId, equals('123'));
       });
     });

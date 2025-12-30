@@ -35,14 +35,14 @@ class MockAuthRepository extends _i1.Mock implements _i2.AuthRepository {
     required String? email,
     required String? password,
     String? fullName,
-    String? role = 'merchant',
+    String? userType = 'merchant',
   }) =>
       (super.noSuchMethod(
             Invocation.method(#signUp, [], {
               #email: email,
               #password: password,
               #fullName: fullName,
-              #role: role,
+              #userType: userType,
             }),
             returnValue: _i3.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
@@ -95,6 +95,14 @@ class MockAuthRepository extends _i1.Mock implements _i2.AuthRepository {
           as _i3.Future<bool>);
 
   @override
+  _i3.Future<String?> getUserType() =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserType, []),
+            returnValue: _i3.Future<String?>.value(),
+          )
+          as _i3.Future<String?>);
+
+  @override
   _i3.Future<String?> getUserRole() =>
       (super.noSuchMethod(
             Invocation.method(#getUserRole, []),
@@ -117,4 +125,30 @@ class MockAuthRepository extends _i1.Mock implements _i2.AuthRepository {
             returnValue: _i3.Future<String?>.value(),
           )
           as _i3.Future<String?>);
+
+  @override
+  _i3.Future<String?> getMerchantId() =>
+      (super.noSuchMethod(
+            Invocation.method(#getMerchantId, []),
+            returnValue: _i3.Future<String?>.value(),
+          )
+          as _i3.Future<String?>);
+
+  @override
+  _i3.Future<String?> getDisplayName() =>
+      (super.noSuchMethod(
+            Invocation.method(#getDisplayName, []),
+            returnValue: _i3.Future<String?>.value(),
+          )
+          as _i3.Future<String?>);
+
+  @override
+  _i3.Future<Map<String, String?>> getAllUserData() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllUserData, []),
+            returnValue: _i3.Future<Map<String, String?>>.value(
+              <String, String?>{},
+            ),
+          )
+          as _i3.Future<Map<String, String?>>);
 }

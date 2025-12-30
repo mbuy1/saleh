@@ -54,7 +54,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     _buildInfoTile(
                       icon: AppIcons.person,
                       title: 'نوع الحساب',
-                      subtitle: authState.userRole == 'merchant'
+                      subtitle: authState.userType == 'merchant'
                           ? 'تاجر'
                           : 'عميل',
                     ),
@@ -86,8 +86,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     _buildSwitchTile(
                       icon: AppIcons.notifications,
                       title: 'إشعارات التطبيق',
-                      subtitle:
-                          'استلام إشعارات الطلبات والتحديثات',
+                      subtitle: 'استلام إشعارات الطلبات والتحديثات',
                       value: _notificationsEnabled,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();
@@ -98,8 +97,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     _buildSwitchTile(
                       icon: AppIcons.email,
                       title: 'إشعارات البريد',
-                      subtitle:
-                          'استلام تحديثات عبر البريد الإلكتروني',
+                      subtitle: 'استلام تحديثات عبر البريد الإلكتروني',
                       value: _emailNotifications,
                       onChanged: (value) {
                         HapticFeedback.selectionClick();

@@ -997,14 +997,14 @@ class _HeatmapScreenState extends State<HeatmapScreen>
   }
 
   String _formatDuration(int seconds) {
-    if (seconds < 60) return '${seconds}ث';
+    if (seconds < 60) return '$seconds ث';
     if (seconds < 3600) {
       final mins = seconds ~/ 60;
-      return '${mins}د';
+      return '$mins د';
     }
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
-    return '${hours}س ${minutes}د';
+    return '$hours س $minutes د';
   }
 
   Future<void> _toggleSessionStar(String sessionId) async {

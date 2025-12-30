@@ -18,7 +18,7 @@ void main() {
       expect(state.isLoading, false);
       expect(state.isAuthenticated, false);
       expect(state.errorMessage, null);
-      expect(state.userRole, null);
+      expect(state.userType, null);
       expect(state.userId, null);
       expect(state.userEmail, null);
     });
@@ -27,7 +27,7 @@ void main() {
       const state = AuthState(
         isLoading: true,
         isAuthenticated: true,
-        userRole: 'merchant',
+        userType: 'merchant',
         userId: 'user-123',
         userEmail: 'test@example.com',
       );
@@ -36,7 +36,7 @@ void main() {
 
       expect(newState.isLoading, false);
       expect(newState.isAuthenticated, true);
-      expect(newState.userRole, 'merchant');
+      expect(newState.userType, 'merchant');
       expect(newState.userId, 'user-123');
       expect(newState.userEmail, 'test@example.com');
     });
@@ -55,14 +55,14 @@ void main() {
       final newState = state.copyWith(
         isLoading: true,
         isAuthenticated: true,
-        userRole: 'customer',
+        userType: 'customer',
         userId: 'new-user-456',
         userEmail: 'new@example.com',
       );
 
       expect(newState.isLoading, true);
       expect(newState.isAuthenticated, true);
-      expect(newState.userRole, 'customer');
+      expect(newState.userType, 'customer');
       expect(newState.userId, 'new-user-456');
       expect(newState.userEmail, 'new@example.com');
     });
@@ -75,14 +75,14 @@ void main() {
       expect(state.isLoading, isFalse);
       expect(state.isAuthenticated, isFalse);
       expect(state.errorMessage, isNull);
-      expect(state.userRole, isNull);
+      expect(state.userType, isNull);
     });
 
     test('AuthState copyWith preserves unset values', () {
       const originalState = AuthState(
         isLoading: false,
         isAuthenticated: true,
-        userRole: 'merchant',
+        userType: 'merchant',
         userId: 'abc-123',
         userEmail: 'merchant@test.com',
       );
@@ -91,7 +91,7 @@ void main() {
 
       expect(newState.isLoading, isTrue);
       expect(newState.isAuthenticated, isTrue);
-      expect(newState.userRole, 'merchant');
+      expect(newState.userType, 'merchant');
       expect(newState.userId, 'abc-123');
       expect(newState.userEmail, 'merchant@test.com');
     });
@@ -143,13 +143,15 @@ void main() {
     test('حالة المصادقة مع جلسة موجودة', () async {
       // Arrange
       when(mockAuthRepository.hasValidSession()).thenAnswer((_) async => true);
-      when(
-        mockAuthRepository.getUserRole(),
-      ).thenAnswer((_) async => 'merchant');
-      when(mockAuthRepository.getUserId()).thenAnswer((_) async => 'user-123');
-      when(
-        mockAuthRepository.getUserEmail(),
-      ).thenAnswer((_) async => 'merchant@example.com');
+      when(mockAuthRepository.getAllUserData()).thenAnswer(
+        (_) async => {
+          'userType': 'merchant',
+          'userId': 'user-123',
+          'userEmail': 'merchant@example.com',
+          'merchantId': null,
+          'displayName': 'Test User',
+        },
+      );
 
       container = createContainer();
 
@@ -169,7 +171,7 @@ void main() {
 
       // Assert
       expect(state.isAuthenticated, true);
-      expect(state.userRole, 'merchant');
+      expect(state.userType, 'merchant');
       expect(state.userId, 'user-123');
       expect(state.userEmail, 'merchant@example.com');
     });
@@ -189,7 +191,7 @@ void main() {
       final state = container.read(authControllerProvider);
       expect(state.isAuthenticated, false);
       expect(state.isLoading, false);
-      expect(state.userRole, null);
+      expect(state.userType, null);
     });
 
     test('clearError يجب أن يمسح رسالة الخطأ', () async {
@@ -215,8 +217,8 @@ void main() {
       expect(isAuthenticatedProvider, isNotNull);
     });
 
-    test('userRoleProvider يجب أن يكون موجود', () {
-      expect(userRoleProvider, isNotNull);
+    test('userTypeProvider يجب أن يكون موجود', () {
+      expect(userTypeProvider, isNotNull);
     });
 
     test('userEmailProvider يجب أن يكون موجود', () {
