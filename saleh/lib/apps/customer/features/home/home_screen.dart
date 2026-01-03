@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'widgets/home_banner_carousel.dart';
 import 'widgets/featured_stores_section.dart';
 import 'widgets/trending_products_section.dart';

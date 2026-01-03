@@ -136,7 +136,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -299,7 +299,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             final index = entry.key;
             final address = entry.value;
             return _buildAddressCard(address, index);
-          }).toList(),
+          }),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {
@@ -336,69 +336,93 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             width: isSelected ? 2 : 1,
           ),
         ),
-        child: Row(
-          children: [
-            Radio<int>(
-              value: index,
-              groupValue: _selectedAddressIndex,
-              onChanged: (value) {
-                setState(() => _selectedAddressIndex = value!);
-              },
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        address.label ?? 'عنوان ${index + 1}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      if (address.isDefault) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
+        child: InkWell(
+          onTap: () => setState(() => _selectedAddressIndex = index),
+          child: Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                margin: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                    width: 2,
+                  ),
+                ),
+                child: isSelected
+                    ? Center(
+                        child: Container(
+                          width: 12,
+                          height: 12,
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            'افتراضي',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    address.fullAddress,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    address.phone,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                  ),
-                ],
+                      )
+                    : null,
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () {
-                // Edit address
-              },
-            ),
-          ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          address.label.isNotEmpty
+                              ? address.label
+                              : 'عنوان ${index + 1}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        if (address.isDefault) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'افتراضي',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      address.fullAddress,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      address.phone,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () {
+                  // Edit address
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -419,7 +443,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             final index = entry.key;
             final method = entry.value;
             return _buildPaymentCard(method, index);
-          }).toList(),
+          }),
           const SizedBox(height: 24),
 
           // Promo Code
@@ -474,34 +498,56 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             width: isSelected ? 2 : 1,
           ),
         ),
-        child: Row(
-          children: [
-            Radio<int>(
-              value: index,
-              groupValue: _selectedPaymentIndex,
-              onChanged: (value) {
-                setState(() => _selectedPaymentIndex = value!);
-              },
-            ),
-            Icon(method.icon, size: 28),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    method.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+        child: InkWell(
+          onTap: () => setState(() => _selectedPaymentIndex = index),
+          child: Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                    width: 2,
                   ),
-                  if (method.details.isNotEmpty)
-                    Text(
-                      method.details,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                ],
+                ),
+                child: isSelected
+                    ? Center(
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      )
+                    : null,
               ),
-            ),
-          ],
+              Icon(method.icon, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      method.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (method.details.isNotEmpty)
+                      Text(
+                        method.details,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -541,7 +587,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  selectedAddress.label ?? 'العنوان',
+                  selectedAddress.label.isNotEmpty
+                      ? selectedAddress.label
+                      : 'العنوان',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
@@ -594,7 +642,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          item.productName ?? 'منتج',
+                          item.productName.isNotEmpty
+                              ? item.productName
+                              : 'منتج',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -721,6 +771,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (orderNumber != null && mounted) {
         // Clear cart after successful order
         await ref.read(cartProvider.notifier).clearCart();
+
+        if (!mounted) return;
 
         showDialog(
           context: context,

@@ -32,7 +32,7 @@ class CustomerAccountScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 35,
                   backgroundImage: NetworkImage(user.avatarUrl),
-                  onBackgroundImageError: (_, __) {},
+                  onBackgroundImageError: (_, _) {},
                   child: user.avatarUrl.isEmpty
                       ? Text(user.name[0], style: const TextStyle(fontSize: 24))
                       : null,
@@ -54,7 +54,7 @@ class CustomerAccountScreen extends ConsumerWidget {
                       Text(
                         user.email,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -75,9 +75,9 @@ class CustomerAccountScreen extends ConsumerWidget {
           // Switch to Merchant Account
           Container(
             decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
+              color: Colors.amber.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.amber.withOpacity(0.3)),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
             ),
             child: ListTile(
               leading: Container(
@@ -219,7 +219,7 @@ class CustomerAccountScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -239,7 +239,7 @@ class CustomerAccountScreen extends ConsumerWidget {
               ),
             ),
           ),
-          ...items.map((item) => _buildMenuItem(item)).toList(),
+          ...items.map((item) => _buildMenuItem(item)),
         ],
       ),
     );

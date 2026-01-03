@@ -1,6 +1,7 @@
 /// Customer API Service - خدمة API للعميل
 ///
 /// Handles all API communication for the customer app
+library;
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;

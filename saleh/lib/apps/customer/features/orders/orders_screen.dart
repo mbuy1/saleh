@@ -127,7 +127,10 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
@@ -209,7 +212,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 if (order.items.length > 2)
                   Text(
                     '+${order.items.length - 2} منتجات أخرى',
@@ -289,12 +292,14 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              navigator.pop();
               await ref.read(ordersProvider.notifier).cancelOrder(order.id);
               if (mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('تم إلغاء الطلب')));
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('تم إلغاء الطلب')),
+                );
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -352,7 +357,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

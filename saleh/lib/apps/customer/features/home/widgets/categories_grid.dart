@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class CategoriesGrid extends ConsumerWidget {
   const CategoriesGrid({super.key});
@@ -114,7 +113,7 @@ class CategoriesGrid extends ConsumerWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: category.color.withOpacity(0.1),
+              color: category.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(category.icon, color: category.color, size: 28),

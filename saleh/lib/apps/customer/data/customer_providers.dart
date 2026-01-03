@@ -1,10 +1,10 @@
 /// Customer Providers - مزودي البيانات للعميل
 ///
 /// Riverpod providers for the customer app
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:state_notifier/state_notifier.dart';
 import '../models/models.dart';
 import 'customer_api_service.dart';
 

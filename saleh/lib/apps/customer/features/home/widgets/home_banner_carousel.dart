@@ -100,7 +100,7 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
                   decoration: BoxDecoration(
                     color: _currentPage == index
                         ? Colors.white
-                        : Colors.white.withOpacity(0.5),
+                        : Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -126,7 +126,7 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
-                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                 child: const Center(
                   child: Icon(Icons.image, size: 50, color: Colors.white54),
                 ),
@@ -140,7 +140,10 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+                colors: [
+                  Colors.black.withValues(alpha: 0.7),
+                  Colors.transparent,
+                ],
               ),
             ),
           ),
@@ -166,7 +169,7 @@ class _HomeBannerCarouselState extends ConsumerState<HomeBannerCarousel> {
                 Text(
                   banner.subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 16,
                   ),
                 ),

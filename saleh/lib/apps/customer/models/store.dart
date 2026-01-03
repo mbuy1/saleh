@@ -1,6 +1,7 @@
 /// Store Model - نموذج المتجر
 ///
 /// Represents a store/merchant in the MBUY platform
+library;
 
 class Store {
   final String id;

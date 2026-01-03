@@ -1,6 +1,7 @@
 /// Order Models - نماذج الطلبات
 ///
 /// Represents orders and order items in the MBUY platform
+library;
 
 /// Order Status Enum
 enum OrderStatus {

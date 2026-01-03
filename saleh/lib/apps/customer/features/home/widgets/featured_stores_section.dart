@@ -94,7 +94,7 @@ class FeaturedStoresSection extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -118,7 +118,9 @@ class FeaturedStoresSection extends ConsumerWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         height: 80,
-                        color: Theme.of(context).primaryColor.withOpacity(0.2),
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.2),
                       );
                     },
                   ),
@@ -136,7 +138,7 @@ class FeaturedStoresSection extends ConsumerWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 8,
                           ),
                         ],
@@ -144,7 +146,7 @@ class FeaturedStoresSection extends ConsumerWidget {
                       child: CircleAvatar(
                         radius: 25,
                         backgroundImage: NetworkImage(store.logoUrl),
-                        onBackgroundImageError: (_, __) {},
+                        onBackgroundImageError: (_, _) {},
                         child: store.logoUrl.isEmpty
                             ? Text(
                                 store.name[0],

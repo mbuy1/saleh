@@ -105,7 +105,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
               stops: const [0.5, 1.0],
             ),
           ),
@@ -205,7 +205,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(

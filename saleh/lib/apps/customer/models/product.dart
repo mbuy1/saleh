@@ -1,6 +1,7 @@
 /// Product Model - نموذج المنتج
 ///
 /// Represents a product in the MBUY platform
+library;
 
 class Product {
   final String id;

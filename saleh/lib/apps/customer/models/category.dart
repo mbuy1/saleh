@@ -1,6 +1,7 @@
 /// Category Model - نموذج الفئة
 ///
 /// Represents a product category in the MBUY platform
+library;
 
 class Category {
   final String id;

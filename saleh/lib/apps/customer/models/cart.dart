@@ -1,6 +1,7 @@
 /// Cart Models - نماذج السلة
 ///
 /// Represents cart and cart items in the MBUY platform
+library;
 
 import 'product.dart';
 
