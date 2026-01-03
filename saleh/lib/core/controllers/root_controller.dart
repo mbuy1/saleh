@@ -53,6 +53,7 @@ class RootState {
   }
 
   bool get isMerchantApp => currentApp == CurrentApp.merchant;
+  bool get isCustomerApp => currentApp == CurrentApp.customer;
   bool get hasNoApp => currentApp == CurrentApp.none;
 }
 

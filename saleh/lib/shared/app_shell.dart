@@ -7,6 +7,7 @@ import '../core/services/api_service.dart';
 import '../core/services/user_preferences_service.dart';
 import '../core/router/app_router.dart';
 import '../apps/merchant/merchant_app.dart';
+import '../apps/customer/customer_app.dart';
 import '../features/auth/data/auth_controller.dart';
 
 /// AppShell - يقرر أي تطبيق يعرض بناءً على RootController
@@ -61,12 +62,11 @@ class _AppShellState extends ConsumerState<AppShell> {
 
       if (updatedAuthState.isAuthenticated &&
           updatedAuthState.userType != null) {
-        // توجد جلسة صالحة - انتقل لتطبيق التاجر فقط
-        // نتحقق من نوع المستخدم (يجب أن يكون merchant)
-        if (updatedAuthState.userType == 'merchant') {
-          rootController.switchToMerchantApp();
+        // توجد جلسة صالحة - انتقل للتطبيق المناسب حسب نوع المستخدم
+        if (updatedAuthState.userType == 'customer') {
+          rootController.switchToCustomerApp();
         } else {
-          // إذا كان نوع المستخدم ليس merchant، نعتبره merchant (للتوافق)
+          // merchant أو أي نوع آخر
           rootController.switchToMerchantApp();
         }
       } else {
@@ -99,9 +99,12 @@ class _AppShellState extends ConsumerState<AppShell> {
       );
     }
 
-    // تحديد أي تطبيق يعرض (Merchant فقط)
-    if (rootState.isMerchantApp) {
-      // تطبيق التاجر - الوحيد المتاح
+    // تحديد أي تطبيق يعرض
+    if (rootState.isCustomerApp) {
+      // تطبيق العميل
+      return const CustomerApp();
+    } else if (rootState.isMerchantApp) {
+      // تطبيق التاجر
       return const MerchantApp();
     } else {
       // لم يتم تحديد التطبيق - عرض شاشة تسجيل الدخول مع GoRouter للتنقل

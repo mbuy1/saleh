@@ -33,6 +33,44 @@ import {
   cancelCustomerOrder,
 } from '../endpoints/orders-crud';
 
+// Customer-specific endpoints
+import {
+  getCart,
+  addToCart,
+  updateCartItem,
+  removeFromCart,
+  clearCart,
+  getCartCount,
+} from '../endpoints/cart';
+
+import {
+  getFavorites,
+  addToFavorites,
+  removeFromFavorites,
+  checkFavorite,
+  toggleFavorite,
+  getFavoritesCount,
+  clearFavorites,
+} from '../endpoints/favorites';
+
+import {
+  searchProducts,
+  searchStores,
+  getSearchSuggestions,
+  getTrendingSearches,
+  getCategories as getSearchCategories,
+  getProductsByCategory,
+} from '../endpoints/search';
+
+import {
+  validateCheckout,
+  createOrder,
+  getCustomerOrders as getCheckoutOrders,
+  getOrderDetails,
+  cancelOrder,
+  getAddresses,
+} from '../endpoints/checkout';
+
 import {
   listInventoryItems,
   getProductInventory,
@@ -79,6 +117,14 @@ apiRoutes.get('/public/products/:id', getPublicProduct);
 
 // Categories
 apiRoutes.get('/public/categories', listPublicCategories);
+
+// Search (Public)
+apiRoutes.get('/public/search/products', searchProducts);
+apiRoutes.get('/public/search/stores', searchStores);
+apiRoutes.get('/public/search/suggestions', getSearchSuggestions);
+apiRoutes.get('/public/search/trending', getTrendingSearches);
+apiRoutes.get('/public/categories/all', getSearchCategories);
+apiRoutes.get('/public/categories/:categoryId/products', getProductsByCategory);
 
 // =====================================================
 // MERCHANT ROUTES
@@ -134,6 +180,31 @@ customerApi.get('/orders', listCustomerOrders);
 customerApi.get('/orders/:id', getCustomerOrder);
 customerApi.post('/orders', createCustomerOrder);
 customerApi.post('/orders/:id/cancel', cancelCustomerOrder);
+
+// Cart
+customerApi.get('/cart', getCart);
+customerApi.post('/cart', addToCart);
+customerApi.put('/cart/:itemId', updateCartItem);
+customerApi.delete('/cart/:itemId', removeFromCart);
+customerApi.delete('/cart', clearCart);
+customerApi.get('/cart/count', getCartCount);
+
+// Favorites
+customerApi.get('/favorites', getFavorites);
+customerApi.post('/favorites', addToFavorites);
+customerApi.delete('/favorites/:productId', removeFromFavorites);
+customerApi.get('/favorites/check/:productId', checkFavorite);
+customerApi.post('/favorites/toggle', toggleFavorite);
+customerApi.get('/favorites/count', getFavoritesCount);
+customerApi.delete('/favorites', clearFavorites);
+
+// Checkout
+customerApi.post('/checkout/validate', validateCheckout);
+customerApi.post('/checkout', createOrder);
+customerApi.get('/checkout/orders', getCheckoutOrders);
+customerApi.get('/checkout/orders/:id', getOrderDetails);
+customerApi.post('/checkout/orders/:id/cancel', cancelOrder);
+customerApi.get('/addresses', getAddresses);
 
 // Mount customer routes
 apiRoutes.route('/customer', customerApi);

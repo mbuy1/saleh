@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/user_preferences_service.dart';
+import '../../../../core/controllers/root_controller.dart';
 import '../../../../shared/widgets/coming_soon_dialog.dart';
 import '../../../merchant/data/merchant_store_provider.dart';
 import '../../../auth/data/auth_controller.dart';
@@ -365,6 +366,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
   Widget _buildSettingsSection(BuildContext context, bool isDark) {
     return Column(
       children: [
+        // زر التبديل لحساب العميل
+        _buildSwitchToCustomerButton(context, isDark),
+        const SizedBox(height: 8),
         _buildSettingsItem(
           context,
           isDark,
@@ -450,6 +454,77 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 22, color: iconColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// زر التبديل لحساب العميل (التسوق)
+  Widget _buildSwitchToCustomerButton(BuildContext context, bool isDark) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        ref.read(rootControllerProvider.notifier).switchToCustomerApp();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).primaryColor,
+              Theme.of(context).primaryColor.withOpacity(0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).primaryColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.shopping_bag_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'التبديل لوضع التسوق',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'تصفح المتاجر وتسوق كعميل',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white70,
+              size: 18,
             ),
           ],
         ),
